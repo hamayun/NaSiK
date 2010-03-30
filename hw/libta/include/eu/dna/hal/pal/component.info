@@ -1,0 +1,4 @@
+#!/bin/bash
+
+. $APES_HOME/support/functions.sh
+create_env $PWD

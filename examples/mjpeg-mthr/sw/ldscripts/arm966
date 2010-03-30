@@ -1,0 +1,146 @@
+/* -*- Mode: LD-Script; -*-  */
+
+ENTRY (_start)
+GROUP(-lc -lgcc)
+
+MEMORY
+{
+	reset  :  ORIGIN = 0xFFFF0000,    LENGTH = 0x00010000
+	tcm    :  ORIGIN = 0x00000000,    LENGTH = 0x00100000
+	text   :  ORIGIN = 0x10000000,    LENGTH = 0x01000000
+}
+
+PHDRS
+{
+	reset PT_LOAD FILEHDR PHDRS ;
+	excep PT_LOAD ;
+	text  PT_LOAD ;
+	data  PT_LOAD ;
+	tcm   PT_NULL ;
+	heap  PT_NULL ;
+	stack PT_NULL ;
+	debug PT_NULL ;
+	bss   PT_LOAD ;
+}
+
+SECTIONS
+{
+	.debug_aranges  0x0 : { *(.debug_aranges*) }  :debug
+	.debug_info     0x0 : { *(.debug_info*) }     :debug
+	.debug_abbrev   0x0 : { *(.debug_abbrev*) }   :debug
+	.debug_line     0x0 : { *(.debug_line*) }     :debug
+	.debug_ranges   0x0 : { *(.debug_ranges*) }   :debug
+	.debug_str      0x0 : { *(.debug_str*) }      :debug
+	.debug_frame    0x0 : { *(.debug_frame*) }    :debug
+	.debug_loc      0x0 : { *(.debug_loc*) }      :debug
+	.debug_pubnames 0x0 : { *(.debug_pubnames*) } :debug
+	.pdr            0x0 : { *(.pdr*) }            :debug
+	.comment        0x0 : { *(.comment*) }        :debug
+	.gnu.attributes 0x0 : { *(.gnu.attributes*) } :debug
+
+	.reset 0xFFFF0000 :
+	{
+		*(.reset*)
+		KEEP(*(.reset*))
+	} > reset :reset
+
+	.excep :
+	{
+		*(.excep*)
+		KEEP(*(.excep*))
+	} > reset :reset
+	
+	.init 0x10000000 : { *(.init*) }                  > text :text
+
+	.ctors   ALIGN(0x8) : { *(.ctors*) }              > text :text
+
+	.text    ALIGN(0x8) : { *(.text*) }               > text :text
+
+	.fini    ALIGN(0x8) : { *(.fini*) }               > text :text
+
+	.dtors   ALIGN(0x8) : { *(.dtors*) }              > text :text
+
+	.jcr     ALIGN(0x8) : { *(.jcr*) }                > text :text
+
+	.sdata   ALIGN(0x8) : { *(.sdata*) *(.scommon*) } > text :data
+
+	.sbss    ALIGN(0x8) : { *(.sbss*) }               > text :bss
+
+	.rodata  ALIGN(0x8) : { *(.rodata*) }             > text :data
+
+	.reginfo ALIGN(0x8) : { *(.reginfo*) }            > text :data
+
+	.data    ALIGN(0x8) : { *(.data*) *(.glue_7*) *(.eh_frame*) } > text :data
+
+	.os_config ALIGN(0x8): {
+		OS_N_DRIVERS = .; LONG(0x3)
+		OS_DRIVERS_LIST = .; LONG(soclib_system_module) LONG(rdv_module) LONG(fdaccess_module)
+		
+		OS_N_FILESYSTEMS = .; LONG(0x2)
+		OS_FILESYSTEMS_LIST = .; LONG(devfs_module) LONG(rootfs_module)
+
+		OS_THREAD_STACK_SIZE = .; LONG(0x8000)
+
+		OS_KERNEL_HEAP_ADDRESS = .; LONG(ADDR(.kheap))
+		OS_KERNEL_HEAP_SIZE = .; LONG(0x100000)
+
+		OS_USER_HEAP_ADDRESS = .; LONG(ADDR(.uheap))
+	} > text :data
+
+	.hal ALIGN(0x8): {
+		PLATFORM_N_ARM966ES = .; LONG(1)
+		APP_ENTRY_POINT = .; LONG(_main);
+
+		CPU_OS_ENTRY_POINT = dna_kickstart;
+
+		KEEP(*(*.dna_kickstart))
+		KEEP(*(*._main))
+
+		CPU_BSS_START = .; LONG(ADDR(.bss))
+		CPU_BSS_END = .; LONG(__hal_bss_end)
+
+		SOCLIB_TIMER_NDEV = .; LONG(0x1)
+		SOCLIB_TIMER_DEVICES = .; LONG(2) LONG(0xC1000000)
+
+		SOCLIB_TTY_NDEV = .; LONG(0x1)
+		SOCLIB_TTY_DEVICES = .; LONG(3) LONG(0xC0000000)
+
+		SOCLIB_FDACCESS_NDEV = .; LONG(0x1)
+		SOCLIB_FDACCESS_DEVICES = .; LONG(5) LONG(0xC2000000)
+
+		SOCLIB_FB_BASE = .; LONG(5) LONG(0xC3000000)
+
+		CHANNEL_RDV_NDEV = .; LONG(16);
+
+	} > text :data
+
+	.bss ALIGN(0x8): {
+		*(.bss*)
+		*(.rel*)
+    *(COMMON)
+		__hal_bss_end = .;
+	} > text :bss
+
+	.sys_stack ALIGN(0x8) : {
+	   . = . + 0x10000;
+		 CPU_SVC_STACK_ADDR = .;
+	} > text :stack
+
+	.irq_stack ALIGN(0x8) : {
+		. = . + 0x8000;
+    CPU_IRQ_STACK_ADDR = .;		
+  } > text :stack
+
+	.fiq_stack ALIGN(0x8) : {
+		. = . + 0x8000;
+    CPU_FIQ_STACK_ADDR = .;		
+  } > text :stack
+
+	.kheap ALIGN(0x8) : {
+		. = . + 0x100000;
+	} > text :heap
+
+	.uheap ALIGN(0x8): {
+		. = . + 0x800000;
+	} > text :heap
+}

@@ -1,0 +1,52 @@
+export TARGET_PREFIX="$PWD/build-native"
+export APP_NAME="app-arm-native.so"
+
+export TARGET_CAL="NATIVE"
+export TARGET_SYSTEM_KSP_OS="SYSTEM_KSP_OS_DNA"
+export TARGET_SYSTEM_KSP_TASK="SYSTEM_KSP_TASK_PTHREAD"
+export TARGET_SYSTEM_ASP_C=""
+export TARGET_SYSTEM_ASP_M=""
+export TARGET_SYSTEM_ASP_COM="SYSTEM_ASP_COM_KPN"
+export TARGET_SYSTEM_SSP_CAL="SYSTEM_SSP_CAL_${TARGET_CAL}"
+export TARGET_SYSTEM_SSP_PAL="SYSTEM_SSP_PAL_NATIVE"
+export TARGET_SYSTEM_LIBS="${TARGET_SYSTEM_SSP_CAL} ${TARGET_SYSTEM_KSP_OS} ${TARGET_SYSTEM_ASP_COM} ${TARGET_SYSTEM_KSP_TASK} ${TARGET_SYSTEM_ASP_C} ${TARGET_SYSTEM_ASP_M}"  
+
+export DNA_CFLAGS="-DDNA_ENABLE_TRACE"
+export DNA_CHANNEL_DEVICES="rendezvous"
+export DNA_SYSTEM_DEVICES="soclib"
+export DNA_DISK_DEVICES="fdaccess"
+export DNA_FILESYSTEMS="devfs rootfs"
+
+#export STDINC="-nostdinc -I/opt/toolchains/llvm-2.4/lib/gcc/i686-pc-linux-gnu/4.2.1/include/
+# We are using the same includes because the NewLibC has not be annotated with
+# llvm. Once we annoatate the newlibc using llvm, we can use the new includes
+# paths here.
+export STDINC="-nostdinc -I/opt/toolchains/gnu-dnaos-newlibc/i386-sls-dnaos/include -I/opt/toolchains/gnu-dnaos-newlibc/lib/gcc/i386-sls-dnaos/4.3.2/include"
+export CRT0="/opt/toolchains/gnu-dnaos-newlibc/i386-sls-dnaos/lib/crt0.o"
+
+export TARGET_LLVMGCC="llvm-gcc"
+export TARGET_LLC="llc"
+# We use "-U__linux__" flag to avoid the floating point error at compile time in
+# "/opt/toolchains/gnu/i386-sls-dnaos/include/sys/reent.h" file. 
+# Removed the -g flag; Otherwise it does not compile; because -g (debug mode) is not supported by LLVM for ARM Processor
+# Actually the -g flag is not supported by LLVM for ARM Processor. Here we should add the -g flag because this file should be for pure Native Simulation Only
+#export TARGET_CFLAGS="-pipe -Wall -Werror -O0 -g -std=c99 -U__linux__ -DPROGRESS"
+export TARGET_CFLAGS="-pipe -Wall -Werror -O0 -std=c99 -U__linux__ -DPROGRESS"
+
+# Using 'i386-sls-dnaos-as' or just 'as' is the same. Because we are operating on
+# the assembly code; output will be same as llvm has done its compilation for
+# producing the assembly code;
+export TARGET_AS="i386-sls-dnaos-as"
+
+export TARGET_LD="llvm-gcc"
+export TARGET_LDFLAGS="-shared -nostdlib -nodefaultlibs ${CRT0} -L/opt/toolchains/gnu-dnaos-newlibc/i386-sls-dnaos/lib"
+
+export TARGET_AR="i386-sls-dnaos-ar"
+export TARGET_ARFLAGS="cru"
+
+export TARGET_RANLIB="i386-sls-dnaos-ranlib"
+export TARGET_LDSCRIPT=""
+
+export ANNOTATION=-annotate=arm
+
+export PATH=/opt/toolchains/llvm-2.4/bin:$PATH

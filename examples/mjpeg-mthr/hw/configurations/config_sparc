@@ -1,0 +1,68 @@
+
+# Global parameters 
+[]
+  unsigned long CLOCK_PERIOD = 1;
+  long          CLOCK_UNIT = 2;  # Use SystemC clock unit.
+                                 #   0 => SC_FS
+                                 #   1 =>	SC_PS
+                                 #   2 =>	SC_NS
+                                 #   3 =>	SC_US
+                                 #   4 =>	SC_MS
+                                 #   5 =>	SC_SEC
+# End of global parameters
+
+[eu_inst_0]
+	long   ID = 0;
+
+#[eu_inst_1]
+#	long   ID = 1;
+#
+#[eu_inst_2]
+#	long   ID = 2;
+
+[generic_noc_inst_0]
+	long   REQ_LATENCY = 6;
+	long   RSP_LATENCY = 4;
+	long   DEPTH = 1;
+
+[tty_pool_inst_0]
+	long   REQ_LATENCY = 4;
+	long   NB_TTY = 2;
+
+[tg]
+	long   REQ_LATENCY = 1;
+	char * FILE = "./videoin.mjpeg";
+
+[linker_dna]
+	char * APPLICATION = "./sparc-native.x";
+	char * CPU_OS_ENTRY_POINT = "dna_start";
+	char * APP_ENTRY_POINT = "_main";
+	long PLATFORM_N_NATIVE = 3;
+
+
+	char * OS_DEVICES_LIST = "soclib_tty_module generic_rdv_module soclib_tg_module";
+	char * OS_FILESYSTEMS_LIST = "generic_devfs_module bridgefs_module";
+
+	long OS_THREAD_STACK_SIZE = 60000;
+
+	char * OS_KERNEL_HEAP_SECTION = ".kheap";
+	char * OS_USER_HEAP_SECTION = ".uheap";
+	char * OS_KERNEL_BSS_SECTION = ".bss";
+
+	char * SECTIONS_DECL = ".kheap .uheap .sysstack .semram";
+	char * SECTIONS_SIZE = "0x1000000 0x1000000 0x100000 0x5000";
+
+	long GENERIC_RDV_NDEV = 16;
+
+[ram0]
+	long   REQ_LATENCY = 1;
+	char * SECTIONS = ".text .bss .data .rodata .kheap .uheap .sysstack";
+
+[semram0]
+	long   REQ_LATENCY = 1;
+	char * SECTION = ".semram";
+
+[fb]
+	long   REQ_LATENCY = 1;
+	long   WIDTH   = 256;
+	long   HEIGHT  = 144;
