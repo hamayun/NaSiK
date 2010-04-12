@@ -31,12 +31,8 @@
 
 using namespace libta;
 
-dna_linker::dna_linker(sc_module_name name) 
-  : linker_base(name)
-{}
-
-dna_linker::~dna_linker()
-{}
+dna_linker::dna_linker(sc_module_name name) : linker_base(name) {}
+dna_linker::~dna_linker() {}
 
 void dna_linker::end_of_elaboration()
 {

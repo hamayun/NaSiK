@@ -45,7 +45,6 @@ linker_base::linker_base(sc_module_name name)
 	_sw_image(NULL)
 {
 	DOUT_CTOR << this->name() << std::endl;
-
 	exp_linker_loader(*this);
 }
 
@@ -60,11 +59,11 @@ void * linker_base::load(const char * filename)
 
   if(_sw_image == NULL)
   {
-    dlerror();
-    _sw_image = dlopen(filename,(RTLD_DEEPBIND| RTLD_NOW));
-    ASSERT_MSG(_sw_image != NULL,dlerror());
-    DOUT_NAME << " application loaded at " << std::hex << _sw_image << std::endl;
-    load_elf_sections(filename);
+      dlerror();
+      _sw_image = dlopen(filename, (RTLD_DEEPBIND | RTLD_NOW));
+      ASSERT_MSG(_sw_image != NULL, dlerror());
+      DOUT_NAME << " application loaded at " << std::hex << _sw_image << std::endl;
+      load_elf_sections(filename);
   }
   return(_sw_image);
 }
@@ -83,7 +82,7 @@ void linker_base::end_of_elaboration()
   _end_of_elaboration_flag = true;
 
   // Load/find the software image.
-  GET_ATTRIBUTE("APPLICATION",_application,char*,false);
+  GET_ATTRIBUTE("APPLICATION", _application, char*, false);
   DOUT << name() << ": APPLICATION = " << _application->value << std::endl;
 
   load((const char*)_application->value);

@@ -35,57 +35,51 @@ extern "C" {
 
 namespace libta
 {
+    class dna_eu : public eu_base
+    {
+        public:
+            dna_eu(sc_module_name name);
+            ~dna_eu();
 
-class dna_eu:
-  public eu_base
-  {
-    public:
-      dna_eu(sc_module_name name);
-      ~dna_eu();
+            void end_of_elaboration();
 
-      void end_of_elaboration();
+            /* eu context */
+            void context_init(CPU_CONTEXT_T *ctx, void *sp, int32_t ssize, void *entry, void *arg);
+            void context_load(CPU_CONTEXT_T *to);
+            void context_save(CPU_CONTEXT_T *from);
+            void context_commute(CPU_CONTEXT_T *from, CPU_CONTEXT_T *to);
 
-      /* interrupt support */
-    protected:
-      void interrupt();
-      interrupt_status_t        _it_status;
-      sc_attribute < uint32_t > *_cpu_n_it;
-      uint32_t                  *_it_lines;
-      uintptr_t                 *_it_vector;
+            /* eu synchro */
+            long int test_and_set(volatile long int * spinlock);
+            long int compare_and_swap(volatile long int * p_val, long int oldval, long int newval);
 
-    public:
+            /* eu io */
+            void write(uint8_t *addr, unsigned char value);
+            void write(uint16_t *addr, unsigned short value);
+            void write(uint32_t *addr, unsigned int value);
+            uint8_t  read(uint8_t *addr);
+            uint16_t read(uint16_t *addr);
+            uint32_t read(uint32_t *addr);
 
-      /* eu context */
-      void context_init(CPU_CONTEXT_T *ctx, void *sp, int32_t ssize, void *entry, void *arg);
-      void context_load(CPU_CONTEXT_T *to);
-      void context_save(CPU_CONTEXT_T *from);
-      void context_commute(CPU_CONTEXT_T *from, CPU_CONTEXT_T *to);
+            /* eu trap */
+            void trap_attach_esr (exception_id_t id, exception_handler_t isr);
+            void trap_attach_isr (interrupt_id_t id, uint32_t mode, interrupt_handler_t isr);
+            interrupt_status_t trap_mask_and_backup (void);
+            void trap_restore (interrupt_status_t backup);
+            void trap_enable (interrupt_id_t id);
+            void trap_disable (interrupt_id_t id);
 
-      /* eu synchro */
-      long int test_and_set(volatile long int * spinlock);
-      long int compare_and_swap(volatile long int * p_val, long int oldval, long int newval);
+            /* eu mp */
+            unsigned int get_proc_id(void);
 
-      /* eu io */
-      void write(uint8_t *addr, unsigned char value);
-      void write(uint16_t *addr, unsigned short value);
-      void write(uint32_t *addr, unsigned int value);
-      uint8_t  read(uint8_t *addr);
-      uint16_t read(uint16_t *addr);
-      uint32_t read(uint32_t *addr);
-
-      /* eu trap */
-      void trap_attach_esr (exception_id_t id, exception_handler_t isr);
-      void trap_attach_isr (interrupt_id_t id, uint32_t mode, interrupt_handler_t isr);
-      interrupt_status_t trap_mask_and_backup (void);
-      void trap_restore (interrupt_status_t backup);
-      void trap_enable (interrupt_id_t id);
-      void trap_disable (interrupt_id_t id);
-
-      /* eu mp */
-      unsigned int get_proc_id(void);
-
-  };
-
+        /* interrupt support */
+        protected:
+            void interrupt();
+            interrupt_status_t        _it_status;
+            sc_attribute < uint32_t > *_cpu_n_it;
+            uint32_t                  *_it_lines;
+            uintptr_t                 *_it_vector;
+    };
 } // end namespace libta
-
 #endif				// __EU_H__
+

@@ -37,71 +37,56 @@
 
 namespace libta
 {
+    class eu_base:
+    public device_master,
+    public annotation::ExecutionSpy
+    {
+        public:
+            sc_port<LINKER::LOADER> p_linker_loader;
 
-class eu_base:
-  public device_master,
-  public annotation::ExecutionSpy
-  {
-	public:
-		sc_port<LINKER::LOADER> p_linker_loader;
+            SC_HAS_PROCESS(eu_base);
 
-	public:
+            eu_base(sc_module_name name);
+            ~eu_base();
 
-    SC_HAS_PROCESS(eu_base);
+            virtual void end_of_elaboration();
+            void thread();
 
-    eu_base(sc_module_name name);
-    ~eu_base();
+            // annotation support
+            void compute(annotation::annotation_t *trace, uint32_t count);
+            static inline eu_base * get_current_eu()
+            {
+                uint32_t i;
+                void * current_process = (void*)::sc_get_current_process_b();
+                for(i = 0; i < _nb_eu; i++)
+                {
+                    if(_proccess_handle[i] == current_process) break;
+                }
+                return(_eu[i]);
+            };
 
-    virtual void end_of_elaboration();
-    void thread();
+            static std::vector< const eu_base* > * get_all_eu();
 
-    // annotation support
-  public:
-    void compute(annotation::annotation_t *trace, uint32_t count);
-  protected:
-    uintptr_t _current_thread_id;
+        protected:
+            uintptr_t _current_thread_id;
+            sc_attribute < uint32_t > *_id;                 // sc_attribute is a 'name' and 'value' pair
 
-	protected:
-		sc_attribute < uint32_t > *_id;
+            typedef void (*entry_fct_t) ();
+            entry_fct_t _sw_entry;                          // The Entry Point Function; Where the EU Starts its Execution. 
 
-	protected:
-		typedef void (*entry_fct_t) ();
-		entry_fct_t _sw_entry;
+            /* eu management */
+            static std::map< void * , eu_base * > _eu_map;
 
-		/* eu management */
-	protected:
-		static std::map< void * , eu_base * > _eu_map;
-	public:
-		static inline eu_base * get_current_eu()
-		{
-//			eu * eu_p;
-//			eu_p = _eu_map[(void*)::sc_get_current_process_b()];
-//			ASSERT_MSG( eu_p != NULL, "No EU found");
-      uint32_t i;
-      void * current_process = (void*)::sc_get_current_process_b();
-      for(i = 0; i < _nb_eu; i++)
-      {
-        if(_proccess_handle[i] == current_process) break;
-      }
-			return(_eu[i]);
-		};
-		static std::vector< const eu_base* > * get_all_eu();
+            /* mp support */
+            static std::map< unsigned int , sc_event* > _mp_synchro_map;
+            static void *     _proccess_handle[MAX_EU];
+            static eu_base *  _eu[MAX_EU];
+            static uint32_t   _nb_eu;
 
-		/* mp support */
-	protected:
-		static std::map< unsigned int , sc_event* > _mp_synchro_map;
-
-    static void *     _proccess_handle[MAX_EU];
-    static eu_base *  _eu[MAX_EU];
-    static uint32_t   _nb_eu;
-
-    /* interrupt support */
-  protected:
-    sc_event  _it_event;
-    virtual   void interrupt() = 0;
-
-  };
-
+            /* interrupt support */
+            sc_event  _it_event;
+            virtual void interrupt() = 0;
+    };
 } // end namespace libta
 
 #endif				// __EU_H__

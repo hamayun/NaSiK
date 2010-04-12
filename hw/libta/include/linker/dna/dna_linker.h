@@ -29,38 +29,33 @@
 
 namespace libta {
 
-	class dna_linker :
-				public linker_base
-	{
-		public:
+    class dna_linker : public linker_base
+    {
+        public:
+            dna_linker(sc_module_name name);
+            ~dna_linker();
+            uintptr_t get_start_addr();
+            void end_of_elaboration();
+            void start_of_simulation();
 
-			dna_linker(sc_module_name name);
-			~dna_linker();
+        private:
+            sc_attribute< char * > *_cpu_os_entry_point;
+            sc_attribute< char * > *_app_entry_point;
 
-			uintptr_t get_start_addr();
+            sc_attribute< char * > *_sections_decl;
+            sc_attribute< char * > *_sections_size;
 
-			void start_of_simulation();
-		  void end_of_elaboration();
+            sc_attribute< char * > *_os_drivers_list;
+            sc_attribute< char * > *_os_filesystems_list;
 
-		private:
-			sc_attribute< char * > *_cpu_os_entry_point;
-			sc_attribute< char * > *_app_entry_point;
+            sc_attribute< uint32_t > *_os_thread_stack_size;
+            sc_attribute< uint32_t > *_platform_n_native;
+            sc_attribute< uint32_t > *_channel_rdv_ndev;
 
-			sc_attribute< char * > *_sections_decl;
-			sc_attribute< char * > *_sections_size;
-
-			sc_attribute< char * > *_os_drivers_list;
-			sc_attribute< char * > *_os_filesystems_list;
-
-			sc_attribute< uint32_t > *_os_thread_stack_size;
-			sc_attribute< uint32_t > *_platform_n_native;
-			sc_attribute< uint32_t > *_channel_rdv_ndev;
-
-			sc_attribute< char * > *_os_kernel_heap_section;
-			sc_attribute< char * > *_os_user_heap_section;
-			sc_attribute< char * > *_os_kernel_bss_section;
-	};
-
+            sc_attribute< char * > *_os_kernel_heap_section;
+            sc_attribute< char * > *_os_user_heap_section;
+            sc_attribute< char * > *_os_kernel_bss_section;
+    };
 } // end namespace libta
 
 #endif				// __SW_LOADER_H__

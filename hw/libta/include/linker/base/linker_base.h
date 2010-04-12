@@ -32,37 +32,36 @@
 #include <string>
 
 namespace libta {
+    #define NB_MAX_LINKER_PORT 256
 
-#define NB_MAX_LINKER_PORT 256
+    SC_MODULE(linker_base),
+    	public LINKER::LOADER
+    	{
+    		public:
+    			sc_export< LINKER::LOADER >  			    exp_linker_loader;
+    			sc_port< LINKER, NB_MAX_LINKER_PORT >    p_linker;
 
-	SC_MODULE(linker_base),
-		public LINKER::LOADER
-		{
-			public:
-				sc_export< LINKER::LOADER >  			    exp_linker_loader;
-				sc_port< LINKER, NB_MAX_LINKER_PORT >    p_linker;
+    			void * load(const char * filename);
+    			mapping::segment_t * get_section(const char * section_name);
+    			virtual uintptr_t get_start_addr() = 0;
+                     link_map* get_link_map();
 
-				void * load(const char * filename);
-				mapping::segment_t * get_section(const char * section_name);
-				virtual uintptr_t get_start_addr() = 0;
-                            link_map* get_link_map();
+    			linker_base(sc_module_name name);
+    			~linker_base();
+    			void end_of_elaboration();
+    			void start_of_simulation();
 
-				linker_base(sc_module_name name);
-				~linker_base();
-				void start_of_simulation();
-				void end_of_elaboration();
+    		protected:
+    			sc_attribute < char * > *_application;
+    			bool _end_of_elaboration_flag;
 
-			private:
-				void load_elf_sections(const char * filename);
+    			void * _sw_image;
+    			std::vector< mapping::segment_t * > _sections_vector;
+    			std::vector< symbol_base * > _symbols_vector;
 
-			protected:
-				sc_attribute < char * > *_application;
-				bool _end_of_elaboration_flag;
-
-				void * _sw_image;
-				std::vector< mapping::segment_t * > _sections_vector;
-				std::vector< symbol_base * > _symbols_vector;
-		};
+    		private:
+    			void load_elf_sections(const char * filename);
+    	};
 
 } // end namespace libta
 
