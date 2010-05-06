@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <df name="libta" root="../../hw/libta">
+      <df name="docs">
+      </df>
+      <df name="include">
+        <df name="annotation">
+          <in>analyzer.h</in>
+          <in>annotation.h</in>
+          <in>execution_spy.h</in>
+        </df>
+        <df name="eu">
+          <df name="base">
+            <df name="proc">
+              <in>eu_base.h</in>
+            </df>
+          </df>
+          <df name="dna">
+            <df name="hal">
+              <df name="cal">
+                <df name="headers">
+                  <in>cpu.h</in>
+                  <in>cpu_context.h</in>
+                  <in>cpu_endian.h</in>
+                  <in>cpu_io.h</in>
+                  <in>cpu_mp.h</in>
+                  <in>cpu_synchro.h</in>
+                  <in>cpu_trap.h</in>
+                </df>
+              </df>
+              <df name="pal">
+                <df name="headers">
+                  <in>platform.h</in>
+                  <in>platform_endian.h</in>
+                  <in>platform_mp.h</in>
+                </df>
+                <df name="sources">
+                </df>
+              </df>
+            </df>
+            <df name="proc">
+              <in>dna_eu.h</in>
+            </df>
+          </df>
+        </df>
+        <df name="interfaces">
+          <in>interrupt.h</in>
+          <in>io.h</in>
+          <in>link.h</in>
+        </df>
+        <df name="linker">
+          <df name="base">
+            <in>linker_base.h</in>
+          </df>
+          <df name="dna">
+            <in>dna_linker.h</in>
+          </df>
+        </df>
+        <in>assertion.h</in>
+        <in>bridgefs.h</in>
+        <in>debug.h</in>
+        <in>devices.h</in>
+        <in>fd_access.h</in>
+        <in>framebuffer.h</in>
+        <in>generic_noc.h</in>
+        <in>mapping.h</in>
+        <in>memory.h</in>
+        <in>process_wrapper.h</in>
+        <in>sc_config.h</in>
+        <in>soclib_fb.h</in>
+        <in>soclib_tg.h</in>
+        <in>soclib_timer.h</in>
+        <in>spinlock.h</in>
+        <in>symbol.h</in>
+        <in>tty_pool.h</in>
+        <in>utils.h</in>
+      </df>
+      <df name="sources">
+        <df name="annotation">
+          <in>analyzer.cpp</in>
+          <in>execution_spy.cpp</in>
+        </df>
+        <df name="eu">
+          <df name="base">
+            <df name="proc">
+              <in>eu_base.cpp</in>
+            </df>
+          </df>
+          <df name="dna">
+            <df name="hal">
+              <in>hal.cpp</in>
+            </df>
+            <df name="proc">
+              <in>context.cpp</in>
+              <in>dna_eu.cpp</in>
+              <in>io.cpp</in>
+              <in>mp.cpp</in>
+              <in>synchro.cpp</in>
+              <in>trap.cpp</in>
+            </df>
+          </df>
+          <df name="ecos">
+          </df>
+          <df name="mutek">
+          </df>
+        </df>
+        <df name="linker">
+          <df name="base">
+            <in>linker_base.cpp</in>
+          </df>
+          <df name="dna">
+            <in>dna_linker.cpp</in>
+          </df>
+        </df>
+        <in>bridgefs.cpp</in>
+        <in>debug.cpp</in>
+        <in>dev_channel.cpp</in>
+        <in>devices.cpp</in>
+        <in>devices_mst.cpp</in>
+        <in>devices_mst_slv.cpp</in>
+        <in>devices_slv.cpp</in>
+        <in>framebuffer.cpp</in>
+        <in>generic_noc.cpp</in>
+        <in>mapping.cpp</in>
+        <in>memory.cpp</in>
+        <in>process_wrapper.cpp</in>
+        <in>soclib_fb.cpp</in>
+        <in>soclib_tg.cpp</in>
+        <in>soclib_timer.cpp</in>
+        <in>spinlock.cpp</in>
+        <in>symbol.cpp</in>
+        <in>tty_pool.cpp</in>
+      </df>
+      <df name="tools">
+        <df name="sc_config">
+          <df name="include">
+            <in>global.h</in>
+            <in>sc_config.h</in>
+          </df>
+          <df name="src">
+          </df>
+        </df>
+      </df>
+    </df>
+    <logicalFolder name="utils" displayName="utils" projectFiles="true">
+      <itemPath>../../../Common/systemc-2.2.0/src/sysc/utils/sc_report.h</itemPath>
+      <itemPath>../../../Common/systemc-2.2.0/src/sysc/utils/sc_stop_here.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>../../hw/libta/Makefile</itemPath>
+      <itemPath>libta-proj-Makefile.mk</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../../hw/libta</Elem>
+  </sourceRootList>
+  <projectmakefile>libta-proj-Makefile.mk</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>../../hw/libta</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile all install -s</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean -s</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+      </makefileType>
+      <item path="../../hw/libta/include/eu/dna/hal/cal/headers/cpu.h"
+            ex="true"
+            tool="3">
+      </item>
+      <item path="../../hw/libta/include/eu/dna/hal/cal/headers/cpu_endian.h"
+            ex="true"
+            tool="3">
+      </item>
+      <item path="../../hw/libta/include/eu/dna/hal/cal/headers/cpu_io.h"
+            ex="true"
+            tool="3">
+      </item>
+      <item path="../../hw/libta/include/eu/dna/hal/cal/headers/cpu_mp.h"
+            ex="true"
+            tool="3">
+      </item>
+      <item path="../../hw/libta/include/eu/dna/hal/cal/headers/cpu_synchro.h"
+            ex="true"
+            tool="3">
+      </item>
+      <item path="../../hw/libta/include/eu/dna/hal/pal/headers/platform.h"
+            ex="true"
+            tool="3">
+      </item>
+      <item path="../../hw/libta/include/eu/dna/hal/pal/headers/platform_endian.h"
+            ex="true"
+            tool="3">
+      </item>
+      <item path="../../hw/libta/include/eu/dna/hal/pal/headers/platform_mp.h"
+            ex="true"
+            tool="3">
+      </item>
+      <item path="../../hw/libta/include/interfaces/interrupt.h" ex="true" tool="3">
+      </item>
+      <item path="../../hw/libta/include/sc_config.h" ex="true" tool="3">
+      </item>
+      <item path="../../hw/libta/sources/annotation/analyzer.cpp" ex="false" tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/annotation/execution_spy.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/bridgefs.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/debug.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/dev_channel.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/devices.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/devices_mst.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/devices_mst_slv.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/devices_slv.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/eu/base/proc/eu_base.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/eu/dna/hal/hal.cpp" ex="false" tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/eu/dna/proc/context.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include/eu/dna/hal/cal/headers</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/eu/dna/proc/dna_eu.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include/eu</pElem>
+            <pElem>../../hw/libta/include/eu/dna/hal/cal/headers</pElem>
+            <pElem>../../hw/libta/include/eu/dna/proc</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/eu/dna/proc/io.cpp" ex="false" tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/eu/dna/proc/mp.cpp" ex="false" tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/eu/dna/proc/synchro.cpp" ex="false" tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/eu/dna/proc/trap.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include/eu/dna/hal/cal/headers</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/framebuffer.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/usr/include/SDL</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/generic_noc.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/linker/base/linker_base.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/linker/dna/dna_linker.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/mapping.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/memory.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/process_wrapper.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/soclib_fb.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/usr/include/SDL</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/soclib_tg.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/soclib_timer.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/spinlock.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/symbol.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/sources/tty_pool.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>../../hw/libta/sources</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="../../hw/libta/tools/sc_config/include/global.h" ex="true" tool="3">
+      </item>
+      <item path="../../hw/libta/tools/sc_config/include/sc_config.h"
+            ex="true"
+            tool="3">
+      </item>
+      <folder path="libta">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="libta/sources/annotation">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include/annotation</pElem>
+            <pElem>../../hw/libta/sources/annotation</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="libta/sources/eu">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include/eu/base/proc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include/annotation</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="libta/sources/eu/base">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/sources/eu/base/proc</pElem>
+            <pElem>../../hw/libta/include/eu</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="libta/sources/eu/dna/hal">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/sources/eu/dna/hal</pElem>
+            <pElem>../../hw/libta/include/eu</pElem>
+            <pElem>../../hw/libta/include/eu/dna/hal/cal/headers</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="libta/sources/eu/dna/proc">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/sources/eu/dna/proc</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="libta/sources/linker">
+        <ccTool>
+          <incDir>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/int</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/bit</pElem>
+            <pElem>../../hw/libta/include/linker</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/kernel</pElem>
+            <pElem>../../hw/libta/include</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/communication</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/misc</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/datatypes/fx</pElem>
+            <pElem>/opt/libs/systemc-2.2.0/include/sysc/utils</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="libta/sources/linker/base">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/include/linker/base</pElem>
+            <pElem>../../hw/libta/include/interfaces</pElem>
+            <pElem>../../hw/libta/sources/linker/base</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="libta/sources/linker/dna">
+        <ccTool>
+          <incDir>
+            <pElem>../../hw/libta/sources/linker/dna</pElem>
+            <pElem>../../hw/libta/include/linker/dna</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="utils">
+        <ccTool>
+          <incDir>
+            <pElem>../../../Build/systemc-2.2.0/src/sysc/utils</pElem>
+            <pElem>../../../Common/systemc-2.2.0/src/sysc/utils</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+    </conf>
+  </confs>
+</configurationDescriptor>

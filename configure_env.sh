@@ -8,6 +8,7 @@ export SYSTEMC=/opt/libs/systemc-2.2.0
 
 echo "LIBTA_HOME = $LIBTA_HOME"
 echo "SYSTEMC = $SYSTEMC"
+echo "APPLICATION = $APP_DIR"
 export LD_LIBRARY_PATH=$LIBTA_HOME/lib:$LD_LIBRARY_PATH
 
 echo "[Setting up Software platform environment]"
