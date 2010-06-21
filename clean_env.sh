@@ -18,11 +18,11 @@ else
 
 	cd $PROJ_TOPDIR
 
-	rm -f `find . -name "*.bb"`
-	rm -f `find . -name "*.mbb"`
-	rm -f `find . -name "*.dot"`
-	rm -f `find . -name "cachegrind.out.*"`
+	rm -f `find -L . -name "*.bb"`
+	rm -f `find -L . -name "*.mbb"`
+	rm -f `find -L . -name "*.dot"`
+	rm -f `find -L . -name "cachegrind.out.*"`
 
-    echo "Environment Cleanup Done !!!"
+  echo "Environment Cleanup Done !!!"
 fi
 
