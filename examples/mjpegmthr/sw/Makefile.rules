@@ -25,6 +25,10 @@ $(BUILDDIR)/%.o : %.c
 	$(TARGET_LLC) $(ANNOTATION) $(addsuffix .bc, $(basename $@)) -f -o $(addsuffix .s, $(basename $@))
 	$(TARGET_AS) $(addsuffix .s, $(basename $@)) -o $@
 
+#	$(TARGET_LLC) $(ANNOTATION) -print-dual-cfg $(addsuffix .bc, $(basename $@)) -f -o $(addsuffix .s, $(basename $@))
+#	$(TARGET_LLC) -march=arm $(addsuffix .bc, $(basename $@)) -f -o $(addsuffix .arm, $(basename $@))
+#	llvm-dis $(addsuffix .bc, $(basename $@)) -o $(addsuffix .ll, $(basename $@))
+
 $(BUILDDIR)/%.o : %.S
 	echo '         | CC $<'
 	$(TARGET_AS) -o $@ $(TARGET_ASFLAGS) $(STDINC) $<

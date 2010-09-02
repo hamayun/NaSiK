@@ -48,123 +48,123 @@ extern uint32_t * SOCLIB_FB_BASE;
 
 int dispatch_process (Channel * c[NB_IDCT + 1]) {
 
-	uint8_t * MCU_YCbCr = NULL;
-	uint8_t * picture = NULL;
-	uint8_t * CELLS = NULL, * Y_SRC = NULL, * Y_DST = NULL;
-	uint8_t * U_SRC = NULL, * U_DST = NULL;
-	uint8_t * V_SRC = NULL, * V_DST = NULL;
-	uint8_t * uv_line_src = NULL, * uv_line_dst = NULL;
-	uint8_t idct_index = 0;
+    uint8_t * MCU_YCbCr = NULL;
+    uint8_t * picture = NULL;
+    uint8_t * CELLS = NULL, * Y_SRC = NULL, * Y_DST = NULL;
+    uint8_t * U_SRC = NULL, * U_DST = NULL;
+    uint8_t * V_SRC = NULL, * V_DST = NULL;
+    uint8_t * uv_line_src = NULL, * uv_line_dst = NULL;
+    uint8_t idct_index = 0;
 
-	uint16_t NB_MCU_X = 0;
-	uint16_t NB_MCU_Y = 0;
-	uint16_t NB_CELLS = 0;
-	uint16_t NB_MCU = 0;
+    uint16_t NB_MCU_X = 0;
+    uint16_t NB_MCU_Y = 0;
+    uint16_t NB_CELLS = 0;
+    uint16_t NB_MCU = 0;
 
-	uint32_t flit_bytes = 0,  flit_size = 0;
-	uint32_t YV = 0, YH = 0;
-	uint32_t LB_X = 0, LB_Y = 0;
-	uint32_t * y_line_dst = NULL, * y_line_src = NULL;
+    uint32_t flit_bytes = 0,  flit_size = 0;
+    uint32_t YV = 0, YH = 0;
+    uint32_t LB_X = 0, LB_Y = 0;
+    uint32_t * y_line_dst = NULL, * y_line_src = NULL;
 
-#ifdef PROGRESS
-	char progress_tab[4] = {'/', '-', '\\', '|'};
-	uint32_t imageCount = 1;
-	uint32_t block_index = 0;
-#endif
+    #ifdef PROGRESS
+    char progress_tab[4] = {'/', '-', '\\', '|'};
+    uint32_t imageCount = 1;
+    uint32_t block_index = 0;
+    #endif
 
-	SOF_section_t SOF_section;
+    SOF_section_t SOF_section;
 
-	channelRead (c[0], (unsigned char*) & SOF_section, sizeof (SOF_section));
-	channelRead (c[0], (unsigned char*) & YV, sizeof (uint32_t));
-	channelRead (c[0], (unsigned char*) & YH, sizeof (uint32_t));
-	channelRead (c[0], (unsigned char*) & flit_size, sizeof (uint32_t));
+    channelRead (c[0], (unsigned char*) & SOF_section, sizeof (SOF_section));
+    channelRead (c[0], (unsigned char*) & YV, sizeof (uint32_t));
+    channelRead (c[0], (unsigned char*) & YH, sizeof (uint32_t));
+    channelRead (c[0], (unsigned char*) & flit_size, sizeof (uint32_t));
 
-	flit_bytes = flit_size * MCU_sx * MCU_sy * sizeof (uint8_t);
+    flit_bytes = flit_size * MCU_sx * MCU_sy * sizeof (uint8_t);
 
-	NB_MCU_X = intceil(SOF_section.width, MCU_sx);
-	NB_MCU_Y = intceil(SOF_section.height, MCU_sy);
-	NB_CELLS = YV * YH + 2;
+    NB_MCU_X = intceil(SOF_section.width, MCU_sx);
+    NB_MCU_Y = intceil(SOF_section.height, MCU_sy);
+    NB_CELLS = YV * YH + 2;
 
-	picture = (uint8_t *) malloc (SOF_section . width * SOF_section . height * 2);
-	if (picture == NULL) printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
+    picture = (uint8_t *) malloc (SOF_section . width * SOF_section . height * 2);
+    if (picture == NULL) printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
 
-	MCU_YCbCr = (uint8_t *) malloc(flit_bytes);
-	if (MCU_YCbCr == NULL) printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
+    MCU_YCbCr = (uint8_t *) malloc(flit_bytes);
+    if (MCU_YCbCr == NULL) printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
 
-	NB_MCU = NB_MCU_Y * NB_MCU_X;
+    NB_MCU = NB_MCU_Y * NB_MCU_X;
 
-#ifdef PROGRESS
-	printf ("Image %lu : |", imageCount++);
-	fflush (stdout);
-#endif
+    #ifdef PROGRESS
+    printf ("Image %lu : |", imageCount++);
+    fflush (stdout);
+    #endif
 
-	while (1) {
-		channelRead (c[idct_index + 1], MCU_YCbCr, flit_bytes);
-		idct_index = (idct_index + 1) % NB_IDCT;
+    while (1) {
+        channelRead (c[idct_index + 1], MCU_YCbCr, flit_bytes);
+        idct_index = (idct_index + 1) % NB_IDCT;
 
-		for (int flit_index = 0; flit_index < flit_size; flit_index += NB_CELLS) {
-			CELLS = MCU_INDEX(MCU_YCbCr, flit_index);
+        for (int flit_index = 0; flit_index < flit_size; flit_index += NB_CELLS) {
+            CELLS = MCU_INDEX(MCU_YCbCr, flit_index);
 
-			for (int cell_y_index = 0; cell_y_index < YV; cell_y_index += 1) {
-				for (int cell_x_index = 0; cell_x_index < YH; cell_x_index += 1) {
-					Y_SRC = MCU_INDEX(CELLS, (YH * cell_y_index + cell_x_index));
-					Y_DST = FB_Y_INDEX(picture, LB_X + cell_x_index, LB_Y + cell_y_index);
+            for (int cell_y_index = 0; cell_y_index < YV; cell_y_index += 1) {
+                for (int cell_x_index = 0; cell_x_index < YH; cell_x_index += 1) {
+                    Y_SRC = MCU_INDEX(CELLS, (YH * cell_y_index + cell_x_index));
+                    Y_DST = FB_Y_INDEX(picture, LB_X + cell_x_index, LB_Y + cell_y_index);
 
-					for (int line_index = 0; line_index < MCU_sy; line_index += 1) {
-						y_line_src = (uint32_t *) MCU_LINE(Y_SRC, line_index);
-						y_line_dst = (uint32_t *) FB_Y_LINE(Y_DST, line_index);
-						*y_line_dst++ = *y_line_src++; *y_line_dst++ = *y_line_src++;
-					}
-				}
+                    for (int line_index = 0; line_index < MCU_sy; line_index += 1) {
+                        y_line_src = (uint32_t *) MCU_LINE(Y_SRC, line_index);
+                        y_line_dst = (uint32_t *) FB_Y_LINE(Y_DST, line_index);
+                        *y_line_dst++ = *y_line_src++; *y_line_dst++ = *y_line_src++;
+                    }
+                }
 
-				U_SRC = MCU_INDEX(CELLS, (YH * YV));
-				U_DST = FB_U_INDEX(picture, LB_X, LB_Y + cell_y_index);
-				
-				for (int line_index = 0; line_index < MCU_sy; line_index += 1) {
-					uv_line_src = MCU_LINE(U_SRC, line_index);
-					uv_line_dst = FB_UV_LINE(U_DST, line_index);
+                U_SRC = MCU_INDEX(CELLS, (YH * YV));
+                U_DST = FB_U_INDEX(picture, LB_X, LB_Y + cell_y_index);
 
-					for (int i = 0; i < (MCU_sx / (3 - YH)); i += 1) uv_line_dst[i] = uv_line_src[i * (3 - YH)];
-				}
+                for (int line_index = 0; line_index < MCU_sy; line_index += 1) {
+                    uv_line_src = MCU_LINE(U_SRC, line_index);
+                    uv_line_dst = FB_UV_LINE(U_DST, line_index);
 
-				V_SRC = MCU_INDEX(CELLS, (YH * YV + 1));
-				V_DST = FB_V_INDEX(picture, LB_X, LB_Y + cell_y_index);
-				
-				for (int line_index = 0; line_index < MCU_sy; line_index += 1) {
-					uv_line_src = MCU_LINE(V_SRC, line_index);
-					uv_line_dst = FB_UV_LINE(V_DST, line_index);
+                    for (int i = 0; i < (MCU_sx / (3 - YH)); i += 1) uv_line_dst[i] = uv_line_src[i * (3 - YH)];
+                }
 
-					for (int i = 0; i < (MCU_sx / (3 - YH)); i += 1) uv_line_dst[i] = uv_line_src[i * (3 - YH)];
-				}
-			}
+                V_SRC = MCU_INDEX(CELLS, (YH * YV + 1));
+                V_DST = FB_V_INDEX(picture, LB_X, LB_Y + cell_y_index);
 
-			LB_X = (LB_X + YH) % NB_MCU_X;
+                for (int line_index = 0; line_index < MCU_sy; line_index += 1) {
+                    uv_line_src = MCU_LINE(V_SRC, line_index);
+                    uv_line_dst = FB_UV_LINE(V_DST, line_index);
 
-#ifdef PROGRESS
-			printf ("\033[1D%c", progress_tab[block_index++ % 4]);
-			fflush (stdout);
-#endif
+                    for (int i = 0; i < (MCU_sx / (3 - YH)); i += 1) uv_line_dst[i] = uv_line_src[i * (3 - YH)];
+                }
+            }
 
-			if (LB_X == 0) {
-				LB_Y = (LB_Y + YV) % NB_MCU_Y;
-				if (LB_Y == 0) memcpy ((void *) SOCLIB_FB_BASE, picture,
-            SOF_section . width * SOF_section . height * 2);
-			}
+            LB_X = (LB_X + YH) % NB_MCU_X;
 
-			if (LB_X == 0 && LB_Y == 0) {
-        volatile uint32_t tmp;
-        CPU_READ(UINT32,SOCLIB_FB_BASE,tmp);
-      }
+            #ifdef PROGRESS
+            printf ("\033[1D%c", progress_tab[block_index++ % 4]);
+            fflush (stdout);
+            #endif
 
-#ifdef PROGRESS
-			if (LB_X == 0 && LB_Y == 0) {
-				printf ("\033[1Ddone\n");
-				printf ("Image %lu : |", imageCount++);
-				fflush (stdout);
-			}
-#endif
-		}
-	}
+            if (LB_X == 0) {
+                LB_Y = (LB_Y + YV) % NB_MCU_Y;
+                if (LB_Y == 0) memcpy ((void *) SOCLIB_FB_BASE, picture,
+                                        SOF_section . width * SOF_section . height * 2);
+            }
 
-	return 0;
+            if (LB_X == 0 && LB_Y == 0) {
+                volatile uint32_t tmp;
+                CPU_READ(UINT32,SOCLIB_FB_BASE,tmp);
+            }
+
+            #ifdef PROGRESS
+            if (LB_X == 0 && LB_Y == 0) {
+            printf ("\033[1Ddone\n");
+            printf ("Image %lu : |", imageCount++);
+            fflush (stdout);
+            }
+            #endif
+        }
+    }
+
+    return 0;
 }

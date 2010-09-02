@@ -399,7 +399,7 @@ static int  CompileModuleForTarget(Module *mod,bool Fast) {
   for (Module::iterator I = mod->begin(), E = mod->end(); I != E; ++I)
     if (!I->isDeclaration())
     {
-      DOUT << __func__ << ": run " << (*I).getName() << std::endl;
+      DOUT << __func__ << ": Running All Passes for Function " << (*I).getName() << std::endl;
       Passes.run(*I);
     }
 

@@ -76,7 +76,7 @@
 /* Copy the first part of user declarations.  */
 
 /* Line 189 of yacc.c  */
-#line 14 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 14 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
 
 #include "ParserInternals.h"
 #include "llvm/CallingConv.h"
@@ -1230,7 +1230,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 970 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 970 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
 
   llvm::Module                           *ModuleVal;
   llvm::Function                         *FunctionVal;
@@ -3515,210 +3515,210 @@ yyreduce:
         case 29:
 
 /* Line 1455 of yacc.c  */
-#line 1148 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1148 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_EQ; ;}
     break;
 
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 1148 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1148 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_NE; ;}
     break;
 
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 1149 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1149 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_SLT; ;}
     break;
 
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 1149 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1149 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_SGT; ;}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 1150 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1150 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_SLE; ;}
     break;
 
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 1150 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1150 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_SGE; ;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 1151 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1151 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_ULT; ;}
     break;
 
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 1151 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1151 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_UGT; ;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 1152 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1152 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_ULE; ;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 1152 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1152 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.IPredicate) = ICmpInst::ICMP_UGE; ;}
     break;
 
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 1156 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1156 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_OEQ; ;}
     break;
 
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 1156 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1156 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_ONE; ;}
     break;
 
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 1157 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1157 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_OLT; ;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 1157 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1157 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_OGT; ;}
     break;
 
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 1158 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1158 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_OLE; ;}
     break;
 
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 1158 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1158 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_OGE; ;}
     break;
 
   case 45:
 
 /* Line 1455 of yacc.c  */
-#line 1159 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1159 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_ORD; ;}
     break;
 
   case 46:
 
 /* Line 1455 of yacc.c  */
-#line 1159 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1159 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_UNO; ;}
     break;
 
   case 47:
 
 /* Line 1455 of yacc.c  */
-#line 1160 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1160 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_UEQ; ;}
     break;
 
   case 48:
 
 /* Line 1455 of yacc.c  */
-#line 1160 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1160 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_UNE; ;}
     break;
 
   case 49:
 
 /* Line 1455 of yacc.c  */
-#line 1161 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1161 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_ULT; ;}
     break;
 
   case 50:
 
 /* Line 1455 of yacc.c  */
-#line 1161 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1161 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_UGT; ;}
     break;
 
   case 51:
 
 /* Line 1455 of yacc.c  */
-#line 1162 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1162 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_ULE; ;}
     break;
 
   case 52:
 
 /* Line 1455 of yacc.c  */
-#line 1162 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1162 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_UGE; ;}
     break;
 
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 1163 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1163 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_TRUE; ;}
     break;
 
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 1164 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1164 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FPredicate) = FCmpInst::FCMP_FALSE; ;}
     break;
 
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 1173 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1173 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.StrVal) = 0; ;}
     break;
 
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 1175 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1175 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal)=(yyvsp[(3) - (4)].UInt64Val); ;}
     break;
 
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 1176 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1176 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal)=0; ;}
     break;
 
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 1180 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1180 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.StrVal) = (yyvsp[(1) - (2)].StrVal);
     CHECK_FOR_ERROR
@@ -3728,7 +3728,7 @@ yyreduce:
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 1184 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1184 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.StrVal) = 0;
     CHECK_FOR_ERROR
@@ -3738,7 +3738,7 @@ yyreduce:
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 1189 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1189 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   (yyval.UIntVal) = (yyvsp[(1) - (2)].UIntVal);
   CHECK_FOR_ERROR
@@ -3748,7 +3748,7 @@ yyreduce:
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 1198 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1198 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.StrVal) = 0;
     CHECK_FOR_ERROR
@@ -3758,7 +3758,7 @@ yyreduce:
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 1203 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1203 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.StrVal) = (yyvsp[(1) - (2)].StrVal);
     CHECK_FOR_ERROR
@@ -3768,224 +3768,224 @@ yyreduce:
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 1209 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1209 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::InternalLinkage; ;}
     break;
 
   case 77:
 
 /* Line 1455 of yacc.c  */
-#line 1210 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1210 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::WeakLinkage; ;}
     break;
 
   case 78:
 
 /* Line 1455 of yacc.c  */
-#line 1211 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1211 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::LinkOnceLinkage; ;}
     break;
 
   case 79:
 
 /* Line 1455 of yacc.c  */
-#line 1212 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1212 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::AppendingLinkage; ;}
     break;
 
   case 80:
 
 /* Line 1455 of yacc.c  */
-#line 1213 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1213 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::DLLExportLinkage; ;}
     break;
 
   case 81:
 
 /* Line 1455 of yacc.c  */
-#line 1214 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1214 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::CommonLinkage; ;}
     break;
 
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 1218 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1218 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::DLLImportLinkage; ;}
     break;
 
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 1219 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1219 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::ExternalWeakLinkage; ;}
     break;
 
   case 84:
 
 /* Line 1455 of yacc.c  */
-#line 1220 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1220 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::ExternalLinkage; ;}
     break;
 
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 1224 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1224 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Visibility) = GlobalValue::DefaultVisibility;   ;}
     break;
 
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 1225 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1225 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Visibility) = GlobalValue::DefaultVisibility;   ;}
     break;
 
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 1226 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1226 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Visibility) = GlobalValue::HiddenVisibility;    ;}
     break;
 
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 1227 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1227 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Visibility) = GlobalValue::ProtectedVisibility; ;}
     break;
 
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 1231 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1231 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::ExternalLinkage; ;}
     break;
 
   case 90:
 
 /* Line 1455 of yacc.c  */
-#line 1232 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1232 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::DLLImportLinkage; ;}
     break;
 
   case 91:
 
 /* Line 1455 of yacc.c  */
-#line 1233 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1233 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::ExternalWeakLinkage; ;}
     break;
 
   case 92:
 
 /* Line 1455 of yacc.c  */
-#line 1237 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1237 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::ExternalLinkage; ;}
     break;
 
   case 93:
 
 /* Line 1455 of yacc.c  */
-#line 1238 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1238 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::InternalLinkage; ;}
     break;
 
   case 94:
 
 /* Line 1455 of yacc.c  */
-#line 1239 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1239 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::LinkOnceLinkage; ;}
     break;
 
   case 95:
 
 /* Line 1455 of yacc.c  */
-#line 1240 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1240 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::WeakLinkage; ;}
     break;
 
   case 96:
 
 /* Line 1455 of yacc.c  */
-#line 1241 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1241 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::DLLExportLinkage; ;}
     break;
 
   case 97:
 
 /* Line 1455 of yacc.c  */
-#line 1245 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1245 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::ExternalLinkage; ;}
     break;
 
   case 98:
 
 /* Line 1455 of yacc.c  */
-#line 1246 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1246 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::WeakLinkage; ;}
     break;
 
   case 99:
 
 /* Line 1455 of yacc.c  */
-#line 1247 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1247 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.Linkage) = GlobalValue::InternalLinkage; ;}
     break;
 
   case 100:
 
 /* Line 1455 of yacc.c  */
-#line 1250 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1250 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = CallingConv::C; ;}
     break;
 
   case 101:
 
 /* Line 1455 of yacc.c  */
-#line 1251 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1251 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = CallingConv::C; ;}
     break;
 
   case 102:
 
 /* Line 1455 of yacc.c  */
-#line 1252 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1252 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = CallingConv::Fast; ;}
     break;
 
   case 103:
 
 /* Line 1455 of yacc.c  */
-#line 1253 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1253 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = CallingConv::Cold; ;}
     break;
 
   case 104:
 
 /* Line 1455 of yacc.c  */
-#line 1254 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1254 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = CallingConv::X86_StdCall; ;}
     break;
 
   case 105:
 
 /* Line 1455 of yacc.c  */
-#line 1255 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1255 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = CallingConv::X86_FastCall; ;}
     break;
 
   case 106:
 
 /* Line 1455 of yacc.c  */
-#line 1256 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1256 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = CallingConv::X86_SSECall; ;}
     break;
 
   case 107:
 
 /* Line 1455 of yacc.c  */
-#line 1257 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1257 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
                    if ((unsigned)(yyvsp[(2) - (2)].UInt64Val) != (yyvsp[(2) - (2)].UInt64Val))
                      GEN_ERROR("Calling conv too large");
@@ -3997,70 +3997,70 @@ yyreduce:
   case 108:
 
 /* Line 1455 of yacc.c  */
-#line 1264 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1264 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::ZExt;      ;}
     break;
 
   case 109:
 
 /* Line 1455 of yacc.c  */
-#line 1265 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1265 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::ZExt;      ;}
     break;
 
   case 110:
 
 /* Line 1455 of yacc.c  */
-#line 1266 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1266 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::SExt;      ;}
     break;
 
   case 111:
 
 /* Line 1455 of yacc.c  */
-#line 1267 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1267 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::SExt;      ;}
     break;
 
   case 112:
 
 /* Line 1455 of yacc.c  */
-#line 1268 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1268 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::InReg;     ;}
     break;
 
   case 113:
 
 /* Line 1455 of yacc.c  */
-#line 1269 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1269 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::StructRet; ;}
     break;
 
   case 114:
 
 /* Line 1455 of yacc.c  */
-#line 1270 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1270 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::NoAlias;   ;}
     break;
 
   case 115:
 
 /* Line 1455 of yacc.c  */
-#line 1271 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1271 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::ByVal;     ;}
     break;
 
   case 116:
 
 /* Line 1455 of yacc.c  */
-#line 1272 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1272 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::Nest;      ;}
     break;
 
   case 117:
 
 /* Line 1455 of yacc.c  */
-#line 1273 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1273 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = 
                           ParamAttr::constructAlignmentFromInt((yyvsp[(2) - (2)].UInt64Val));    ;}
     break;
@@ -4068,14 +4068,14 @@ yyreduce:
   case 118:
 
 /* Line 1455 of yacc.c  */
-#line 1277 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1277 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::None; ;}
     break;
 
   case 119:
 
 /* Line 1455 of yacc.c  */
-#line 1278 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1278 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
                 (yyval.ParamAttrs) = (yyvsp[(1) - (2)].ParamAttrs) | (yyvsp[(2) - (2)].ParamAttrs);
               ;}
@@ -4084,56 +4084,56 @@ yyreduce:
   case 120:
 
 /* Line 1455 of yacc.c  */
-#line 1283 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1283 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::NoReturn; ;}
     break;
 
   case 121:
 
 /* Line 1455 of yacc.c  */
-#line 1284 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1284 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::NoUnwind; ;}
     break;
 
   case 122:
 
 /* Line 1455 of yacc.c  */
-#line 1285 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1285 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::ZExt;     ;}
     break;
 
   case 123:
 
 /* Line 1455 of yacc.c  */
-#line 1286 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1286 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::SExt;     ;}
     break;
 
   case 124:
 
 /* Line 1455 of yacc.c  */
-#line 1287 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1287 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::ReadNone; ;}
     break;
 
   case 125:
 
 /* Line 1455 of yacc.c  */
-#line 1288 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1288 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::ReadOnly; ;}
     break;
 
   case 126:
 
 /* Line 1455 of yacc.c  */
-#line 1291 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1291 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamAttrs) = ParamAttr::None; ;}
     break;
 
   case 127:
 
 /* Line 1455 of yacc.c  */
-#line 1292 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1292 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
                 (yyval.ParamAttrs) = (yyvsp[(1) - (2)].ParamAttrs) | (yyvsp[(2) - (2)].ParamAttrs);
               ;}
@@ -4142,14 +4142,14 @@ yyreduce:
   case 128:
 
 /* Line 1455 of yacc.c  */
-#line 1297 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1297 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FunctionNotes) = (yyvsp[(1) - (1)].FunctionNotes); ;}
     break;
 
   case 129:
 
 /* Line 1455 of yacc.c  */
-#line 1298 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1298 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { 
                 FunctionNotes tmp = (yyvsp[(1) - (3)].FunctionNotes) | (yyvsp[(3) - (3)].FunctionNotes);
                 if ((yyvsp[(3) - (3)].FunctionNotes) == FN_NOTE_NoInline && ((yyvsp[(1) - (3)].FunctionNotes) & FN_NOTE_AlwaysInline))
@@ -4164,35 +4164,35 @@ yyreduce:
   case 130:
 
 /* Line 1455 of yacc.c  */
-#line 1309 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1309 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FunctionNotes) = FN_NOTE_NoInline; ;}
     break;
 
   case 131:
 
 /* Line 1455 of yacc.c  */
-#line 1310 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1310 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FunctionNotes) = FN_NOTE_AlwaysInline; ;}
     break;
 
   case 132:
 
 /* Line 1455 of yacc.c  */
-#line 1311 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1311 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FunctionNotes) = FN_NOTE_OptimizeForSize; ;}
     break;
 
   case 133:
 
 /* Line 1455 of yacc.c  */
-#line 1314 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1314 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.FunctionNotes) = FN_NOTE_None; ;}
     break;
 
   case 134:
 
 /* Line 1455 of yacc.c  */
-#line 1315 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1315 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
                 (yyval.FunctionNotes) =  (yyvsp[(3) - (4)].FunctionNotes);
               ;}
@@ -4201,14 +4201,14 @@ yyreduce:
   case 135:
 
 /* Line 1455 of yacc.c  */
-#line 1320 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1320 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.StrVal) = 0; ;}
     break;
 
   case 136:
 
 /* Line 1455 of yacc.c  */
-#line 1321 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1321 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
                 (yyval.StrVal) = (yyvsp[(2) - (2)].StrVal);
               ;}
@@ -4217,14 +4217,14 @@ yyreduce:
   case 137:
 
 /* Line 1455 of yacc.c  */
-#line 1328 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1328 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = 0; ;}
     break;
 
   case 138:
 
 /* Line 1455 of yacc.c  */
-#line 1329 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1329 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   (yyval.UIntVal) = (yyvsp[(2) - (2)].UInt64Val);
   if ((yyval.UIntVal) != 0 && !isPowerOf2_32((yyval.UIntVal)))
@@ -4236,14 +4236,14 @@ yyreduce:
   case 139:
 
 /* Line 1455 of yacc.c  */
-#line 1335 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1335 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.UIntVal) = 0; ;}
     break;
 
   case 140:
 
 /* Line 1455 of yacc.c  */
-#line 1336 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1336 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   (yyval.UIntVal) = (yyvsp[(3) - (3)].UInt64Val);
   if ((yyval.UIntVal) != 0 && !isPowerOf2_32((yyval.UIntVal)))
@@ -4255,7 +4255,7 @@ yyreduce:
   case 141:
 
 /* Line 1455 of yacc.c  */
-#line 1345 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1345 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   for (unsigned i = 0, e = (yyvsp[(2) - (2)].StrVal)->length(); i != e; ++i)
     if ((*(yyvsp[(2) - (2)].StrVal))[i] == '"' || (*(yyvsp[(2) - (2)].StrVal))[i] == '\\')
@@ -4268,35 +4268,35 @@ yyreduce:
   case 142:
 
 /* Line 1455 of yacc.c  */
-#line 1353 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1353 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.StrVal) = 0; ;}
     break;
 
   case 143:
 
 /* Line 1455 of yacc.c  */
-#line 1354 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1354 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.StrVal) = (yyvsp[(1) - (1)].StrVal); ;}
     break;
 
   case 144:
 
 /* Line 1455 of yacc.c  */
-#line 1359 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1359 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {;}
     break;
 
   case 145:
 
 /* Line 1455 of yacc.c  */
-#line 1360 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1360 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {;}
     break;
 
   case 146:
 
 /* Line 1455 of yacc.c  */
-#line 1361 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1361 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CurGV->setSection(*(yyvsp[(1) - (1)].StrVal));
     delete (yyvsp[(1) - (1)].StrVal);
@@ -4307,7 +4307,7 @@ yyreduce:
   case 147:
 
 /* Line 1455 of yacc.c  */
-#line 1366 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1366 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(2) - (2)].UInt64Val) != 0 && !isPowerOf2_32((yyvsp[(2) - (2)].UInt64Val)))
       GEN_ERROR("Alignment must be a power of two");
@@ -4319,7 +4319,7 @@ yyreduce:
   case 155:
 
 /* Line 1455 of yacc.c  */
-#line 1382 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1382 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TypeVal) = new PATypeHolder(OpaqueType::get());
     CHECK_FOR_ERROR
@@ -4329,7 +4329,7 @@ yyreduce:
   case 156:
 
 /* Line 1455 of yacc.c  */
-#line 1386 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1386 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TypeVal) = new PATypeHolder((yyvsp[(1) - (1)].PrimType));
     CHECK_FOR_ERROR
@@ -4339,7 +4339,7 @@ yyreduce:
   case 157:
 
 /* Line 1455 of yacc.c  */
-#line 1390 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1390 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                             // Pointer type?
     if (*(yyvsp[(1) - (3)].TypeVal) == Type::LabelTy)
       GEN_ERROR("Cannot form a pointer to a basic block");
@@ -4352,7 +4352,7 @@ yyreduce:
   case 158:
 
 /* Line 1455 of yacc.c  */
-#line 1397 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1397 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {            // Named types are also simple types...
     const Type* tmp = getTypeVal((yyvsp[(1) - (1)].ValIDVal));
     CHECK_FOR_ERROR
@@ -4363,7 +4363,7 @@ yyreduce:
   case 159:
 
 /* Line 1455 of yacc.c  */
-#line 1402 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1402 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                   // Type UpReference
     if ((yyvsp[(2) - (2)].UInt64Val) > (uint64_t)~0U) GEN_ERROR("Value out of range");
     OpaqueType *OT = OpaqueType::get();        // Use temporary placeholder
@@ -4377,7 +4377,7 @@ yyreduce:
   case 160:
 
 /* Line 1455 of yacc.c  */
-#line 1410 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1410 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // Allow but ignore attributes on function types; this permits auto-upgrade.
     // FIXME: remove in LLVM 3.0.
@@ -4412,7 +4412,7 @@ yyreduce:
   case 161:
 
 /* Line 1455 of yacc.c  */
-#line 1439 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1439 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // Allow but ignore attributes on function types; this permits auto-upgrade.
     // FIXME: remove in LLVM 3.0.
@@ -4442,7 +4442,7 @@ yyreduce:
   case 162:
 
 /* Line 1455 of yacc.c  */
-#line 1464 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1464 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {          // Sized array type?
     (yyval.TypeVal) = new PATypeHolder(HandleUpRefs(ArrayType::get(*(yyvsp[(4) - (5)].TypeVal), (yyvsp[(2) - (5)].UInt64Val))));
     delete (yyvsp[(4) - (5)].TypeVal);
@@ -4453,7 +4453,7 @@ yyreduce:
   case 163:
 
 /* Line 1455 of yacc.c  */
-#line 1469 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1469 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {          // Vector type?
      const llvm::Type* ElemTy = (yyvsp[(4) - (5)].TypeVal)->get();
      if ((unsigned)(yyvsp[(2) - (5)].UInt64Val) != (yyvsp[(2) - (5)].UInt64Val))
@@ -4469,7 +4469,7 @@ yyreduce:
   case 164:
 
 /* Line 1455 of yacc.c  */
-#line 1479 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1479 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                        // Structure type?
     std::vector<const Type*> Elements;
     for (std::list<llvm::PATypeHolder>::iterator I = (yyvsp[(2) - (3)].TypeList)->begin(),
@@ -4485,7 +4485,7 @@ yyreduce:
   case 165:
 
 /* Line 1455 of yacc.c  */
-#line 1489 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1489 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                                  // Empty structure type?
     (yyval.TypeVal) = new PATypeHolder(StructType::get(std::vector<const Type*>()));
     CHECK_FOR_ERROR
@@ -4495,7 +4495,7 @@ yyreduce:
   case 166:
 
 /* Line 1455 of yacc.c  */
-#line 1493 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1493 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     std::vector<const Type*> Elements;
     for (std::list<llvm::PATypeHolder>::iterator I = (yyvsp[(3) - (5)].TypeList)->begin(),
@@ -4511,7 +4511,7 @@ yyreduce:
   case 167:
 
 /* Line 1455 of yacc.c  */
-#line 1503 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1503 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                         // Empty structure type?
     (yyval.TypeVal) = new PATypeHolder(StructType::get(std::vector<const Type*>(), true));
     CHECK_FOR_ERROR
@@ -4521,7 +4521,7 @@ yyreduce:
   case 168:
 
 /* Line 1455 of yacc.c  */
-#line 1510 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1510 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // Allow but ignore attributes on function types; this permits auto-upgrade.
     // FIXME: remove in LLVM 3.0.
@@ -4533,7 +4533,7 @@ yyreduce:
   case 169:
 
 /* Line 1455 of yacc.c  */
-#line 1519 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1519 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (1)].TypeVal))->getDescription());
@@ -4546,7 +4546,7 @@ yyreduce:
   case 170:
 
 /* Line 1455 of yacc.c  */
-#line 1526 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1526 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TypeVal) = new PATypeHolder(Type::VoidTy);
   ;}
@@ -4555,7 +4555,7 @@ yyreduce:
   case 171:
 
 /* Line 1455 of yacc.c  */
-#line 1531 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1531 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TypeWithAttrsList) = new TypeWithAttrsList();
     (yyval.TypeWithAttrsList)->push_back((yyvsp[(1) - (1)].TypeWithAttrs));
@@ -4566,7 +4566,7 @@ yyreduce:
   case 172:
 
 /* Line 1455 of yacc.c  */
-#line 1536 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1536 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     ((yyval.TypeWithAttrsList)=(yyvsp[(1) - (3)].TypeWithAttrsList))->push_back((yyvsp[(3) - (3)].TypeWithAttrs));
     CHECK_FOR_ERROR
@@ -4576,7 +4576,7 @@ yyreduce:
   case 174:
 
 /* Line 1455 of yacc.c  */
-#line 1544 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1544 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TypeWithAttrsList)=(yyvsp[(1) - (3)].TypeWithAttrsList);
     TypeWithAttrs TWA; TWA.Attrs = ParamAttr::None;
@@ -4589,7 +4589,7 @@ yyreduce:
   case 175:
 
 /* Line 1455 of yacc.c  */
-#line 1551 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1551 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TypeWithAttrsList) = new TypeWithAttrsList;
     TypeWithAttrs TWA; TWA.Attrs = ParamAttr::None;
@@ -4602,7 +4602,7 @@ yyreduce:
   case 176:
 
 /* Line 1455 of yacc.c  */
-#line 1558 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1558 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TypeWithAttrsList) = new TypeWithAttrsList();
     CHECK_FOR_ERROR
@@ -4612,7 +4612,7 @@ yyreduce:
   case 177:
 
 /* Line 1455 of yacc.c  */
-#line 1566 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1566 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TypeList) = new std::list<PATypeHolder>();
     (yyval.TypeList)->push_back(*(yyvsp[(1) - (1)].TypeVal)); 
@@ -4624,7 +4624,7 @@ yyreduce:
   case 178:
 
 /* Line 1455 of yacc.c  */
-#line 1572 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1572 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     ((yyval.TypeList)=(yyvsp[(1) - (3)].TypeList))->push_back(*(yyvsp[(3) - (3)].TypeVal)); 
     delete (yyvsp[(3) - (3)].TypeVal);
@@ -4635,7 +4635,7 @@ yyreduce:
   case 179:
 
 /* Line 1455 of yacc.c  */
-#line 1584 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1584 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { // Nonempty unsized arr
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (4)].TypeVal))->getDescription());
@@ -4669,7 +4669,7 @@ yyreduce:
   case 180:
 
 /* Line 1455 of yacc.c  */
-#line 1612 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1612 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (3)].TypeVal))->getDescription());
@@ -4691,7 +4691,7 @@ yyreduce:
   case 181:
 
 /* Line 1455 of yacc.c  */
-#line 1628 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1628 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (3)].TypeVal))->getDescription());
@@ -4724,7 +4724,7 @@ yyreduce:
   case 182:
 
 /* Line 1455 of yacc.c  */
-#line 1655 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1655 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { // Nonempty unsized arr
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (4)].TypeVal))->getDescription());
@@ -4758,7 +4758,7 @@ yyreduce:
   case 183:
 
 /* Line 1455 of yacc.c  */
-#line 1683 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1683 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     const StructType *STy = dyn_cast<StructType>((yyvsp[(1) - (4)].TypeVal)->get());
     if (STy == 0)
@@ -4790,7 +4790,7 @@ yyreduce:
   case 184:
 
 /* Line 1455 of yacc.c  */
-#line 1709 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1709 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (3)].TypeVal))->getDescription());
@@ -4816,7 +4816,7 @@ yyreduce:
   case 185:
 
 /* Line 1455 of yacc.c  */
-#line 1729 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1729 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     const StructType *STy = dyn_cast<StructType>((yyvsp[(1) - (6)].TypeVal)->get());
     if (STy == 0)
@@ -4848,7 +4848,7 @@ yyreduce:
   case 186:
 
 /* Line 1455 of yacc.c  */
-#line 1755 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1755 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (5)].TypeVal))->getDescription());
@@ -4874,7 +4874,7 @@ yyreduce:
   case 187:
 
 /* Line 1455 of yacc.c  */
-#line 1775 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1775 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (2)].TypeVal))->getDescription());
@@ -4892,7 +4892,7 @@ yyreduce:
   case 188:
 
 /* Line 1455 of yacc.c  */
-#line 1787 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1787 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (2)].TypeVal))->getDescription());
@@ -4905,7 +4905,7 @@ yyreduce:
   case 189:
 
 /* Line 1455 of yacc.c  */
-#line 1794 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1794 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (2)].TypeVal))->getDescription());
@@ -4977,7 +4977,7 @@ yyreduce:
   case 190:
 
 /* Line 1455 of yacc.c  */
-#line 1860 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1860 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (2)].TypeVal))->getDescription());
@@ -4993,7 +4993,7 @@ yyreduce:
   case 191:
 
 /* Line 1455 of yacc.c  */
-#line 1870 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1870 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (2)].TypeVal))->getDescription());
@@ -5009,7 +5009,7 @@ yyreduce:
   case 192:
 
 /* Line 1455 of yacc.c  */
-#line 1880 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1880 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {      // integral constants
     if (!ConstantInt::isValueValidForType((yyvsp[(1) - (2)].PrimType), (yyvsp[(2) - (2)].SInt64Val)))
       GEN_ERROR("Constant value doesn't fit in type");
@@ -5021,7 +5021,7 @@ yyreduce:
   case 193:
 
 /* Line 1455 of yacc.c  */
-#line 1886 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1886 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {      // arbitrary precision integer constants
     uint32_t BitWidth = cast<IntegerType>((yyvsp[(1) - (2)].PrimType))->getBitWidth();
     if ((yyvsp[(2) - (2)].APIntVal)->getBitWidth() > BitWidth) {
@@ -5037,7 +5037,7 @@ yyreduce:
   case 194:
 
 /* Line 1455 of yacc.c  */
-#line 1896 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1896 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {      // integral constants
     if (!ConstantInt::isValueValidForType((yyvsp[(1) - (2)].PrimType), (yyvsp[(2) - (2)].UInt64Val)))
       GEN_ERROR("Constant value doesn't fit in type");
@@ -5049,7 +5049,7 @@ yyreduce:
   case 195:
 
 /* Line 1455 of yacc.c  */
-#line 1902 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1902 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {      // arbitrary precision integer constants
     uint32_t BitWidth = cast<IntegerType>((yyvsp[(1) - (2)].PrimType))->getBitWidth();
     if ((yyvsp[(2) - (2)].APIntVal)->getBitWidth() > BitWidth) {
@@ -5065,7 +5065,7 @@ yyreduce:
   case 196:
 
 /* Line 1455 of yacc.c  */
-#line 1912 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1912 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                      // Boolean constants
     if (cast<IntegerType>((yyvsp[(1) - (2)].PrimType))->getBitWidth() != 1)
       GEN_ERROR("Constant true must have type i1");
@@ -5077,7 +5077,7 @@ yyreduce:
   case 197:
 
 /* Line 1455 of yacc.c  */
-#line 1918 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1918 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                     // Boolean constants
     if (cast<IntegerType>((yyvsp[(1) - (2)].PrimType))->getBitWidth() != 1)
       GEN_ERROR("Constant false must have type i1");
@@ -5089,7 +5089,7 @@ yyreduce:
   case 198:
 
 /* Line 1455 of yacc.c  */
-#line 1924 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1924 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                   // Floating point constants
     if (!ConstantFP::isValueValidForType((yyvsp[(1) - (2)].PrimType), *(yyvsp[(2) - (2)].FPVal)))
       GEN_ERROR("Floating point constant invalid for type");
@@ -5106,7 +5106,7 @@ yyreduce:
   case 199:
 
 /* Line 1455 of yacc.c  */
-#line 1937 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1937 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(5) - (6)].TypeVal))->getDescription());
@@ -5124,7 +5124,7 @@ yyreduce:
   case 200:
 
 /* Line 1455 of yacc.c  */
-#line 1949 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1949 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!isa<PointerType>((yyvsp[(3) - (5)].ConstVal)->getType()))
       GEN_ERROR("GetElementPtr requires a pointer operand");
@@ -5151,7 +5151,7 @@ yyreduce:
   case 201:
 
 /* Line 1455 of yacc.c  */
-#line 1970 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1970 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(3) - (8)].ConstVal)->getType() != Type::Int1Ty)
       GEN_ERROR("Select condition must be of boolean type");
@@ -5165,7 +5165,7 @@ yyreduce:
   case 202:
 
 /* Line 1455 of yacc.c  */
-#line 1978 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1978 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(3) - (6)].ConstVal)->getType() != (yyvsp[(5) - (6)].ConstVal)->getType())
       GEN_ERROR("Binary operator types must match");
@@ -5177,7 +5177,7 @@ yyreduce:
   case 203:
 
 /* Line 1455 of yacc.c  */
-#line 1984 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1984 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(3) - (6)].ConstVal)->getType() != (yyvsp[(5) - (6)].ConstVal)->getType())
       GEN_ERROR("Logical operator types must match");
@@ -5194,7 +5194,7 @@ yyreduce:
   case 204:
 
 /* Line 1455 of yacc.c  */
-#line 1995 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 1995 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(4) - (7)].ConstVal)->getType() != (yyvsp[(6) - (7)].ConstVal)->getType())
       GEN_ERROR("icmp operand types must match");
@@ -5205,7 +5205,7 @@ yyreduce:
   case 205:
 
 /* Line 1455 of yacc.c  */
-#line 2000 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2000 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(4) - (7)].ConstVal)->getType() != (yyvsp[(6) - (7)].ConstVal)->getType())
       GEN_ERROR("fcmp operand types must match");
@@ -5216,7 +5216,7 @@ yyreduce:
   case 206:
 
 /* Line 1455 of yacc.c  */
-#line 2005 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2005 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(4) - (7)].ConstVal)->getType() != (yyvsp[(6) - (7)].ConstVal)->getType())
       GEN_ERROR("vicmp operand types must match");
@@ -5227,7 +5227,7 @@ yyreduce:
   case 207:
 
 /* Line 1455 of yacc.c  */
-#line 2010 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2010 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(4) - (7)].ConstVal)->getType() != (yyvsp[(6) - (7)].ConstVal)->getType())
       GEN_ERROR("vfcmp operand types must match");
@@ -5238,7 +5238,7 @@ yyreduce:
   case 208:
 
 /* Line 1455 of yacc.c  */
-#line 2015 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2015 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!ExtractElementInst::isValidOperands((yyvsp[(3) - (6)].ConstVal), (yyvsp[(5) - (6)].ConstVal)))
       GEN_ERROR("Invalid extractelement operands");
@@ -5250,7 +5250,7 @@ yyreduce:
   case 209:
 
 /* Line 1455 of yacc.c  */
-#line 2021 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2021 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!InsertElementInst::isValidOperands((yyvsp[(3) - (8)].ConstVal), (yyvsp[(5) - (8)].ConstVal), (yyvsp[(7) - (8)].ConstVal)))
       GEN_ERROR("Invalid insertelement operands");
@@ -5262,7 +5262,7 @@ yyreduce:
   case 210:
 
 /* Line 1455 of yacc.c  */
-#line 2027 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2027 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!ShuffleVectorInst::isValidOperands((yyvsp[(3) - (8)].ConstVal), (yyvsp[(5) - (8)].ConstVal), (yyvsp[(7) - (8)].ConstVal)))
       GEN_ERROR("Invalid shufflevector operands");
@@ -5274,7 +5274,7 @@ yyreduce:
   case 211:
 
 /* Line 1455 of yacc.c  */
-#line 2033 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2033 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!isa<StructType>((yyvsp[(3) - (5)].ConstVal)->getType()) && !isa<ArrayType>((yyvsp[(3) - (5)].ConstVal)->getType()))
       GEN_ERROR("ExtractValue requires an aggregate operand");
@@ -5288,7 +5288,7 @@ yyreduce:
   case 212:
 
 /* Line 1455 of yacc.c  */
-#line 2041 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2041 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!isa<StructType>((yyvsp[(3) - (7)].ConstVal)->getType()) && !isa<ArrayType>((yyvsp[(3) - (7)].ConstVal)->getType()))
       GEN_ERROR("InsertValue requires an aggregate operand");
@@ -5302,7 +5302,7 @@ yyreduce:
   case 213:
 
 /* Line 1455 of yacc.c  */
-#line 2052 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2052 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     ((yyval.ConstVector) = (yyvsp[(1) - (3)].ConstVector))->push_back((yyvsp[(3) - (3)].ConstVal));
     CHECK_FOR_ERROR
@@ -5312,7 +5312,7 @@ yyreduce:
   case 214:
 
 /* Line 1455 of yacc.c  */
-#line 2056 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2056 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ConstVector) = new std::vector<Constant*>();
     (yyval.ConstVector)->push_back((yyvsp[(1) - (1)].ConstVal));
@@ -5323,35 +5323,35 @@ yyreduce:
   case 215:
 
 /* Line 1455 of yacc.c  */
-#line 2064 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2064 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.BoolVal) = false; ;}
     break;
 
   case 216:
 
 /* Line 1455 of yacc.c  */
-#line 2064 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2064 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.BoolVal) = true; ;}
     break;
 
   case 217:
 
 /* Line 1455 of yacc.c  */
-#line 2067 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2067 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.BoolVal) = true; ;}
     break;
 
   case 218:
 
 /* Line 1455 of yacc.c  */
-#line 2067 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2067 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.BoolVal) = false; ;}
     break;
 
   case 219:
 
 /* Line 1455 of yacc.c  */
-#line 2070 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2070 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     const Type* VTy = (yyvsp[(1) - (2)].TypeVal)->get();
     Value *V = getVal(VTy, (yyvsp[(2) - (2)].ValIDVal));
@@ -5369,7 +5369,7 @@ yyreduce:
   case 220:
 
 /* Line 1455 of yacc.c  */
-#line 2082 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2082 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     Constant *Val = (yyvsp[(3) - (6)].ConstVal);
     const Type *DestTy = (yyvsp[(5) - (6)].TypeVal)->get();
@@ -5387,7 +5387,7 @@ yyreduce:
   case 221:
 
 /* Line 1455 of yacc.c  */
-#line 2103 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2103 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ModuleVal) = ParserResult = CurModule.CurrentModule;
     CurModule.ModuleDone();
@@ -5398,7 +5398,7 @@ yyreduce:
   case 222:
 
 /* Line 1455 of yacc.c  */
-#line 2108 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2108 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ModuleVal) = ParserResult = CurModule.CurrentModule;
     CurModule.ModuleDone();
@@ -5409,14 +5409,14 @@ yyreduce:
   case 225:
 
 /* Line 1455 of yacc.c  */
-#line 2121 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2121 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { CurFun.isDeclare = false; ;}
     break;
 
   case 226:
 
 /* Line 1455 of yacc.c  */
-#line 2121 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2121 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CurFun.FunctionDone();
     CHECK_FOR_ERROR
@@ -5426,14 +5426,14 @@ yyreduce:
   case 227:
 
 /* Line 1455 of yacc.c  */
-#line 2125 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2125 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { CurFun.isDeclare = true; ;}
     break;
 
   case 228:
 
 /* Line 1455 of yacc.c  */
-#line 2125 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2125 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CHECK_FOR_ERROR
   ;}
@@ -5442,7 +5442,7 @@ yyreduce:
   case 229:
 
 /* Line 1455 of yacc.c  */
-#line 2128 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2128 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CHECK_FOR_ERROR
   ;}
@@ -5451,7 +5451,7 @@ yyreduce:
   case 230:
 
 /* Line 1455 of yacc.c  */
-#line 2131 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2131 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(3) - (3)].TypeVal))->getDescription());
@@ -5481,7 +5481,7 @@ yyreduce:
   case 231:
 
 /* Line 1455 of yacc.c  */
-#line 2155 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2155 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     ResolveTypeTo((yyvsp[(1) - (3)].StrVal), (yyvsp[(3) - (3)].PrimType));
 
@@ -5498,7 +5498,7 @@ yyreduce:
   case 232:
 
 /* Line 1455 of yacc.c  */
-#line 2167 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2167 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { 
     /* "Externally Visible" Linkage */
     if ((yyvsp[(5) - (6)].ConstVal) == 0) 
@@ -5512,7 +5512,7 @@ yyreduce:
   case 233:
 
 /* Line 1455 of yacc.c  */
-#line 2174 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2174 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CurGV = 0;
   ;}
@@ -5521,7 +5521,7 @@ yyreduce:
   case 234:
 
 /* Line 1455 of yacc.c  */
-#line 2178 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2178 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(6) - (7)].ConstVal) == 0) 
       GEN_ERROR("Global value initializer is not a constant");
@@ -5533,7 +5533,7 @@ yyreduce:
   case 235:
 
 /* Line 1455 of yacc.c  */
-#line 2183 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2183 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CurGV = 0;
   ;}
@@ -5542,7 +5542,7 @@ yyreduce:
   case 236:
 
 /* Line 1455 of yacc.c  */
-#line 2187 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2187 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(6) - (7)].TypeVal))->getDescription());
@@ -5555,7 +5555,7 @@ yyreduce:
   case 237:
 
 /* Line 1455 of yacc.c  */
-#line 2193 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2193 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CurGV = 0;
     CHECK_FOR_ERROR
@@ -5565,7 +5565,7 @@ yyreduce:
   case 238:
 
 /* Line 1455 of yacc.c  */
-#line 2197 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2197 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     std::string Name;
     if ((yyvsp[(1) - (5)].StrVal)) {
@@ -5611,7 +5611,7 @@ yyreduce:
   case 239:
 
 /* Line 1455 of yacc.c  */
-#line 2237 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2237 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { 
     CHECK_FOR_ERROR
   ;}
@@ -5620,7 +5620,7 @@ yyreduce:
   case 240:
 
 /* Line 1455 of yacc.c  */
-#line 2240 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2240 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CHECK_FOR_ERROR
   ;}
@@ -5629,7 +5629,7 @@ yyreduce:
   case 241:
 
 /* Line 1455 of yacc.c  */
-#line 2246 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2246 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   const std::string &AsmSoFar = CurModule.CurrentModule->getModuleInlineAsm();
   if (AsmSoFar.empty())
@@ -5644,7 +5644,7 @@ yyreduce:
   case 242:
 
 /* Line 1455 of yacc.c  */
-#line 2256 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2256 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CurModule.CurrentModule->setTargetTriple(*(yyvsp[(3) - (3)].StrVal));
     delete (yyvsp[(3) - (3)].StrVal);
@@ -5654,7 +5654,7 @@ yyreduce:
   case 243:
 
 /* Line 1455 of yacc.c  */
-#line 2260 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2260 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CurModule.CurrentModule->setDataLayout(*(yyvsp[(3) - (3)].StrVal));
     delete (yyvsp[(3) - (3)].StrVal);
@@ -5664,7 +5664,7 @@ yyreduce:
   case 245:
 
 /* Line 1455 of yacc.c  */
-#line 2267 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2267 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
           CurModule.CurrentModule->addLibrary(*(yyvsp[(3) - (3)].StrVal));
           delete (yyvsp[(3) - (3)].StrVal);
@@ -5675,7 +5675,7 @@ yyreduce:
   case 246:
 
 /* Line 1455 of yacc.c  */
-#line 2272 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2272 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
           CurModule.CurrentModule->addLibrary(*(yyvsp[(1) - (1)].StrVal));
           delete (yyvsp[(1) - (1)].StrVal);
@@ -5686,7 +5686,7 @@ yyreduce:
   case 247:
 
 /* Line 1455 of yacc.c  */
-#line 2277 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2277 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
           CHECK_FOR_ERROR
         ;}
@@ -5695,7 +5695,7 @@ yyreduce:
   case 248:
 
 /* Line 1455 of yacc.c  */
-#line 2286 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2286 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(3) - (5)].TypeVal))->getDescription());
@@ -5711,7 +5711,7 @@ yyreduce:
   case 249:
 
 /* Line 1455 of yacc.c  */
-#line 2296 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2296 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (3)].TypeVal))->getDescription());
@@ -5727,7 +5727,7 @@ yyreduce:
   case 250:
 
 /* Line 1455 of yacc.c  */
-#line 2307 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2307 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ArgList) = (yyvsp[(1) - (1)].ArgList);
     CHECK_FOR_ERROR
@@ -5737,7 +5737,7 @@ yyreduce:
   case 251:
 
 /* Line 1455 of yacc.c  */
-#line 2311 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2311 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ArgList) = (yyvsp[(1) - (3)].ArgList);
     struct ArgListEntry E;
@@ -5752,7 +5752,7 @@ yyreduce:
   case 252:
 
 /* Line 1455 of yacc.c  */
-#line 2320 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2320 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ArgList) = new ArgListType;
     struct ArgListEntry E;
@@ -5767,7 +5767,7 @@ yyreduce:
   case 253:
 
 /* Line 1455 of yacc.c  */
-#line 2329 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2329 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ArgList) = 0;
     CHECK_FOR_ERROR
@@ -5777,7 +5777,7 @@ yyreduce:
   case 254:
 
 /* Line 1455 of yacc.c  */
-#line 2335 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2335 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   std::string FunctionName(*(yyvsp[(3) - (11)].StrVal));
   delete (yyvsp[(3) - (11)].StrVal);  // Free strdup'd memory!
@@ -5913,7 +5913,7 @@ yyreduce:
   case 257:
 
 /* Line 1455 of yacc.c  */
-#line 2468 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2468 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   (yyval.FunctionVal) = CurFun.CurrentFunction;
 
@@ -5927,7 +5927,7 @@ yyreduce:
   case 260:
 
 /* Line 1455 of yacc.c  */
-#line 2479 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2479 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   (yyval.FunctionVal) = (yyvsp[(1) - (2)].FunctionVal);
   CHECK_FOR_ERROR
@@ -5937,7 +5937,7 @@ yyreduce:
   case 261:
 
 /* Line 1455 of yacc.c  */
-#line 2484 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2484 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CurFun.CurrentFunction->setLinkage((yyvsp[(1) - (3)].Linkage));
     CurFun.CurrentFunction->setVisibility((yyvsp[(2) - (3)].Visibility));
@@ -5950,7 +5950,7 @@ yyreduce:
   case 262:
 
 /* Line 1455 of yacc.c  */
-#line 2496 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2496 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.BoolVal) = false;
     CHECK_FOR_ERROR
@@ -5960,7 +5960,7 @@ yyreduce:
   case 263:
 
 /* Line 1455 of yacc.c  */
-#line 2500 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2500 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.BoolVal) = true;
     CHECK_FOR_ERROR
@@ -5970,7 +5970,7 @@ yyreduce:
   case 264:
 
 /* Line 1455 of yacc.c  */
-#line 2505 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2505 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {    // A reference to a direct constant
     (yyval.ValIDVal) = ValID::create((yyvsp[(1) - (1)].SInt64Val));
     CHECK_FOR_ERROR
@@ -5980,7 +5980,7 @@ yyreduce:
   case 265:
 
 /* Line 1455 of yacc.c  */
-#line 2509 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2509 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValIDVal) = ValID::create((yyvsp[(1) - (1)].UInt64Val));
     CHECK_FOR_ERROR
@@ -5990,7 +5990,7 @@ yyreduce:
   case 266:
 
 /* Line 1455 of yacc.c  */
-#line 2513 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2513 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {      // arbitrary precision integer constants
     (yyval.ValIDVal) = ValID::create(*(yyvsp[(1) - (1)].APIntVal), true);
     delete (yyvsp[(1) - (1)].APIntVal);
@@ -6001,7 +6001,7 @@ yyreduce:
   case 267:
 
 /* Line 1455 of yacc.c  */
-#line 2518 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2518 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {      // arbitrary precision integer constants
     (yyval.ValIDVal) = ValID::create(*(yyvsp[(1) - (1)].APIntVal), false);
     delete (yyvsp[(1) - (1)].APIntVal);
@@ -6012,7 +6012,7 @@ yyreduce:
   case 268:
 
 /* Line 1455 of yacc.c  */
-#line 2523 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2523 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                     // Perhaps it's an FP constant?
     (yyval.ValIDVal) = ValID::create((yyvsp[(1) - (1)].FPVal));
     CHECK_FOR_ERROR
@@ -6022,7 +6022,7 @@ yyreduce:
   case 269:
 
 /* Line 1455 of yacc.c  */
-#line 2527 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2527 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValIDVal) = ValID::create(ConstantInt::getTrue());
     CHECK_FOR_ERROR
@@ -6032,7 +6032,7 @@ yyreduce:
   case 270:
 
 /* Line 1455 of yacc.c  */
-#line 2531 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2531 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValIDVal) = ValID::create(ConstantInt::getFalse());
     CHECK_FOR_ERROR
@@ -6042,7 +6042,7 @@ yyreduce:
   case 271:
 
 /* Line 1455 of yacc.c  */
-#line 2535 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2535 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValIDVal) = ValID::createNull();
     CHECK_FOR_ERROR
@@ -6052,7 +6052,7 @@ yyreduce:
   case 272:
 
 /* Line 1455 of yacc.c  */
-#line 2539 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2539 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValIDVal) = ValID::createUndef();
     CHECK_FOR_ERROR
@@ -6062,7 +6062,7 @@ yyreduce:
   case 273:
 
 /* Line 1455 of yacc.c  */
-#line 2543 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2543 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {     // A vector zero constant.
     (yyval.ValIDVal) = ValID::createZeroInit();
     CHECK_FOR_ERROR
@@ -6072,7 +6072,7 @@ yyreduce:
   case 274:
 
 /* Line 1455 of yacc.c  */
-#line 2547 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2547 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { // Nonempty unsized packed vector
     const Type *ETy = (*(yyvsp[(2) - (3)].ConstVector))[0]->getType();
     unsigned NumElements = (yyvsp[(2) - (3)].ConstVector)->size(); 
@@ -6100,7 +6100,7 @@ yyreduce:
   case 275:
 
 /* Line 1455 of yacc.c  */
-#line 2569 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2569 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { // Nonempty unsized arr
     const Type *ETy = (*(yyvsp[(2) - (3)].ConstVector))[0]->getType();
     uint64_t NumElements = (yyvsp[(2) - (3)].ConstVector)->size(); 
@@ -6128,7 +6128,7 @@ yyreduce:
   case 276:
 
 /* Line 1455 of yacc.c  */
-#line 2591 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2591 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // Use undef instead of an array because it's inconvenient to determine
     // the element type at this point, there being no elements to examine.
@@ -6140,7 +6140,7 @@ yyreduce:
   case 277:
 
 /* Line 1455 of yacc.c  */
-#line 2597 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2597 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     uint64_t NumElements = (yyvsp[(2) - (2)].StrVal)->length();
     const Type *ETy = Type::Int8Ty;
@@ -6159,7 +6159,7 @@ yyreduce:
   case 278:
 
 /* Line 1455 of yacc.c  */
-#line 2610 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2610 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     std::vector<const Type*> Elements((yyvsp[(2) - (3)].ConstVector)->size());
     for (unsigned i = 0, e = (yyvsp[(2) - (3)].ConstVector)->size(); i != e; ++i)
@@ -6177,7 +6177,7 @@ yyreduce:
   case 279:
 
 /* Line 1455 of yacc.c  */
-#line 2622 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2622 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     const StructType *STy = StructType::get(std::vector<const Type*>());
     (yyval.ValIDVal) = ValID::create(ConstantStruct::get(STy, std::vector<Constant*>()));
@@ -6188,7 +6188,7 @@ yyreduce:
   case 280:
 
 /* Line 1455 of yacc.c  */
-#line 2627 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2627 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     std::vector<const Type*> Elements((yyvsp[(3) - (5)].ConstVector)->size());
     for (unsigned i = 0, e = (yyvsp[(3) - (5)].ConstVector)->size(); i != e; ++i)
@@ -6206,7 +6206,7 @@ yyreduce:
   case 281:
 
 /* Line 1455 of yacc.c  */
-#line 2639 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2639 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     const StructType *STy = StructType::get(std::vector<const Type*>(),
                                             /*isPacked=*/true);
@@ -6218,7 +6218,7 @@ yyreduce:
   case 282:
 
 /* Line 1455 of yacc.c  */
-#line 2645 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2645 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValIDVal) = ValID::create((yyvsp[(1) - (1)].ConstVal));
     CHECK_FOR_ERROR
@@ -6228,7 +6228,7 @@ yyreduce:
   case 283:
 
 /* Line 1455 of yacc.c  */
-#line 2649 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2649 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValIDVal) = ValID::createInlineAsm(*(yyvsp[(3) - (5)].StrVal), *(yyvsp[(5) - (5)].StrVal), (yyvsp[(2) - (5)].BoolVal));
     delete (yyvsp[(3) - (5)].StrVal);
@@ -6240,7 +6240,7 @@ yyreduce:
   case 284:
 
 /* Line 1455 of yacc.c  */
-#line 2659 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2659 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {  // Is it an integer reference...?
     (yyval.ValIDVal) = ValID::createLocalID((yyvsp[(1) - (1)].UIntVal));
     CHECK_FOR_ERROR
@@ -6250,7 +6250,7 @@ yyreduce:
   case 285:
 
 /* Line 1455 of yacc.c  */
-#line 2663 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2663 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValIDVal) = ValID::createGlobalID((yyvsp[(1) - (1)].UIntVal));
     CHECK_FOR_ERROR
@@ -6260,7 +6260,7 @@ yyreduce:
   case 286:
 
 /* Line 1455 of yacc.c  */
-#line 2667 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2667 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                   // Is it a named reference...?
     (yyval.ValIDVal) = ValID::createLocalName(*(yyvsp[(1) - (1)].StrVal));
     delete (yyvsp[(1) - (1)].StrVal);
@@ -6271,7 +6271,7 @@ yyreduce:
   case 287:
 
 /* Line 1455 of yacc.c  */
-#line 2672 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2672 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                   // Is it a named reference...?
     (yyval.ValIDVal) = ValID::createGlobalName(*(yyvsp[(1) - (1)].StrVal));
     delete (yyvsp[(1) - (1)].StrVal);
@@ -6282,7 +6282,7 @@ yyreduce:
   case 290:
 
 /* Line 1455 of yacc.c  */
-#line 2685 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2685 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (2)].TypeVal))->getDescription());
@@ -6295,7 +6295,7 @@ yyreduce:
   case 291:
 
 /* Line 1455 of yacc.c  */
-#line 2694 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2694 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValueList) = new std::vector<Value *>();
     (yyval.ValueList)->push_back((yyvsp[(1) - (1)].ValueVal)); 
@@ -6306,7 +6306,7 @@ yyreduce:
   case 292:
 
 /* Line 1455 of yacc.c  */
-#line 2699 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2699 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     ((yyval.ValueList)=(yyvsp[(1) - (3)].ValueList))->push_back((yyvsp[(3) - (3)].ValueVal)); 
     CHECK_FOR_ERROR
@@ -6316,7 +6316,7 @@ yyreduce:
   case 293:
 
 /* Line 1455 of yacc.c  */
-#line 2704 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2704 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.FunctionVal) = (yyvsp[(1) - (2)].FunctionVal);
     CHECK_FOR_ERROR
@@ -6326,7 +6326,7 @@ yyreduce:
   case 294:
 
 /* Line 1455 of yacc.c  */
-#line 2708 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2708 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { // Do not allow functions with 0 basic blocks   
     (yyval.FunctionVal) = (yyvsp[(1) - (2)].FunctionVal);
     CHECK_FOR_ERROR
@@ -6336,7 +6336,7 @@ yyreduce:
   case 295:
 
 /* Line 1455 of yacc.c  */
-#line 2717 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2717 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     setValueName((yyvsp[(3) - (3)].TermInstVal), (yyvsp[(2) - (3)].StrVal));
     CHECK_FOR_ERROR
@@ -6350,7 +6350,7 @@ yyreduce:
   case 296:
 
 /* Line 1455 of yacc.c  */
-#line 2726 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2726 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
   CHECK_FOR_ERROR
   int ValNum = InsertValue((yyvsp[(3) - (3)].TermInstVal));
@@ -6367,7 +6367,7 @@ yyreduce:
   case 297:
 
 /* Line 1455 of yacc.c  */
-#line 2739 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2739 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (CastInst *CI1 = dyn_cast<CastInst>((yyvsp[(2) - (2)].InstVal)))
       if (CastInst *CI2 = dyn_cast<CastInst>(CI1->getOperand(0)))
@@ -6382,7 +6382,7 @@ yyreduce:
   case 298:
 
 /* Line 1455 of yacc.c  */
-#line 2748 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2748 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {          // Empty space between instruction lists
     (yyval.BasicBlockVal) = defineBBVal(ValID::createLocalID(CurFun.NextValNum));
     CHECK_FOR_ERROR
@@ -6392,7 +6392,7 @@ yyreduce:
   case 299:
 
 /* Line 1455 of yacc.c  */
-#line 2752 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2752 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {             // Labelled (named) basic block
     (yyval.BasicBlockVal) = defineBBVal(ValID::createLocalName(*(yyvsp[(1) - (1)].StrVal)));
     delete (yyvsp[(1) - (1)].StrVal);
@@ -6404,7 +6404,7 @@ yyreduce:
   case 300:
 
 /* Line 1455 of yacc.c  */
-#line 2760 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2760 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { // Return with a result...
     ValueList &VL = *(yyvsp[(2) - (2)].ValueList);
     assert(!VL.empty() && "Invalid ret operands!");
@@ -6430,7 +6430,7 @@ yyreduce:
   case 301:
 
 /* Line 1455 of yacc.c  */
-#line 2780 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2780 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                                    // Return with no result...
     (yyval.TermInstVal) = ReturnInst::Create();
     CHECK_FOR_ERROR
@@ -6440,7 +6440,7 @@ yyreduce:
   case 302:
 
 /* Line 1455 of yacc.c  */
-#line 2784 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2784 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {                           // Unconditional Branch...
     BasicBlock* tmpBB = getBBVal((yyvsp[(3) - (3)].ValIDVal));
     CHECK_FOR_ERROR
@@ -6451,7 +6451,7 @@ yyreduce:
   case 303:
 
 /* Line 1455 of yacc.c  */
-#line 2789 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2789 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {  
     if (cast<IntegerType>((yyvsp[(2) - (9)].PrimType))->getBitWidth() != 1)
       GEN_ERROR("Branch condition must have type i1");
@@ -6468,7 +6468,7 @@ yyreduce:
   case 304:
 
 /* Line 1455 of yacc.c  */
-#line 2800 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2800 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     Value* tmpVal = getVal((yyvsp[(2) - (9)].PrimType), (yyvsp[(3) - (9)].ValIDVal));
     CHECK_FOR_ERROR
@@ -6493,7 +6493,7 @@ yyreduce:
   case 305:
 
 /* Line 1455 of yacc.c  */
-#line 2819 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2819 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     Value* tmpVal = getVal((yyvsp[(2) - (8)].PrimType), (yyvsp[(3) - (8)].ValIDVal));
     CHECK_FOR_ERROR
@@ -6508,7 +6508,7 @@ yyreduce:
   case 306:
 
 /* Line 1455 of yacc.c  */
-#line 2829 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2829 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
 
     // Handle the short syntax
@@ -6599,7 +6599,7 @@ yyreduce:
   case 307:
 
 /* Line 1455 of yacc.c  */
-#line 2914 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2914 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TermInstVal) = new UnwindInst();
     CHECK_FOR_ERROR
@@ -6609,7 +6609,7 @@ yyreduce:
   case 308:
 
 /* Line 1455 of yacc.c  */
-#line 2918 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2918 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.TermInstVal) = new UnreachableInst();
     CHECK_FOR_ERROR
@@ -6619,7 +6619,7 @@ yyreduce:
   case 309:
 
 /* Line 1455 of yacc.c  */
-#line 2925 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2925 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.JumpTable) = (yyvsp[(1) - (6)].JumpTable);
     Constant *V = cast<Constant>(getExistingVal((yyvsp[(2) - (6)].PrimType), (yyvsp[(3) - (6)].ValIDVal)));
@@ -6636,7 +6636,7 @@ yyreduce:
   case 310:
 
 /* Line 1455 of yacc.c  */
-#line 2936 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2936 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.JumpTable) = new std::vector<std::pair<Constant*, BasicBlock*> >();
     Constant *V = cast<Constant>(getExistingVal((yyvsp[(1) - (5)].PrimType), (yyvsp[(2) - (5)].ValIDVal)));
@@ -6654,7 +6654,7 @@ yyreduce:
   case 311:
 
 /* Line 1455 of yacc.c  */
-#line 2949 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2949 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // Is this definition named?? if so, assign the name...
     setValueName((yyvsp[(2) - (2)].InstVal), (yyvsp[(1) - (2)].StrVal));
@@ -6668,7 +6668,7 @@ yyreduce:
   case 312:
 
 /* Line 1455 of yacc.c  */
-#line 2958 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2958 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     CHECK_FOR_ERROR
     int ValNum = InsertValue((yyvsp[(2) - (2)].InstVal));
@@ -6685,7 +6685,7 @@ yyreduce:
   case 313:
 
 /* Line 1455 of yacc.c  */
-#line 2971 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2971 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {    // Used for PHI nodes
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(1) - (6)].TypeVal))->getDescription());
@@ -6702,7 +6702,7 @@ yyreduce:
   case 314:
 
 /* Line 1455 of yacc.c  */
-#line 2982 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2982 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.PHIList) = (yyvsp[(1) - (7)].PHIList);
     Value* tmpVal = getVal((yyvsp[(1) - (7)].PHIList)->front().first->getType(), (yyvsp[(4) - (7)].ValIDVal));
@@ -6716,7 +6716,7 @@ yyreduce:
   case 315:
 
 /* Line 1455 of yacc.c  */
-#line 2992 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 2992 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // FIXME: Remove trailing OptParamAttrs in LLVM 3.0, it was a mistake in 2.0
     if (!UpRefs.empty())
@@ -6733,7 +6733,7 @@ yyreduce:
   case 316:
 
 /* Line 1455 of yacc.c  */
-#line 3003 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3003 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // FIXME: Remove trailing OptParamAttrs in LLVM 3.0, it was a mistake in 2.0
     // Labels are only valid in ASMs
@@ -6747,7 +6747,7 @@ yyreduce:
   case 317:
 
 /* Line 1455 of yacc.c  */
-#line 3011 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3011 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // FIXME: Remove trailing OptParamAttrs in LLVM 3.0, it was a mistake in 2.0
     if (!UpRefs.empty())
@@ -6763,7 +6763,7 @@ yyreduce:
   case 318:
 
 /* Line 1455 of yacc.c  */
-#line 3021 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3021 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     // FIXME: Remove trailing OptParamAttrs in LLVM 3.0, it was a mistake in 2.0
     (yyval.ParamList) = (yyvsp[(1) - (6)].ParamList);
@@ -6776,21 +6776,21 @@ yyreduce:
   case 319:
 
 /* Line 1455 of yacc.c  */
-#line 3028 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3028 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ParamList) = new ParamList(); ;}
     break;
 
   case 320:
 
 /* Line 1455 of yacc.c  */
-#line 3031 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3031 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     { (yyval.ValueList) = new std::vector<Value*>(); ;}
     break;
 
   case 321:
 
 /* Line 1455 of yacc.c  */
-#line 3032 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3032 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ValueList) = (yyvsp[(1) - (3)].ValueList);
     (yyval.ValueList)->push_back((yyvsp[(3) - (3)].ValueVal));
@@ -6801,7 +6801,7 @@ yyreduce:
   case 322:
 
 /* Line 1455 of yacc.c  */
-#line 3040 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3040 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ConstantList) = new std::vector<unsigned>();
     if ((unsigned)(yyvsp[(2) - (2)].UInt64Val) != (yyvsp[(2) - (2)].UInt64Val))
@@ -6813,7 +6813,7 @@ yyreduce:
   case 323:
 
 /* Line 1455 of yacc.c  */
-#line 3046 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3046 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.ConstantList) = (yyvsp[(1) - (3)].ConstantList);
     if ((unsigned)(yyvsp[(3) - (3)].UInt64Val) != (yyvsp[(3) - (3)].UInt64Val))
@@ -6826,7 +6826,7 @@ yyreduce:
   case 324:
 
 /* Line 1455 of yacc.c  */
-#line 3055 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3055 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.BoolVal) = true;
     CHECK_FOR_ERROR
@@ -6836,7 +6836,7 @@ yyreduce:
   case 325:
 
 /* Line 1455 of yacc.c  */
-#line 3059 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3059 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.BoolVal) = false;
     CHECK_FOR_ERROR
@@ -6846,7 +6846,7 @@ yyreduce:
   case 326:
 
 /* Line 1455 of yacc.c  */
-#line 3064 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3064 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (5)].TypeVal))->getDescription());
@@ -6868,7 +6868,7 @@ yyreduce:
   case 327:
 
 /* Line 1455 of yacc.c  */
-#line 3080 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3080 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (5)].TypeVal))->getDescription());
@@ -6891,7 +6891,7 @@ yyreduce:
   case 328:
 
 /* Line 1455 of yacc.c  */
-#line 3097 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3097 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(3) - (6)].TypeVal))->getDescription());
@@ -6911,7 +6911,7 @@ yyreduce:
   case 329:
 
 /* Line 1455 of yacc.c  */
-#line 3111 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3111 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(3) - (6)].TypeVal))->getDescription());
@@ -6931,7 +6931,7 @@ yyreduce:
   case 330:
 
 /* Line 1455 of yacc.c  */
-#line 3125 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3125 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(3) - (6)].TypeVal))->getDescription());
@@ -6951,7 +6951,7 @@ yyreduce:
   case 331:
 
 /* Line 1455 of yacc.c  */
-#line 3139 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3139 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(3) - (6)].TypeVal))->getDescription());
@@ -6971,7 +6971,7 @@ yyreduce:
   case 332:
 
 /* Line 1455 of yacc.c  */
-#line 3153 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3153 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(4) - (4)].TypeVal))->getDescription());
@@ -6989,7 +6989,7 @@ yyreduce:
   case 333:
 
 /* Line 1455 of yacc.c  */
-#line 3165 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3165 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if ((yyvsp[(2) - (6)].ValueVal)->getType() != Type::Int1Ty)
       GEN_ERROR("select condition must be boolean");
@@ -7003,7 +7003,7 @@ yyreduce:
   case 334:
 
 /* Line 1455 of yacc.c  */
-#line 3173 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3173 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(4) - (4)].TypeVal))->getDescription());
@@ -7016,7 +7016,7 @@ yyreduce:
   case 335:
 
 /* Line 1455 of yacc.c  */
-#line 3180 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3180 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!ExtractElementInst::isValidOperands((yyvsp[(2) - (4)].ValueVal), (yyvsp[(4) - (4)].ValueVal)))
       GEN_ERROR("Invalid extractelement operands");
@@ -7028,7 +7028,7 @@ yyreduce:
   case 336:
 
 /* Line 1455 of yacc.c  */
-#line 3186 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3186 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!InsertElementInst::isValidOperands((yyvsp[(2) - (6)].ValueVal), (yyvsp[(4) - (6)].ValueVal), (yyvsp[(6) - (6)].ValueVal)))
       GEN_ERROR("Invalid insertelement operands");
@@ -7040,7 +7040,7 @@ yyreduce:
   case 337:
 
 /* Line 1455 of yacc.c  */
-#line 3192 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3192 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!ShuffleVectorInst::isValidOperands((yyvsp[(2) - (6)].ValueVal), (yyvsp[(4) - (6)].ValueVal), (yyvsp[(6) - (6)].ValueVal)))
       GEN_ERROR("Invalid shufflevector operands");
@@ -7052,7 +7052,7 @@ yyreduce:
   case 338:
 
 /* Line 1455 of yacc.c  */
-#line 3198 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3198 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     const Type *Ty = (yyvsp[(2) - (2)].PHIList)->front().first->getType();
     if (!Ty->isFirstClassType())
@@ -7073,7 +7073,7 @@ yyreduce:
   case 339:
 
 /* Line 1455 of yacc.c  */
-#line 3214 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3214 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
 
     // Handle the short syntax
@@ -7168,7 +7168,7 @@ yyreduce:
   case 340:
 
 /* Line 1455 of yacc.c  */
-#line 3303 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3303 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.InstVal) = (yyvsp[(1) - (1)].InstVal);
     CHECK_FOR_ERROR
@@ -7178,7 +7178,7 @@ yyreduce:
   case 341:
 
 /* Line 1455 of yacc.c  */
-#line 3308 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3308 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.BoolVal) = true;
     CHECK_FOR_ERROR
@@ -7188,7 +7188,7 @@ yyreduce:
   case 342:
 
 /* Line 1455 of yacc.c  */
-#line 3312 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3312 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     (yyval.BoolVal) = false;
     CHECK_FOR_ERROR
@@ -7198,7 +7198,7 @@ yyreduce:
   case 343:
 
 /* Line 1455 of yacc.c  */
-#line 3319 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3319 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (3)].TypeVal))->getDescription());
@@ -7211,7 +7211,7 @@ yyreduce:
   case 344:
 
 /* Line 1455 of yacc.c  */
-#line 3326 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3326 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (6)].TypeVal))->getDescription());
@@ -7227,7 +7227,7 @@ yyreduce:
   case 345:
 
 /* Line 1455 of yacc.c  */
-#line 3336 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3336 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (3)].TypeVal))->getDescription());
@@ -7240,7 +7240,7 @@ yyreduce:
   case 346:
 
 /* Line 1455 of yacc.c  */
-#line 3343 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3343 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (6)].TypeVal))->getDescription());
@@ -7256,7 +7256,7 @@ yyreduce:
   case 347:
 
 /* Line 1455 of yacc.c  */
-#line 3353 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3353 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!isa<PointerType>((yyvsp[(2) - (2)].ValueVal)->getType()))
       GEN_ERROR("Trying to free nonpointer type " + 
@@ -7269,7 +7269,7 @@ yyreduce:
   case 348:
 
 /* Line 1455 of yacc.c  */
-#line 3361 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3361 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(3) - (5)].TypeVal))->getDescription());
@@ -7289,7 +7289,7 @@ yyreduce:
   case 349:
 
 /* Line 1455 of yacc.c  */
-#line 3375 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3375 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(5) - (7)].TypeVal))->getDescription());
@@ -7312,7 +7312,7 @@ yyreduce:
   case 350:
 
 /* Line 1455 of yacc.c  */
-#line 3392 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3392 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (5)].TypeVal))->getDescription());
@@ -7332,7 +7332,7 @@ yyreduce:
   case 351:
 
 /* Line 1455 of yacc.c  */
-#line 3406 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3406 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (4)].TypeVal))->getDescription());
@@ -7353,7 +7353,7 @@ yyreduce:
   case 352:
 
 /* Line 1455 of yacc.c  */
-#line 3421 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3421 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (4)].TypeVal))->getDescription());
@@ -7374,7 +7374,7 @@ yyreduce:
   case 353:
 
 /* Line 1455 of yacc.c  */
-#line 3436 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3436 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
     {
     if (!UpRefs.empty())
       GEN_ERROR("Invalid upreference in type: " + (*(yyvsp[(2) - (7)].TypeVal))->getDescription());
@@ -7609,7 +7609,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 3455 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 3455 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
 
 
 // common code from the two 'RunVMAsmParser' functions

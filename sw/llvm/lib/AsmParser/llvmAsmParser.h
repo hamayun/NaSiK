@@ -208,7 +208,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 970 "/home/hamayun/workspace/Native/sw/llvm/lib/AsmParser/llvmAsmParser.y"
+#line 970 "/home/hamayun/workspace/NaSiK/sw/llvm/lib/AsmParser/llvmAsmParser.y"
 
   llvm::Module                           *ModuleVal;
   llvm::Function                         *FunctionVal;

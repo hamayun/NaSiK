@@ -1300,6 +1300,7 @@ bool FPPassManager::runOnFunction(Function &F) {
 
   for (unsigned Index = 0; Index < getNumContainedPasses(); ++Index) {
     FunctionPass *FP = getContainedPass(Index);
+    //cout << "MMH: Running Pass: " << FP->getPassName() << " on " << F.getName() << std::endl;
 
     dumpPassInfo(FP, EXECUTION_MSG, ON_FUNCTION_MSG, F.getNameStart());
     dumpRequiredSet(FP);

@@ -185,12 +185,23 @@ static raw_ostream *GetOutputStream(const char *ProgName) {
   return Out;
 }
 
+
+void printInputArgs(int argc, char **argv)
+{
+    int i;
+    for(i=0; i<argc; i++)
+        cout << "[" << i << "]: " << argv[i] << std::endl;
+}
+
 // main - Entry point for the llc compiler.
 //
 int main(int argc, char **argv) {
   llvm_shutdown_obj X;  // Call llvm_shutdown() on exit.
   cl::ParseCommandLineOptions(argc, argv, "llvm system compiler\n");
   sys::PrintStackTraceOnErrorSignal();
+
+  // Temp Call
+  // printInputArgs(argc, argv);
 
   // Load the module to be compiled...
   std::string ErrorMessage;
@@ -205,8 +216,11 @@ int main(int argc, char **argv) {
     std::cerr << "Reason: " << ErrorMessage << "\n";
     return 1;
   }
+
+  // MMH: Create a copy of the Original Module and Assign to "mod".
+  // "M" should still be valid, even though it is auto_ptr.
   Module &mod = *M.get();
-  
+
   // If we are supposed to override the target triple, do so now.
   if (!TargetTriple.empty())
     mod.setTargetTriple(TargetTriple);
@@ -310,7 +324,10 @@ int main(int argc, char **argv) {
     // TODO: this could lazily stream functions out of the module.
     for (Module::iterator I = mod.begin(), E = mod.end(); I != E; ++I)
       if (!I->isDeclaration())
+      {
+        //cout << __func__ << ": Running All Passes for Function " << (*I).getName() << std::endl;
         Passes.run(*I);
+      }
     
     Passes.doFinalization();
   }

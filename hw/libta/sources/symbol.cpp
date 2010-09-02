@@ -39,18 +39,14 @@ bool symbol<uint32_t>::link(void * sw_image)
 
 	DOUT_FCT << _name << std::endl;
 
-	symbol_ptr = (uint32_t*)dlsym(sw_image,_name.c_str());
+        symbol_ptr = (uint32_t*)dlsym(sw_image,_name.c_str());
 	ASSERT_MSG(symbol_ptr != NULL, _name);
 
 	for(index = 0 ; index < _values.size() ; index++)
 	{
-		symbol_ptr[index] = _values[index];
+                symbol_ptr[index] = _values[index];
 		DOUT << std::hex << &(symbol_ptr[index]) << " = 0x" << std::hex << _values[index] << std::endl;
-	}
-
-
-	symbol_ptr = (uint32_t*)dlsym(sw_image,_name.c_str());
-	DOUT << std::hex << symbol_ptr << std::endl;
+        }
 
 	return(false);
 }
@@ -71,10 +67,6 @@ bool symbol<uint64_t>::link(void * sw_image)
 		symbol_ptr[index] = _values[index];
 		DOUT << std::hex << &(symbol_ptr[index]) << " = 0x" << std::hex << _values[index] << std::endl;
 	}
-
-
-	symbol_ptr = (uint64_t*)dlsym(sw_image,_name.c_str());
-	DOUT << std::hex << symbol_ptr << std::endl;
 
 	return(false);
 }

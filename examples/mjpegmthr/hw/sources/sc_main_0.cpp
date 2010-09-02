@@ -55,14 +55,14 @@ int sc_main(int argc, char *argv[])
 	return (!EXIT_SUCCESS);
   }
 
-  dna_eu            eu_inst_0("eu_inst_0");
-  tty_pool           tty_pool_inst_0("tty_pool_inst_0");
-  generic_noc     generic_noc_inst_0("generic_noc_inst_0");
+  dna_eu           eu_inst_0("eu_inst_0");
+  tty_pool         tty_pool_inst_0("tty_pool_inst_0");
+  generic_noc      generic_noc_inst_0("generic_noc_inst_0");
   dna_linker	   linker_dna("linker_dna");
   memory	   ram0("ram0");
   soclib_fb  	   fb("fb");
   soclib_timer     timer("timer");
-  bridgefs           fdaccess("fdaccess");
+  bridgefs         fdaccess("fdaccess");
 
   // Devices Channels
 #ifdef CHANNELS

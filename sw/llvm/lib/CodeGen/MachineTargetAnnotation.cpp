@@ -174,9 +174,10 @@ bool MachineTargetAnnotation::runOnMachineFunction(MachineFunction &MF) {
     printBoth();
   }
 
-  //if (_plotCFG)
+  if (_plotCFG)
   {
-    plotGraph(MF);
+    // Call this Function to Create MBB BB and DOT Files for CFG Viewing
+    //plotGraph(MF);
   }
 
   return (true);
