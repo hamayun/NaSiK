@@ -17,14 +17,14 @@ export DNA_SYSTEM_DEVICES="soclib"
 export DNA_DISK_DEVICES="fdaccess"
 export DNA_FILESYSTEMS="devfs rootfs"
 
-export STDINC="-nostdinc -I/opt/toolchains/gnu/i386-sls-dnaos/i386-sls-dnaos/include -I/opt/toolchains/gnu/i386-sls-dnaos/lib/gcc/i386-sls-dnaos/4.3.2/include"
+export STDINC="-nostdinc -I/opt/toolchains/gnu-dnaos-newlibc/i386-sls-dnaos/include -I/opt/toolchains/gnu-dnaos-newlibc/lib/gcc/i386-sls-dnaos/4.3.2/include"
 
 export TARGET_CC="arm-sls-dnaos-gcc"
 #export TARGET_CFLAGS="-pipe -Wall -Werror -mlittle-endian -O3 -g -std=c99 -mfloat-abi=soft -DPROGRESS -ffunction-sections -fdata-sections"
 export TARGET_CFLAGS="-pipe -Wall -Werror -O3 -g -std=c99 -mfloat-abi=soft -DPROGRESS"
 #export TARGET_CFLAGS="-pipe -Wall -Werror -mbig-endian -O3 -g -std=c99 -mfloat-abi=soft -DPROGRESS"
 
-export TARGET_LD="/opt/toolchains/gnu/arm-sls-dnaos/bin/arm-sls-dnaos-gcc"
+export TARGET_LD="/opt/toolchains/gnu-dnaos-newlibc/bin/arm-sls-dnaos-gcc"
 #export TARGET_LDFLAGS="-mfloat-abi=soft -mlittle-endian -Wl,--gc-sections"
 export TARGET_LDFLAGS="-mfloat-abi=soft"
 #export TARGET_LDFLAGS="-mfloat-abi=soft -mbig-endian"
@@ -33,7 +33,8 @@ export TARGET_ARFLAGS="cru"
 export TARGET_AR="arm-sls-dnaos-ar"
 
 export TARGET_ASFLAGS="-c -Wall -Werror -std=c99 -pipe -mfloat-abi=soft"
-export TARGET_AS="/opt/toolchains/gnu/arm-sls-dnaos/bin/arm-sls-dnaos-gcc"
+export TARGET_AS="/opt/toolchains/gnu-dnaos-newlibc/bin/arm-sls-dnaos-gcc"
 
 export TARGET_RANLIB="arm-sls-dnaos-ranlib"
 export TARGET_LDSCRIPT="-T ./ldscripts/arm966"
+

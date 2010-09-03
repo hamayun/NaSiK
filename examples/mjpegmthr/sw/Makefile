@@ -31,7 +31,7 @@ NAME = ${APP_NAME}
 
 default: install_check apes apes_submake binary
 
-export MAKEFILE_RULES=${PWD}/Makefile.rules
+export MAKEFILE_RULES=${PWD}/Makefile.rules.$(CONFIGURATION)
 
 install_check:
 	@if [ -z $(APES_HOME) ] ; then \
