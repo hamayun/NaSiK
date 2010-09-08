@@ -1,0 +1,2060 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <df name="llvm" root="../../sw/llvm">
+      <df name="autoconf">
+        <df name="m4">
+        </df>
+      </df>
+      <df name="bindings">
+        <df name="ocaml">
+          <df name="analysis">
+            <in>analysis_ocaml.c</in>
+          </df>
+          <df name="bitreader">
+            <in>bitreader_ocaml.c</in>
+          </df>
+          <df name="bitwriter">
+            <in>bitwriter_ocaml.c</in>
+          </df>
+          <df name="executionengine">
+            <in>executionengine_ocaml.c</in>
+          </df>
+          <df name="llvm">
+            <in>llvm_ocaml.c</in>
+          </df>
+          <df name="target">
+            <in>target_ocaml.c</in>
+          </df>
+          <df name="transforms">
+            <df name="scalar">
+              <in>scalar_opts_ocaml.c</in>
+            </df>
+          </df>
+        </df>
+      </df>
+      <df name="docs">
+        <df name="CommandGuide">
+          <df name="html">
+          </df>
+        </df>
+        <df name="HistoricalNotes">
+        </df>
+        <df name="img">
+        </df>
+        <df name="tutorial">
+        </df>
+      </df>
+      <df name="examples">
+        <df name="BrainF">
+          <in>BrainF.cpp</in>
+          <in>BrainF.h</in>
+          <in>BrainFDriver.cpp</in>
+        </df>
+        <df name="Fibonacci">
+          <in>fibonacci.cpp</in>
+        </df>
+        <df name="HowToUseJIT">
+          <in>HowToUseJIT.cpp</in>
+        </df>
+        <df name="ModuleMaker">
+          <in>ModuleMaker.cpp</in>
+        </df>
+        <df name="ParallelJIT">
+          <in>ParallelJIT.cpp</in>
+        </df>
+      </df>
+      <df name="include">
+        <df name="llvm">
+          <df name="ADT">
+            <in>APFloat.h</in>
+            <in>APInt.h</in>
+            <in>APSInt.h</in>
+            <in>BitVector.h</in>
+            <in>DenseMap.h</in>
+            <in>DenseSet.h</in>
+            <in>DepthFirstIterator.h</in>
+            <in>EquivalenceClasses.h</in>
+            <in>FoldingSet.h</in>
+            <in>GraphTraits.h</in>
+            <in>HashExtras.h</in>
+            <in>ImmutableList.h</in>
+            <in>ImmutableMap.h</in>
+            <in>ImmutableSet.h</in>
+            <in>IndexedMap.h</in>
+            <in>IntrusiveRefCntPtr.h</in>
+            <in>OwningPtr.h</in>
+            <in>PostOrderIterator.h</in>
+            <in>PriorityQueue.h</in>
+            <in>SCCIterator.h</in>
+            <in>STLExtras.h</in>
+            <in>ScopedHashTable.h</in>
+            <in>SetOperations.h</in>
+            <in>SetVector.h</in>
+            <in>SmallPtrSet.h</in>
+            <in>SmallSet.h</in>
+            <in>SmallString.h</in>
+            <in>SmallVector.h</in>
+            <in>SparseBitVector.h</in>
+            <in>Statistic.h</in>
+            <in>StringExtras.h</in>
+            <in>StringMap.h</in>
+            <in>StringSet.h</in>
+            <in>Tree.h</in>
+            <in>Trie.h</in>
+            <in>UniqueVector.h</in>
+            <in>VectorExtras.h</in>
+            <in>ilist.h</in>
+            <in>ilist_node.h</in>
+          </df>
+          <df name="Analysis">
+            <in>AliasAnalysis.h</in>
+            <in>AliasSetTracker.h</in>
+            <in>CFGPrinter.h</in>
+            <in>CallGraph.h</in>
+            <in>ConstantFolding.h</in>
+            <in>ConstantsScanner.h</in>
+            <in>DominatorInternals.h</in>
+            <in>Dominators.h</in>
+            <in>FindUsedTypes.h</in>
+            <in>Interval.h</in>
+            <in>IntervalIterator.h</in>
+            <in>IntervalPartition.h</in>
+            <in>LibCallAliasAnalysis.h</in>
+            <in>LibCallSemantics.h</in>
+            <in>LoopInfo.h</in>
+            <in>LoopPass.h</in>
+            <in>LoopVR.h</in>
+            <in>MemoryDependenceAnalysis.h</in>
+            <in>Passes.h</in>
+            <in>PostDominators.h</in>
+            <in>ProfileInfo.h</in>
+            <in>ProfileInfoLoader.h</in>
+            <in>ProfileInfoTypes.h</in>
+            <in>ScalarEvolution.h</in>
+            <in>ScalarEvolutionExpander.h</in>
+            <in>ScalarEvolutionExpressions.h</in>
+            <in>SparsePropagation.h</in>
+            <in>Trace.h</in>
+            <in>ValueTracking.h</in>
+            <in>Verifier.h</in>
+          </df>
+          <df name="Assembly">
+            <in>AsmAnnotationWriter.h</in>
+            <in>Parser.h</in>
+            <in>PrintModulePass.h</in>
+            <in>Writer.h</in>
+          </df>
+          <df name="Bitcode">
+            <in>Archive.h</in>
+            <in>BitCodes.h</in>
+            <in>BitstreamReader.h</in>
+            <in>BitstreamWriter.h</in>
+            <in>Deserialize.h</in>
+            <in>LLVMBitCodes.h</in>
+            <in>ReaderWriter.h</in>
+            <in>Serialization.h</in>
+            <in>SerializationFwd.h</in>
+            <in>Serialize.h</in>
+          </df>
+          <df name="CodeGen">
+            <in>AsmPrinter.h</in>
+            <in>BreakCriticalMachineEdge.h</in>
+            <in>CallingConvLower.h</in>
+            <in>DAGISelHeader.h</in>
+            <in>DwarfWriter.h</in>
+            <in>ELFRelocation.h</in>
+            <in>FastISel.h</in>
+            <in>FileWriters.h</in>
+            <in>GCMetadata.h</in>
+            <in>GCMetadataPrinter.h</in>
+            <in>GCStrategy.h</in>
+            <in>GCs.h</in>
+            <in>IntrinsicLowering.h</in>
+            <in>LinkAllAsmWriterComponents.h</in>
+            <in>LinkAllCodegenComponents.h</in>
+            <in>LiveInterval.h</in>
+            <in>LiveIntervalAnalysis.h</in>
+            <in>LiveStackAnalysis.h</in>
+            <in>LiveVariables.h</in>
+            <in>MachORelocation.h</in>
+            <in>MachineBasicBlock.h</in>
+            <in>MachineCodeEmitter.h</in>
+            <in>MachineConstantPool.h</in>
+            <in>MachineDominators.h</in>
+            <in>MachineFrameInfo.h</in>
+            <in>MachineFunction.h</in>
+            <in>MachineFunctionPass.h</in>
+            <in>MachineInstr.h</in>
+            <in>MachineInstrBuilder.h</in>
+            <in>MachineJumpTableInfo.h</in>
+            <in>MachineLocation.h</in>
+            <in>MachineLoopInfo.h</in>
+            <in>MachineMemOperand.h</in>
+            <in>MachineModuleInfo.h</in>
+            <in>MachineOperand.h</in>
+            <in>MachinePassRegistry.h</in>
+            <in>MachineRegisterInfo.h</in>
+            <in>MachineRelocation.h</in>
+            <in>Passes.h</in>
+            <in>PseudoSourceValue.h</in>
+            <in>RegAllocRegistry.h</in>
+            <in>RegisterCoalescer.h</in>
+            <in>RegisterScavenging.h</in>
+            <in>RuntimeLibcalls.h</in>
+            <in>ScheduleDAG.h</in>
+            <in>SchedulerRegistry.h</in>
+            <in>SelectionDAG.h</in>
+            <in>SelectionDAGISel.h</in>
+            <in>SelectionDAGNodes.h</in>
+            <in>ValueTypes.h</in>
+          </df>
+          <df name="Config">
+            <in>alloca.h</in>
+          </df>
+          <df name="Debugger">
+            <in>Debugger.h</in>
+            <in>InferiorProcess.h</in>
+            <in>ProgramInfo.h</in>
+            <in>RuntimeInfo.h</in>
+            <in>SourceFile.h</in>
+            <in>SourceLanguage.h</in>
+          </df>
+          <df name="ExecutionEngine">
+            <in>ExecutionEngine.h</in>
+            <in>GenericValue.h</in>
+            <in>Interpreter.h</in>
+            <in>JIT.h</in>
+            <in>JITMemoryManager.h</in>
+          </df>
+          <df name="Support">
+            <in>AIXDataTypesFix.h</in>
+            <in>AlignOf.h</in>
+            <in>Allocator.h</in>
+            <in>Annotation.h</in>
+            <in>CFG.h</in>
+            <in>CallSite.h</in>
+            <in>Casting.h</in>
+            <in>CommandLine.h</in>
+            <in>Compiler.h</in>
+            <in>ConstantFolder.h</in>
+            <in>ConstantRange.h</in>
+            <in>DOTGraphTraits.h</in>
+            <in>DataFlow.h</in>
+            <in>Debug.h</in>
+            <in>DebugInfoBuilder.h</in>
+            <in>Dwarf.h</in>
+            <in>DynamicLinker.h</in>
+            <in>ELF.h</in>
+            <in>FileUtilities.h</in>
+            <in>Format.h</in>
+            <in>GetElementPtrTypeIterator.h</in>
+            <in>GraphWriter.h</in>
+            <in>IRBuilder.h</in>
+            <in>InstIterator.h</in>
+            <in>InstVisitor.h</in>
+            <in>LeakDetector.h</in>
+            <in>ManagedStatic.h</in>
+            <in>Mangler.h</in>
+            <in>MathExtras.h</in>
+            <in>MemoryBuffer.h</in>
+            <in>MutexGuard.h</in>
+            <in>NoFolder.h</in>
+            <in>OutputBuffer.h</in>
+            <in>PassNameParser.h</in>
+            <in>PatternMatch.h</in>
+            <in>PluginLoader.h</in>
+            <in>Recycler.h</in>
+            <in>RecyclingAllocator.h</in>
+            <in>Registry.h</in>
+            <in>SlowOperationInformer.h</in>
+            <in>StableBasicBlockNumbering.h</in>
+            <in>Streams.h</in>
+            <in>StringPool.h</in>
+            <in>SystemUtils.h</in>
+            <in>TargetFolder.h</in>
+            <in>Timer.h</in>
+            <in>raw_ostream.h</in>
+            <in>type_traits.h</in>
+          </df>
+          <df name="System">
+            <in>Alarm.h</in>
+            <in>Disassembler.h</in>
+            <in>DynamicLibrary.h</in>
+            <in>Host.h</in>
+            <in>IncludeFile.h</in>
+            <in>Memory.h</in>
+            <in>Mutex.h</in>
+            <in>Path.h</in>
+            <in>Process.h</in>
+            <in>Program.h</in>
+            <in>Signals.h</in>
+            <in>Solaris.h</in>
+            <in>TimeValue.h</in>
+          </df>
+          <df name="Target">
+            <in>DarwinTargetAsmInfo.h</in>
+            <in>ELFTargetAsmInfo.h</in>
+            <in>SubtargetFeature.h</in>
+            <in>TargetAnnotationInfo.h</in>
+            <in>TargetAsmInfo.h</in>
+            <in>TargetData.h</in>
+            <in>TargetELFWriterInfo.h</in>
+            <in>TargetFrameInfo.h</in>
+            <in>TargetInstrDesc.h</in>
+            <in>TargetInstrInfo.h</in>
+            <in>TargetInstrItineraries.h</in>
+            <in>TargetJITInfo.h</in>
+            <in>TargetLowering.h</in>
+            <in>TargetMachOWriterInfo.h</in>
+            <in>TargetMachine.h</in>
+            <in>TargetMachineRegistry.h</in>
+            <in>TargetOptions.h</in>
+            <in>TargetRegisterInfo.h</in>
+            <in>TargetSubtarget.h</in>
+          </df>
+          <df name="Transforms">
+            <df name="IPO">
+              <in>InlinerPass.h</in>
+            </df>
+            <df name="Utils">
+              <in>BasicBlockUtils.h</in>
+              <in>BasicInliner.h</in>
+              <in>Cloning.h</in>
+              <in>FunctionUtils.h</in>
+              <in>InlineCost.h</in>
+              <in>Local.h</in>
+              <in>PromoteMemToReg.h</in>
+              <in>UnifyFunctionExitNodes.h</in>
+              <in>UnrollLoop.h</in>
+              <in>ValueMapper.h</in>
+            </df>
+            <in>IPO.h</in>
+            <in>Instrumentation.h</in>
+            <in>RSProfiling.h</in>
+            <in>Scalar.h</in>
+          </df>
+          <in>AbstractTypeUser.h</in>
+          <in>Argument.h</in>
+          <in>AutoUpgrade.h</in>
+          <in>BasicBlock.h</in>
+          <in>CallGraphSCCPass.h</in>
+          <in>CallingConv.h</in>
+          <in>Constant.h</in>
+          <in>Constants.h</in>
+          <in>DerivedTypes.h</in>
+          <in>Function.h</in>
+          <in>GlobalAlias.h</in>
+          <in>GlobalValue.h</in>
+          <in>GlobalVariable.h</in>
+          <in>InlineAsm.h</in>
+          <in>InstrTypes.h</in>
+          <in>Instruction.h</in>
+          <in>Instructions.h</in>
+          <in>IntrinsicInst.h</in>
+          <in>Intrinsics.h</in>
+          <in>LinkAllPasses.h</in>
+          <in>LinkAllVMCore.h</in>
+          <in>Linker.h</in>
+          <in>Module.h</in>
+          <in>ModuleProvider.h</in>
+          <in>OperandTraits.h</in>
+          <in>ParameterAttributes.h</in>
+          <in>Pass.h</in>
+          <in>PassAnalysisSupport.h</in>
+          <in>PassManager.h</in>
+          <in>PassManagers.h</in>
+          <in>PassSupport.h</in>
+          <in>SymbolTableListTraits.h</in>
+          <in>Type.h</in>
+          <in>TypeSymbolTable.h</in>
+          <in>Use.h</in>
+          <in>User.h</in>
+          <in>Value.h</in>
+          <in>ValueSymbolTable.h</in>
+        </df>
+        <df name="llvm-c">
+          <df name="Transforms">
+            <in>Scalar.h</in>
+          </df>
+          <in>Analysis.h</in>
+          <in>BitReader.h</in>
+          <in>BitWriter.h</in>
+          <in>Core.h</in>
+          <in>ExecutionEngine.h</in>
+          <in>LinkTimeOptimizer.h</in>
+          <in>Target.h</in>
+          <in>lto.h</in>
+        </df>
+      </df>
+      <df name="lib">
+        <df name="Analysis">
+          <df name="IPA">
+            <in>Andersens.cpp</in>
+            <in>CallGraph.cpp</in>
+            <in>CallGraphSCCPass.cpp</in>
+            <in>FindUsedTypes.cpp</in>
+            <in>GlobalsModRef.cpp</in>
+          </df>
+          <in>AliasAnalysis.cpp</in>
+          <in>AliasAnalysisCounter.cpp</in>
+          <in>AliasAnalysisEvaluator.cpp</in>
+          <in>AliasDebugger.cpp</in>
+          <in>AliasSetTracker.cpp</in>
+          <in>Analysis.cpp</in>
+          <in>BasicAliasAnalysis.cpp</in>
+          <in>CFGPrinter.cpp</in>
+          <in>ConstantFolding.cpp</in>
+          <in>InstCount.cpp</in>
+          <in>Interval.cpp</in>
+          <in>IntervalPartition.cpp</in>
+          <in>LibCallAliasAnalysis.cpp</in>
+          <in>LibCallSemantics.cpp</in>
+          <in>LoopInfo.cpp</in>
+          <in>LoopPass.cpp</in>
+          <in>LoopVR.cpp</in>
+          <in>MemoryDependenceAnalysis.cpp</in>
+          <in>PostDominators.cpp</in>
+          <in>ProfileInfo.cpp</in>
+          <in>ProfileInfoLoader.cpp</in>
+          <in>ProfileInfoLoaderPass.cpp</in>
+          <in>ScalarEvolution.cpp</in>
+          <in>ScalarEvolutionExpander.cpp</in>
+          <in>SparsePropagation.cpp</in>
+          <in>Trace.cpp</in>
+          <in>ValueTracking.cpp</in>
+        </df>
+        <df name="Archive">
+          <in>Archive.cpp</in>
+          <in>ArchiveInternals.h</in>
+          <in>ArchiveReader.cpp</in>
+          <in>ArchiveWriter.cpp</in>
+        </df>
+        <df name="AsmParser">
+          <in>LLLexer.cpp</in>
+          <in>LLLexer.h</in>
+          <in>Parser.cpp</in>
+          <in>ParserInternals.h</in>
+          <in>llvmAsmParser.cpp</in>
+          <in>llvmAsmParser.h</in>
+        </df>
+        <df name="Bitcode">
+          <df name="Reader">
+            <in>BitReader.cpp</in>
+            <in>BitcodeReader.cpp</in>
+            <in>BitcodeReader.h</in>
+            <in>Deserialize.cpp</in>
+            <in>DeserializeAPFloat.cpp</in>
+            <in>DeserializeAPInt.cpp</in>
+          </df>
+          <df name="Writer">
+            <in>BitWriter.cpp</in>
+            <in>BitcodeWriter.cpp</in>
+            <in>BitcodeWriterPass.cpp</in>
+            <in>Serialize.cpp</in>
+            <in>SerializeAPFloat.cpp</in>
+            <in>SerializeAPInt.cpp</in>
+            <in>ValueEnumerator.cpp</in>
+            <in>ValueEnumerator.h</in>
+          </df>
+        </df>
+        <df name="CodeGen">
+          <df name="AsmPrinter">
+            <in>AsmPrinter.cpp</in>
+            <in>DwarfWriter.cpp</in>
+            <in>OcamlGCPrinter.cpp</in>
+          </df>
+          <df name="SelectionDAG">
+            <in>CallingConvLower.cpp</in>
+            <in>DAGCombiner.cpp</in>
+            <in>FastISel.cpp</in>
+            <in>LegalizeDAG.cpp</in>
+            <in>LegalizeFloatTypes.cpp</in>
+            <in>LegalizeIntegerTypes.cpp</in>
+            <in>LegalizeTypes.cpp</in>
+            <in>LegalizeTypes.h</in>
+            <in>LegalizeTypesGeneric.cpp</in>
+            <in>LegalizeVectorTypes.cpp</in>
+            <in>ScheduleDAG.cpp</in>
+            <in>ScheduleDAGEmit.cpp</in>
+            <in>ScheduleDAGList.cpp</in>
+            <in>ScheduleDAGRRList.cpp</in>
+            <in>SelectionDAG.cpp</in>
+            <in>SelectionDAGBuild.cpp</in>
+            <in>SelectionDAGBuild.h</in>
+            <in>SelectionDAGISel.cpp</in>
+            <in>SelectionDAGPrinter.cpp</in>
+            <in>TargetLowering.cpp</in>
+          </df>
+          <in>BranchFolding.cpp</in>
+          <in>CFGPrinter.cpp</in>
+          <in>ELFWriter.cpp</in>
+          <in>ELFWriter.h</in>
+          <in>GCMetadata.cpp</in>
+          <in>GCMetadataPrinter.cpp</in>
+          <in>GCStrategy.cpp</in>
+          <in>IfConversion.cpp</in>
+          <in>IntrinsicLowering.cpp</in>
+          <in>LLVMTargetMachine.cpp</in>
+          <in>LiveInterval.cpp</in>
+          <in>LiveIntervalAnalysis.cpp</in>
+          <in>LiveStackAnalysis.cpp</in>
+          <in>LiveVariables.cpp</in>
+          <in>LoopAligner.cpp</in>
+          <in>LowerSubregs.cpp</in>
+          <in>MachOWriter.cpp</in>
+          <in>MachOWriter.h</in>
+          <in>MachineBasicBlock.cpp</in>
+          <in>MachineDominators.cpp</in>
+          <in>MachineFunction.cpp</in>
+          <in>MachineInstr.cpp</in>
+          <in>MachineLICM.cpp</in>
+          <in>MachineLoopInfo.cpp</in>
+          <in>MachineModuleInfo.cpp</in>
+          <in>MachinePassRegistry.cpp</in>
+          <in>MachineRegisterInfo.cpp</in>
+          <in>MachineSink.cpp</in>
+          <in>MachineTargetAnnotation.cpp</in>
+          <in>OcamlGC.cpp</in>
+          <in>PHIElimination.cpp</in>
+          <in>Passes.cpp</in>
+          <in>PhysRegTracker.h</in>
+          <in>PostRASchedulerList.cpp</in>
+          <in>PrologEpilogInserter.cpp</in>
+          <in>PseudoSourceValue.cpp</in>
+          <in>RegAllocBigBlock.cpp</in>
+          <in>RegAllocLinearScan.cpp</in>
+          <in>RegAllocLocal.cpp</in>
+          <in>RegAllocSimple.cpp</in>
+          <in>RegisterCoalescer.cpp</in>
+          <in>RegisterScavenging.cpp</in>
+          <in>ShadowStackGC.cpp</in>
+          <in>SimpleRegisterCoalescing.cpp</in>
+          <in>SimpleRegisterCoalescing.h</in>
+          <in>StackSlotColoring.cpp</in>
+          <in>StrongPHIElimination.cpp</in>
+          <in>TargetInstrInfoImpl.cpp</in>
+          <in>TwoAddressInstructionPass.cpp</in>
+          <in>UnreachableBlockElim.cpp</in>
+          <in>VirtRegMap.cpp</in>
+          <in>VirtRegMap.h</in>
+        </df>
+        <df name="Debugger">
+          <in>Debugger.cpp</in>
+          <in>ProgramInfo.cpp</in>
+          <in>RuntimeInfo.cpp</in>
+          <in>SourceFile.cpp</in>
+          <in>SourceLanguage-CFamily.cpp</in>
+          <in>SourceLanguage-CPlusPlus.cpp</in>
+          <in>SourceLanguage-Unknown.cpp</in>
+          <in>SourceLanguage.cpp</in>
+        </df>
+        <df name="ExecutionEngine">
+          <df name="Interpreter">
+            <in>Execution.cpp</in>
+            <in>ExternalFunctions.cpp</in>
+            <in>Interpreter.cpp</in>
+            <in>Interpreter.h</in>
+          </df>
+          <df name="JIT">
+            <in>Intercept.cpp</in>
+            <in>JIT.cpp</in>
+            <in>JIT.h</in>
+            <in>JITDwarfEmitter.cpp</in>
+            <in>JITDwarfEmitter.h</in>
+            <in>JITEmitter.cpp</in>
+            <in>JITMemoryManager.cpp</in>
+            <in>TargetSelect.cpp</in>
+          </df>
+          <in>ExecutionEngine.cpp</in>
+          <in>ExecutionEngineBindings.cpp</in>
+        </df>
+        <df name="Linker">
+          <in>LinkArchives.cpp</in>
+          <in>LinkItems.cpp</in>
+          <in>LinkModules.cpp</in>
+          <in>Linker.cpp</in>
+        </df>
+        <df name="Support">
+          <in>APFloat.cpp</in>
+          <in>APInt.cpp</in>
+          <in>APSInt.cpp</in>
+          <in>Allocator.cpp</in>
+          <in>Annotation.cpp</in>
+          <in>CommandLine.cpp</in>
+          <in>ConstantRange.cpp</in>
+          <in>Debug.cpp</in>
+          <in>Dwarf.cpp</in>
+          <in>FileUtilities.cpp</in>
+          <in>FoldingSet.cpp</in>
+          <in>GraphWriter.cpp</in>
+          <in>IsInf.cpp</in>
+          <in>IsNAN.cpp</in>
+          <in>ManagedStatic.cpp</in>
+          <in>MemoryBuffer.cpp</in>
+          <in>PluginLoader.cpp</in>
+          <in>SlowOperationInformer.cpp</in>
+          <in>SmallPtrSet.cpp</in>
+          <in>Statistic.cpp</in>
+          <in>Streams.cpp</in>
+          <in>StringExtras.cpp</in>
+          <in>StringMap.cpp</in>
+          <in>StringPool.cpp</in>
+          <in>SystemUtils.cpp</in>
+          <in>Timer.cpp</in>
+          <in>raw_ostream.cpp</in>
+        </df>
+        <df name="System">
+          <df name="Unix">
+            <in>Unix.h</in>
+          </df>
+          <df name="Win32">
+            <in>Win32.h</in>
+          </df>
+          <in>Alarm.cpp</in>
+          <in>Disassembler.cpp</in>
+          <in>DynamicLibrary.cpp</in>
+          <in>IncludeFile.cpp</in>
+          <in>Memory.cpp</in>
+          <in>Mutex.cpp</in>
+          <in>Path.cpp</in>
+          <in>Process.cpp</in>
+          <in>Program.cpp</in>
+          <in>Signals.cpp</in>
+          <in>TimeValue.cpp</in>
+        </df>
+        <df name="Target">
+          <df name="Alpha">
+            <in>Alpha.h</in>
+            <in>AlphaAsmPrinter.cpp</in>
+            <in>AlphaBranchSelector.cpp</in>
+            <in>AlphaCodeEmitter.cpp</in>
+            <in>AlphaISelDAGToDAG.cpp</in>
+            <in>AlphaISelLowering.cpp</in>
+            <in>AlphaISelLowering.h</in>
+            <in>AlphaInstrInfo.cpp</in>
+            <in>AlphaInstrInfo.h</in>
+            <in>AlphaJITInfo.cpp</in>
+            <in>AlphaJITInfo.h</in>
+            <in>AlphaLLRP.cpp</in>
+            <in>AlphaRegisterInfo.cpp</in>
+            <in>AlphaRegisterInfo.h</in>
+            <in>AlphaRelocations.h</in>
+            <in>AlphaSubtarget.cpp</in>
+            <in>AlphaSubtarget.h</in>
+            <in>AlphaTargetAsmInfo.cpp</in>
+            <in>AlphaTargetAsmInfo.h</in>
+            <in>AlphaTargetMachine.cpp</in>
+            <in>AlphaTargetMachine.h</in>
+          </df>
+          <df name="ARM">
+            <df name="AsmPrinter">
+              <in>ARMAsmPrinter.cpp</in>
+            </df>
+            <in>ARM.h</in>
+            <in>ARMAddressingModes.h</in>
+            <in>ARMCodeEmitter.cpp</in>
+            <in>ARMConstantIslandPass.cpp</in>
+            <in>ARMConstantPoolValue.cpp</in>
+            <in>ARMConstantPoolValue.h</in>
+            <in>ARMFrameInfo.h</in>
+            <in>ARMISelDAGToDAG.cpp</in>
+            <in>ARMISelLowering.cpp</in>
+            <in>ARMISelLowering.h</in>
+            <in>ARMInstrInfo.cpp</in>
+            <in>ARMInstrInfo.h</in>
+            <in>ARMJITInfo.cpp</in>
+            <in>ARMJITInfo.h</in>
+            <in>ARMLoadStoreOptimizer.cpp</in>
+            <in>ARMMachineFunctionInfo.h</in>
+            <in>ARMRegisterInfo.cpp</in>
+            <in>ARMRegisterInfo.h</in>
+            <in>ARMRelocations.h</in>
+            <in>ARMSubtarget.cpp</in>
+            <in>ARMSubtarget.h</in>
+            <in>ARMTargetAnnotation.cpp</in>
+            <in>ARMTargetAsmInfo.cpp</in>
+            <in>ARMTargetAsmInfo.h</in>
+            <in>ARMTargetMachine.cpp</in>
+            <in>ARMTargetMachine.h</in>
+          </df>
+          <df name="CBackend">
+            <in>CBackend.cpp</in>
+            <in>CTargetMachine.h</in>
+          </df>
+          <df name="CellSPU">
+            <in>SPU.h</in>
+            <in>SPUAsmPrinter.cpp</in>
+            <in>SPUFrameInfo.cpp</in>
+            <in>SPUFrameInfo.h</in>
+            <in>SPUHazardRecognizers.cpp</in>
+            <in>SPUHazardRecognizers.h</in>
+            <in>SPUISelDAGToDAG.cpp</in>
+            <in>SPUISelLowering.cpp</in>
+            <in>SPUISelLowering.h</in>
+            <in>SPUInstrBuilder.h</in>
+            <in>SPUInstrInfo.cpp</in>
+            <in>SPUInstrInfo.h</in>
+            <in>SPUMachineFunction.h</in>
+            <in>SPURegisterInfo.cpp</in>
+            <in>SPURegisterInfo.h</in>
+            <in>SPURegisterNames.h</in>
+            <in>SPUSubtarget.cpp</in>
+            <in>SPUSubtarget.h</in>
+            <in>SPUTargetAsmInfo.cpp</in>
+            <in>SPUTargetAsmInfo.h</in>
+            <in>SPUTargetMachine.cpp</in>
+            <in>SPUTargetMachine.h</in>
+          </df>
+          <df name="CppBackend">
+            <in>CPPBackend.cpp</in>
+            <in>CPPTargetMachine.h</in>
+          </df>
+          <df name="IA64">
+            <in>IA64.h</in>
+            <in>IA64AsmPrinter.cpp</in>
+            <in>IA64Bundling.cpp</in>
+            <in>IA64ISelDAGToDAG.cpp</in>
+            <in>IA64ISelLowering.cpp</in>
+            <in>IA64ISelLowering.h</in>
+            <in>IA64InstrBuilder.h</in>
+            <in>IA64InstrInfo.cpp</in>
+            <in>IA64InstrInfo.h</in>
+            <in>IA64MachineFunctionInfo.h</in>
+            <in>IA64RegisterInfo.cpp</in>
+            <in>IA64RegisterInfo.h</in>
+            <in>IA64TargetAsmInfo.cpp</in>
+            <in>IA64TargetAsmInfo.h</in>
+            <in>IA64TargetMachine.cpp</in>
+            <in>IA64TargetMachine.h</in>
+          </df>
+          <df name="Mips">
+            <in>Mips.h</in>
+            <in>MipsAsmPrinter.cpp</in>
+            <in>MipsDelaySlotFiller.cpp</in>
+            <in>MipsISelDAGToDAG.cpp</in>
+            <in>MipsISelLowering.cpp</in>
+            <in>MipsISelLowering.h</in>
+            <in>MipsInstrInfo.cpp</in>
+            <in>MipsInstrInfo.h</in>
+            <in>MipsMachineFunction.h</in>
+            <in>MipsRegisterInfo.cpp</in>
+            <in>MipsRegisterInfo.h</in>
+            <in>MipsSubtarget.cpp</in>
+            <in>MipsSubtarget.h</in>
+            <in>MipsTargetAnnotation.cpp</in>
+            <in>MipsTargetAsmInfo.cpp</in>
+            <in>MipsTargetAsmInfo.h</in>
+            <in>MipsTargetMachine.cpp</in>
+            <in>MipsTargetMachine.h</in>
+          </df>
+          <df name="MSIL">
+            <in>MSILWriter.cpp</in>
+            <in>MSILWriter.h</in>
+          </df>
+          <df name="PIC16">
+            <in>PIC16.h</in>
+            <in>PIC16AsmPrinter.cpp</in>
+            <in>PIC16ConstantPoolValue.cpp</in>
+            <in>PIC16ConstantPoolValue.h</in>
+            <in>PIC16ISelDAGToDAG.cpp</in>
+            <in>PIC16ISelLowering.cpp</in>
+            <in>PIC16ISelLowering.h</in>
+            <in>PIC16InstrInfo.cpp</in>
+            <in>PIC16InstrInfo.h</in>
+            <in>PIC16RegisterInfo.cpp</in>
+            <in>PIC16RegisterInfo.h</in>
+            <in>PIC16Subtarget.cpp</in>
+            <in>PIC16Subtarget.h</in>
+            <in>PIC16TargetAsmInfo.cpp</in>
+            <in>PIC16TargetAsmInfo.h</in>
+            <in>PIC16TargetMachine.cpp</in>
+            <in>PIC16TargetMachine.h</in>
+          </df>
+          <df name="PowerPC">
+            <df name="AsmPrinter">
+              <in>PPCAsmPrinter.cpp</in>
+            </df>
+            <in>PPC.h</in>
+            <in>PPCBranchSelector.cpp</in>
+            <in>PPCCodeEmitter.cpp</in>
+            <in>PPCFrameInfo.h</in>
+            <in>PPCHazardRecognizers.cpp</in>
+            <in>PPCHazardRecognizers.h</in>
+            <in>PPCISelDAGToDAG.cpp</in>
+            <in>PPCISelLowering.cpp</in>
+            <in>PPCISelLowering.h</in>
+            <in>PPCInstrBuilder.h</in>
+            <in>PPCInstrInfo.cpp</in>
+            <in>PPCInstrInfo.h</in>
+            <in>PPCJITInfo.cpp</in>
+            <in>PPCJITInfo.h</in>
+            <in>PPCMachOWriterInfo.cpp</in>
+            <in>PPCMachOWriterInfo.h</in>
+            <in>PPCMachineFunctionInfo.h</in>
+            <in>PPCPerfectShuffle.h</in>
+            <in>PPCPredicates.cpp</in>
+            <in>PPCPredicates.h</in>
+            <in>PPCRegisterInfo.cpp</in>
+            <in>PPCRegisterInfo.h</in>
+            <in>PPCRelocations.h</in>
+            <in>PPCSubtarget.cpp</in>
+            <in>PPCSubtarget.h</in>
+            <in>PPCTargetAsmInfo.cpp</in>
+            <in>PPCTargetAsmInfo.h</in>
+            <in>PPCTargetMachine.cpp</in>
+            <in>PPCTargetMachine.h</in>
+          </df>
+          <df name="Sparc">
+            <in>DelaySlotFiller.cpp</in>
+            <in>FPMover.cpp</in>
+            <in>Sparc.h</in>
+            <in>SparcAsmPrinter.cpp</in>
+            <in>SparcISelDAGToDAG.cpp</in>
+            <in>SparcISelLowering.cpp</in>
+            <in>SparcISelLowering.h</in>
+            <in>SparcInstrInfo.cpp</in>
+            <in>SparcInstrInfo.h</in>
+            <in>SparcRegisterInfo.cpp</in>
+            <in>SparcRegisterInfo.h</in>
+            <in>SparcSubtarget.cpp</in>
+            <in>SparcSubtarget.h</in>
+            <in>SparcTargetAnnotation.cpp</in>
+            <in>SparcTargetAsmInfo.cpp</in>
+            <in>SparcTargetAsmInfo.h</in>
+            <in>SparcTargetMachine.cpp</in>
+            <in>SparcTargetMachine.h</in>
+          </df>
+          <df name="X86">
+            <df name="AsmPrinter">
+              <in>X86ATTAsmPrinter.cpp</in>
+              <in>X86ATTAsmPrinter.h</in>
+              <in>X86AsmPrinter.cpp</in>
+              <in>X86IntelAsmPrinter.cpp</in>
+              <in>X86IntelAsmPrinter.h</in>
+            </df>
+            <in>X86.h</in>
+            <in>X86COFF.h</in>
+            <in>X86CodeEmitter.cpp</in>
+            <in>X86ELFWriterInfo.cpp</in>
+            <in>X86ELFWriterInfo.h</in>
+            <in>X86FastISel.cpp</in>
+            <in>X86FloatingPoint.cpp</in>
+            <in>X86ISelDAGToDAG.cpp</in>
+            <in>X86ISelLowering.cpp</in>
+            <in>X86ISelLowering.h</in>
+            <in>X86InstrBuilder.h</in>
+            <in>X86InstrInfo.cpp</in>
+            <in>X86InstrInfo.h</in>
+            <in>X86JITInfo.cpp</in>
+            <in>X86JITInfo.h</in>
+            <in>X86MachineFunctionInfo.h</in>
+            <in>X86RegisterInfo.cpp</in>
+            <in>X86RegisterInfo.h</in>
+            <in>X86Relocations.h</in>
+            <in>X86Subtarget.cpp</in>
+            <in>X86Subtarget.h</in>
+            <in>X86TargetAsmInfo.cpp</in>
+            <in>X86TargetAsmInfo.h</in>
+            <in>X86TargetMachine.cpp</in>
+            <in>X86TargetMachine.h</in>
+          </df>
+          <in>DarwinTargetAsmInfo.cpp</in>
+          <in>ELFTargetAsmInfo.cpp</in>
+          <in>SubtargetFeature.cpp</in>
+          <in>Target.cpp</in>
+          <in>TargetAnnotationInfo.cpp</in>
+          <in>TargetAsmInfo.cpp</in>
+          <in>TargetData.cpp</in>
+          <in>TargetFrameInfo.cpp</in>
+          <in>TargetInstrInfo.cpp</in>
+          <in>TargetMachOWriterInfo.cpp</in>
+          <in>TargetMachine.cpp</in>
+          <in>TargetMachineRegistry.cpp</in>
+          <in>TargetRegisterInfo.cpp</in>
+          <in>TargetSubtarget.cpp</in>
+        </df>
+        <df name="Transforms">
+          <df name="Hello">
+            <in>Hello.cpp</in>
+          </df>
+          <df name="Instrumentation">
+            <in>BlockProfiling.cpp</in>
+            <in>EdgeProfiling.cpp</in>
+            <in>ProfilingUtils.cpp</in>
+            <in>ProfilingUtils.h</in>
+            <in>RSProfiling.cpp</in>
+            <in>RSProfiling.h</in>
+          </df>
+          <df name="IPO">
+            <in>ArgumentPromotion.cpp</in>
+            <in>ConstantMerge.cpp</in>
+            <in>DeadArgumentElimination.cpp</in>
+            <in>DeadTypeElimination.cpp</in>
+            <in>ExtractGV.cpp</in>
+            <in>GlobalDCE.cpp</in>
+            <in>GlobalOpt.cpp</in>
+            <in>IPConstantPropagation.cpp</in>
+            <in>IndMemRemoval.cpp</in>
+            <in>InlineAlways.cpp</in>
+            <in>InlineSimple.cpp</in>
+            <in>Inliner.cpp</in>
+            <in>Internalize.cpp</in>
+            <in>LoopExtractor.cpp</in>
+            <in>LowerSetJmp.cpp</in>
+            <in>PartialSpecialization.cpp</in>
+            <in>PruneEH.cpp</in>
+            <in>RaiseAllocations.cpp</in>
+            <in>StripDeadPrototypes.cpp</in>
+            <in>StripSymbols.cpp</in>
+            <in>StructRetPromotion.cpp</in>
+          </df>
+          <df name="Scalar">
+            <in>ADCE.cpp</in>
+            <in>BasicBlockPlacement.cpp</in>
+            <in>CodeGenPrepare.cpp</in>
+            <in>CondPropagate.cpp</in>
+            <in>ConstantProp.cpp</in>
+            <in>DCE.cpp</in>
+            <in>DeadStoreElimination.cpp</in>
+            <in>GVN.cpp</in>
+            <in>GVNPRE.cpp</in>
+            <in>IndVarSimplify.cpp</in>
+            <in>InstructionCombining.cpp</in>
+            <in>JumpThreading.cpp</in>
+            <in>LICM.cpp</in>
+            <in>LoopDeletion.cpp</in>
+            <in>LoopIndexSplit.cpp</in>
+            <in>LoopRotation.cpp</in>
+            <in>LoopStrengthReduce.cpp</in>
+            <in>LoopUnroll.cpp</in>
+            <in>LoopUnswitch.cpp</in>
+            <in>MarkModRef.cpp</in>
+            <in>MemCpyOptimizer.cpp</in>
+            <in>PredicateSimplifier.cpp</in>
+            <in>Reassociate.cpp</in>
+            <in>Reg2Mem.cpp</in>
+            <in>SCCP.cpp</in>
+            <in>Scalar.cpp</in>
+            <in>ScalarReplAggregates.cpp</in>
+            <in>SimplifyCFGPass.cpp</in>
+            <in>SimplifyLibCalls.cpp</in>
+            <in>TailDuplication.cpp</in>
+            <in>TailRecursionElimination.cpp</in>
+          </df>
+          <df name="Utils">
+            <in>BasicBlockUtils.cpp</in>
+            <in>BasicInliner.cpp</in>
+            <in>BreakCriticalEdges.cpp</in>
+            <in>CloneFunction.cpp</in>
+            <in>CloneLoop.cpp</in>
+            <in>CloneModule.cpp</in>
+            <in>CloneTrace.cpp</in>
+            <in>CodeExtractor.cpp</in>
+            <in>DemoteRegToStack.cpp</in>
+            <in>InlineCost.cpp</in>
+            <in>InlineFunction.cpp</in>
+            <in>InstructionNamer.cpp</in>
+            <in>LCSSA.cpp</in>
+            <in>Local.cpp</in>
+            <in>LoopSimplify.cpp</in>
+            <in>LowerAllocations.cpp</in>
+            <in>LowerInvoke.cpp</in>
+            <in>LowerSwitch.cpp</in>
+            <in>Mem2Reg.cpp</in>
+            <in>PromoteMemoryToRegister.cpp</in>
+            <in>SimplifyCFG.cpp</in>
+            <in>UnifyFunctionExitNodes.cpp</in>
+            <in>UnrollLoop.cpp</in>
+            <in>ValueMapper.cpp</in>
+          </df>
+        </df>
+        <df name="VMCore">
+          <in>AsmWriter.cpp</in>
+          <in>AutoUpgrade.cpp</in>
+          <in>BasicBlock.cpp</in>
+          <in>ConstantFold.cpp</in>
+          <in>ConstantFold.h</in>
+          <in>Constants.cpp</in>
+          <in>Core.cpp</in>
+          <in>DebugInfoBuilder.cpp</in>
+          <in>Dominators.cpp</in>
+          <in>Function.cpp</in>
+          <in>Globals.cpp</in>
+          <in>InlineAsm.cpp</in>
+          <in>Instruction.cpp</in>
+          <in>Instructions.cpp</in>
+          <in>IntrinsicInst.cpp</in>
+          <in>LeakDetector.cpp</in>
+          <in>Mangler.cpp</in>
+          <in>Module.cpp</in>
+          <in>ModuleProvider.cpp</in>
+          <in>ParameterAttributes.cpp</in>
+          <in>Pass.cpp</in>
+          <in>PassManager.cpp</in>
+          <in>SymbolTableListTraitsImpl.h</in>
+          <in>Type.cpp</in>
+          <in>TypeSymbolTable.cpp</in>
+          <in>Use.cpp</in>
+          <in>Value.cpp</in>
+          <in>ValueSymbolTable.cpp</in>
+          <in>ValueTypes.cpp</in>
+          <in>Verifier.cpp</in>
+        </df>
+      </df>
+      <df name="projects">
+        <df name="sample">
+          <df name="autoconf">
+          </df>
+          <df name="include">
+            <in>sample.h</in>
+          </df>
+          <df name="lib">
+            <df name="sample">
+              <in>sample.c</in>
+            </df>
+          </df>
+          <df name="tools">
+            <df name="sample">
+              <in>main.c</in>
+            </df>
+          </df>
+        </df>
+      </df>
+      <df name="runtime">
+        <df name="GC">
+          <df name="SemiSpace">
+            <in>semispace.c</in>
+          </df>
+          <in>GCInterface.h</in>
+        </df>
+        <df name="libprofile">
+          <in>BasicBlockTracing.c</in>
+          <in>BlockProfiling.c</in>
+          <in>CommonProfiling.c</in>
+          <in>EdgeProfiling.c</in>
+          <in>FunctionProfiling.c</in>
+          <in>Profiling.h</in>
+        </df>
+      </df>
+      <df name="tools">
+        <df name="bugpoint">
+          <in>BugDriver.cpp</in>
+          <in>BugDriver.h</in>
+          <in>CrashDebugger.cpp</in>
+          <in>ExecutionDriver.cpp</in>
+          <in>ExtractFunction.cpp</in>
+          <in>FindBugs.cpp</in>
+          <in>ListReducer.h</in>
+          <in>Miscompilation.cpp</in>
+          <in>OptimizerDriver.cpp</in>
+          <in>TestPasses.cpp</in>
+          <in>ToolRunner.cpp</in>
+          <in>ToolRunner.h</in>
+          <in>bugpoint.cpp</in>
+        </df>
+        <df name="gccas">
+        </df>
+        <df name="gccld">
+        </df>
+        <df name="llc">
+          <in>llc.cpp</in>
+        </df>
+        <df name="lli">
+          <in>lli.cpp</in>
+        </df>
+        <df name="llvm-ar">
+          <in>llvm-ar.cpp</in>
+        </df>
+        <df name="llvm-as">
+          <in>llvm-as.cpp</in>
+        </df>
+        <df name="llvm-bcanalyzer">
+          <in>llvm-bcanalyzer.cpp</in>
+        </df>
+        <df name="llvm-config">
+        </df>
+        <df name="llvm-db">
+          <in>CLICommand.h</in>
+          <in>CLIDebugger.cpp</in>
+          <in>CLIDebugger.h</in>
+          <in>Commands.cpp</in>
+          <in>llvm-db.cpp</in>
+        </df>
+        <df name="llvm-dis">
+          <in>llvm-dis.cpp</in>
+        </df>
+        <df name="llvm-extract">
+          <in>llvm-extract.cpp</in>
+        </df>
+        <df name="llvm-ld">
+          <in>Optimize.cpp</in>
+          <in>llvm-ld.cpp</in>
+        </df>
+        <df name="llvm-link">
+          <in>llvm-link.cpp</in>
+        </df>
+        <df name="llvm-nm">
+          <in>llvm-nm.cpp</in>
+        </df>
+        <df name="llvm-prof">
+          <in>llvm-prof.cpp</in>
+        </df>
+        <df name="llvm-ranlib">
+          <in>llvm-ranlib.cpp</in>
+        </df>
+        <df name="llvm-stub">
+          <in>llvm-stub.c</in>
+        </df>
+        <df name="llvmc2">
+          <df name="doc">
+          </df>
+          <df name="examples">
+          </df>
+          <in>Action.cpp</in>
+          <in>Action.h</in>
+          <in>AutoGenerated.cpp</in>
+          <in>AutoGenerated.h</in>
+          <in>CompilationGraph.cpp</in>
+          <in>CompilationGraph.h</in>
+          <in>Error.h</in>
+          <in>Tool.h</in>
+          <in>llvmc.cpp</in>
+        </df>
+        <df name="lto">
+          <in>LTOCodeGenerator.cpp</in>
+          <in>LTOCodeGenerator.h</in>
+          <in>LTOModule.cpp</in>
+          <in>LTOModule.h</in>
+          <in>lto.cpp</in>
+        </df>
+        <df name="lto-bugpoint">
+          <in>LTOBugPoint.cpp</in>
+          <in>LTOBugPoint.h</in>
+          <in>lto-bugpoint.cpp</in>
+        </df>
+        <df name="opt">
+          <in>AnalysisWrappers.cpp</in>
+          <in>GraphPrinters.cpp</in>
+          <in>PrintSCC.cpp</in>
+          <in>opt.cpp</in>
+        </df>
+      </df>
+      <df name="utils">
+        <df name="buildit">
+        </df>
+        <df name="emacs">
+        </df>
+        <df name="fpcmp">
+          <in>fpcmp.cpp</in>
+        </df>
+        <df name="PerfectShuffle">
+          <in>PerfectShuffle.cpp</in>
+        </df>
+        <df name="TableGen">
+          <in>AsmWriterEmitter.cpp</in>
+          <in>AsmWriterEmitter.h</in>
+          <in>CallingConvEmitter.cpp</in>
+          <in>CallingConvEmitter.h</in>
+          <in>CodeEmitterGen.cpp</in>
+          <in>CodeEmitterGen.h</in>
+          <in>CodeGenDAGPatterns.cpp</in>
+          <in>CodeGenDAGPatterns.h</in>
+          <in>CodeGenInstruction.cpp</in>
+          <in>CodeGenInstruction.h</in>
+          <in>CodeGenIntrinsics.h</in>
+          <in>CodeGenRegisters.h</in>
+          <in>CodeGenTarget.cpp</in>
+          <in>CodeGenTarget.h</in>
+          <in>DAGISelEmitter.cpp</in>
+          <in>DAGISelEmitter.h</in>
+          <in>FastISelEmitter.cpp</in>
+          <in>FastISelEmitter.h</in>
+          <in>InstrEnumEmitter.cpp</in>
+          <in>InstrEnumEmitter.h</in>
+          <in>InstrInfoEmitter.cpp</in>
+          <in>InstrInfoEmitter.h</in>
+          <in>IntrinsicEmitter.cpp</in>
+          <in>IntrinsicEmitter.h</in>
+          <in>LLVMCConfigurationEmitter.cpp</in>
+          <in>LLVMCConfigurationEmitter.h</in>
+          <in>Record.cpp</in>
+          <in>Record.h</in>
+          <in>RegisterInfoEmitter.cpp</in>
+          <in>RegisterInfoEmitter.h</in>
+          <in>SubtargetEmitter.cpp</in>
+          <in>SubtargetEmitter.h</in>
+          <in>TGLexer.cpp</in>
+          <in>TGLexer.h</in>
+          <in>TGParser.cpp</in>
+          <in>TGParser.h</in>
+          <in>TableGen.cpp</in>
+          <in>TableGenBackend.cpp</in>
+          <in>TableGenBackend.h</in>
+        </df>
+        <df name="vim">
+        </df>
+      </df>
+      <df name="website">
+      </df>
+      <df name="win32">
+        <df name="Analysis">
+        </df>
+        <df name="Archive">
+        </df>
+        <df name="AsmParser">
+        </df>
+        <df name="Bitcode">
+        </df>
+        <df name="bugpoint">
+        </df>
+        <df name="CBackend">
+        </df>
+        <df name="CodeGen">
+        </df>
+        <df name="Configure">
+        </df>
+        <df name="ExecutionEngine">
+        </df>
+        <df name="Fibonacci">
+        </df>
+        <df name="Linker">
+        </df>
+        <df name="llc">
+        </df>
+        <df name="lli">
+        </df>
+        <df name="llvm-ar">
+        </df>
+        <df name="llvm-as">
+        </df>
+        <df name="llvm-bcanalyzer">
+        </df>
+        <df name="llvm-dis">
+        </df>
+        <df name="llvm-ld">
+        </df>
+        <df name="llvm-link">
+        </df>
+        <df name="llvm-nm">
+        </df>
+        <df name="llvm-prof">
+        </df>
+        <df name="llvm-ranlib">
+        </df>
+        <df name="opt">
+        </df>
+        <df name="Support">
+        </df>
+        <df name="System">
+        </df>
+        <df name="TableGen">
+        </df>
+        <df name="Target">
+        </df>
+        <df name="Transforms">
+        </df>
+        <df name="VMCore">
+        </df>
+        <df name="x86">
+        </df>
+        <in>config.h</in>
+        <in>unistd.h</in>
+      </df>
+      <df name="Xcode">
+        <df name="LLVM.xcodeproj">
+        </df>
+      </df>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>../../sw/llvm/Makefile</itemPath>
+      <itemPath>llvm-Makefile.mk</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../../sw/llvm</Elem>
+  </sourceRootList>
+  <projectmakefile>llvm-Makefile.mk</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>../../sw/llvm</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+      </makefileType>
+      <item path="../../sw/llvm/lib/Support/APFloat.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/APInt.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/APSInt.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/Allocator.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/Annotation.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/CommandLine.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/ConstantRange.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/Debug.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/Dwarf.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/FileUtilities.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/FoldingSet.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/GraphWriter.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/ManagedStatic.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/MemoryBuffer.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/PluginLoader.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/SlowOperationInformer.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/SmallPtrSet.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/Statistic.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/Streams.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/StringExtras.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/StringMap.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/StringPool.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/SystemUtils.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/Timer.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Support/raw_ostream.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/DarwinTargetAsmInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/ELFTargetAsmInfo.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCBranchSelector.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCCodeEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCHazardRecognizers.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCISelDAGToDAG.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCISelLowering.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCInstrInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCJITInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCMachOWriterInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCRegisterInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCSubtarget.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCTargetAsmInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/SubtargetFeature.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/Target.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetAnnotationInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetAsmInfo.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetData.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetFrameInfo.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetInstrInfo.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetMachOWriterInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetMachine.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetMachineRegistry.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetRegisterInfo.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/lib/Target/TargetSubtarget.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/AsmWriterEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/CallingConvEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/CodeEmitterGen.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/CodeGenDAGPatterns.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/CodeGenInstruction.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/CodeGenTarget.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/DAGISelEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/FastISelEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/InstrEnumEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/InstrInfoEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/IntrinsicEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/LLVMCConfigurationEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/Record.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/RegisterInfoEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/SubtargetEmitter.cpp"
+            ex="false"
+            tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/TGLexer.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/TGParser.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="../../sw/llvm/utils/TableGen/TableGen.cpp" ex="false" tool="1">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <folder path="llvm/bindings">
+        <cTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <folder path="llvm/examples">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Analysis">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Archive">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/AsmParser">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Bitcode">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/CodeGen">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Debugger">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/ExecutionEngine">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Linker">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/System">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/ARM">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/ARM/AsmPrinter">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/lib/Target/ARM</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/Alpha">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/CBackend">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/CellSPU">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/CppBackend">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/IA64">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/MSIL">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/Mips">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/PIC16">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/PowerPC/AsmPrinter">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/lib/Target/PowerPC</pElem>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/Sparc">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/X86">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Target/X86/AsmPrinter">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/lib/Target/X86</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/Transforms">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/lib/VMCore">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/projects">
+        <cTool>
+          <incDir>
+            <pElem>../../sw/llvm/projects/sample/include</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <folder path="llvm/runtime/libprofile">
+        <cTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <folder path="llvm/tools">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="llvm/utils/fpcmp">
+        <ccTool>
+          <incDir>
+            <pElem>../../sw/llvm/include</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+    </conf>
+  </confs>
+</configurationDescriptor>

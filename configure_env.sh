@@ -2,10 +2,12 @@ echo "[Setting up Hardware Platform environment]"
 PROJ_TOPDIR=$PWD
 HW_PLATFORM=$PROJ_TOPDIR/hw
 APP_DIR=$PROJ_TOPDIR/examples/mjpegmthr
+#APP_DIR=$PROJ_TOPDIR/examples/helloworld
 
 export LIBTA_HOME=/opt/libs/libta
 export SYSTEMC=/opt/libs/systemc-2.2.0
 export CONFIGURATION=native
+#export CONFIGURATION=arm966
 
 echo "LIBTA_HOME = $LIBTA_HOME"
 echo "SYSTEMC = $SYSTEMC"

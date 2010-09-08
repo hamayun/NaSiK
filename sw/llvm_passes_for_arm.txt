@@ -1,0 +1,47 @@
+CompileModuleForTarget: Running All Passes for Function main
+Running Pass: Dominator Tree Construction on main
+Running Pass: Natural Loop Construction on main
+Running Pass: Canonicalize natural loops on main
+Running Pass: Scalar Evolution Analysis on main
+Running Pass: Loop Pass Manager on main
+Running Pass: Lower Garbage Collection Instructions on main
+Running Pass: Lower invoke and unwind, for unwindless code generators on main
+Running Pass: Remove unreachable blocks from the CFG on main
+Running Pass: Optimize for code generation on main
+Running Pass: ARM Instruction Selection on main
+Running Pass: CFG Printer on main
+Running Pass: CFG Printer on main
+Running Pass: Remove unreachable machine basic blocks on main
+Running Pass: Live Variable Analysis on main
+Running Pass: Eliminate PHI nodes for register allocation on main
+Running Pass: Two-Address instruction pass on main
+Running Pass: Live Interval Analysis on main
+Running Pass: MachineDominator Tree Construction on main
+Running Pass: Machine Natural Loop Construction on main
+Running Pass: Simple Register Coalescing on main
+Running Pass: Live Stack Slot Analysis on main
+Running Pass: Linear Scan Register Allocator on main
+Running Pass: CFG Printer on main
+Running Pass: Live Stack Slot Analysis on main
+Running Pass: Stack Slot Coloring on main
+Running Pass: CFG Printer on main
+Running Pass: Subregister lowering instruction pass on main
+Running Pass: CFG Printer on main
+Running Pass: Prolog/Epilog Insertion & Frame Finalization on main
+Running Pass: CFG Printer on main
+Running Pass: Control Flow Optimizer on main
+Running Pass: CFG Printer on main
+Running Pass: Analyze Machine Code For Garbage Collection on main
+Running Pass: CFG Printer on main
+Running Pass: Label Folder on main
+Running Pass: ARM load / store optimization pass on main
+Running Pass: If Converter on main
+Running Pass: ARM constant island placement and branch shortening pass on main
+Running Pass: MachineDominator Tree Construction on main
+Running Pass: Machine Natural Loop Construction on main
+Running Pass: Loop aligner on main
+Running Pass: CFG Printer on main
+Running Pass: Target Annotation pass on main
+Running Pass: Delete Garbage Collector Information on main
+Running Pass: Machine Code Deleter on main
+

@@ -1,0 +1,33 @@
+
+apes_clean:
+ifneq ($(strip $(SUBDIRS)),)
+		for i in $(SUBDIRS) ; do make -C $$i apes_clean || exit $?; done; 
+endif
+
+ifneq ($(strip $(BUILDDIR)),)
+	rm -rf $(BUILDDIR)/*.o $(BUILDDIR)/*.a
+endif
+
+apes_submake: create_builddir 
+ifneq ($(strip $(SUBDIRS)),)
+	for i in $(SUBDIRS) ; do make -C $$i || exit $? ; done;
+endif
+
+apes_lib: apes_submake
+	$(TARGET_AR) $(TARGET_ARFLAGS) $(BUILDDIR)/$(TARGETLIB) $(BUILDDIR)/objs/*.o
+	$(TARGET_RANLIB) $(BUILDDIR)/$(TARGETLIB)
+
+apes_objects : create_builddir $(OBJ)
+
+$(BUILDDIR)/%.o : %.c
+	echo '         | CC $<'
+	$(TARGET_CC) $(CFLAGS) $(STDINC) -o $(addsuffix .o, $(basename $@)) -c $<
+
+$(BUILDDIR)/%.o : %.S
+	echo '         | CC $<'
+	$(TARGET_AS) -o $@ $(TARGET_ASFLAGS) $(STDINC) $<
+
+create_builddir:
+ifneq ($(strip $(BUILDDIR)),)
+	mkdir -p $(BUILDDIR)
+endif
