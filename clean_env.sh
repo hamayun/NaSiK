@@ -8,8 +8,8 @@ else
     cd $PROJ_TOPDIR/hw/libta
     make clean -s
  
-	echo "Cleaning Software Application ... "
-	cd $APP_DIR/sw
+    echo "Cleaning Software Application ... "
+    cd $APP_DIR/sw
     make clean -s
 
     echo "Cleaning Hardware Model ... "
@@ -17,11 +17,6 @@ else
     make clean -s
 
 	cd $PROJ_TOPDIR
-
-	rm -f `find -L . -name "*.bb"`
-	rm -f `find -L . -name "*.mbb"`
-	rm -f `find -L . -name "*.dot"`
-	rm -f `find -L . -name "cachegrind.out.*"`
 
   echo "Environment Cleanup Done !!!"
 fi

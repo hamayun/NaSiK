@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z $PROJ_TOPDIR ] ; then
-	echo "$PROJ_TOPDIR variable is Undefined; Please Run the Configure Script First !!!"
+	echo "Environment Variables are Undefined; Please Run the Configure Script First !!!"
 else
 	echo "Compiling and Installing TA Library ... "
 	cd $PROJ_TOPDIR/hw/libta 
@@ -14,7 +14,5 @@ else
 	echo "Compiling Hardware Model ... "
 	cd $APP_DIR/hw
 	make -s 
-
-	echo "Compilation Finished Successfully !!!"
 fi
 

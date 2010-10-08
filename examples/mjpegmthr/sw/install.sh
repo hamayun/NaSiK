@@ -69,7 +69,7 @@ else
 		echo "	| Drivers       : ${DNA_DRIVERS}"
 		echo "	| Filesystems   : ${DNA_FILESYSTEMS}"
 		echo
-		echo "[Tool Chain settings]"
+		echo "[Toolchain settings]"
 		echo "	| LLVMGCC   : ${TARGET_LLVMGCC}"
 		echo "	| LLC       : ${TARGET_LLC}"
 		echo "	| AS        : ${TARGET_AS}"
@@ -79,7 +79,11 @@ else
 		echo "	| AR        : ${TARGET_AR}"
 		echo "	| ARFLAGS   : ${TARGET_ARFLAGS}"
 		echo "	| RANLIB    : ${TARGET_RANLIB}"
-		echo "	| ANNOTATION: ${ANNOTATION}" 
+		if [ "$ANNOTATION" !=  "" ]; then
+			echo "	| ANNOTATION: ${ANNOTATION}" 
+		else
+			echo "	| ANNOTATION: No Annotations" 
+		fi	
 	else
 		echo "[ERROR  ] The configuration file does not exist"
 		echo "[ERROR  ] Please create one and restart the installation"
