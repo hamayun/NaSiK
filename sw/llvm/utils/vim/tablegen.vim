@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:   TableGen
 " Maintainer: The LLVM team, http://llvm.org/
-" Updated:    2003-08-11
+" Version:    $Revision: 97271 $
 
 if version < 600
   syntax clear
@@ -50,5 +50,5 @@ if version >= 508 || !exists("did_c_syn_inits")
 
   delcommand HiLink
 endif
- 
+
 let b:current_syntax = "tablegen"

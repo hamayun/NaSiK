@@ -14,69 +14,34 @@
 #include "llvm/BasicBlock.h"
 #include "llvm/Constants.h"
 #include "llvm/Instructions.h"
+#include "llvm/IntrinsicInst.h"
+#include "llvm/LLVMContext.h"
 #include "llvm/Type.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/CFG.h"
 #include "llvm/Support/LeakDetector.h"
-#include "llvm/Support/Compiler.h"
 #include "SymbolTableListTraitsImpl.h"
 #include <algorithm>
 using namespace llvm;
 
-inline ValueSymbolTable *
-ilist_traits<Instruction>::getSymTab(BasicBlock *BB) {
-  if (BB)
-    if (Function *F = BB->getParent())
-      return &F->getValueSymbolTable();
+ValueSymbolTable *BasicBlock::getValueSymbolTable() {
+  if (Function *F = getParent())
+    return &F->getValueSymbolTable();
   return 0;
 }
 
-
-namespace {
-  /// DummyInst - An instance of this class is used to mark the end of the
-  /// instruction list.  This is not a real instruction.
-  struct VISIBILITY_HIDDEN DummyInst : public Instruction {
-    // allocate space for exactly zero operands
-    void *operator new(size_t s) {
-      return User::operator new(s, 0);
-    }
-    DummyInst() : Instruction(Type::VoidTy, OtherOpsEnd, 0, 0) {
-      // This should not be garbage monitored.
-      LeakDetector::removeGarbageObject(this);
-    }
-
-    Instruction *clone() const {
-      assert(0 && "Cannot clone EOL");abort();
-      return 0;
-    }
-    const char *getOpcodeName() const { return "*end-of-list-inst*"; }
-
-    // Methods for support type inquiry through isa, cast, and dyn_cast...
-    static inline bool classof(const DummyInst *) { return true; }
-    static inline bool classof(const Instruction *I) {
-      return I->getOpcode() == OtherOpsEnd;
-    }
-    static inline bool classof(const Value *V) {
-      return isa<Instruction>(V) && classof(cast<Instruction>(V));
-    }
-  };
-}
-
-Instruction *ilist_traits<Instruction>::createSentinel() {
-  return new DummyInst();
-}
-iplist<Instruction> &ilist_traits<Instruction>::getList(BasicBlock *BB) {
-  return BB->getInstList();
+LLVMContext &BasicBlock::getContext() const {
+  return getType()->getContext();
 }
 
 // Explicit instantiation of SymbolTableListTraits since some of the methods
 // are not in the public header file...
-template class SymbolTableListTraits<Instruction, BasicBlock>;
+template class llvm::SymbolTableListTraits<Instruction, BasicBlock>;
 
 
-BasicBlock::BasicBlock(const std::string &Name, Function *NewParent,
+BasicBlock::BasicBlock(LLVMContext &C, const Twine &Name, Function *NewParent,
                        BasicBlock *InsertBefore)
-  : Value(Type::LabelTy, Value::BasicBlockVal), Parent(0) {
+  : Value(Type::getLabelTy(C), Value::BasicBlockVal), Parent(0) {
 
   // Make sure that we get added to a function
   LeakDetector::addGarbageObject(this);
@@ -90,10 +55,29 @@ BasicBlock::BasicBlock(const std::string &Name, Function *NewParent,
   }
   
   setName(Name);
+  setAnnotationFlag(false);
+  setAnnotationType(0);
 }
 
-
 BasicBlock::~BasicBlock() {
+  // If the address of the block is taken and it is being deleted (e.g. because
+  // it is dead), this means that there is either a dangling constant expr
+  // hanging off the block, or an undefined use of the block (source code
+  // expecting the address of a label to keep the block alive even though there
+  // is no indirect branch).  Handle these cases by zapping the BlockAddress
+  // nodes.  There are no other possible uses at this point.
+  if (hasAddressTaken()) {
+    assert(!use_empty() && "There should be at least one blockaddress!");
+    Constant *Replacement =
+      ConstantInt::get(llvm::Type::getInt32Ty(getContext()), 1);
+    while (!use_empty()) {
+      BlockAddress *BA = cast<BlockAddress>(use_back());
+      BA->replaceAllUsesWith(ConstantExpr::getIntToPtr(Replacement,
+                                                       BA->getType()));
+      BA->destroyConstant();
+    }
+  }
+  
   assert(getParent() == 0 && "BasicBlock still linked into the program!");
   dropAllReferences();
   InstList.clear();
@@ -154,6 +138,16 @@ Instruction* BasicBlock::getFirstNonPHI() {
   return &*i;
 }
 
+Instruction* BasicBlock::getFirstNonPHIOrDbg() {
+  BasicBlock::iterator i = begin();
+  // All valid basic blocks should have a terminator,
+  // which is not a PHINode. If we have an invalid basic
+  // block we'll get an assertion failure when dereferencing
+  // a past-the-end iterator.
+  while (isa<PHINode>(i) || isa<DbgInfoIntrinsic>(i)) ++i;
+  return &*i;
+}
+
 void BasicBlock::dropAllReferences() {
   for(iterator I = begin(), E = end(); I != E; ++I)
     I->dropAllReferences();
@@ -167,6 +161,25 @@ BasicBlock *BasicBlock::getSinglePredecessor() {
   BasicBlock *ThePred = *PI;
   ++PI;
   return (PI == E) ? ThePred : 0 /*multiple preds*/;
+}
+
+/// getUniquePredecessor - If this basic block has a unique predecessor block,
+/// return the block, otherwise return a null pointer.
+/// Note that unique predecessor doesn't mean single edge, there can be 
+/// multiple edges from the unique predecessor to this block (for example 
+/// a switch statement with multiple cases having the same destination).
+BasicBlock *BasicBlock::getUniquePredecessor() {
+  pred_iterator PI = pred_begin(this), E = pred_end(this);
+  if (PI == E) return 0; // No preds.
+  BasicBlock *PredBB = *PI;
+  ++PI;
+  for (;PI != E; ++PI) {
+    if (*PI != PredBB)
+      return 0;
+    // The same predecessor appears multiple times in the predecessor list.
+    // This is OK.
+  }
+  return PredBB;
 }
 
 /// removePredecessor - This method is used to notify a BasicBlock that the
@@ -256,14 +269,15 @@ void BasicBlock::removePredecessor(BasicBlock *Pred,
 /// cause a degenerate basic block to be formed, having a terminator inside of
 /// the basic block).
 ///
-BasicBlock *BasicBlock::splitBasicBlock(iterator I, const std::string &BBName) {
+BasicBlock *BasicBlock::splitBasicBlock(iterator I, const Twine &BBName) {
   assert(getTerminator() && "Can't use splitBasicBlock on degenerate BB!");
   assert(I != InstList.end() &&
          "Trying to get me to create degenerate basic block!");
 
-  BasicBlock *InsertBefore = next(Function::iterator(this))
+  BasicBlock *InsertBefore = llvm::next(Function::iterator(this))
                                .getNodePtrUnchecked();
-  BasicBlock *New = BasicBlock::Create(BBName, getParent(), InsertBefore);
+  BasicBlock *New = BasicBlock::Create(getContext(), BBName,
+                                       getParent(), InsertBefore);
 
   // Move all of the specified instructions from the original basic block into
   // the new basic block.
@@ -293,3 +307,4 @@ BasicBlock *BasicBlock::splitBasicBlock(iterator I, const std::string &BBName) {
   }
   return New;
 }
+

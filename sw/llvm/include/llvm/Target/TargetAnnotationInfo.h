@@ -45,6 +45,7 @@ public:
   unsigned int getStoreCount();
   unsigned int getType();
 
+  TargetAnnotationDB * addDB(TargetAnnotationDB * pDB); 
   unsigned int DumpSize();
   char * Dump();
 

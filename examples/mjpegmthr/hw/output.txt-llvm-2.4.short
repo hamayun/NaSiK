@@ -1,0 +1,1151 @@
+Simulating with Annotations Option [-annotate=arm]
+
+             SystemC 2.2.0 --- Oct  5 2010 19:04:22
+        Copyright (c) 1996-2006 by all Contributors
+                    ALL RIGHTS RESERVED
+Set Option analyze
+Set Option online
+Set Debug Option analyzer
+Load configuration files ...
+ + configurations/config_native
+Analyzer:  Application ../sw/app-arm-native.so-llvm-2.4 at 6b2000
+load_symtab: ../sw/app-arm-native.so-llvm-2.4
+load_symtab:  SHT_SYMTAB found in .symtab
+Current local time and date: Fri Nov 26 13:01:09 2010
+Analyzer: ANALYZE_OPTION = 1
+Analyzer: ONLINE_OPTION = 1
+_thread_fct: wait on buffer 0 (0xb4be8008)
+_thread_fct: buffer 0 ready
+_thread_fct: 1ffae annotation to push 
+push: New thread ID=0xbfceda9c at 0x0x9adb9e8 bb->db->InstructionCount = 6
+push: Current thread ID=0xbfceda9c
+push: New BB belong to dna_kickstart(0x6c4b9f) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+push_context:  Entering a new context entry: 0x0x9adba78 symbol: dna_kickstart
+push_context: 0x9adb9e8 pushed dna_kickstart
+push: New BB belong to dna_kickstart(0x6c4bb8)
+push: New BB belong to memory_create(0x6c4daf) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+push_context: Create call to memory_create
+push_context: Call from 0x6c4bb8 to 0x6c4daf
+push_context: 0x9adb9e8 pushed memory_create
+push: New BB belong to dna_memset(0x6c26af) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 memory_create
+push_context: Create call to dna_memset
+push_context: Call from 0x6c4daf to 0x6c26af
+push_context: 0x9adb9e8 pushed dna_memset
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c2732)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2748)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2748)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2748)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2782)
+push: New BB belong to dna_memset(0x6c279a) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 memory_create
+print_stack: 0x9adb9e8:3 dna_memset
+pop_context: 0x9adb9e8 popped dna_memset
+dna_memset cost = 1449 / 2098
+push: New BB belong to memory_create(0x7097971) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 memory_create
+pop_context: 0x9adb9e8 popped memory_create
+memory_create cost = 1493 / 2164
+push: New BB belong to dna_kickstart(0x7097311)
+push: New BB belong to core_create(0x7081329) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+push_context: Create call to core_create
+push_context: Call from 0x6c4bdf to 0x6c0d71
+push_context: 0x9adb9e8 pushed core_create
+push: New BB belong to dna_memset(0x6c26af) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+push_context: Create call to dna_memset
+push_context: Call from 0x6c0d71 to 0x6c26af
+push_context: 0x9adb9e8 pushed dna_memset
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c2732)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2782)
+push: New BB belong to dna_memset(0x6c279a) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 dna_memset
+pop_context: 0x9adb9e8 popped dna_memset
+dna_memset cost = 195 / 277
+push: New BB belong to dna_memset(0x7087791) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+push_context: call to dna_memset already exist
+push_context: Call from 0x6c0d71 to 0x6c26af
+push_context: 0x9adb9e8 pushed dna_memset
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c2732)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2782)
+push: New BB belong to dna_memset(0x6c279a) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 dna_memset
+pop_context: 0x9adb9e8 popped dna_memset
+dna_memset cost = 74 / 101
+push: New BB belong to kernel_malloc(0x7095023) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+push_context: Create call to kernel_malloc
+push_context: Call from 0x6c0d71 to 0x6c42ef
+push_context: 0x9adb9e8 pushed kernel_malloc
+push: New BB belong to kernel_malloc(0x6c433e)
+push: New BB belong to kernel_malloc(0x6c436c)
+push: New BB belong to lock_acquire(0x6c4d2f) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+push_context: Create call to lock_acquire
+push_context: Call from 0x6c436c to 0x6c4d2f
+push_context: 0x9adb9e8 pushed lock_acquire
+push: New BB belong to lock_acquire(0x6c4d4c)
+push: New BB belong to lock_acquire(0x6c4d69) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+print_stack: 0x9adb9e8:4 lock_acquire
+pop_context: 0x9adb9e8 popped lock_acquire
+lock_acquire cost = 12 / 16
+push: New BB belong to kernel_region_create(0x7095471) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+push_context: Create call to kernel_region_create
+push_context: Call from 0x6c436c to 0x6c44af
+push_context: 0x9adb9e8 pushed kernel_region_create
+push: New BB belong to kernel_region_create(0x6c4502)
+push: New BB belong to kernel_region_create(0x6c451e)
+push: New BB belong to kernel_region_create(0x6c4542)
+push: New BB belong to kernel_region_create(0x6c45bc)
+push: New BB belong to kernel_region_create(0x6c46da)
+push: New BB belong to kernel_region_create(0x6c46f3)
+push: New BB belong to kernel_region_create(0x6c4764)
+push: New BB belong to kernel_region_create(0x6c4782)
+push: New BB belong to kernel_region_create(0x6c4796) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+print_stack: 0x9adb9e8:4 kernel_region_create
+pop_context: 0x9adb9e8 popped kernel_region_create
+kernel_region_create cost = 87 / 124
+push: New BB belong to kernel_malloc(0x7095250)
+push: New BB belong to lock_release(0x7097727) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+push_context: Create call to lock_release
+push_context: Call from 0x6c43d2 to 0x6c4d7f
+push_context: 0x9adb9e8 pushed lock_release
+push: New BB belong to lock_release(0x6c4d99) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+print_stack: 0x9adb9e8:4 lock_release
+pop_context: 0x9adb9e8 popped lock_release
+lock_release cost = 6 / 6
+push: New BB belong to kernel_malloc(0x7095303)
+push: New BB belong to dna_memset(0x7087791) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+push_context: Create call to dna_memset
+push_context: Call from 0x6c4407 to 0x6c26af
+push_context: 0x9adb9e8 pushed dna_memset
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c2732)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2782)
+push: New BB belong to dna_memset(0x6c279a) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+print_stack: 0x9adb9e8:4 dna_memset
+pop_context: 0x9adb9e8 popped dna_memset
+dna_memset cost = 1086 / 1573
+push: New BB belong to kernel_malloc(0x7095351)
+push: New BB belong to kernel_malloc(0x7095371)
+push: New BB belong to kernel_malloc(0x7095391) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+pop_context: 0x9adb9e8 popped kernel_malloc
+kernel_malloc cost = 1273 / 1834
+push: New BB belong to core_create(0x7081466)
+push: New BB belong to kernel_malloc(0x7095023) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+push_context: Create call to kernel_malloc
+push_context: Call from 0x6c0dfa to 0x6c42ef
+push_context: 0x9adb9e8 pushed kernel_malloc
+push: New BB belong to kernel_malloc(0x6c433e)
+push: New BB belong to kernel_malloc(0x6c436c)
+push: New BB belong to lock_acquire(0x6c4d2f) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+push_context: call to lock_acquire already exist
+push_context: Call from 0x6c436c to 0x6c4d2f
+push_context: 0x9adb9e8 pushed lock_acquire
+push: New BB belong to lock_acquire(0x6c4d4c)
+push: New BB belong to lock_acquire(0x6c4d69) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+print_stack: 0x9adb9e8:4 lock_acquire
+pop_context: 0x9adb9e8 popped lock_acquire
+lock_acquire cost = 12 / 16
+push: New BB belong to kernel_region_create(0x7095471) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+push_context: call to kernel_region_create already exist
+push_context: Call from 0x6c436c to 0x6c44af
+push_context: 0x9adb9e8 pushed kernel_region_create
+push: New BB belong to kernel_region_create(0x6c4502)
+push: New BB belong to kernel_region_create(0x6c451e)
+push: New BB belong to kernel_region_create(0x6c4542)
+push: New BB belong to kernel_region_create(0x6c45bc)
+push: New BB belong to kernel_region_create(0x6c46da)
+push: New BB belong to kernel_region_create(0x6c472c)
+push: New BB belong to kernel_region_create(0x6c4742)
+push: New BB belong to kernel_region_create(0x6c4764)
+push: New BB belong to kernel_region_create(0x6c4782)
+push: New BB belong to kernel_region_create(0x6c4796) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+print_stack: 0x9adb9e8:4 kernel_region_create
+pop_context: 0x9adb9e8 popped kernel_region_create
+kernel_region_create cost = 93 / 134
+push: New BB belong to kernel_malloc(0x7095250)
+push: New BB belong to lock_release(0x7097727) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+push_context: call to lock_release already exist
+push_context: Call from 0x6c43d2 to 0x6c4d7f
+push_context: 0x9adb9e8 pushed lock_release
+push: New BB belong to lock_release(0x6c4d99) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+print_stack: 0x9adb9e8:4 lock_release
+pop_context: 0x9adb9e8 popped lock_release
+lock_release cost = 6 / 6
+push: New BB belong to kernel_malloc(0x7095303)
+push: New BB belong to dna_memset(0x7087791) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+push_context: call to dna_memset already exist
+push_context: Call from 0x6c4407 to 0x6c26af
+push_context: 0x9adb9e8 pushed dna_memset
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c2732)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2782)
+push: New BB belong to dna_memset(0x6c279a) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+print_stack: 0x9adb9e8:4 dna_memset
+pop_context: 0x9adb9e8 popped dna_memset
+dna_memset cost = 1526 / 2213
+push: New BB belong to kernel_malloc(0x7095351)
+push: New BB belong to kernel_malloc(0x7095371)
+push: New BB belong to kernel_malloc(0x7095391) RETURN
+pop_context: <<<<<<<<<<<<<<<<<<<<
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+print_stack: 0x9adb9e8:3 kernel_malloc
+pop_context: 0x9adb9e8 popped kernel_malloc
+kernel_malloc cost = 1719 / 2484
+push: New BB belong to core_create(0x7081512)
+push: New BB belong to dna_memset(0x7087791) ENTRY
+push_context: >>>>>>>>>>>>>>>>>>>>
+print_stack: 0x9adb9e8:0 out_of_context
+print_stack: 0x9adb9e8:1 dna_kickstart
+print_stack: 0x9adb9e8:2 core_create
+push_context: Create call to dna_memset
+push_context: Call from 0x6c0e28 to 0x6c26af
+push_context: 0x9adb9e8 pushed dna_memset
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c26f7)
+push: New BB belong to dna_memset(0x6c271c)
+push: New BB belong to dna_memset(0x6c2732)
+push: New BB belong to dna_memset(0x6c276c)
+push: New BB belong to dna_memset(0x6c2782)
+push: New BB belong to dna_memset

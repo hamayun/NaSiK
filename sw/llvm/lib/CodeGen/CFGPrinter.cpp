@@ -42,12 +42,11 @@ EnableCFGPrinter("enable-cfg-printer",
     cl::init(false), cl::Hidden);
 
 namespace {
-  struct VISIBILITY_HIDDEN CFGPrinter : public MachineFunctionPass {
+  struct CFGPrinter : public MachineFunctionPass {
     static char ID;
 
     CFGPrinter(const std::string &Name) :
-      MachineFunctionPass((intptr_t)&ID),
-      _File_name(Name)
+      MachineFunctionPass(ID), _File_name(Name)
     {}
 
     virtual bool runOnMachineFunction(MachineFunction &MF);
@@ -127,7 +126,7 @@ void CFGPrinter::printBoth() {
   BasicBlock                *SuccBB;
   std::map< const BasicBlock*, std::string > basicblockMap;
 
-  fileName = "CFG_" + _Function->getName() + "_" + _File_name + ".dot";
+  fileName = "CFG_" + _Function->getNameStr() + "_" + _File_name + ".dot";
   fileCFG.open(fileName.data(), std::fstream::out);
 
   fileCFG << "digraph module_graph {\n";

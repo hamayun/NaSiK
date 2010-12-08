@@ -15,96 +15,95 @@
 #ifndef LLVM_CODEGEN_PASSES_H
 #define LLVM_CODEGEN_PASSES_H
 
-#include <iosfwd>
+#include "llvm/Target/TargetMachine.h"
 #include <string>
 
 namespace llvm {
 
   class FunctionPass;
-  class ModulePass;
+  class MachineFunctionPass;
   class PassInfo;
-  class TargetMachine;
+  class TargetLowering;
   class RegisterCoalescer;
+  class raw_ostream;
 
   /// createUnreachableBlockEliminationPass - The LLVM code generator does not
   /// work well with unreachable basic blocks (what live ranges make sense for a
   /// block that cannot be reached?).  As such, a code generator should either
-  /// not instruction select unreachable blocks, or it can run this pass as it's
+  /// not instruction select unreachable blocks, or run this pass as its
   /// last LLVM modifying pass to clean up blocks that are not reachable from
   /// the entry block.
   FunctionPass *createUnreachableBlockEliminationPass();
 
   /// MachineFunctionPrinter pass - This pass prints out the machine function to
-  /// standard error, as a debugging tool.
-  FunctionPass *createMachineFunctionPrinterPass(std::ostream *OS,
-                                                 const std::string &Banner ="");
+  /// the given stream as a debugging tool.
+  MachineFunctionPass *
+  createMachineFunctionPrinterPass(raw_ostream &OS,
+                                   const std::string &Banner ="");
 
   /// MachineLoopInfo pass - This pass is a loop analysis pass.
-  /// 
-  extern const PassInfo *const MachineLoopInfoID;
+  ///
+  extern char &MachineLoopInfoID;
 
   /// MachineDominators pass - This pass is a machine dominators analysis pass.
-  /// 
-  extern const PassInfo *const MachineDominatorsID;
+  ///
+  extern char &MachineDominatorsID;
 
   /// PHIElimination pass - This pass eliminates machine instruction PHI nodes
   /// by inserting copy instructions.  This destroys SSA information, but is the
   /// desired input for some register allocators.  This pass is "required" by
   /// these register allocator like this: AU.addRequiredID(PHIEliminationID);
   ///
-  extern const PassInfo *const PHIEliminationID;
-  
+  extern char &PHIEliminationID;
+
   /// StrongPHIElimination pass - This pass eliminates machine instruction PHI
   /// nodes by inserting copy instructions.  This destroys SSA information, but
   /// is the desired input for some register allocators.  This pass is
   /// "required" by these register allocator like this:
   ///    AU.addRequiredID(PHIEliminationID);
   ///  This pass is still in development
-  extern const PassInfo *const StrongPHIEliminationID;
+  extern char &StrongPHIEliminationID;
+
+  extern char &PreAllocSplittingID;
 
   /// SimpleRegisterCoalescing pass.  Aggressively coalesces every register
   /// copy it can.
   ///
-  extern const PassInfo *const SimpleRegisterCoalescingID;
+  extern char &SimpleRegisterCoalescingID;
 
   /// TwoAddressInstruction pass - This pass reduces two-address instructions to
   /// use two operands. This destroys SSA information but it is desired by
   /// register allocators.
-  extern const PassInfo *const TwoAddressInstructionPassID;
+  extern char &TwoAddressInstructionPassID;
 
   /// UnreachableMachineBlockElimination pass - This pass removes unreachable
   /// machine basic blocks.
-  extern const PassInfo *const UnreachableMachineBlockElimID;
+  extern char &UnreachableMachineBlockElimID;
 
-  /// Creates a register allocator as the user specified on the command line.
+  /// DeadMachineInstructionElim pass - This pass removes dead machine
+  /// instructions.
   ///
-  FunctionPass *createRegisterAllocator();
+  FunctionPass *createDeadMachineInstructionElimPass();
 
-  /// SimpleRegisterAllocation Pass - This pass converts the input machine code
-  /// from SSA form to use explicit registers by spilling every register.  Wow,
-  /// great policy huh?
+  /// Creates a register allocator as the user specified on the command line, or
+  /// picks one that matches OptLevel.
   ///
-  FunctionPass *createSimpleRegisterAllocator();
+  FunctionPass *createRegisterAllocator(CodeGenOpt::Level OptLevel);
 
-  /// LocalRegisterAllocation Pass - This pass register allocates the input code
-  /// a basic block at a time, yielding code better than the simple register
-  /// allocator, but not as good as a global allocator.
+  /// FastRegisterAllocation Pass - This pass register allocates as fast as
+  /// possible. It is best suited for debug code where live ranges are short.
   ///
-  FunctionPass *createLocalRegisterAllocator();
-
-  /// BigBlockRegisterAllocation Pass - The BigBlock register allocator
-  /// munches single basic blocks at a time, like the local register
-  /// allocator.  While the BigBlock allocator is a little slower, and uses
-  /// somewhat more memory than the local register allocator, it tends to
-  /// yield the best allocations (of any of the allocators) for blocks that
-  /// have hundreds or thousands of instructions in sequence.
-  ///
-  FunctionPass *createBigBlockRegisterAllocator();
+  FunctionPass *createFastRegisterAllocator();
 
   /// LinearScanRegisterAllocation Pass - This pass implements the linear scan
   /// register allocation algorithm, a global register allocator.
   ///
   FunctionPass *createLinearScanRegisterAllocator();
+
+  /// PBQPRegisterAllocation Pass - This pass implements the Partitioned Boolean
+  /// Quadratic Prograaming (PBQP) based register allocator.
+  ///
+  FunctionPass *createDefaultPBQPRegisterAllocator();
 
   /// SimpleRegisterCoalescing Pass - Coalesce all copies possible.  Can run
   /// independently of the register allocator.
@@ -115,15 +114,16 @@ namespace llvm {
   /// and eliminates abstract frame references.
   ///
   FunctionPass *createPrologEpilogCodeInserter();
-  
+
   /// LowerSubregs Pass - This pass lowers subregs to register-register copies
   /// which yields suboptimal, but correct code if the register allocator
   /// cannot coalesce all subreg operations during allocation.
   ///
   FunctionPass *createLowerSubregsPass();
 
-  /// createPostRAScheduler - under development.
-  FunctionPass *createPostRAScheduler();
+  /// createPostRAScheduler - This pass performs post register allocation
+  /// scheduling.
+  FunctionPass *createPostRAScheduler(CodeGenOpt::Level OptLevel);
 
   /// BranchFolding Pass - This pass performs machine code CFG based
   /// optimizations to delete branches to branches, eliminate branches to
@@ -131,59 +131,83 @@ namespace llvm {
   /// branches.
   FunctionPass *createBranchFoldingPass(bool DefaultEnableTailMerge);
 
+  /// TailDuplicate Pass - Duplicate blocks with unconditional branches
+  /// into tails of their predecessors.
+  FunctionPass *createTailDuplicatePass(bool PreRegAlloc = false);
+
   /// IfConverter Pass - This pass performs machine code if conversion.
   FunctionPass *createIfConverterPass();
 
-  /// LoopAligner Pass - This pass aligns loop headers to target specific
-  /// alignment boundary.
-  FunctionPass *createLoopAlignerPass();
-
-  /// DebugLabelFoldingPass - This pass prunes out redundant debug labels.  This
-  /// allows a debug emitter to determine if the range of two labels is empty,
-  /// by seeing if the labels map to the same reduced label.
-  FunctionPass *createDebugLabelFoldingPass();
-
-  /// MachineCodeDeletion Pass - This pass deletes all of the machine code for
-  /// the current function, which should happen after the function has been
-  /// emitted to a .s file or to memory.
-  FunctionPass *createMachineCodeDeleter();
-
-  /// getRegisterAllocator - This creates an instance of the register allocator
-  /// for the Sparc.
-  FunctionPass *getRegisterAllocator(TargetMachine &T);
+  /// Code Placement Pass - This pass optimize code placement and aligns loop
+  /// headers to target specific alignment boundary.
+  FunctionPass *createCodePlacementOptPass();
 
   /// IntrinsicLowering Pass - Performs target-independent LLVM IR
   /// transformations for highly portable strategies.
   FunctionPass *createGCLoweringPass();
-  
+
   /// MachineCodeAnalysis Pass - Target-independent pass to mark safe points in
   /// machine code. Must be added very late during code generation, just prior
   /// to output, and importantly after all CFG transformations (such as branch
   /// folding).
   FunctionPass *createGCMachineCodeAnalysisPass();
-  
+
   /// Deleter Pass - Releases GC metadata.
-  /// 
+  ///
   FunctionPass *createGCInfoDeleter();
-  
+
   /// Creates a pass to print GC metadata.
-  /// 
-  FunctionPass *createGCInfoPrinter(std::ostream &OS);
-  
+  ///
+  FunctionPass *createGCInfoPrinter(raw_ostream &OS);
+
+  /// createMachineCSEPass - This pass performs global CSE on machine
+  /// instructions.
+  FunctionPass *createMachineCSEPass();
+
   /// createMachineLICMPass - This pass performs LICM on machine instructions.
-  /// 
-  FunctionPass *createMachineLICMPass();
+  ///
+  FunctionPass *createMachineLICMPass(bool PreRegAlloc = true);
 
   /// createMachineSinkingPass - This pass performs sinking on machine
   /// instructions.
   FunctionPass *createMachineSinkingPass();
 
+  /// createPeepholeOptimizerPass - This pass performs peephole optimizations -
+  /// like extension and comparison eliminations.
+  FunctionPass *createPeepholeOptimizerPass();
+
+  /// createOptimizePHIsPass - This pass optimizes machine instruction PHIs
+  /// to take advantage of opportunities created during DAG legalization.
+  FunctionPass *createOptimizePHIsPass();
+
   /// createStackSlotColoringPass - This pass performs stack slot coloring.
-  FunctionPass *createStackSlotColoringPass();
-  
+  FunctionPass *createStackSlotColoringPass(bool);
+
+  /// createStackProtectorPass - This pass adds stack protectors to functions.
+  FunctionPass *createStackProtectorPass(const TargetLowering *tli);
+
+  /// createMachineVerifierPass - This pass verifies cenerated machine code
+  /// instructions for correctness.
+  FunctionPass *createMachineVerifierPass();
+
+  /// createDwarfEHPass - This pass mulches exception handling code into a form
+  /// adapted to code generation.  Required if using dwarf exception handling.
+  FunctionPass *createDwarfEHPass(const TargetMachine *tm);
+
+  /// createSjLjEHPass - This pass adapts exception handling code to use
+  /// the GCC-style builtin setjmp/longjmp (sjlj) to handling EH control flow.
+  FunctionPass *createSjLjEHPass(const TargetLowering *tli);
+
+  /// createLocalStackSlotAllocationPass - This pass assigns local frame
+  /// indices to stack slots relative to one another and allocates
+  /// base registers to access them when it is estimated by the target to
+  /// be out of range of normal frame pointer or stack pointer index
+  /// addressing.
+  FunctionPass *createLocalStackSlotAllocationPass();
+
   /// createMachineCheckCFGPass - This pass performs checking on machine
   /// CFG and LLVM CFG
-  FunctionPass *createMachineCheckCFGPass(const char* previousPass);
+  // FunctionPass *createMachineCheckCFGPass(const char* previousPass);
 
   /// createMachineTargetAnnotationPass - This pass insert annotations
   /// for a target arch in the LLVM level CFG. If generated, the BC file

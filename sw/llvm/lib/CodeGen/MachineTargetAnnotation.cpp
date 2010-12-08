@@ -26,11 +26,12 @@
 #include "llvm/Constants.h"
 #include "llvm/Module.h"
 #include "llvm/CodeGen/AsmPrinter.h"
-#include "llvm/CodeGen/DwarfWriter.h"
+#include "llvm/Type.h"
+#include "llvm/LLVMContext.h"
+#include "llvm/Support/raw_ostream.h"
 #include "llvm/CodeGen/MachineModuleInfo.h"
 #include "llvm/CodeGen/MachineFunctionPass.h"
 #include "llvm/CodeGen/MachineJumpTableInfo.h"
-#include "llvm/Target/TargetAsmInfo.h"
 #include "llvm/Target/TargetData.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
@@ -39,27 +40,28 @@
 #include "llvm/ADT/Statistic.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/Mangler.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/CFG.h"
 #include "llvm/Instructions.h"
 #include "llvm/Function.h"
+#include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/CodeGen/MachineBasicBlock.h"
 #include <map>
 #include <list>
 #include <vector>
 #include <string>
-#include <fstream>
 #include <iostream>
 #include <unistd.h>
 #include <cctype>
+#include <fstream>
 
 namespace llvm
 {
   bool PrintDualCFG;
   bool BranchPenalty;
+  bool PrintAnnotatedCFG;
 
   static cl::opt<bool, true> PrintDualCFGOpt("print-dual-cfg", 
 	 cl::desc("Print LLVM and Target Machine CFG in the same graph."),
@@ -68,19 +70,29 @@ namespace llvm
   static cl::opt<bool, true> BranchPenaltyOpt("annotate-branch-penalty",
          cl::desc("Insert annotation for mispredicted branch penalty."),
          cl::location(BranchPenalty), cl::init(false));
+
+  static cl::opt<bool, true> PrintAnnotatedCFGOpt("print-annotated-cfg",
+	 cl::desc("Print superimposed LLVM and Machine CFG with annotation statistics."),
+         cl::location(PrintAnnotatedCFG), cl::init(false));
 }
 
 using namespace llvm;
 
-//STATISTIC(EmittedInsts, "Number of machine instrs printed");
+//#define PRINT_ANNOTATION_DETAILS
+#ifdef PRINT_ANNOTATION_DETAILS
+    #define ANNOUT if(1) std::cout
+#else
+    #define ANNOUT if(0) std::cout
+#endif
 
+#define DOUT                    if(0) std::cout
 #define DDOUT			DOUT << __func__ << ": "
 
 namespace {
-  struct VISIBILITY_HIDDEN MachineTargetAnnotation : public MachineFunctionPass {
+  struct MachineTargetAnnotation : public MachineFunctionPass {
   static char ID;
 
-  MachineTargetAnnotation(TargetMachine & T): MachineFunctionPass((intptr_t) & ID), _Target(T) {}
+  MachineTargetAnnotation(TargetMachine & T): MachineFunctionPass(ID), _Target(T) {}
 
   virtual const char *getPassName() const {
     return "Target Annotation pass";
@@ -92,7 +104,7 @@ namespace {
 
   typedef std::list < BasicBlock* > llvmBB_list_t;
   typedef std::list < MachineBasicBlock* > machineBB_list_t;
-  typedef std::map < BasicBlock*, machineBB_list_t* > llvmBasicBlockMap_t;
+  typedef std::map < BasicBlock*, machineBB_list_t*> llvmBasicBlockMap_t;
 
   private:
     unsigned int getInstructionCount(const MachineInstr & MI);
@@ -105,7 +117,7 @@ namespace {
     machineBB_list_t * getMBBSuccessors(machineBB_list_t * listMBB);
     llvmBB_list_t * insertAndAnnotateBB(const BasicBlock* pred, machineBB_list_t * succs);
 
-    bool plotGraph(MachineFunction & MF);
+    bool printAnnotatedCFG(MachineFunction & MF);
 
   private:
     Function		*_LLVM_F;
@@ -118,12 +130,11 @@ namespace {
     bool                _entry_flag;
     bool                _return_flag;
 
-    std::string      _File_name;
     Function         *_Function;
     MachineFunction  *_MachineFunction;
 
     bool check(BasicBlock* BB, MachineBasicBlock *MBB, std::list< std::string > *lst);
-    void printBoth(); 
+    void printDualCFG();
     void formatDotLabel(std::string *str);
     void formatDotNode(std::string *str);
   };
@@ -135,7 +146,6 @@ FunctionPass *llvm::createMachineTargetAnnotationPass(TargetMachine &T) {
 }
 
 /// runOnMachineFunction - 
-///
 bool MachineTargetAnnotation::doInitialization(Module &M) {
   _Target.InitializeMBBAnnotation();
   return (false);
@@ -146,38 +156,47 @@ bool MachineTargetAnnotation::doFinalization(Module &M) {
 }
 
 bool MachineTargetAnnotation::runOnMachineFunction(MachineFunction &MF) {
-  _File_name  = "annotate";
   _MachineFunction= &MF;
   _Function = (Function*)(MF.getFunction());
 
-  // Get current function parent module 
+  // Get current function's parent module
   _LLVM_F = (Function*) MF.getFunction();
   assert(_LLVM_F && "Machine Function must have a Function to annotate!\n");
   _LLVM_M = _LLVM_F->getParent();
   assert(_LLVM_M && "Function must have a parent Module!\n");
 
-  DDOUT << " run on function : " << _LLVM_F -> getName() << " (in " << _LLVM_M -> getModuleIdentifier() << ")" << std::endl;
+  LLVMContext &Context = _LLVM_M->getContext();  // The current Module Context
+  DDOUT << " run on function : " << _LLVM_F->getNameStr() << " (in " << _LLVM_M->getModuleIdentifier() << ")" << std::endl;
 
-  //  Constant * c = _LLVM_M->getOrInsertFunction("mbb_annotation",
-  //      Type::VoidTy,
-  //      PointerType::get(IntegerType::get(8),0),
-  //      NULL);
+  /// Constant *Module::getOrInsertFunction(StringRef Name, const FunctionType *Ty);
+  /// static FunctionType *get(const Type *Result, ///< The result type
+  ///                          const std::vector<const Type*> &Params, ///< The types of the parameters
+  ///                          bool isVarArg  ///< Whether this is a variable argument length function
+  ///                          );
 
-  _Fannotation = cast<Function>( _LLVM_M->getOrInsertFunction("mbb_annotation", Type::VoidTy, PointerType::get(IntegerType::get(8),0), NULL));
-  _Fannotation_Entry = cast<Function>( _LLVM_M->getOrInsertFunction("annotation_entry", Type::VoidTy, NULL));
-  _Fannotation_Return = cast<Function>( _LLVM_M->getOrInsertFunction("annotation_return", Type::VoidTy, NULL));
+  _Fannotation = cast<Function>(_LLVM_M->getOrInsertFunction(StringRef("mbb_annotation"),
+                                FunctionType::get(Type::getVoidTy(Context),
+                                std::vector<const Type*> (1, PointerType::get(IntegerType::get(Context, 8),0)), false)));
 
+  /*
+  _Fannotation_Entry = cast<Function>(_LLVM_M->getOrInsertFunction(StringRef("annotation_entry"),
+                                FunctionType::get(Type::getVoidTy(Context), false)));
+
+  _Fannotation_Return = cast<Function>(_LLVM_M->getOrInsertFunction(StringRef("annotation_return"),
+                                FunctionType::get(Type::getVoidTy(Context), false)));
+  */
+  
   _plotCFG = false;
   annotateFunction(MF);
   if (PrintDualCFG)
   {
-    printBoth();
+    printDualCFG();
   }
 
-  if (_plotCFG)
+  if (_plotCFG || PrintAnnotatedCFG)
   {
     // Call this Function to Create MBB BB and DOT Files for CFG Viewing
-    //plotGraph(MF);
+    printAnnotatedCFG(MF);
   }
 
   return (true);
@@ -202,26 +221,39 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
     assert(llvmBasicBlock && "NULL pointer!\n");
     listMachineBasicBlock = (*llvmBasicBlockMap)[llvmBasicBlock];
     assert(listMachineBasicBlock && "NULL pointer!\n");
-    if (listMachineBasicBlock->size() > 1) {
-      _plotCFG = true;
-#if 0
-      DDOUT << llvmBasicBlock->getName() << " have multiple childs! (" << listMachineBasicBlock->size() << ")\n";
-      DDOUT << *llvmBasicBlock;
+    if (listMachineBasicBlock->size() > 1) 
+    {
+      TargetAnnotationDB compositeDB;
+      //_plotCFG = true;
+      ANNOUT << llvmBasicBlock->getNameStr() << " have multiple childs! (" << listMachineBasicBlock->size() << ")\n";
 
-//    cerr << "Annotation warning: " << llvmBasicBlock->getName() << " LLVM BasicBlock have multiple corresponding MachineBasicBlock "
-//         << "(CFG and LLVM files created)\n";
-      _plotCFG = true;
-
-      for (machineBB_list_t::const_iterator MBBI = listMachineBasicBlock->begin(), MBBI_E = listMachineBasicBlock->end(); MBBI != MBBI_E; ++MBBI) {
+      // Iterate through the Machine Basic Block List 
+      for (machineBB_list_t::const_iterator MBBI = listMachineBasicBlock->begin(), MBBI_E = listMachineBasicBlock->end(); MBBI != MBBI_E; ++MBBI)
+      {
         machineBasicBlock = (*MBBI);
         assert(machineBasicBlock && "NULL pointer!\n");
 
         annotationDB = (TargetAnnotationDB*) _Target.MachineBasicBlockAnnotation(*machineBasicBlock);
-        if(annotationDB != NULL)
-          annotateLLVMBasicBlock(annotationDB, llvmBasicBlock);
+        if(annotationDB != NULL){
+            compositeDB.addDB(annotationDB);
+        }
       }
-#endif
-    } else if (listMachineBasicBlock->size() == 1) {
+
+      // Handle the Entry/Return Types
+      // I wonder if there exists a possibility of having a Basic Block in
+      // (In Machine Independent LLVM) containing both Entry *AND* Return Types?
+      // This sheme will work when we *ALWAYS* have two different Entry/Return LLVM BBs.
+      if (llvmBasicBlock->getNameStr() == "entry")    compositeDB.setType(MBB_ENTRY);
+      if (llvmBasicBlock->getNameStr() == "return")   compositeDB.setType(MBB_RETURN);
+
+      // Set the Entry/Return flags for Checking Later on.
+      if(compositeDB.getType() & MBB_ENTRY)   _entry_flag  = true;
+      if(compositeDB.getType() & MBB_RETURN)  _return_flag = true;
+
+      // Now we have the 'SUM' of all annotation DBs; We annotate the LLVM Basic Block with it.
+      annotateLLVMBasicBlock(&compositeDB, llvmBasicBlock);
+    }
+    else if (listMachineBasicBlock->size() == 1) {
       machineBasicBlock = listMachineBasicBlock->front();
       assert(machineBasicBlock && "NULL pointer!\n");
 
@@ -239,12 +271,12 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
             //succMachineBasicBlock = listMachineBasicBlock->front(); 
             succMachineBasicBlock = *succMBB; 
 
-            //cout << "MBB # "<< machineBasicBlock->getNumber() << "-->SuccMBB # "<< succMachineBasicBlock->getNumber() << std::endl;
+            //DOUT << "MBB # "<< machineBasicBlock->getNumber() << "-->SuccMBB # "<< succMachineBasicBlock->getNumber() << std::endl;
 
             branchAnnotationDB = (TargetAnnotationDB*) _Target.MBBBranchPenaltyAnnotation(*machineBasicBlock, *succMachineBasicBlock);
             if(branchAnnotationDB != NULL)
             {
-              cout  << "Penalty = " << branchAnnotationDB->getCycleCount() << std::endl << std::endl;
+              ANNOUT << "Penalty = " << branchAnnotationDB->getCycleCount() << std::endl << std::endl;
 
               BasicBlock *BBdest = (BasicBlock*)(*succMachineBasicBlock).getBasicBlock();
               BasicBlock *BBsrc = BBdest->getSinglePredecessor();
@@ -263,13 +295,67 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
         //}
         }
       }
+
       annotationDB = (TargetAnnotationDB*) _Target.MachineBasicBlockAnnotation(*machineBasicBlock);
-      if(annotationDB != NULL)
+      if(annotationDB != NULL){
+        // Handle the Entry/Return Types
+        // I wonder if there exists a possibility of having a Basic Block in
+        // (In Machine Independent LLVM) containing both Entry *AND* Return Types?
+        // This sheme will work when we *ALWAYS* have two different Entry/Return LLVM BBs.
+        if (llvmBasicBlock->getNameStr() == "entry")    annotationDB->setType(MBB_ENTRY);
+        if (llvmBasicBlock->getNameStr() == "return")   annotationDB->setType(MBB_RETURN);
+
+        // Set the Entry/Return flags for Checking Later on.
+        if(annotationDB->getType() & MBB_ENTRY)   _entry_flag  = true;
+        if(annotationDB->getType() & MBB_RETURN)  _return_flag = true;
+
+        // Call this function to Insert 'annotate' call with 'annotation db' to the current basic block.
         annotateLLVMBasicBlock(annotationDB, llvmBasicBlock);
+      }
     }
   }
 
   cleanLLVMBasicBlockMap(llvmBasicBlockMap);
+
+  // Normally Every Function *SHOULD* have one entry and one return basic block.
+  // Except for the cases when a Function contains an Infinite Loop i.e. Does *Not Return* during the lifetime of the programe.
+  // And Also for cases when the doesn't exist a correspondance between Machine Basic Blocks and LLVM Basic Blocks
+  // In such cases we insert Dummy Entry/Return Annotation Function Calls. (See Below)
+  if(_entry_flag == false || _return_flag == false){
+    ANNOUT << "Warning: Function " << MF.getFunction()->getNameStr()
+           << "  _entry_flag = " << _entry_flag << "  _return_flag = " << _return_flag << std::endl;
+  }
+
+  // Now go through all the LLVM Basic Blocks and Search for Entry/Return BBs.
+  // If any of the Entry/Return BBs is missing in an Annoatation Call;
+  // We Insert a dummy one with MBB_ENTRY/MBB_RETURN as Annotation Type.
+  // This fix is neccessary for the online-analysis option of libta to get performance estimates.
+
+  //std::cout << "($) Function: " << _Function->getNameStr() << std::endl;
+  TargetAnnotationDB dummyEntryDB, dummyReturnDB;
+  dummyEntryDB.setType(MBB_ENTRY); 
+  dummyReturnDB.setType(MBB_RETURN);
+
+  for (Function::iterator BBI = _Function->begin(), E = _Function->end(); BBI != E; ++BBI)
+  {
+      if(BBI->getAnnotationFlag() == false)
+      {
+        // We check the entry flag as well to make sure that there is only *ONE* entry BB
+        if(BBI->getNameStr() == "entry" && (_entry_flag == false))
+        {
+            //std::cout << "Annotating with Dummy entry" << std::endl;
+            annotateLLVMBasicBlock(&dummyEntryDB, &(*BBI));
+        }
+        // We check the return flag as well to make sure that there is only *ONE* return BB
+        else if(BBI->getNameStr() == "return" && (_return_flag == false))
+        {
+            //std::cout << "Annotating with Dummy return" << std::endl;
+            annotateLLVMBasicBlock(&dummyReturnDB, &(*BBI));
+        }
+      }
+      //std::cout << "($ After ) BB Name: " << BBI->getNameStr() << " IsAnnotated: " << BBI->getAnnotationFlag()
+      //          << "   Annotation Type: " << BBI->getAnnotationType() << std::endl;
+  }
 
   return (false);
 }
@@ -285,7 +371,7 @@ MachineTargetAnnotation::llvmBasicBlockMap_t* MachineTargetAnnotation::buildLLVM
 
   listMachineBasicBlock = NULL;
 
-  // Create LLVM function basic block map
+  // Create LLVM Basic Block Map to contain corresponding Machine Basic Blocks List (For Each BB but currently Empty)
   llvmFunction = (Function*) MF.getFunction();
   for (Function::iterator BBI = llvmFunction->begin(), E = llvmFunction->end(); BBI != E; ++BBI) {
     assert((llvmBasicBlockMap->count(BBI) == 0) && "LLVM BasicBlock already in the map!");
@@ -293,6 +379,7 @@ MachineTargetAnnotation::llvmBasicBlockMap_t* MachineTargetAnnotation::buildLLVM
     assert((*llvmBasicBlockMap)[BBI] && "NULL pointer!\n");
   }
 
+  // Check How Many of Machine Basic Blocks Correspond to LLVM Basic Blocks
   unsigned int counter = 0;
   for (MachineFunction::iterator BBI = MF.begin(), E = MF.end(); BBI != E; ++BBI) {
     llvmBasicBlock = (BasicBlock*) BBI->getBasicBlock();
@@ -300,15 +387,36 @@ MachineTargetAnnotation::llvmBasicBlockMap_t* MachineTargetAnnotation::buildLLVM
       counter++;
     }
   }
-  if (counter != llvmBasicBlockMap->size()) 
-    DDOUT << "Number of BasicBlock and MachineMachineBlock doesn't match! " << llvmBasicBlockMap->size() << ":" << counter << "\n";
 
-  // Create Machine function basic block map
-  for (MachineFunction::iterator BBI = MF.begin(), E = MF.end(); BBI != E; ++BBI) {
-    llvmBasicBlock = (BasicBlock*) BBI->getBasicBlock();
+  // Check If the Number of Basic Blocks (Expected as in the Map Above) and Machines Basic Blocks are Equal. 
+  if (counter != llvmBasicBlockMap->size()){
+    ANNOUT << "Number of BasicBlocks and MachineBasicBlocks don't match! [Function: " << MF.getFunction()->getNameStr() << "] "
+           << "BBs: " <<llvmBasicBlockMap->size() << ", MBBs: " << counter << "\n";
+    for (MachineFunction::iterator BBI = MF.begin(), E = MF.end(); BBI != E; ++BBI) {
+        MachineBasicBlock * machineBasicBlock = BBI;
+        llvmBasicBlock = (BasicBlock*) BBI->getBasicBlock();
+
+        if(llvmBasicBlock)
+            ANNOUT << "MBB # "    << machineBasicBlock->getNumber() << " --> "
+                 << "BB: " << llvmBasicBlock->getName().str() << std::endl;
+        else
+            ANNOUT << "MBB # "    << machineBasicBlock->getNumber() << " --> "
+                 << "NULL" << std::endl;
+    }
+  }
+
+  // Now Actually Populate the List of Machine Basic Blocks inside the llvmBasicBlockMap
+  for (MachineFunction::iterator MBBI = MF.begin(), E = MF.end(); MBBI != E; ++MBBI) {
+    llvmBasicBlock = (BasicBlock*) MBBI->getBasicBlock();
     if (llvmBasicBlock != NULL) {
+      // Here we get a pointer to the List of MBBs for the llvmBasicBlock (the corresponding BB for the current MBB)
+      // Get the pointer to MBBs list from the Map.
       listMachineBasicBlock = (*llvmBasicBlockMap)[llvmBasicBlock];
-      listMachineBasicBlock->push_back(BBI);
+
+      // And Insert (push_back) the current MBB into it.
+      // This push_back may be called multiple times for the given llvmBasicBlock
+      // if we have a one-to-many correspondance between BBs and MBBs.
+      listMachineBasicBlock->push_back(MBBI);
     } else {
       // CONSTANT POOL are Machine BasicBlock with no LLVM parent BasicBlock
     }
@@ -326,43 +434,58 @@ void MachineTargetAnnotation::cleanLLVMBasicBlockMap(llvmBasicBlockMap_t* map) {
 }
 
 bool MachineTargetAnnotation::annotateLLVMBasicBlock(TargetAnnotationDB *MBBinfo, BasicBlock *BB) {
-  //Value *mBBValue;
+  LLVMContext &Context = _LLVM_M->getContext();  // The current Module Context
+  ANNOUT << "Annotating " << BB->getNameStr() << std::endl;
 
   assert(MBBinfo && "NULL pointer!\n");
   assert(BB && "NULL pointer!\n");
 
   std::vector < Constant * > DumpValues;
-  char * dump = MBBinfo->Dump();
+  char * dump = MBBinfo->Dump();                // Get the AnnotationDB as a Dump
 
   for( unsigned int i = 0 ; i < MBBinfo->DumpSize() ; i++){
-    DumpValues.push_back(ConstantInt::get(IntegerType::get(8), dump[i]));
+    DumpValues.push_back(ConstantInt::get(IntegerType::get(Context, 8), dump[i]));      // Push AnnotationDB Dump to DumpValues Vector
   }
 
-  std::string  VarName = BB->getName() + "_db";
-  GlobalVariable * DumpVar = new GlobalVariable(ArrayType::get(IntegerType::get(8),MBBinfo->DumpSize()),
-      true,
-      GlobalValue::InternalLinkage,
-      ConstantArray::get(ArrayType::get(IntegerType::get(8),MBBinfo->DumpSize()), DumpValues),
-      VarName.data(),
-      _LLVM_M
-      );
+  std::string VarName = BB->getNameStr() + "_db";
+
+  // Here we create a Global Variable in the current module and Dump Annotation Info for the Current BB into it.
+  GlobalVariable * DumpVar = new GlobalVariable(*_LLVM_M,
+                                                ArrayType::get(IntegerType::get(Context, 8), MBBinfo->DumpSize()),
+                                                true,
+                                                GlobalValue::InternalLinkage,
+                                                ConstantArray::get(ArrayType::get(IntegerType::get(Context, 8), MBBinfo->DumpSize()), DumpValues),
+                                                VarName.data());
 
   std::vector<Constant*> const_ptr_7_indices;
-  Constant* const_int32_8 = Constant::getNullValue(IntegerType::get(32));
+  Constant* const_int32_8 = Constant::getNullValue(IntegerType::get(Context, 32));
   const_ptr_7_indices.push_back(const_int32_8);
   const_ptr_7_indices.push_back(const_int32_8);
   Constant* GEP = ConstantExpr::getGetElementPtr(DumpVar, &const_ptr_7_indices[0], const_ptr_7_indices.size() );
 
-  // Get the first valide instruction for the insertion of the call
+  // Get the first valide instruction for the insertion of the call; Skip the Phi Instructions
+  // A phi instruction is used to select appropriate version of a given variable in SSA form.
+  // And usually this is done using grouping those variables togather and telling to compiler to use
+  // the same register for storing them.
   BasicBlock::iterator BBI = ((BasicBlock*) BB)->begin();
   while (isa<PHINode > (BBI)) BBI++;
 
-  /* MMH: Comment this to have different calls to Entry/Return BBs */
-  CallInst*  annotationCall= CallInst::Create(_Fannotation, GEP, "");
+  // Create the Call Instruction for annotate function.
+  CallInst*  annotationCall= CallInst::Create(_Fannotation, GEP, "");       
   assert(annotationCall	&& "NULL pointer!\n");
+
+  // Here we Insert the Annotation Function Call to Basic Block
   BB->getInstList().insert(BBI, annotationCall);
-  
+
+  // Set the Annoatation Flag so that we can check it later on if required.
+  BB->setAnnotationFlag(true);
+
+  //std::cout << "Setting Annotation Type to: " << MBBinfo->getType() << std::endl;
+  BB->setAnnotationType(MBBinfo->getType()); 
+
   /* MMH: Un-comment this to have different calls to Entry/Return BBs */
+  // Effectively we don't need to have different function calls
+  // as now we are dealing with the BB type in H/W analyzer component
   //if(pred_begin(BB) == pred_end(BB))
   //{
   //  CallInst*  annotationEntryCall= CallInst::Create(_Fannotation_Entry, "");
@@ -382,12 +505,10 @@ bool MachineTargetAnnotation::annotateLLVMBasicBlock(TargetAnnotationDB *MBBinfo
   return (true);
 }
 
-bool MachineTargetAnnotation::plotGraph(MachineFunction &MF) {
-  std::fstream fileCFG;
-  std::fstream fileBB;
-  std::fstream fileMBB;
+bool MachineTargetAnnotation::printAnnotatedCFG(MachineFunction &MF)
+{
   std::string fileName;
-  std::string name1, name2;
+  std::string name1;
   BasicBlock* BB;
   MachineBasicBlock* MBB;
   machineBB_list_t* listMachineBasicBlock;
@@ -396,47 +517,63 @@ bool MachineTargetAnnotation::plotGraph(MachineFunction &MF) {
 
   assert(_LLVM_F && "Machine Function must have a Function to annotate!\n");
 
-  fileName = "CFG_" + _LLVM_F->getName() + ".dot";
-  fileCFG.open(fileName.data(), std::fstream::out);
-  fileName = "BB_" + _LLVM_F->getName() + ".bb";
-  fileBB.open(fileName.data(), std::fstream::out);
-  fileName = "MBB_" + _LLVM_F->getName() + ".mbb";
-  fileMBB.open(fileName.data(), std::fstream::out);
+  fileName = _LLVM_F->getNameStr() + "_annotated_CFG" + ".dot";
+  std::string CFGErrorInfo;
+  raw_fd_ostream fileCFG(fileName.c_str(), CFGErrorInfo);
+
+  fileName = _LLVM_F->getNameStr() + ".bb";
+  std::string BBErrorInfo;
+  raw_fd_ostream fileBB(fileName.c_str(), BBErrorInfo);
+
+  fileName = _LLVM_F->getNameStr() + ".mbb";
+  std::string MBBErrorInfo;
+  raw_fd_ostream fileMBB(fileName.c_str(), MBBErrorInfo);
 
   fileCFG << "digraph module_graph {\n";
 
   llvmBasicBlockMap = buildLLVMBasicBlockMap(MF);
-  for (llvmBasicBlockMap_t::const_iterator BBI = llvmBasicBlockMap->begin(), E = llvmBasicBlockMap->end(); BBI != E; ++BBI) {
+  for (llvmBasicBlockMap_t::const_iterator BBI = llvmBasicBlockMap->begin(), E = llvmBasicBlockMap->end(); BBI != E; ++BBI)
+  {
     BB = (*BBI).first;
-    name1 = BB->getName();
+    name1 = BB->getNameStr();
     size_t pos = -1;
-    while ((pos = name1.find(".", pos + 1)) != std::string::npos) name1.replace(pos, 1, "_");
+    while ((pos = name1.find(".", pos + 1)) != std::string::npos)
+        name1.replace(pos, 1, "_");
 
     listMachineBasicBlock = (*llvmBasicBlockMap)[(*BBI).first];
-    if (listMachineBasicBlock->size() >= 1) {
-
+    if (listMachineBasicBlock->size() >= 1)
+    {
       fileCFG << "\tsubgraph cluster_" << name1 << " {\n";
       fileCFG << "\t\tlabel = \"" << name1 << "\";\n";
       fileCFG << "\t\tnode [style=filled];\n";
-      if (listMachineBasicBlock->size() > 1) {
+      if (listMachineBasicBlock->size() > 1)
+      {
         fileCFG << "\t\tstyle=filled;\n";
         fileCFG << "\t\tcolor=red;\n";
       }
-      while (!listMachineBasicBlock->empty()) {
+      
+      while (!listMachineBasicBlock->empty())
+      {
         MBB = listMachineBasicBlock->front();
         listMachineBasicBlock->pop_front();
         annotationDB = (TargetAnnotationDB*) _Target.MachineBasicBlockAnnotation(*MBB);
         if( MBB->succ_begin() ==  MBB->succ_end() )
         {
-          fileCFG << "\t\tnode " << MBB->getNumber() << " [label = \"return_#" << MBB->getNumber() << "(" << ((annotationDB != NULL) ? annotationDB->getInstructionCount() : -1) << ")" <<"\"];\n";
+          fileCFG << "\t\tnode " << MBB->getNumber() << " [label = \"return_#" << MBB->getNumber() 
+                  << "(I:" << ((annotationDB != NULL) ? annotationDB->getInstructionCount() : -1)
+                  << ",C:" << ((annotationDB != NULL) ? annotationDB->getCycleCount() : -1) << ")" <<"\"];\n";
         }
         else if( MBB->pred_begin() ==  MBB->pred_end() )
         {
-          fileCFG << "\t\tnode " << MBB->getNumber() << " [label = \"entry_#" << MBB->getNumber() << "(" << ((annotationDB != NULL) ? annotationDB->getInstructionCount() : -1) << ")" << "\"];\n";
+          fileCFG << "\t\tnode " << MBB->getNumber() << " [label = \"entry_#" << MBB->getNumber() 
+                  << "(I:" << ((annotationDB != NULL) ? annotationDB->getInstructionCount() : -1)
+                  << ",C:" << ((annotationDB != NULL) ? annotationDB->getCycleCount() : -1) << ")" <<"\"];\n";
         }
         else
         {
-          fileCFG << "\t\tnode " << MBB->getNumber() << " [label = \"_#" << MBB->getNumber() << "(" << ((annotationDB != NULL) ? annotationDB->getInstructionCount() : -1) << ")" << "\"];\n";
+          fileCFG << "\t\tnode " << MBB->getNumber() << " [label = \"_#" << MBB->getNumber() 
+                  << "(I:" << ((annotationDB != NULL) ? annotationDB->getInstructionCount() : -1)
+                  << ",C:" << ((annotationDB != NULL) ? annotationDB->getCycleCount() : -1) << ")" <<"\"];\n";
         }
       }
       fileCFG << "\t}\n";
@@ -444,6 +581,7 @@ bool MachineTargetAnnotation::plotGraph(MachineFunction &MF) {
   }
   cleanLLVMBasicBlockMap(llvmBasicBlockMap);
 
+  // Print the Machine Basic Blocks
   for (MachineFunction::iterator MBBI = MF.begin(), MBBI_E = MF.end(); MBBI != MBBI_E; ++MBBI) {
     fileMBB << *MBBI;
     for (MachineBasicBlock::succ_iterator SI = MBBI->succ_begin(), SI_E = MBBI->succ_end(); SI != SI_E; ++SI) {
@@ -451,9 +589,10 @@ bool MachineTargetAnnotation::plotGraph(MachineFunction &MF) {
     }
   }
 
+  // Print the LLVM Basic Blocks
   for (Function::iterator BBI = _LLVM_F->begin(), BBI_E = _LLVM_F->end(); BBI != BBI_E; ++BBI) {
     fileBB << *BBI;
-    name1 = BBI->getName();
+    name1 = BBI->getNameStr();
     size_t pos = -1;
     while ((pos = name1.find(".", pos + 1)) != std::string::npos) name1.replace(pos, 1, "_");
     fileCFG << "\tsubgraph cluster_" << name1 << ";\n";
@@ -496,7 +635,7 @@ void MachineTargetAnnotation::formatDotLabel(std::string *str)
   *str = _str;
 }
 
-void MachineTargetAnnotation::printBoth() {
+void MachineTargetAnnotation::printDualCFG() {
   std::fstream              fileCFG;
   std::string               fileName;
   std::string               LabelNameSource, LabelNameSucc;
@@ -507,23 +646,22 @@ void MachineTargetAnnotation::printBoth() {
   std::map< const BasicBlock*, std::string > basicblockMap;
   const TerminatorInst      *Term;
 
-  fileName = "CFG_" + _Function->getName() + "_" + _File_name + ".dot";
+  fileName = _Function->getNameStr() + "_dual_CFG" + ".dot";
   fileCFG.open(fileName.data(), std::fstream::out);
 
   fileCFG << "digraph module_graph {\n";
-
   fileCFG << "subgraph cluster_Machine {\n";
   fileCFG << "\tlabel = \"cluster_Machine\";\n";
   fileCFG << "\tnode [style=filled];\n";
 
-  for (MachineFunction::iterator BBI = _MachineFunction->begin(), E = _MachineFunction->end(); 
-      BBI != E; 
-      ++BBI) 
+  // Print All Nodes in Machine Function
+  for (MachineFunction::iterator BBI = _MachineFunction->begin(), E = _MachineFunction->end(); BBI != E; ++BBI) 
   {
     if(BBI->getBasicBlock() != NULL)
-      NodeNameSource = BBI->getBasicBlock()->getName();
+      NodeNameSource = BBI->getBasicBlock()->getNameStr();
     else
       NodeNameSource = "noname_" + BBI->getNumber();
+
     LabelNameSource = NodeNameSource;
     formatDotNode(&NodeNameSource);
 
@@ -540,11 +678,10 @@ void MachineTargetAnnotation::printBoth() {
   fileCFG << "subgraph cluster_LLVM {\n";
   fileCFG << "\tlabel = \"cluster_LLVM\";\n";
   fileCFG << "\tnode [style=filled];\n";
-  for (Function::const_iterator BBI = _Function->begin(), E = _Function->end();
-      BBI != E; 
-      ++BBI) 
+  // Print All Nodes in LLVM Function
+  for (Function::const_iterator BBI = _Function->begin(), E = _Function->end(); BBI != E; ++BBI)
   {
-    LabelNameSource = BBI->getName();
+    LabelNameSource = BBI->getNameStr();
     NodeNameSource = LabelNameSource;
     formatDotNode(&NodeNameSource);
     //    ASMostr = new std::stringstream();
@@ -558,62 +695,59 @@ void MachineTargetAnnotation::printBoth() {
 
   fileCFG << "}\n";
 
-  for (Function::const_iterator BBI = _Function->begin(), E = _Function->end();
-      BBI != E; 
-      ++BBI) 
+  // Print Relationships between LLVM Basic Blocks
+  for (Function::const_iterator BBI = _Function->begin(), E = _Function->end(); BBI != E; ++BBI)
   {
-    NodeNameSource = BBI->getName();
+    NodeNameSource = BBI->getNameStr();
     formatDotNode(&NodeNameSource);
     Term = BBI->getTerminator();
     for(unsigned int i = 0 ; i < Term->getNumSuccessors() ; i++)
     {
       SuccBB = Term->getSuccessor(i);
-      NodeNameSucc = SuccBB->getName();
+      NodeNameSucc = SuccBB->getNameStr();
       formatDotNode(&NodeNameSucc);
 
       fileCFG << "\t" << NodeNameSource << " -> " << NodeNameSucc << ";\n";
     }
   }
 
-  for (MachineFunction::iterator BBI = _MachineFunction->begin(), E = _MachineFunction->end(); 
-      BBI != E; 
-      ++BBI) 
+  // Print Relationships between Machine Basic Blocks
+  for (MachineFunction::iterator BBI = _MachineFunction->begin(), E = _MachineFunction->end(); BBI != E; ++BBI) 
   {
     if(BBI->getBasicBlock() != NULL)
-      NodeNameSource = BBI->getBasicBlock()->getName();
+      NodeNameSource = BBI->getBasicBlock()->getNameStr();
     else
       NodeNameSource = "noname_" + BBI->getNumber();
+
     formatDotNode(&NodeNameSource);
 
-    for(MachineBasicBlock::const_succ_iterator SI = BBI->succ_begin(), SI_E = BBI->succ_end();
-        SI != SI_E;
-        ++SI)
+    for(MachineBasicBlock::const_succ_iterator SI = BBI->succ_begin(), SI_E = BBI->succ_end(); SI != SI_E; ++SI)
     {
       if((*SI)->getBasicBlock() != NULL)
-        NodeNameSucc = (*SI)->getBasicBlock()->getName();
+        NodeNameSucc = (*SI)->getBasicBlock()->getNameStr();
       else
         NodeNameSucc = "noname_" + (*SI)->getNumber();
 
       formatDotNode(&NodeNameSucc);
-
       fileCFG << "\tM_" << NodeNameSource << " -> M_" << NodeNameSucc << ";\n";
     }
   }
 
-  for (MachineFunction::iterator BBI = _MachineFunction->begin(), E = _MachineFunction->end(); 
-      BBI != E; 
-      ++BBI) 
+  // Mapping between LLVM Basic Blocks and Machine Basic Blocks
+  for (MachineFunction::iterator BBI = _MachineFunction->begin(), E = _MachineFunction->end(); BBI != E; ++BBI) 
   {
     if(BBI->getBasicBlock() != NULL)
-      NodeNameSource = BBI->getBasicBlock()->getName();
+      NodeNameSource = BBI->getBasicBlock()->getNameStr();
     else
       NodeNameSource = "noname_" + BBI->getNumber();
+    
     formatDotNode(&NodeNameSource);
     basicblockMap.erase(BBI->getBasicBlock());
 
     fileCFG << "\t" << NodeNameSource << " -> M_" << NodeNameSource << " [color=gray,arrowtail=dot, arrowhead=dot];\n";
   }
 
+  // Branch Penalty Related ... Needs Elaboration !!!
   for(std::map<const BasicBlock*,std::string>::const_iterator BBI = basicblockMap.begin(), E = basicblockMap.end() ; BBI != E ; ++BBI)
   {
     if( (*BBI).second.find("penalty") != std::string::npos ) {
@@ -624,9 +758,8 @@ void MachineTargetAnnotation::printBoth() {
     }
   }
 
-  for (MachineFunction::iterator BBI = _MachineFunction->begin(), E = _MachineFunction->end(); 
-      BBI != E; 
-      ++BBI) 
+  // For the Cases where we don't find a match between BBs and MBBs.
+  for (MachineFunction::iterator BBI = _MachineFunction->begin(), E = _MachineFunction->end(); BBI != E; ++BBI) 
   {
     if(BBI->getBasicBlock() != NULL)
     {
@@ -634,12 +767,12 @@ void MachineTargetAnnotation::printBoth() {
       std::string              _name;
       if(!check((BasicBlock*)BBI->getBasicBlock(),BBI, &_lst))
       {
-        fileCFG << "\tnode " << BBI->getBasicBlock()->getName() << "[color=red];\n";
+        fileCFG << "\tnode " << BBI->getBasicBlock()->getNameStr() << "[color=red];\n";
         while(_lst.empty() == false)
         {
           _name=_lst.front();
           _lst.pop_front();
-          fileCFG << "\t" << BBI->getBasicBlock()->getName() << " -> " << _name << " [color=red];\n";
+          fileCFG << "\t" << BBI->getBasicBlock()->getNameStr() << " -> " << _name << " [color=red];\n";
         }
       }
     }
@@ -652,8 +785,6 @@ void MachineTargetAnnotation::printBoth() {
   fileCFG.close();
 }
 
-
-
 bool MachineTargetAnnotation::check(BasicBlock* BB, MachineBasicBlock *MBB, std::list< std::string > *lst) {
   bool                   result = true;
   BasicBlock                *SuccBB;
@@ -663,22 +794,22 @@ bool MachineTargetAnnotation::check(BasicBlock* BB, MachineBasicBlock *MBB, std:
   std::map< BasicBlock*, BasicBlock* >::iterator bbMapSuccIt;
   const TerminatorInst      *Term;
 
-  cout <<  _Function->getName() << ": BB = " << BB->getName() << "\n";
+  DOUT <<  _Function->getNameStr() << ": BB = " << BB->getNameStr() << "\n";
 
   Term = BB->getTerminator();
   if(Term == NULL) return(true);
   for(unsigned int i = 0 ; i < Term->getNumSuccessors() ; i++)
   {
     SuccBB = Term->getSuccessor(i);
-    if( SuccBB->getName().find("penalty") != std::string::npos ) {
+    if( SuccBB->getNameStr().find("penalty") != std::string::npos ) {
       // Skip penalty branch
       SuccBB = SuccBB->getTerminator()->getSuccessor(0);
     }
     bbMapSucc[SuccBB] = SuccBB;
-    cout << "    - " << SuccBB->getName() << "\n";
+    DOUT << "    - " << SuccBB->getNameStr() << "\n";
   }
 
-  cout << "    ---------------- " << "\n";
+  DOUT << "    ---------------- " << "\n";
 
   for(MachineBasicBlock::succ_iterator SI = MBB->succ_begin(), SI_E = MBB->succ_end();
       SI != SI_E;
@@ -687,12 +818,12 @@ bool MachineTargetAnnotation::check(BasicBlock* BB, MachineBasicBlock *MBB, std:
     if((*SI)->getBasicBlock() != NULL)
     {
       SuccBB = (BasicBlock*)(*SI)->getBasicBlock();
-      if( SuccBB->getName().find("penalty") != std::string::npos ) {
+      if( SuccBB->getNameStr().find("penalty") != std::string::npos ) {
         // Skip penalty branch
         SuccBB = SuccBB->getTerminator()->getSuccessor(0);
       }
       mbbMapSucc[SuccBB] = SuccBB;
-      cout << "    - " << SuccBB->getName() << "\n";
+      DOUT << "    - " << SuccBB->getNameStr() << "\n";
     }
   }
 
@@ -712,7 +843,7 @@ bool MachineTargetAnnotation::check(BasicBlock* BB, MachineBasicBlock *MBB, std:
     for(std::map< BasicBlock*, BasicBlock* >::iterator BBI = bbMapSucc.begin(), E = bbMapSucc.end() ; BBI != E ; ++BBI)
     {
       ptrBB= (*BBI).second;
-      lst->push_back(ptrBB->getName());
+      lst->push_back(ptrBB->getNameStr());
     }
     result = false;;
   }

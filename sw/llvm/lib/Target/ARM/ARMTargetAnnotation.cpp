@@ -22,12 +22,13 @@
  *************************************************************************************/
 
 #define DEBUG_TYPE "annotation"
-
+#include <iostream>
 #include <iomanip>
 #include "llvm/Target/TargetAnnotationInfo.h"
 
 #include "ARM.h"
 #include "ARMInstrInfo.h"
+#include "ARMBaseInfo.h"
 #include "ARMTargetMachine.h"
 #include "ARMAddressingModes.h"
 #include "llvm/Support/Debug.h"
@@ -36,6 +37,7 @@
 
 using namespace llvm;
 using namespace std;
+using namespace ARM; 
 
 bool PRINT_WARNINGS;
 
@@ -50,7 +52,8 @@ static cl::opt<bool, true> PrintAnnotationWarnings("print-annotation-warnings",
 
 namespace ARMCycleEstimation {
     enum ARM9InstrClasses {
-        ARM9_GENERIC        = 0, 
+        ARM9_UNKNOWN        = 0,
+        ARM9_GENERIC,
         ARM9_ALU, 
         ARM9_ALU_RSL,
         ARM9_BRANCH,
@@ -91,7 +94,7 @@ namespace ARMCycleEstimation {
     };
 
     int ARM9ClassCycles [ARM9_TOTAL_TYPES] = {0};
-    ARM9InstrClasses ARM9InstrClassAssignment[ARM::INSTRUCTION_LIST_END] = {ARM9_GENERIC};
+    ARM9InstrClasses ARM9InstrClassAssignment[INSTRUCTION_LIST_END] = {ARM9_UNKNOWN};
         
     void initInstrClassCycles();
     void initInstrClassAssignment();
@@ -109,6 +112,245 @@ namespace ARMCycleEstimation {
 
 }
 
+void ARMCycleEstimation :: initInstrClassAssignment()
+{
+    for (unsigned int instrIndex = 0; instrIndex < INSTRUCTION_LIST_END; instrIndex++)
+    {
+        switch(instrIndex)
+        {
+            case PHI:                   case INLINEASM:             case PROLOG_LABEL:          case EH_LABEL:
+            case GC_LABEL:              case KILL:                  case EXTRACT_SUBREG:        case INSERT_SUBREG:
+            case IMPLICIT_DEF:          case SUBREG_TO_REG:         case COPY_TO_REGCLASS:      case DBG_VALUE:
+            case REG_SEQUENCE:          case COPY:                  case ADJCALLSTACKDOWN:      case ADJCALLSTACKUP:
+            case ATOMIC_CMP_SWAP_I16:   case ATOMIC_CMP_SWAP_I32:   case ATOMIC_CMP_SWAP_I8:    case ATOMIC_LOAD_ADD_I16:
+            case ATOMIC_LOAD_ADD_I32:   case ATOMIC_LOAD_ADD_I8:    case ATOMIC_LOAD_AND_I16:   case ATOMIC_LOAD_AND_I32:
+            case ATOMIC_LOAD_AND_I8:    case ATOMIC_LOAD_NAND_I16:  case ATOMIC_LOAD_NAND_I32:  case ATOMIC_LOAD_NAND_I8:
+            case ATOMIC_LOAD_OR_I16:    case ATOMIC_LOAD_OR_I32:    case ATOMIC_LOAD_OR_I8:     case ATOMIC_LOAD_SUB_I16:
+            case ATOMIC_LOAD_SUB_I32:   case ATOMIC_LOAD_SUB_I8:    case ATOMIC_LOAD_XOR_I16:   case ATOMIC_LOAD_XOR_I32:
+            case ATOMIC_LOAD_XOR_I8:    case ATOMIC_SWAP_I16:       case ATOMIC_SWAP_I32:       case ATOMIC_SWAP_I8:
+            case BCCZi64:               case BCCi64:                case CLREX:                 case CONSTPOOL_ENTRY:
+            case CPS:                   case DBG:                   case DMB_MCR:               case DMBsy:
+            case DMBvar:                case DSB_MCR:               case DSBsy:                 case DSBvar:
+            case ISBsy:                 case Int_eh_sjlj_longjmp:   case Int_eh_sjlj_setjmp:    case Int_eh_sjlj_setjmp_nofp:
+            case LDREX:                 case LDREXB:                case LDREXD:                case LDREXH:
+            case MOVPCLR:               case MOVPCRX:               case QASX:                  case QSAX:
+            case REV:                   case REV16:                 case REVSH:                 case RFE:
+            case RFEW:                  case SADD16:                case SADD8:                 case SASX:
+            case SEL:                   case SETENDBE:              case SETENDLE:              case SHADD16:
+            case SHADD8:                case SHASX:                 case SHSAX:                 case SHSUB16:
+            case SHSUB8:                case SMC:                   case SMLABT:                case SMLAD:
+            case SMLADX:                case SMLALBT:               case SMLALD:                case SMLALDX:
+            case SMLALTB:               case SMLALTT:               case SMLATB:                case SMLATT:
+            case SMLAWT:                case SMLSD:                 case SMLSDX:                case SMLSLD:
+            case SMLSLDX:               case SMMLA:                 case SMMLAR:                case SMMLS:
+            case SMMLSR:                case SMMUL:                 case SMMULR:                case SMUAD:
+            case SMUADX:                case SMULBT:                case SMULTB:                case SMULTT:
+            case SMULWT:                case SMUSD:                 case SMUSDX:
+            case SRS:                   case SRSW:                  case SSAT:                  case SSAT16:
+            case SSAX:                  case SSUB16:                case SSUB8:                 case STC2L_OFFSET:
+            case STC2L_OPTION:          case STC2L_POST:            case STC2L_PRE:             case STC2_OFFSET:
+            case STC2_OPTION:           case STC2_POST:             case STC2_PRE:              case STCL_OFFSET:
+            case STCL_OPTION:           case STCL_POST:             case STCL_PRE:              case STC_OFFSET:
+            case STC_OPTION:            case STC_POST:              case STC_PRE:              
+            case STRBT:                 case STREX:                 case STREXB:                case STREXD:
+            case STREXH:                case SXTAB16rr:             case SXTAB16rr_rot:         case SXTABrr:
+            case SXTABrr_rot:           case SXTAHrr:               case SXTAHrr_rot:           case SXTB16r:
+            case SXTB16r_rot:           case SXTBr:                 case SXTBr_rot:             case SXTHr:
+            case SXTHr_rot:             case TAILJMPd:              case TAILJMPdND:            case TAILJMPdNDt:
+            case TAILJMPdt:             case TAILJMPr:              case TAILJMPrND:            case TCRETURNdi:
+            case TCRETURNdiND:          case TCRETURNri:            case TCRETURNriND:          case UADD16:
+            case UADD8:                 case UASX:                  case UHADD16:               case UHADD8:
+            case UHASX:                 case UHSAX:                 case UHSUB16:               case UHSUB8:
+            case UQADD16:               case UQADD8:                case UQASX:                 case UQSAX:
+            case UQSUB16:               case UQSUB8:                case USAD8:                 case USADA8:
+            case USAT:                  case USAT16:                case USAX:                  case USUB16:
+            case USUB8:                 case UXTAB16rr:             case UXTAB16rr_rot:         case UXTABrr:
+            case UXTABrr_rot:           case UXTAHrr:               case UXTAHrr_rot:           case UXTB16r:
+            case UXTB16r_rot:           case UXTBr:                 case UXTBr_rot:             case UXTHr:
+            case UXTHr_rot:           
+                // We do *NOT* support these instructions for Performance Estimation as we Annotate for ARM9Erev2 (ARMv5TE)
+                // Most of the above instructions are either for ARMv6 or SIMD instructions for Cortex Series Processors.
+                // Refer to the following files.
+                // AETC2010-21_ARM_Cortex-M4_IanJohnson.pdf, QRC0001_UAL.pdf, ARM9E-S Core Technical Reference Manual
+                // ARMGenCodeEmitter.inc, ARMGenInstrInfo.inc, ARMGenInstrNames.inc
+                ARM9InstrClassAssignment[instrIndex] = ARM9_INVALID;            
+                break;
+
+            case BKPT:                  case BMOVPCRX:              case BMOVPCRXr9:            case FCONSTD:
+            case FCONSTS:               case FMSTAT:                case LEApcrel:              case LEApcrelJT:
+            case MOVCCi:                case MOVCCi16:              case MOVCCr:                case MOVCCs:
+            case MOVTi16:               case MOVi16:                case MOVi32imm:             case NOP:
+            case PICADD:                case PICLDR:                case PICLDRB:               case PICLDRH:
+            case PICLDRSB:              case PICLDRSH:              case PICSTR:                case PICSTRB:
+            case PICSTRH:               case PKHBT:                 case PKHTB:                 case SVC:
+            case SWP:                   case SWPB:                  case TPsoft:                case TRAP:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_GENERIC;            // We count *ONE* cycle for these instructions
+                break;
+
+            case ADCSSri:               case ADCSSrr:               case ADCri:                 case ADCrr:
+            case ADDSri:                case ADDSrr:                case ADDri:                 case ADDrr:
+            case ANDSri:                case ANDSrr:                case ANDri:                 case ANDrr:
+            case BICri:                 case BICrr:                 case CLZ:                   case CMNzri:
+            case CMNzrr:                case CMPri:                 case CMPrr:                 case CMPzri:
+            case CMPzrr:                case EORri:                 case EORrr:                 case MOVi:
+            case MOVr:                  case MOVr_TC:               case MOVrx:                 case MOVs:
+            case MOVsra_flag:           case MOVsrl_flag:           case MVNi:                  case MVNr:
+            case MVNs:                  case ORRri:                 case ORRrr:                 case RSBri:                     
+            case RSBrr:                 case RSCri:                 case RSCrr:                 case SBCri:                 
+            case SBCrr:                 case SUBSri:                case SUBSrr:                case SUBri:
+            case SUBrr:                 case TEQri:                 case TEQrr:                 case TSTri:
+            case TSTrr:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_ALU;
+                break;
+
+            case ADCSSrs:               case ADCrs:                 case ADDSrs:                case ADDrs:
+            case ANDSrs:                case ANDrs:                 case BICrs:                 case CMNzrs:
+            case CMPrs:                 case CMPzrs:                case EORrs:                 case ORRrs:
+            case RSBrs:                 case RSCrs:                 case SBCrs:                 case SUBSrs:
+            case SUBrs:                 case TEQrs:                 case TSTrs:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_ALU_RSL;            // Arithematic Instructions with Register Shift
+                break;
+
+            case B:                     case BRIND:                 case BR_JTadd:              case BR_JTm:
+            case BR_JTr:                case BX:                    case BXJ:                   case BX_RET:
+            case BXr9:                  case Bcc:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_BRANCH;
+                break;
+
+            case BL:                    case BLX:                   case BLXr9:                 case BL_pred:
+            case BLr9:                  case BLr9_pred:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_BRANCH_LINK;        // Branch and Link
+                break;
+
+            case CDP:                   case CDP2:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_CDP;
+                break;
+
+            case LDC2L_OFFSET:          case LDC2L_OPTION:          case LDC2L_POST:            case LDC2L_PRE:
+            case LDC2_OFFSET:           case LDC2_OPTION:           case LDC2_POST:             case LDC2_PRE:
+            case LDCL_OFFSET:           case LDCL_OPTION:           case LDCL_POST:             case LDCL_PRE:
+            case LDC_OFFSET:            case LDC_OPTION:            case LDC_POST:              case LDC_PRE:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_LDC;
+                break;
+
+            case LDM:                   case LDM_UPD:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_LDM_NPC;
+                break;
+
+            case LDM_RET:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_LDM_PC;
+                break;
+
+            case LDR:                   case LDRT:                  case LDR_POST:              case LDR_PRE:
+            case LDRcp:
+                // Every LDR is considered as Not Loading PC; The fact that an instruction is loading PC is decided later on. 
+                ARM9InstrClassAssignment[instrIndex] = ARM9_LDR_NPC;
+                break;
+
+            case LDRB:                  case LDRBT:                 case LDRB_POST:             case LDRB_PRE:
+            case LDRH:                  case LDRHT:                 case LDRH_POST:             case LDRH_PRE:
+            case LDRSB:                 case LDRSBT:                case LDRSB_POST:            case LDRSB_PRE:
+            case LDRSH:                 case LDRSHT:                case LDRSH_POST:            case LDRSH_PRE:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_LDRB;
+                break;
+
+            case LDRD:                  case LDRD_POST:             case LDRD_PRE:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_LDRD;
+                break;
+
+            case MCR:                   case MCR2:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_MCR;
+                break; 
+
+            case MCRR:                  case MCRR2:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_MCRR;
+                break;
+
+            case MLA:                   case MUL:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_MUL_MLA;
+                break;
+
+            case MOVi2pieces:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_MOV2PIECES;
+                break; 
+
+            case MRC:                   case MRC2:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_MRC_NPC;
+                break;
+
+            case MRRC:                  case MRRC2:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_MRRC;
+                break;
+
+            case MRS:                   case MRSsys:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_MRS;
+                break;
+                
+            case MSR:                   case MSRi:                  case MSRsys:                    case MSRsysi:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_MSR;
+                break;
+
+
+            case PLDWi:                 case PLDWr:                 case PLDi:                      case PLDr:
+            case PLIi:                  case PLIr:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_PLD;
+                break;
+
+            case QADD:                  case QADD16:                case QADD8:                     case QDADD:
+            case QDSUB:                 case QSUB:                  case QSUB16:                    case QSUB8:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_QX_ADDSUB;
+                break;
+
+            case SMLABB:                case SMLALBB:               case SMLAWB:                    case SMULBB:
+            case SMULWB:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_SMUL_SMLA_XY;
+                break;
+
+            case STM:                    case STM_UPD:
+                // STM_UPD is Essentially an STM instruction with update to SP Register.
+                ARM9InstrClassAssignment[instrIndex] = ARM9_STM;
+                break;
+
+            case STR:                   case STRB:                  case STRB_POST:                 case STRB_PRE:
+            case STRH:                  case STRHT:                 case STRH_POST:                 case STRH_PRE:
+            case STRT:                  case STR_POST:              case STR_PRE:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_STR_BH;
+
+            case STRD:                  case STRD_POST:             case STRD_PRE:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_STRD;
+                break;
+
+            case SMLAL:                 case SMULL:                 case UMAAL:                     case UMLAL:
+            case UMULL:
+                ARM9InstrClassAssignment[instrIndex] = ARM9_SMLAL_XY;
+                break;
+
+            // All of the following instructions are Thumb-2 Instructions;
+            // We treat them as default case i.e. As Thumb Instructions and don't expect them in Generated Code.
+            case BFC:                   case BFI:                   case MLS:                       case RBIT:
+            case RSBSri:                case RSBSrs:                case RSCSri:                    case RSCSrs:
+            case SBCSSri:               case SBCSSrr:               case SBCSSrs:
+            case SBFX:                  case SEV:                   case UBFX:                      case WFE:
+            case WFI:                   case YIELD:
+            default:
+                // Default Case for All the rest of Instructions including Thumb Instructions.
+                // We don't Handle Thumb Instructions for Annotation Purpose
+                ARM9InstrClassAssignment[instrIndex] = ARM9_INVALID;
+                break;
+        }
+    }
+
+    // Check if All of the Instructions have been Assigned A Class?
+    // Add An Assert Later HERE
+    for (unsigned int instrIndex = 0; instrIndex < INSTRUCTION_LIST_END; instrIndex++)
+    {
+        if (ARM9InstrClassAssignment[instrIndex] == ARM9_UNKNOWN)
+            cout << "Unknown Class for Instruction: " << instrIndex << endl;
+    }
+
+} // initInstrClassAssignment
+
+#if 0
 void ARMCycleEstimation :: initInstrClassAssignment()
 {
     // NOTES: 
@@ -136,324 +378,8 @@ void ARMCycleEstimation :: initInstrClassAssignment()
         ARM9_SWP_B,
     */
 
-    ARM9InstrClassAssignment[ARM::PHI               ] = ARM9_INVALID;           // Should not be present in Code. 
-    ARM9InstrClassAssignment[ARM::INLINEASM	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::DBG_LABEL	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::EH_LABEL	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::GC_LABEL	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::DECLARE           ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::EXTRACT_SUBREG    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::INSERT_SUBREG	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::IMPLICIT_DEF	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::SUBREG_TO_REG	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::ADCri	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::ADCrr	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::ADCrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::ADDSri	        ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::ADDSrr	        ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::ADDSrs	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::ADDri	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::ADDrr	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::ADDrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::ADJCALLSTACKDOWN	] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::ADJCALLSTACKUP	] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::ANDri	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::ANDrr	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::ANDrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::B	                ] = ARM9_BRANCH;
-    ARM9InstrClassAssignment[ARM::BICri	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::BICrr	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::BICrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::BL	            ] = ARM9_BRANCH_LINK;
-    ARM9InstrClassAssignment[ARM::BLX	            ] = ARM9_BRANCH_LINK;
-    ARM9InstrClassAssignment[ARM::BL_pred	        ] = ARM9_BRANCH_LINK;
-    ARM9InstrClassAssignment[ARM::BR_JTadd	        ] = ARM9_BRANCH;
-    ARM9InstrClassAssignment[ARM::BR_JTm	        ] = ARM9_BRANCH;
-    ARM9InstrClassAssignment[ARM::BR_JTr	        ] = ARM9_BRANCH;
-    ARM9InstrClassAssignment[ARM::BX	            ] = ARM9_BRANCH;
-    ARM9InstrClassAssignment[ARM::BX_RET	        ] = ARM9_BRANCH;
-    ARM9InstrClassAssignment[ARM::Bcc	            ] = ARM9_BRANCH;
-    ARM9InstrClassAssignment[ARM::CLZ	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::CMNnzri	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMNnzrr	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMNnzrs	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMNri	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMNrr	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMNrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMPnzri	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMPnzrr	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMPnzrs	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMPri	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMPrr	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CMPrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::CONSTPOOL_ENTRY	] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::DWARF_LOC	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::EORri	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::EORrr	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::EORrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::FABSD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FABSS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FADDD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FADDS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCMPED	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCMPES	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCMPEZD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCMPEZS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCPYD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCPYDcc	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCPYS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCPYScc	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCVTDS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FCVTSD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FDIVD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FDIVS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FLDD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FLDMD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FLDMS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FLDS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMACD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMACS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMDRR	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMRRD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMRS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMSCD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMSCS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMSR	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMSTAT	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMULD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FMULS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNEGD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNEGDcc	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNEGS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNEGScc	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNMACD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNMACS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNMSCD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNMSCS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNMULD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FNMULS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSITOD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSITOS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSQRTD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSQRTS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSTD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSTMD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSTMS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSTS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSUBD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FSUBS	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FTOSIZD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FTOSIZS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FTOUIZD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FTOUIZS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FUITOD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::FUITOS	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::LDM	            ] = ARM9_LDM_NPC;
-    ARM9InstrClassAssignment[ARM::LDM_RET	        ] = ARM9_LDM_PC;
-    ARM9InstrClassAssignment[ARM::LDR	            ] = ARM9_LDR_NPC;
-    ARM9InstrClassAssignment[ARM::LDRB	            ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRB_POST	        ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRB_PRE	        ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRD	            ] = ARM9_LDRD;
-    ARM9InstrClassAssignment[ARM::LDRH	            ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRH_POST	        ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRH_PRE	        ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRSB	            ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRSB_POST	    ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRSB_PRE	        ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRSH	            ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRSH_POST	    ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDRSH_PRE	        ] = ARM9_LDRB;
-    ARM9InstrClassAssignment[ARM::LDR_POST	        ] = ARM9_LDR_NPC;
-    ARM9InstrClassAssignment[ARM::LDR_PRE	        ] = ARM9_LDR_NPC;
-    ARM9InstrClassAssignment[ARM::LDRcp	            ] = ARM9_LDR_NPC;
-    ARM9InstrClassAssignment[ARM::LEApcrel	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::LEApcrelJT	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::MLA	            ] = ARM9_MUL_MLA;
-    ARM9InstrClassAssignment[ARM::MOVCCi	        ] = ARM9_GENERIC;  /* Classify This Instruction to More Relevent Class Like ALU Class */ 
-    ARM9InstrClassAssignment[ARM::MOVCCr	        ] = ARM9_GENERIC;  /* Classify This Instruction to More Relevent Class Like ALU Class */
-    ARM9InstrClassAssignment[ARM::MOVCCs	        ] = ARM9_GENERIC;  /* Classify This Instruction to More Relevent Class Like ALU Class */
-    ARM9InstrClassAssignment[ARM::MOVi	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::MOVi2pieces	    ] = ARM9_MOV2PIECES;
-    ARM9InstrClassAssignment[ARM::MOVr	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::MOVrx	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::MOVs	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::MOVsra_flag	    ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::MOVsrl_flag	    ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::MUL	            ] = ARM9_MUL_MLA;
-    ARM9InstrClassAssignment[ARM::MVNi	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::MVNr	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::MVNs	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::ORRri	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::ORRrr	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::ORRrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::PICADD	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICLD	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICLDB	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICLDH	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICLDSB	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICLDSH	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICLDZB	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICLDZH	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICSTR	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICSTRB	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PICSTRH	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PKHBT	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::PKHTB	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::REV	            ] = ARM9_GENERIC;  /* Classify This Instruction to More Relevent Class Like ALU Class */
-    ARM9InstrClassAssignment[ARM::REV16	            ] = ARM9_GENERIC;  /* Classify This Instruction to More Relevent Class Like ALU Class */
-    ARM9InstrClassAssignment[ARM::REVSH	            ] = ARM9_GENERIC;  /* Classify This Instruction to More Relevent Class Like ALU Class */
-    ARM9InstrClassAssignment[ARM::RSBSri	        ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::RSBSrs	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::RSBri	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::RSBrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::RSCri	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::RSCrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::SBCri	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::SBCrr	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::SBCrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::SMLABB	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMLABT	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMLATB	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMLATT	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMLAWB	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMLAWT	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMULBB	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMULBT	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMULTB	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMULTT	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMULWB	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMULWT	        ] = ARM9_SMUL_SMLA_XY;
-    ARM9InstrClassAssignment[ARM::SMLAL	            ] = ARM9_SMLAL_XY;
-    ARM9InstrClassAssignment[ARM::SMULL	            ] = ARM9_SMLAL_XY;
-    ARM9InstrClassAssignment[ARM::UMLAL	            ] = ARM9_SMLAL_XY;
-    ARM9InstrClassAssignment[ARM::UMULL	            ] = ARM9_SMLAL_XY;
-    ARM9InstrClassAssignment[ARM::UMAAL	            ] = ARM9_SMLAL_XY;
-    ARM9InstrClassAssignment[ARM::SMMLA	            ] = ARM9_SMUL_SMLA_XY;          // Reconsider the Classification of this Instruction. 
-    ARM9InstrClassAssignment[ARM::SMMLS	            ] = ARM9_SMUL_SMLA_XY;          // Reconsider the Classification of this Instruction. 
-    ARM9InstrClassAssignment[ARM::SMMUL	            ] = ARM9_SMUL_SMLA_XY;          // Reconsider the Classification of this Instruction. 
-    ARM9InstrClassAssignment[ARM::STM	            ] = ARM9_STM;
-    ARM9InstrClassAssignment[ARM::STR	            ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::STRB	            ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::STRB_POST	        ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::STRB_PRE	        ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::STRD	            ] = ARM9_STRD;     
-    ARM9InstrClassAssignment[ARM::STRH	            ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::STRH_POST	        ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::STRH_PRE	        ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::STR_POST	        ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::STR_PRE	        ] = ARM9_STR_BH;
-    ARM9InstrClassAssignment[ARM::SUBSri	        ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::SUBSrr	        ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::SUBSrs	        ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::SUBri	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::SUBrr	            ] = ARM9_ALU;
-    ARM9InstrClassAssignment[ARM::SUBrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::SXTABrr	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::SXTABrr_rot	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::SXTAHrr	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::SXTAHrr_rot	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::SXTBr	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::SXTBr_rot	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::SXTHr	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::SXTHr_rot	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::TEQri	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::TEQrr	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::TEQrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::TPsoft	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::TSTri	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::TSTrr	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::TSTrs	            ] = ARM9_ALU_RSL;
-    ARM9InstrClassAssignment[ARM::UXTABrr	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTABrr_rot	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTAHrr	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTAHrr_rot	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTB16r	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTB16r_rot	    ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTBr	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTBr_rot	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTHr	            ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::UXTHr_rot	        ] = ARM9_GENERIC;
-    ARM9InstrClassAssignment[ARM::tADC	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADDS	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADDhirr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADDi3	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADDi8	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADDrPCi	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADDrSPi	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADDrr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADDspi	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADJCALLSTACKDOWN	] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tADJCALLSTACKUP	] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tAND	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tASRri	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tASRrr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tB	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBIC	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBL	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBLXi	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBLXr	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBR_JTr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBX	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBX_RET	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBX_RET_vararg	] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBcc	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tBfar	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tCMN	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tCMNNZ	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tCMPNZi8	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tCMPNZr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tCMPi8	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tCMPr	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tEOR	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLDR	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLDRB	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLDRH	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLDRSB	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLDRSH	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLDRcp	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLDRpci	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLDRspi	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLEApcrel	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLEApcrelJT	    ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLSLri	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLSLrr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLSRri	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tLSRrr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tMOVCCr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tMOVi8	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tMOVr	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tMUL	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tMVN	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tNEG	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tORR	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tPICADD	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tPOP	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tPOP_RET	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tPUSH	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tREV	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tREV16	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tREVSH	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tROR	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tRestore	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSBC	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSTR	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSTRB	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSTRH	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSTRspi	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSUBS	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSUBi3	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSUBi8	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSUBrr	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSUBspi	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSXTB	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSXTH	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tSpill	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tTPsoft	        ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tTST	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tUXTB	            ] = ARM9_THUMB;
-    ARM9InstrClassAssignment[ARM::tUXTH	            ] = ARM9_THUMB;
 }
+#endif
 
 void ARMCycleEstimation :: initInstrClassCycles()
 {
@@ -506,7 +432,7 @@ unsigned int ARMCycleEstimation :: getRegOperandsCount(const MachineInstr &MachI
     {
         MachineOperand MO = MachInstr.getOperand(i); 
 
-        if(MO.isRegister())
+        if(MO.isReg())
             if(MO.getReg() != 0)        // 0 is %reg0 and is not counted for N
                 N++;
     }
@@ -600,16 +526,25 @@ unsigned int ARMCycleEstimation :: calculateExtraCycles(const MachineInstr &Mach
     
     switch (instructionClass)
     {
+        case ARM9_UNKNOWN:
+            DERR(PRINT_WARNINGS) << "Unknown ARM Instruction: " << MachInstr.getDesc().Name << std::endl;
+            // assert(0 && "Unknown ARM Instruction !!!");
+            break;
+
         case ARM9_GENERIC:
-            DERR(PRINT_WARNINGS) << "ARM9_GENERIC Class Instruction: " << MachInstr.getDesc().Name << std::endl;
+            DERR(PRINT_WARNINGS) << "Warning [Counted 1 Cycle for Annotation]: ARM9_GENERIC Class Instruction: " << MachInstr.getDesc().Name << std::endl;
         break;
 
         case ARM9_ALU:              // +2 if Rd is pc
         case ARM9_ALU_RSL:          // +2 more if Rd is pc
             if(ARMRegisterInfo::getRegisterNumbering(MachInstr.getOperand(0).getReg()) == 15)        // +2 if Rd is PC
                 extraCycles = 2;
-        break;
+            //ARMRegisterInfo::getRegisterNumbering();
+            //MachInstr.getOperand(0).getReg();
             
+            //ARMRegisterInfo::
+        break;
+
         case ARM9_BRANCH:       
         case ARM9_BRANCH_LINK:               
         break;
@@ -628,7 +563,7 @@ unsigned int ARMCycleEstimation :: calculateExtraCycles(const MachineInstr &Mach
         case ARM9_SWP_B:            // Rd is not available for one cycle.
             DERR(PRINT_WARNINGS) << "ARM 9 Un-used Instruction Classes: " << MachInstr.getDesc().Name << std::endl;
         break;
-            
+
         case ARM9_LDRB:             // Rd is not available for two cycles. +1 if the load offset is shifted.
             if(getInstrAddressingMode(MachInstr) == 2)
             {
@@ -658,6 +593,9 @@ unsigned int ARMCycleEstimation :: calculateExtraCycles(const MachineInstr &Mach
                 }
             }
         break;
+
+        case ARM9_LDR_PC:           // This is empty because this class has not been assigned to any Instructions.
+        break; 
             
         case ARM9_LDM_NPC:          // +N Later on, +1 if N = 1 or the last loaded register used in the next cycle
         {
@@ -675,7 +613,7 @@ unsigned int ARMCycleEstimation :: calculateExtraCycles(const MachineInstr &Mach
             extraCycles = N;
         }
         break;
-            
+
         case ARM9_MUL_MLA:          // Rd is not available for one cycle, except as an accumulator input for a multiply accumulate.
                                     // No Early Termination, but Check for Rd Availability. 
         break;
@@ -706,7 +644,7 @@ unsigned int ARMCycleEstimation :: calculateExtraCycles(const MachineInstr &Mach
                 }
             }
         break;
-            
+
         case ARM9_STM:              // +N Later on, +1 if N = 1.
         {
             int  N = getRegOperandsCount(MachInstr);
@@ -725,7 +663,9 @@ unsigned int ARMCycleEstimation :: calculateExtraCycles(const MachineInstr &Mach
         break;
             
         case ARM9_INVALID:
-            DERR(PRINT_WARNINGS) << "ARM9_INVALID Instruction: " << MachInstr.getDesc().Name << std::endl;
+            // Invalid means that we were not expecting this Instruction, So Ignored from Annotation.
+            DERR(PRINT_WARNINGS) << "Warning [Ignored for Annotation]: ARM9_INVALID Instruction : " << MachInstr.getDesc().Name << std::endl;
+            // assert(0 && "Unknown ARM Instruction !!!");
         break;
             
         default:
@@ -764,7 +704,7 @@ const TargetAnnotationDB * ARMTargetMachine::MBBBranchPenaltyAnnotation(MachineB
             {
                 MachineOperand MO = LastInstr->getOperand(i);
 
-                if(MO.isMachineBasicBlock())
+                if(MO.isMBB())
                 {
                     MachineBasicBlock* TargetMBB = MO.getMBB();
 
@@ -870,8 +810,11 @@ const TargetAnnotationDB * ARMTargetMachine::MachineBasicBlockAnnotation(Machine
         annotationDB = new TargetAnnotationDB();
         assert( annotationDB && "NULL pointer!\n" );
 
-        annotationDB->setType( (MBB.pred_empty() ? MBB_ENTRY:0) | (MBB.succ_empty() ? MBB_RETURN:0) );
-        //annotationDB->setType( MBB_DEFAULT );
+        // The entry and return types will be handled in the Machine Independent Code
+        annotationDB->setType(MBB_DEFAULT);
+        // annotationDB->setType( (MBB.pred_empty() ? MBB_ENTRY:0) | (MBB.succ_empty() ? MBB_RETURN:0) );
+        // cout << "MBB Name: " << MBB.getName().str() << "  Annotation DB Type: " << annotationDB->getType() << endl;
+
         annotationDB->setInstructionCount(mbbInstructionCount);
         annotationDB->setCycleCount(mbbTotalCycles);
         annotationDB->setLoadCount(mbbLoadCount);
@@ -895,7 +838,7 @@ unsigned int ARMCycleEstimation :: estimateDependencyCycles(const MachineInstr &
             
             for(int i = 0; i < currInstrOperandCount; i++)
             {
-                if(CurrInstr.getOperand(i).isRegister())
+                if(CurrInstr.getOperand(i).isReg())
                 {
                     int currInstrReg = CurrInstr.getOperand(i).getReg();
                     if(currInstrReg == prevInstrRd)
@@ -915,7 +858,7 @@ unsigned int ARMCycleEstimation :: estimateDependencyCycles(const MachineInstr &
             
             for(int i = 0; i < currInstrOperandCount; i++)
             {
-                if(CurrInstr.getOperand(i).isRegister())
+                if(CurrInstr.getOperand(i).isReg())
                 {
                     int currInstrReg = CurrInstr.getOperand(i).getReg();
                     if(currInstrReg == prevInstrRd)
@@ -937,7 +880,7 @@ unsigned int ARMCycleEstimation :: estimateDependencyCycles(const MachineInstr &
             
             for(int i = 0; i < currInstrOperandCount; i++)
             {
-                if(CurrInstr.getOperand(i).isRegister())
+                if(CurrInstr.getOperand(i).isReg())
                 {
                     int currInstrReg = CurrInstr.getOperand(i).getReg();
                     if(currInstrReg == prevInstrRd)
@@ -958,7 +901,7 @@ unsigned int ARMCycleEstimation :: estimateDependencyCycles(const MachineInstr &
 
             for(int i = 0; i < currInstrOperandCount; i++)
             {
-                if(CurrInstr.getOperand(i).isRegister())
+                if(CurrInstr.getOperand(i).isReg())
                 {
                     int currInstrReg = CurrInstr.getOperand(i).getReg();
                     if(currInstrReg == prevInstrLastReg)
@@ -980,7 +923,7 @@ unsigned int ARMCycleEstimation :: estimateDependencyCycles(const MachineInstr &
             // TODO: Handle the except as an accumulator input for multiply accumulate case. 
             for(int i = 0; i < currInstrOperandCount; i++)
             {
-                if(CurrInstr.getOperand(i).isRegister())
+                if(CurrInstr.getOperand(i).isReg())
                 {
                     int currInstrReg = CurrInstr.getOperand(i).getReg();
                     if(currInstrReg == prevInstrRd)
@@ -1001,7 +944,7 @@ unsigned int ARMCycleEstimation :: estimateDependencyCycles(const MachineInstr &
             // TODO: Handle the except as an accumulator input for multiply accumulate case. 
             for(int i = 0; i < currInstrOperandCount; i++)
             {
-                if(CurrInstr.getOperand(i).isRegister())
+                if(CurrInstr.getOperand(i).isReg())
                 {
                     int currInstrReg = CurrInstr.getOperand(i).getReg();
                     if(currInstrReg == prevInstrRd)
@@ -1067,7 +1010,7 @@ unsigned int ARMCycleEstimation::getDataLoadCount(MachineBasicBlock &MBB)
                 // The first parameter is a Register but it is the Base Address of Memory (Load/Store Address), so we start from the second operand.
                 for(int i = 1; i < operandCount; i++)
                 {
-                    if(CurrInstr->getOperand(i).isRegister())
+                    if(CurrInstr->getOperand(i).isReg())
                         if(CurrInstr->getOperand(i).getReg() != 0)
                             currInstrLoadCount++;
                 }
@@ -1117,7 +1060,7 @@ unsigned int ARMCycleEstimation::getDataStoreCount(MachineBasicBlock &MBB)
                 // The first parameter is a Register but it is the Base Address of Memory (Load/Store Address), so we start from the second operand.
                 for(int i = 1; i < operandCount; i++)
                 {
-                    if(CurrInstr->getOperand(i).isRegister())
+                    if(CurrInstr->getOperand(i).isReg())
                         if(CurrInstr->getOperand(i).getReg() != 0)
                             currInstrStoreCount++;
                 }
@@ -1135,14 +1078,11 @@ unsigned int ARMCycleEstimation::getDataStoreCount(MachineBasicBlock &MBB)
 
 unsigned int ARMCycleEstimation :: estimateInstructionCycles(const MachineInstr &MachInstr)
 {
-    unsigned int instrCycleCount = 0;
-    ARM9InstrClasses instructionClass = ARM9_GENERIC;
-
     // Identify the Class of Current Instruction. 
-    instructionClass = ARM9InstrClassAssignment[MachInstr.getOpcode()];
+    ARM9InstrClasses instructionClass = ARM9InstrClassAssignment[MachInstr.getOpcode()];
 
     // Get Basic Class Based Cycle Estimate 
-    instrCycleCount = ARM9ClassCycles [instructionClass]; 
+    unsigned int instrCycleCount = ARM9ClassCycles [instructionClass];
 
     // Calculate the Extra Number of Cycles Needed in Special Cases. 
     instrCycleCount += calculateExtraCycles(MachInstr, instructionClass);

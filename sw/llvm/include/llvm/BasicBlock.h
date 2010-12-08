@@ -17,22 +17,39 @@
 #include "llvm/Instruction.h"
 #include "llvm/SymbolTableListTraits.h"
 #include "llvm/ADT/ilist.h"
-#include "llvm/Support/DataTypes.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/System/DataTypes.h"
 
 namespace llvm {
 
 class TerminatorInst;
-template <class Term, class BB> class SuccIterator;  // Successor Iterator
-template <class Ptr, class USE_iterator> class PredIterator;
+class LLVMContext;
+class BlockAddress;
 
 template<> struct ilist_traits<Instruction>
   : public SymbolTableListTraits<Instruction, BasicBlock> {
-  // createSentinel is used to create a node that marks the end of the list...
-  static Instruction *createSentinel();
-  static void destroySentinel(Instruction *I) { delete I; }
-  static iplist<Instruction> &getList(BasicBlock *BB);
-  static ValueSymbolTable *getSymTab(BasicBlock *ItemParent);
-  static int getListOffset();
+  // createSentinel is used to get hold of a node that marks the end of
+  // the list...
+  // The sentinel is relative to this instance, so we use a non-static
+  // method.
+  Instruction *createSentinel() const {
+    // since i(p)lists always publicly derive from the corresponding
+    // traits, placing a data member in this class will augment i(p)list.
+    // But since the NodeTy is expected to publicly derive from
+    // ilist_node<NodeTy>, there is a legal viable downcast from it
+    // to NodeTy. We use this trick to superpose i(p)list with a "ghostly"
+    // NodeTy, which becomes the sentinel. Dereferencing the sentinel is
+    // forbidden (save the ilist_node<NodeTy>) so no one will ever notice
+    // the superposition.
+    return static_cast<Instruction*>(&Sentinel);
+  }
+  static void destroySentinel(Instruction*) {}
+
+  Instruction *provideInitialHead() const { return createSentinel(); }
+  Instruction *ensureHead(Instruction*) const { return createSentinel(); }
+  static void noteHead(Instruction*, Instruction*) {}
+private:
+  mutable ilist_half_node<Instruction> Sentinel;
 };
 
 /// This represents a single basic block in LLVM. A basic block is simply a
@@ -51,11 +68,14 @@ template<> struct ilist_traits<Instruction>
 /// @brief LLVM Basic Block Representation
 class BasicBlock : public Value, // Basic blocks are data objects also
                    public ilist_node<BasicBlock> {
+  friend class BlockAddress;
 public:
   typedef iplist<Instruction> InstListType;
-private :
+private:
   InstListType InstList;
   Function *Parent;
+  bool      AnnotationFlag;
+  unsigned int AnnotationType;
 
   void setParent(Function *parent);
   friend class SymbolTableListTraits<BasicBlock, Function>;
@@ -67,9 +87,20 @@ private :
   /// is automatically inserted at either the end of the function (if
   /// InsertBefore is null), or before the specified basic block.
   ///
-  explicit BasicBlock(const std::string &Name = "", Function *Parent = 0,
-                      BasicBlock *InsertBefore = 0);
+  explicit BasicBlock(LLVMContext &C, const Twine &Name = "",
+                      Function *Parent = 0, BasicBlock *InsertBefore = 0);
 public:
+  /// getContext - Get the context in which this basic block lives.
+  LLVMContext &getContext() const;
+
+  /// Functions for getting/setting annotation flag
+  void setAnnotationFlag(bool flag) {AnnotationFlag = flag; }
+  bool getAnnotationFlag() const    {return(AnnotationFlag);}
+
+  /// Functions for getting/setting annotation type
+  void setAnnotationType(unsigned int type) {AnnotationType = type; }
+  unsigned int getAnnotationType() const    {return(AnnotationType);}
+
   /// Instruction iterators...
   typedef InstListType::iterator                              iterator;
   typedef InstListType::const_iterator                  const_iterator;
@@ -77,9 +108,9 @@ public:
   /// Create - Creates a new BasicBlock. If the Parent parameter is specified,
   /// the basic block is automatically inserted at either the end of the
   /// function (if InsertBefore is 0), or before the specified basic block.
-  static BasicBlock *Create(const std::string &Name = "", Function *Parent = 0,
-                            BasicBlock *InsertBefore = 0) {
-    return new BasicBlock(Name, Parent, InsertBefore);
+  static BasicBlock *Create(LLVMContext &Context, const Twine &Name = "", 
+                            Function *Parent = 0,BasicBlock *InsertBefore = 0) {
+    return new BasicBlock(Context, Name, Parent, InsertBefore);
   }
   ~BasicBlock();
 
@@ -89,9 +120,10 @@ public:
         Function *getParent()       { return Parent; }
 
   /// use_back - Specialize the methods defined in Value, as we know that an
-  /// BasicBlock can only be used by Instructions (specifically PHI and terms).
-  Instruction       *use_back()       { return cast<Instruction>(*use_begin());}
-  const Instruction *use_back() const { return cast<Instruction>(*use_begin());}
+  /// BasicBlock can only be used by Users (specifically PHI nodes, terminators,
+  /// and BlockAddress's).
+  User       *use_back()       { return cast<User>(*use_begin());}
+  const User *use_back() const { return cast<User>(*use_begin());}
   
   /// getTerminator() - If this is a well formed basic block, then this returns
   /// a pointer to the terminator instruction.  If it is not, then you get a
@@ -108,6 +140,12 @@ public:
   Instruction* getFirstNonPHI();
   const Instruction* getFirstNonPHI() const {
     return const_cast<BasicBlock*>(this)->getFirstNonPHI();
+  }
+
+  // Same as above, but also skip debug intrinsics.
+  Instruction* getFirstNonPHIOrDbg();
+  const Instruction* getFirstNonPHIOrDbg() const {
+    return const_cast<BasicBlock*>(this)->getFirstNonPHIOrDbg();
   }
   
   /// removeFromParent - This method unlinks 'this' from the containing
@@ -136,6 +174,16 @@ public:
     return const_cast<BasicBlock*>(this)->getSinglePredecessor();
   }
 
+  /// getUniquePredecessor - If this basic block has a unique predecessor block,
+  /// return the block, otherwise return a null pointer.
+  /// Note that unique predecessor doesn't mean single edge, there can be 
+  /// multiple edges from the unique predecessor to this block (for example 
+  /// a switch statement with multiple cases having the same destination).
+  BasicBlock *getUniquePredecessor();
+  const BasicBlock *getUniquePredecessor() const {
+    return const_cast<BasicBlock*>(this)->getUniquePredecessor();
+  }
+
   //===--------------------------------------------------------------------===//
   /// Instruction iterator methods
   ///
@@ -156,6 +204,14 @@ public:
   ///
   const InstListType &getInstList() const { return InstList; }
         InstListType &getInstList()       { return InstList; }
+
+  /// getSublistAccess() - returns pointer to member of instruction list
+  static iplist<Instruction> BasicBlock::*getSublistAccess(Instruction*) {
+    return &BasicBlock::InstList;
+  }
+
+  /// getValueSymbolTable() - returns pointer to symbol table (if any)
+  ValueSymbolTable *getValueSymbolTable();
 
   /// Methods for support type inquiry through isa, cast, and dyn_cast:
   static inline bool classof(const BasicBlock *) { return true; }
@@ -193,19 +249,30 @@ public:
   /// cause a degenerate basic block to be formed, having a terminator inside of
   /// the basic block).
   ///
-  BasicBlock *splitBasicBlock(iterator I, const std::string &BBName = "");
-  
-  
-  static unsigned getInstListOffset() {
-    BasicBlock *Obj = 0;
-    return unsigned(reinterpret_cast<uintptr_t>(&Obj->InstList));
+  /// Also note that this doesn't preserve any passes. To split blocks while
+  /// keeping loop information consistent, use the SplitBlock utility function.
+  ///
+  BasicBlock *splitBasicBlock(iterator I, const Twine &BBName = "");
+
+  /// hasAddressTaken - returns true if there are any uses of this basic block
+  /// other than direct branches, switches, etc. to it.
+  bool hasAddressTaken() const { return getSubclassDataFromValue() != 0; }
+                     
+private:
+  /// AdjustBlockAddressRefCount - BasicBlock stores the number of BlockAddress
+  /// objects using it.  This is almost always 0, sometimes one, possibly but
+  /// almost never 2, and inconceivably 3 or more.
+  void AdjustBlockAddressRefCount(int Amt) {
+    setValueSubclassData(getSubclassDataFromValue()+Amt);
+    assert((int)(signed char)getSubclassDataFromValue() >= 0 &&
+           "Refcount wrap-around");
+  }
+  // Shadow Value::setValueSubclassData with a private forwarding method so that
+  // any future subclasses cannot accidentally use it.
+  void setValueSubclassData(unsigned short D) {
+    Value::setValueSubclassData(D);
   }
 };
-
-inline int 
-ilist_traits<Instruction>::getListOffset() {
-  return BasicBlock::getInstListOffset();
-}
 
 } // End llvm namespace
 

@@ -44,7 +44,7 @@
       <li><a href="#projects"><tt>llvm/projects</tt></a></li>
       <li><a href="#runtime"><tt>llvm/runtime</tt></a></li>
       <li><a href="#test"><tt>llvm/test</tt></a></li>
-      <li><a href="#llvmtest"><tt>llvm-test</tt></a></li>
+      <li><a href="#test-suite"><tt>test-suite</tt></a></li>
       <li><a href="#tools"><tt>llvm/tools</tt></a></li>
       <li><a href="#utils"><tt>llvm/utils</tt></a></li>
       <li><a href="#win32"><tt>llvm/win32</tt></a></li>
@@ -80,11 +80,12 @@
 <p>Welcome to LLVM! In order to get started, you first need to know some
 basic information.</p>
 
-<p>First, LLVM comes in two pieces. The first piece is the LLVM suite. This
-contains all of the tools, libraries, and header files needed to use the low
-level virtual machine.  It contains an assembler, disassembler, bitcode
-analyzer and bitcode optimizer.  It also contains a test suite that can be
-used to test the LLVM tools and the GCC front end.</p>
+<p>First, LLVM comes in three pieces. The first piece is the LLVM
+suite. This contains all of the tools, libraries, and header files
+needed to use the low level virtual machine.  It contains an
+assembler, disassembler, bitcode analyzer and bitcode optimizer.  It
+also contains basic regression tests that can be used to test the LLVM
+tools and the GCC front end.</p>
 
 <p>The second piece is the GCC front end.  This component provides a version of
 GCC that compiles C and C++ code into LLVM bitcode.  Currently, the GCC front
@@ -93,7 +94,7 @@ compiled into LLVM bitcode, a program can be manipulated with the LLVM tools
 from the LLVM suite.</p>
 
 <p>
-There is a third, optional piece called llvm-test.  It is a suite of programs
+There is a third, optional piece called Test Suite.  It is a suite of programs
 with a testing harness that can be used to further test LLVM's functionality
 and performance.
 </p>
@@ -114,14 +115,15 @@ and performance.
   <li>Read the documentation.</li>
   <li>Read the documentation.</li>
   <li>Remember that you were warned twice about reading the documentation.</li>
-  <li>Install the llvm-gcc4.2 front end if you intend to compile C or C++:
+  <li>Install the llvm-gcc-4.2 front end if you intend to compile C or C++
+      (see <a href="#installcf">Install the GCC Front End</a> for details):</li>
     <ol>
       <li><tt>cd <i>where-you-want-the-C-front-end-to-live</i></tt></li>
-      <li><tt>gunzip --stdout llvm-gcc.<i>platform</i>.tar.gz | tar -xvf -</tt>
-      </li>
-      <ul><li>If the binary extension is ".bz" use bunzip2 instead of gunzip.</li>
-      </ul>
-      <li>Add llvm-gcc's "bin" directory to your PATH variable.</li>
+      <li><tt>gunzip --stdout llvm-gcc-4.2-<i>version</i>-<i>platform</i>.tar.gz | tar -xvf -</tt></li>
+	  <li><tt><i>install-binutils-binary-from-MinGW</i></tt> (Windows only)</li>
+	  <li>Note: If the binary extension is "<tt>.bz</tt>" use <tt>bunzip2</tt> instead of <tt>gunzip</tt>.</li>
+	  <li>Note: On Windows, use <a href="http://www.7-zip.org">7-Zip</a> or a similar archiving tool.</li>
+	  <li>Add <tt>llvm-gcc</tt>'s "<tt>bin</tt>" directory to your <tt>PATH</tt> environment variable.</li>
     </ol></li>
 
   <li>Get the LLVM Source Code
@@ -141,6 +143,7 @@ and performance.
       <li><tt>cd <i>where-you-want-llvm-to-live</i></tt>
       <li><tt>cd llvm/projects</tt>
       <li><tt>gunzip --stdout llvm-test-<i>version</i>.tar.gz | tar -xvf -</tt>
+      <li><tt>mv llvm-test-<i>version</i> test-suite</tt>
     </ol></li>
 
   </ul></li>
@@ -160,7 +163,8 @@ and performance.
         <li><tt>--with-llvmgccdir=<i>directory</i></tt>
         <p>Optionally, specify for <i>directory</i> the full pathname of the 
         C/C++ front end installation to use with this LLVM configuration. If
-        not specified, the PATH will be searched.</p></li>
+        not specified, the PATH will be searched.  This is only needed if you
+        want to run test-suite or do some special kinds of LLVM builds.</p></li>
         <li><tt>--enable-spec2000=<i>directory</i></tt>
             <p>Enable the SPEC2000 benchmarks for testing.  The SPEC2000
             benchmarks should be available in
@@ -216,8 +220,18 @@ software you will need.</p>
   <th>Compilers</th>
 </tr>
 <tr>
+  <td>AuroraUX</td>
+  <td>x86<sup><a href="#pf_1">1</a></sup></td>
+  <td>GCC</td>
+</tr>
+<tr>
   <td>Linux</td>
   <td>x86<sup><a href="#pf_1">1</a></sup></td>
+  <td>GCC</td>
+</tr>
+<tr>
+  <td>Linux</td>
+  <td>amd64</td>
   <td>GCC</td>
 </tr>
 <tr>
@@ -239,22 +253,18 @@ software you will need.</p>
   <td>MacOS X<sup><a href="#pf_2">2</a>,<a href="#pf_9">9</a></sup></td>
   <td>x86</td>
   <td>GCC</td>
-
 </tr>
 <tr>
   <td>Cygwin/Win32</td>
-  <td>x86<sup><a href="#pf_1">1</a>,<a href="#pf_8">8</a></sup></td>
-  <td>GCC 3.4.X, binutils 2.15</td>
+  <td>x86<sup><a href="#pf_1">1</a>,<a href="#pf_8">8</a>,
+     <a href="#pf_11">11</a></sup></td>
+  <td>GCC 3.4.X, binutils 2.20</td>
 </tr>
 <tr>
   <td>MinGW/Win32</td>
-  <td>x86<sup><a href="#pf_1">1</a>,<a href="#pf_6">6</a>,<a href="#pf_8">8</a></sup></td>
-  <td>GCC 3.4.X, binutils 2.15</td>
-</tr>
-<tr>
-  <td>Linux</td>
-  <td>amd64<sup><a href="#pf_3">3</a></sup></td>
-  <td>GCC</td>
+  <td>x86<sup><a href="#pf_1">1</a>,<a href="#pf_6">6</a>,
+     <a href="#pf_8">8</a>, <a href="#pf_10">10</a></sup></td>
+  <td>GCC 3.4.X, binutils 2.20</td>
 </tr>
 </table>
 
@@ -269,7 +279,7 @@ software you will need.</p>
 <tr>
   <td>Windows</td>
   <td>x86<sup><a href="#pf_1">1</a></sup></td>
-  <td>Visual Studio .NET<sup><a href="#pf_4">4</a>,<a href="#pf_5">5</a></sup></td>
+  <td>Visual Studio 2005 SP1 or higher<sup><a href="#pf_4">4</a>,<a href="#pf_5">5</a></sup></td>
 <tr>
   <td>AIX<sup><a href="#pf_3">3</a>,<a href="#pf_4">4</a></sup></td>
   <td>PowerPC</td>
@@ -306,34 +316,34 @@ software you will need.</p>
 up</a></li>
 <li><a name="pf_2">Code generation supported for 32-bit ABI only</a></li>
 <li><a name="pf_3">No native code generation</a></li>
-<li><a name="pf_4">Build is not complete: one or more tools don't link</a></li>
+<li><a name="pf_4">Build is not complete: one or more tools do not link or function</a></li>
 <li><a name="pf_5">The GCC-based C/C++ frontend does not build</a></li>
-<li><a name="pf_6">The port is done using the MSYS shell.</a>
-<a href="http://www.mingw.org/MinGWiki/">Download</a> and install 
-bison (excl. M4.exe) and flex in that order. Build binutils-2.15 from source,
-if necessary. Bison &amp; flex can be also grabbed from GNUWin32 sf.net 
-project.</li>
+<li><a name="pf_6">The port is done using the MSYS shell.</a></li>
 <li><a name="pf_7">Native code generation exists but is not complete.</a></li>
-<li><a name="pf_8">Binutils</a> up to post-2.17 has bug in bfd/cofflink.c
-    preventing LLVM from building correctly. Several workarounds have been
-    introduced into LLVM build system, but the bug can occur anytime in the
-    future. We highly recommend that you rebuild your current binutils with the
-    patch from <a href="http://sourceware.org/bugzilla/show_bug.cgi?id=2659">
-    Binutils bugzilla</a>, if it wasn't already applied.</li>
-<li><a name="pf_9">XCode 2.5 and gcc 4.0.1 (Apple Build 5370) will trip
+<li><a name="pf_8">Binutils 2.20 or later is required to build the assembler
+    generated by LLVM properly.</a></li>
+<li><a name="pf_9">XCode 2.5 and gcc 4.0.1</a> (Apple Build 5370) will trip
     internal LLVM assert messages when compiled for Release at optimization
-    levels greater than 0 (i.e., <i>&ldquo;-O1&rdquo;</i> and higher).
-    Add <i>OPTIMIZE_OPTION=&quot;-O0&quot;</i> to the build command line
+    levels greater than 0 (i.e., <i>"-O1"</i> and higher).
+    Add <i>OPTIMIZE_OPTION="-O0"</i> to the build command line
     if compiling for LLVM Release or bootstrapping the LLVM toolchain.</li>
+<li><a name="pf_10">For MSYS/MinGW on Windows, be sure to install the MSYS
+    version of the perl package, and be sure it appears in your path
+    before any Windows-based versions such as Strawberry Perl and
+    ActivePerl, as these have Windows-specifics that will cause the
+    build to fail.</a></li>
+<li><a name="pf_11">In general, LLVM modules requiring dynamic linking can
+    not be built on Windows. However, you can build LLVM tools using
+    <i>"make tools-only"</i>.</li>
 </ol>
 </div>
 
 <p>Note that you will need about 1-3 GB of space for a full LLVM build in Debug
 mode, depending on the system (it is so large because of all the debugging
 information and the fact that the libraries are statically linked into multiple
-tools).  If you do not need many of the tools and you are space-conscious,
-you can disable them individually in <tt>llvm/tools/Makefile</tt>.  The Release
-build requires considerably less space.</p>
+tools).  If you do not need many of the tools and you are space-conscious, you
+can pass <tt>ONLY_TOOLS="tools you need"</tt> to make.  The Release build
+requires considerably less space.</p>
 
 <p>The LLVM suite <i>may</i> compile on other platforms, but it is not
 guaranteed to do so.  If compilation is successful, the LLVM utilities should be
@@ -377,18 +387,6 @@ href="GCCFEBuildInstrs.html">try to compile it</a> on your platform.</p>
     </tr>
 
     <tr>
-      <td><a href="http://www.gnu.org/software/flex">Flex</a></td>
-      <td>2.5.4</td>
-      <td>LEX compiler</td>
-    </tr>
-
-    <tr>
-      <td><a href="http://www.gnu.org/software/bison/bison.html">Bison</a></td>
-      <td>1.28, 1.35, 1.75, 1.875d, 2.0, or 2.1<br>(not 1.85 or 1.875)</td>
-      <td>YACC compiler</td>
-    </tr>
-
-    <tr>
       <td><a href="http://subversion.tigris.org/project_packages.html">SVN</a></td>
       <td>&ge;1.3</td>
       <td>Subversion access to LLVM<sup><a href="#sf2">2</a></sup></td>
@@ -426,19 +424,19 @@ href="GCCFEBuildInstrs.html">try to compile it</a> on your platform.</p>
 
     <tr>
       <td><a href="http://www.gnu.org/software/autoconf">GNU Autoconf</a></td>
-      <td>2.59</td>
+      <td>2.60</td>
       <td>Configuration script builder<sup><a href="#sf4">4</a></sup></td>
     </tr>
 
     <tr>
       <td><a href="http://www.gnu.org/software/automake">GNU Automake</a></td>
-      <td>1.9.2</td>
+      <td>1.9.6</td>
       <td>aclocal macro generator<sup><a href="#sf4">4</a></sup></td>
     </tr>
 
     <tr>
       <td><a href="http://savannah.gnu.org/projects/libtool">libtool</a></td>
-      <td>1.5.10</td>
+      <td>1.5.22</td>
       <td>Shared library manager<sup><a href="#sf4">4</a></sup></td>
     </tr>
 
@@ -456,8 +454,8 @@ href="GCCFEBuildInstrs.html">try to compile it</a> on your platform.</p>
     <li><a name="sf3">Only needed if you want to run the automated test 
       suite in the <tt>llvm/test</tt> directory.</a></li>
     <li><a name="sf4">If you want to make changes to the configure scripts, 
-      you will need GNU autoconf (2.59), and consequently, GNU M4 (version 1.4 
-      or higher). You will also need automake (1.9.2). We only use aclocal 
+      you will need GNU autoconf (2.60), and consequently, GNU M4 (version 1.4 
+      or higher). You will also need automake (1.9.6). We only use aclocal 
       from that package.</a></li>
   </ol>
   </div>
@@ -556,6 +554,21 @@ the "<tt>convert_from_eh_region_ranges_1</tt>" GCC function.</p>
    portions of its testsuite.</p>
 <p><b>GCC 4.1.2 on OpenSUSE</b>: Seg faults during libstdc++ build and on x86_64
 platforms compiling md5.c gets a mangled constant.</p>
+<p><b>GCC 4.1.2 (20061115 (prerelease) (Debian 4.1.1-21)) on Debian</b>: Appears
+to miscompile parts of LLVM 2.4. One symptom is ValueSymbolTable complaining
+about symbols remaining in the table on destruction.</p>
+<p><b>GCC 4.1.2 20071124 (Red Hat 4.1.2-42)</b>: Suffers from the same symptoms
+as the previous one. It appears to work with ENABLE_OPTIMIZED=0 (the default).</p>
+<p><b>Cygwin GCC 4.3.2 20080827 (beta) 2</b>:
+  Users <a href="http://llvm.org/PR4145">reported</a> various problems related
+  with link errors when using this GCC version.</p>
+<p><b>Debian GCC 4.3.2 on X86</b>: Crashes building some files in LLVM 2.6.</p>
+<p><b>GCC 4.3.3 (Debian 4.3.3-10) on ARM</b>: Miscompiles parts of LLVM 2.6
+when optimizations are turned on. The symptom is an infinite loop in
+FoldingSetImpl::RemoveNode while running the code generator.</p>
+<p><b>GCC 4.3.5 and GCC 4.4.5 on ARM</b>: These can miscompile <tt>value >>
+1</tt> even at -O0. A test failure in <tt>test/Assembler/alignstack.ll</tt> is
+one symptom of the problem.
 <p><b>GNU ld 2.16.X</b>. Some 2.16.X versions of the ld linker will produce very
 long warning messages complaining that some ".gnu.linkonce.t.*" symbol was
 defined in a discarded section. You can safely ignore these messages as they are
@@ -566,6 +579,12 @@ erroneous and the linkage is correct.  These messages disappear using ld
 href="http://sourceware.org/bugzilla/show_bug.cgi?id=3111">a bug</a> which
 causes huge link times (minutes instead of seconds) when building LLVM.  We
 recommend upgrading to a newer version (2.17.50.0.4 or later).</p>
+
+<p><b>GNU Binutils 2.19.1 Gold</b>: This version of Gold contained
+<a href="http://sourceware.org/bugzilla/show_bug.cgi?id=9836">a bug</a>
+which causes intermittent failures when building LLVM with position independent
+code.  The symptom is an error about cyclic dependencies.  We recommend
+upgrading to a newer version of Gold.</p>
 
 </div>
 
@@ -667,17 +686,17 @@ compressed with the gzip program.
 <p>The files are as follows, with <em>x.y</em> marking the version number:
 <dl>
   <dt><tt>llvm-x.y.tar.gz</tt></dt>
-  <dd>Source release for the LLVM libraries and tools.<br/></dd>
+  <dd>Source release for the LLVM libraries and tools.<br></dd>
 
   <dt><tt>llvm-test-x.y.tar.gz</tt></dt>
-  <dd>Source release for the LLVM test suite.</dd>
+  <dd>Source release for the LLVM test-suite.</dd>
 
-  <dt><tt>llvm-gcc4-x.y.source.tar.gz</tt></dt>
-  <dd>Source release of the llvm-gcc4 front end.  See README.LLVM in the root
-      directory for build instructions.<br/></dd>
+  <dt><tt>llvm-gcc-4.2-x.y.source.tar.gz</tt></dt>
+  <dd>Source release of the llvm-gcc-4.2 front end.  See README.LLVM in the root
+      directory for build instructions.<br></dd>
 
-  <dt><tt>llvm-gcc4-x.y-platform.tar.gz</tt></dt>
-  <dd>Binary release of the llvm-gcc4 front end for a specific platform.<br/></dd>
+  <dt><tt>llvm-gcc-4.2-x.y-platform.tar.gz</tt></dt>
+  <dd>Binary release of the llvm-gcc-4.2 front end for a specific platform.<br></dd>
 
 </dl>
 
@@ -691,7 +710,7 @@ compressed with the gzip program.
 <div class="doc_text">
 
 <p>If you have access to our Subversion repository, you can get a fresh copy of
-the entire source code.  All you need to do is check it out from Subvresion as
+the entire source code.  All you need to do is check it out from Subversion as
 follows:</p>
 
 <ul>
@@ -709,9 +728,14 @@ test directories, and local copies of documentation files.</p>
 <p>If you want to get a specific release (as opposed to the most recent
 revision), you can checkout it from the '<tt>tags</tt>' directory (instead of
 '<tt>trunk</tt>'). The following releases are located in the following
-  subdirectories of the '<tt>tags</tt>' directory:</p>
+subdirectories of the '<tt>tags</tt>' directory:</p>
 
 <ul>
+<li>Release 2.8: <b>RELEASE_28</b></li>
+<li>Release 2.7: <b>RELEASE_27</b></li>
+<li>Release 2.6: <b>RELEASE_26</b></li>
+<li>Release 2.5: <b>RELEASE_25</b></li>
+<li>Release 2.4: <b>RELEASE_24</b></li>
 <li>Release 2.3: <b>RELEASE_23</b></li>
 <li>Release 2.2: <b>RELEASE_22</b></li>
 <li>Release 2.1: <b>RELEASE_21</b></li>
@@ -734,7 +758,7 @@ you get it from the Subversion repository:</p>
 <div class="doc_code">
 <pre>
 % cd llvm/projects
-% svn co http://llvm.org/svn/llvm-project/test-suite/trunk llvm-test
+% svn co http://llvm.org/svn/llvm-project/test-suite/trunk test-suite
 </pre>
 </div>
 
@@ -755,36 +779,66 @@ instructions</a> to successfully get and build the LLVM GCC front-end.</p>
 
 <div class="doc_text">
 
-<p>Before configuring and compiling the LLVM suite, you can optionally extract the 
-LLVM GCC front end from the binary distribution.  It is used for running the 
-llvm-test testsuite and for compiling C/C++ programs.  Note that you can optionally
-<a href="GCCFEBuildInstrs.html">build llvm-gcc yourself</a> after building the
+<p>Before configuring and compiling the LLVM suite (or if you want to use just the LLVM
+GCC front end) you can optionally extract the front end from the binary distribution.
+It is used for running the LLVM test-suite and for compiling C/C++ programs.  Note that
+you can optionally <a href="GCCFEBuildInstrs.html">build llvm-gcc yourself</a> after building the
 main LLVM repository.</p>
 
-<p>To install the GCC front end, do the following:</p>
+<p>To install the GCC front end, do the following (on Windows, use an archival tool
+like <a href="http://www.7-zip.org">7-zip</a> that understands gzipped tars):</p>
 
 <ol>
   <li><tt>cd <i>where-you-want-the-front-end-to-live</i></tt></li>
-  <li><tt>gunzip --stdout llvmgcc-<i>version</i>.<i>platform</i>.tar.gz | tar -xvf
+  <li><tt>gunzip --stdout llvm-gcc-4.2-<i>version</i>-<i>platform</i>.tar.gz | tar -xvf
       -</tt></li>
 </ol>
 
-<p>Once the binary is uncompressed, you should add a symlink for llvm-gcc and 
-llvm-g++ to some directory in your path.  When you configure LLVM, it will 
-automatically detect llvm-gcc's presence (if it is in your path) enabling its
-use in llvm-test.  Note that you can always build or install llvm-gcc at any
-pointer after building the main LLVM repository: just reconfigure llvm and 
-llvm-test will pick it up.
+<p>Once the binary is uncompressed, if you're using a *nix-based system, add a symlink for
+<tt>llvm-gcc</tt> and <tt>llvm-g++</tt> to some directory in your path.  If you're using a
+Windows-based system, add the <tt>bin</tt> subdirectory of your front end installation directory
+to your <tt>PATH</tt> environment variable.  For example, if you uncompressed the binary to
+<tt>c:\llvm-gcc</tt>, add <tt>c:\llvm-gcc\bin</tt> to your <tt>PATH</tt>.</p>
+
+<p>If you now want to build LLVM from source, when you configure LLVM, it will 
+automatically detect <tt>llvm-gcc</tt>'s presence (if it is in your path) enabling its
+use in test-suite.  Note that you can always build or install <tt>llvm-gcc</tt> at any
+point after building the main LLVM repository: just reconfigure llvm and 
+test-suite will pick it up.
 </p>
 
-<p>The binary versions of the GCC front end may not suit all of your needs.  For
-example, the binary distribution may include an old version of a system header
-file, not "fix" a header file that needs to be fixed for GCC, or it may be
-linked with libraries not available on your system.</p>
+<p>As a convenience for Windows users, the front end binaries for MinGW/x86 include
+versions of the required w32api and mingw-runtime binaries.  The last remaining step for
+Windows users is to simply uncompress the binary binutils package from
+<a href="http://mingw.org/">MinGW</a> into your front end installation directory.  While the
+front end installation steps are not quite the same as a typical manual MinGW installation,
+they should be similar enough to those who have previously installed MinGW on Windows systems.</p>
 
-<p>In cases like these, you may want to try <a
-href="GCCFEBuildInstrs.html">building the GCC front end from source.</a> This is
-much easier now than it was in the past.</p>
+<p>To install binutils on Windows:</p>
+
+<ol>
+  <li><tt><i>download GNU Binutils from <a href="http://sourceforge.net/projects/mingw/files/">MinGW Downloads</a></i></tt></li>
+  <li><tt>cd <i>where-you-uncompressed-the-front-end</i></tt></li>
+  <li><tt><i>uncompress archived binutils directories (not the tar file) into the current directory</i></tt></li>
+</ol>
+
+<p>The binary versions of the LLVM GCC front end may not suit all of your needs.  For
+example, the binary distribution may include an old version of a system header
+file, not "fix" a header file that needs to be fixed for GCC, or it may be linked with
+libraries not available on your system.  In cases like these, you may want to try
+<a href="GCCFEBuildInstrs.html">building the GCC front end from source</a>.  Thankfully,
+this is much easier now than it was in the past.</p>
+
+<p>We also do not currently support updating of the GCC front end by manually overlaying
+newer versions of the w32api and mingw-runtime binary packages that may become available
+from MinGW.  At this time, it's best to think of the MinGW LLVM GCC front end binary as
+a self-contained convenience package that requires Windows users to simply download and
+uncompress the GNU Binutils binary package from the MinGW project.</p>
+
+<p>Regardless of your platform, if you discover that installing the LLVM GCC front end
+binaries is not as easy as previously described, or you would like to suggest improvements,
+please let us know how you would like to see things improved by dropping us a note on our
+<a href="http://llvm.org/docs/#maillist">mailing list</a>.</p>
 
 </div>
 
@@ -851,9 +905,11 @@ script to configure the build system:</p>
   </dd>
   <dt><i>--enable-optimized</i></dt>
   <dd>
-    Enables optimized compilation by default (debugging symbols are removed
-    and GCC optimization flags are enabled).  The default is to use an
-    unoptimized build (also known as a debug build).
+    Enables optimized compilation (debugging symbols are removed
+    and GCC optimization flags are enabled). Note that this is the default 
+    setting     if you are using the LLVM distribution. The default behavior 
+    of an Subversion checkout is to use an unoptimized build (also known as a 
+    debug build).
     <br><br>
   </dd>
   <dt><i>--enable-debug-runtime</i></dt>
@@ -876,7 +932,7 @@ script to configure the build system:</p>
   native compiler (no cross-compiler targets available). The "native" target is 
   selected as the target of the build host. You can also specify a comma 
   separated list of target names that you want available in llc. The target 
-  names use all lower case. The current set of targets is: <br/>
+  names use all lower case. The current set of targets is: <br>
   <tt>alpha, ia64, powerpc, skeleton, sparc, x86</tt>.
   <br><br></dd>
   <dt><i>--enable-doxygen</i></dt>
@@ -921,10 +977,12 @@ builds:</p>
 <dl>
     <dt>Debug Builds
     <dd>
-    These builds are the default when one types <tt>gmake</tt> (unless the
-    <tt>--enable-optimized</tt> option was used during configuration).  The
-    build system will compile the tools and libraries with debugging
-    information.
+    These builds are the default when one is using an Subversion checkout and 
+    types <tt>gmake</tt> (unless the <tt>--enable-optimized</tt> option was 
+    used during configuration).  The build system will compile the tools and 
+    libraries with debugging information.  To get a Debug Build using the
+    LLVM distribution the <tt>--disable-optimized</tt> option must be passed
+    to <tt>configure</tt>.
     <br><br>
 
     <dt>Release (Optimized) Builds
@@ -934,6 +992,7 @@ builds:</p>
     <tt>gmake</tt> command line.  For these builds, the build system will
     compile the tools and libraries with GCC optimizations enabled and strip
     debugging information from the libraries and executables it generates. 
+    Note that Release Builds are default when using an LLVM distribution.
     <br><br>
 
     <dt>Profile Builds
@@ -1010,6 +1069,11 @@ declaring variables on the command line.  The following are some examples:</p>
   <dd>
   Perform a Release (Optimized) build without assertions enabled.
   <br><br>
+ 
+  <dt><tt>gmake ENABLE_OPTIMIZED=0</tt>
+  <dd>
+  Perform a Debug build.
+  <br><br>
 
   <dt><tt>gmake ENABLE_PROFILING=1</tt>
   <dd>
@@ -1040,43 +1104,16 @@ that directory that is out of date.</p>
 </div>
 
 <div class="doc_text">
-  <p>It is possible to cross-compile LLVM. That is, you can create LLVM
-  executables and libraries for a platform different than the one one which you
-  are compiling.  To do this, a few additional steps are 
-  required. <sup><a href="#ccn_1">1</a></sup> To cross-compile LLVM, use
-  these instructions:</p>
-  <ol>
-    <li>Configure and build LLVM as a native compiler. You will need
-    just <tt>TableGen</tt> from that build.
-      <ul>
-        <li>If you have <tt>$LLVM_OBJ_ROOT=$LLVM_SRC_ROOT</tt> just execute 
-          <tt>make -C utils/TableGen</tt> after configuring.</li>
-        <li>Otherwise you will need to monitor building process and terminate 
-          it just after <tt>TableGen</tt> was built.</li>
-      </ul>
-    </li>
-    <li>Copy the TableGen binary to somewhere safe (out of your build tree).
-    </li>
-    <li>Configure LLVM to build with a cross-compiler. To do this, supply the
-    configure script with <tt>--build</tt> and <tt>--host</tt> options that
-    are different. The values of these options must be legal target triples 
-    that your GCC compiler supports.</li>
-    <li>Put the saved <tt>TableGen</tt> executable into the
-    into <tt>$LLVM_OBJ_ROOT/{BUILD_TYPE}/bin</tt> directory (e.g. into 
-    <tt>.../Release/bin</tt> for a Release build).</li>
-    <li>Build LLVM  as usual.</li>
-  </ol>
-  <p>The result of such a build will produce executables that are not executable
-  on your build host (--build option) but can be executed on your compile host
+  <p>It is possible to cross-compile LLVM itself. That is, you can create LLVM
+  executables and libraries to be hosted on a platform different from the
+  platform where they are build (a Canadian Cross build). To configure a
+  cross-compile, supply the configure script with <tt>--build</tt> and
+  <tt>--host</tt> options that are different. The values of these options must
+  be legal target triples that your GCC compiler supports.</p>
+
+  <p>The result of such a build is executables that are not runnable on
+  on the build host (--build option) but can be executed on the compile host
   (--host option).</p>
-  <p><b>Notes:</b></p>
-  <div class="doc_notes">
-    <ol>
-      <li><a name="ccn_1">Cross-compiling</a> was tested only with Linux as 
-      build platform and Windows as host using mingw32 cross-compiler. Other
-      combinations have not been tested.</li>
-    </ol>
-  </div>
 </div>
 
 <!-- ======================================================================= -->
@@ -1107,13 +1144,13 @@ platforms or configurations using the same source tree.</p>
 named after the build type:</p>
 
 <dl>
-  <dt>Debug Builds
+  <dt>Debug Builds with assertions enabled (the default)
   <dd>
   <dl>
     <dt>Tools
-    <dd><tt><i>OBJ_ROOT</i>/Debug/bin</tt>
+    <dd><tt><i>OBJ_ROOT</i>/Debug+Asserts/bin</tt>
     <dt>Libraries
-    <dd><tt><i>OBJ_ROOT</i>/Debug/lib</tt>
+    <dd><tt><i>OBJ_ROOT</i>/Debug+Asserts/lib</tt>
   </dl>
   <br><br>
 
@@ -1156,19 +1193,24 @@ first command may not be required if you are already using the module):</p>
 <div class="doc_code">
 <pre>
 $ mount -t binfmt_misc none /proc/sys/fs/binfmt_misc
-$ echo ':llvm:M::llvm::/path/to/lli:' &gt; /proc/sys/fs/binfmt_misc/register
+$ echo ':llvm:M::BC::/path/to/lli:' &gt; /proc/sys/fs/binfmt_misc/register
 $ chmod u+x hello.bc   (if needed)
 $ ./hello.bc
 </pre>
 </div>
 
 <p>
-This allows you to execute LLVM bitcode files directly.  Thanks to Jack
-Cummings for pointing this out!
+This allows you to execute LLVM bitcode files directly.  On Debian, you 
+can also use this command instead of the 'echo' command above:</p>
 </p>
 
+<div class="doc_code">
+<pre>
+$ sudo update-binfmts --install llvm /path/to/lli --magic 'BC'
+</pre>
 </div>
 
+</div>
 
 <!-- *********************************************************************** -->
 <div class="doc_section">
@@ -1313,7 +1355,7 @@ end to compile.</p>
 </div>
 
 <!-- ======================================================================= -->
-<div class="doc_subsection"><a name="llvmtest"><tt>test-suite</tt></a></div>
+<div class="doc_subsection"><a name="test-suite"><tt>test-suite</tt></a></div>
 <div class="doc_text">
   <p>This is not a directory in the normal llvm module; it is a separate
   Subversion
@@ -1334,7 +1376,7 @@ end to compile.</p>
 
 <p>The <b>tools</b> directory contains the executables built out of the
 libraries above, which form the main part of the user interface.  You can
-always get help for a tool by typing <tt>tool_name --help</tt>.  The
+always get help for a tool by typing <tt>tool_name -help</tt>.  The
 following is a brief introduction to the most important tools.  More detailed
 information is in the <a href="CommandGuide/index.html">Command Guide</a>.</p>
 
@@ -1373,7 +1415,7 @@ information is in the <a href="CommandGuide/index.html">Command Guide</a>.</p>
 
   <dt><tt><b>llvm-ld</b></tt></dt>
   <dd><tt>llvm-ld</tt> is a general purpose and extensible linker for LLVM. 
-  This is the linker invoked by <tt>llvmc</tt>. It performsn standard link time
+  This is the linker invoked by <tt>llvmc</tt>. It performs standard link time
   optimizations and allows optimization modules to be loaded and run so that 
   language specific optimizations can be applied at link time.</dd>
 
@@ -1405,8 +1447,8 @@ information is in the <a href="CommandGuide/index.html">Command Guide</a>.</p>
   <dt><tt><b>opt</b></tt></dt>
   <dd><tt>opt</tt> reads LLVM bitcode, applies a series of LLVM to LLVM 
   transformations (which are specified on the command line), and then outputs 
-  the resultant bitcode.  The '<tt>opt --help</tt>' command is a good way to 
-  get a list of the program transformations available in LLVM.<br/>
+  the resultant bitcode.  The '<tt>opt -help</tt>' command is a good way to 
+  get a list of the program transformations available in LLVM.<br>
   <dd><tt>opt</tt> can also be used to run a specific analysis on an input 
   LLVM bitcode file and print out the results.  It is primarily useful for 
   debugging analyses, or familiarizing yourself with what an analysis does.</dd>
@@ -1493,7 +1535,7 @@ are code generators for parts of LLVM infrastructure.</p>
 
 <div class="doc_text">
 <p>This section gives an example of using LLVM.  llvm-gcc3 is now obsolete,
-so we only include instructiosn for llvm-gcc4.
+so we only include instructions for llvm-gcc4.
 </p>
 
 <p><b>Note:</b> The <i>gcc4</i> frontend's invocation is <b><i>considerably different</i></b>
@@ -1631,14 +1673,14 @@ out:</p>
 <hr>
 <address>
   <a href="http://jigsaw.w3.org/css-validator/check/referer"><img
-  src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!"></a>
+  src="http://jigsaw.w3.org/css-validator/images/vcss-blue" alt="Valid CSS"></a>
   <a href="http://validator.w3.org/check/referer"><img
-  src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!" /></a>
+  src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01"></a>
 
   <a href="mailto:sabre@nondot.org">Chris Lattner</a><br>
   <a href="http://llvm.x10sys.com/rspencer/">Reid Spencer</a><br>
   <a href="http://llvm.org">The LLVM Compiler Infrastructure</a><br>
-  Last modified: $Date: 2008-08-19 22:17:48 +0200 (Tue, 19 Aug 2008) $
+  Last modified: $Date: 2010-10-08 00:30:47 +0200 (Fri, 08 Oct 2010) $
 </address>
 </body>
 </html>
