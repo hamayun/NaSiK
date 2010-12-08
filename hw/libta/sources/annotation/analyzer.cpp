@@ -40,7 +40,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <time.h>
-
+#include <iostream>
 
 namespace libta
 {
@@ -51,7 +51,6 @@ namespace libta
       : _buffers(buffers),
         _previous_thread_id(0),
         _current_thread_slot(NULL),
-        _push_context_required(false),
         _link_map(linkmap),
         _appli_base_addr(0),
         _ending(false),
@@ -103,6 +102,18 @@ namespace libta
       return(NULL);
     }
 
+    void Analyzer::print_annotation(annotation_t *bb)
+    {
+        std::cout << "\teu=0x" << std::hex << bb->eu
+                  << "\tthread=0x" << std::hex << bb->thread
+                  << "\tbb_addr=0x" << std::hex << bb->bb_addr
+                  << "\tcaller_addr=0x" << std::hex << bb->caller_addr
+                  << "\tdb->Type=0x" << std::hex << bb->db->Type
+                  << "\tdb->InstructionCount=" << std::dec << bb->db->InstructionCount
+                  << "\tdb->CycleCount=" << std::dec << bb->db->CycleCount
+                  << "\ttype=" << std::dec << bb->type << std::endl;
+    }
+
     void * Analyzer::_thread_fct()
     {
       uint32_t              buffer_index;
@@ -132,14 +143,17 @@ namespace libta
         {
           if(_online_analyze == true)
           {
+            // online analysis
             buffer = _buffers[buffer_index].buffer;
             for(uint32_t i = 0; i < _buffers[buffer_index].count; i++)
             {
+              //print_annotation(&(buffer[i]));
               push(&(buffer[i])); 
             }
           }
           else
           {
+            // For offline anaylsis; write annotations in the buffer to the dump file.
             write(_file_id, (const void *)buffer, sizeof(annotation_t) * _buffers[buffer_index].count);
           }
         }
@@ -185,18 +199,26 @@ namespace libta
     {
       call_t           *call_ptr;
       call_context_t   *context_ptr;
+
       // Avoid search in the map each time a new bb is pushed.
-      // Most of push belong to the same previous thread slot.
+      // Most of pushes belong to the previous thread slot.
       if(bb->thread != _previous_thread_id)
       {
+        //std::cout << "Thread Switch, Current Thread=0x" << std::hex << bb->thread
+        //          << " Previous Thread=0x" << std::hex << _previous_thread_id << std::endl;
+
+        // if its not the previous thread, then search in the thread slots map.
         std::map< uintptr_t, thread_slot_t* >::iterator  it = _thread_slots.find(bb->thread);
+
+        // if couldn't find the thread in slots, create a new thread and add it to slots
         if(it == _thread_slots.end())
         {
-          // New thread...
+          // Create New thread slot ... and Initialize it. 
           _current_thread_slot = new thread_slot_t;
           *_current_thread_slot = INIT_THREAD_SLOT;
-          _current_thread_slot->id = bb->thread;
+          _current_thread_slot->id = bb->thread;            
           _current_thread_slot->call_stack = new std::list< call_context_t* >();
+          // Insert into the thread slot map
           _thread_slots[bb->thread] = _current_thread_slot;
 
           // Initial function context
@@ -209,77 +231,77 @@ namespace libta
           context_ptr->call = call_ptr;
           _current_thread_slot->call_stack->push_back(context_ptr);
 
-          DOUT_FCT << "New thread ID=0x" << std::hex << bb->thread << " at 0x" << std::hex << _current_thread_slot << std::endl;
+          DOUT_FCT << "New thread ID=0x" << std::hex << bb->thread
+                   << " at 0x" << std::hex << _current_thread_slot
+                   << " bb->db->InstructionCount = " << std::dec <<  bb->db->InstructionCount
+                   << std::endl;
         }
         else
         {
           _current_thread_slot = it->second;
         }
+
+        // Save the previous thread id for the next comparison
         _previous_thread_id = bb->thread;
         DOUT_FCT << "Current thread ID=0x" << std::hex << bb->thread << std::endl;
       }
-#if 0
-      if(bb->type == BB_ENTRY)
-      {
-        _push_context_required = true;
-        return;
-      }
-      if(bb->type == BB_RETURN)
-      {
-        pop_context();
-        return;
-      }
-#endif
 
       // Insert the bb ...
       basicblock_t  * cur_bb;
       basicblock_t  * bb_ptr;
 
+      // Start from the first bb in the current thread slot
       cur_bb = &(_current_thread_slot->bb_list);
+
+      // And loop until the bb_addr of the next bb is less than from the input bb address.
       while( (cur_bb->next != NULL) && (cur_bb->next->annotation.bb_addr < bb->bb_addr) )
         cur_bb = cur_bb->next;
 
+      // Are we at the end of bb list? or next bb's address is really greater than from the input bb. 
       if( (cur_bb->next == NULL) || (cur_bb->next->annotation.bb_addr > bb->bb_addr) )
       {
         bb_ptr =  new basicblock_t;
         *bb_ptr = INIT_BB;
+        // Insert into the bb list
         bb_ptr->next = cur_bb->next;
         cur_bb->next = bb_ptr;
+        // Link Annotation to new list entry
         bb_ptr->annotation = *bb;
         bb_ptr->calls = new std::list< call_t* >();
+        // Copy Annotation info from annotation db to cost object ... both within the "basicblock_t" object.
         compute_cost(bb_ptr);
       }
       // The bb to compute is the next one
       bb_ptr = cur_bb->next;
 
       sym_desc_t  *sym;
-      sym = find_symbol(bb_ptr->annotation.bb_addr);
-      DOUT_FCT << "New BB belong to " << sym->name << "(0x" << bb_ptr->annotation.bb_addr << ")";
-      DOUT << ((bb_ptr->annotation.db->Type & BB_ENTRY) ? " ENTRY" : " ") <<  ((bb_ptr->annotation.db->Type & BB_RETURN) ? " RETURN" : "")  << std::endl;
+      // Find symbol for the current bb_addr in symbol vector ... constructed earlier
+      sym = find_symbol(bb_ptr->annotation.bb_addr); 
 
-      //if(bb->type == BB_ENTRY)
-      if(bb_ptr->annotation.db->Type & BB_ENTRY)
+      DOUT_FCT << "New BB belong to " << sym->name << "(0x" << bb_ptr->annotation.bb_addr << ")";
+      DOUT << ((bb_ptr->annotation.type & BB_ENTRY) ? " ENTRY" : "")
+           << ((bb_ptr->annotation.type & BB_RETURN) ? " RETURN" : "")  << std::endl;
+      
+      // If the bb is an entry basic block ... push context (It marks the start of a new function)
+      if(bb_ptr->annotation.type & BB_ENTRY)
       {
         push_context(bb_ptr);
       }
-//      else
-//      {
-//        while(sym->base_addr != _current_thread_slot->call_stack->back()->call->symbol.base_addr)
-//        {
-//          pop_context();
-//        }
-//      }
 
-      // Compute the current bb
+      // Compute How many times the current BB has been executed.
       bb_ptr->counter++;
+
+      // Cumulative cost for the Current Thread Slot. 
       add_cost(&(_current_thread_slot->call_stack->back()->cost), &(bb_ptr->cost)); 
 
-      if(bb_ptr->annotation.db->Type & BB_RETURN)
+      if(bb_ptr->annotation.type & BB_RETURN)
       {
         pop_context();
       }
       else
       {
+        // perhaps this keeps track of the previous basic block of the same function
+        // until we pop the context of this function. 
         _current_thread_slot->prev_bb = bb_ptr;
       }
     }
@@ -291,17 +313,17 @@ namespace libta
       call_context_t   *context_ptr;
       sym_desc_t  *sym;
 
-      DOUT_FCT << "------------------------------------------------" << std::endl;
+      DOUT_FCT << ">>>>>>>>>>>>>>>>>>>>" << std::endl;
       print_stack();
 
       if(_current_thread_slot->prev_bb != NULL)
       {
-        // A basic block may be the caller of multiple function ... in LLVM 
+        // A basic block may be the caller of multiple functions ... in LLVM
         for( calls_it = _current_thread_slot->prev_bb->calls->begin() ;
             calls_it != _current_thread_slot->prev_bb->calls->end() ;
             calls_it++)
         {
-          if( (*calls_it)->entry == bb) break;
+            if( (*calls_it)->entry == bb) break;
         }
 
         if( calls_it == _current_thread_slot->prev_bb->calls->end() )
@@ -312,16 +334,17 @@ namespace libta
           call_ptr->entry = bb;
           call_ptr->symbol = *sym;
           _current_thread_slot->prev_bb->calls->push_back(call_ptr);
+
           DOUT_FCT << "Create call to " << call_ptr->symbol.name << std::endl;
         }
         else
         {
-          // 
           call_ptr = *calls_it;
           DOUT_FCT << "call to " << call_ptr->symbol.name << " already exist" << std::endl;
         }
 
-        DOUT_FCT << "Call from " << _current_thread_slot->prev_bb->annotation.bb_addr << " to " << bb->annotation.bb_addr << std::endl;
+        DOUT_FCT << "Call from 0x" << std::hex << _current_thread_slot->prev_bb->annotation.bb_addr
+                 << " to 0x" << std::hex << bb->annotation.bb_addr << std::endl;
 
         call_ptr->counter++;
         context_ptr = new call_context_t;
@@ -332,12 +355,16 @@ namespace libta
       else
       {
         // Initial function
-        DOUT_FCT << " Entering a new context"  << std::endl;
+        // This means that we are at the start of a New Function Context and this is the first BB
+        // thats why we can search for its address and expect to find a corresponding symbol
+        DOUT_FCT << " Entering a new context ";
         call_ptr = new call_t;
         *call_ptr = INIT_CALL;
         sym = find_symbol(bb->annotation.bb_addr);
         call_ptr->entry = bb;
         call_ptr->symbol = *sym;
+
+        DOUT << "entry: 0x" << std::hex << call_ptr->entry << " symbol: " << call_ptr->symbol.name << std::endl;
         context_ptr = new call_context_t;
         *context_ptr = INIT_CALL_CONTEXT;
         context_ptr->call = call_ptr;
@@ -345,24 +372,24 @@ namespace libta
 
       _current_thread_slot->call_stack->push_back(context_ptr);
 
-      DOUT_FCT << std::hex << _current_thread_slot << " push " << context_ptr->call->symbol.name << std::endl;
+      DOUT_FCT << std::hex << _current_thread_slot << " pushed " << context_ptr->call->symbol.name << std::endl;
     }
 
     inline void Analyzer::pop_context(void)
     {
       call_context_t   *context_ptr;
 
-      DOUT_FCT << "------------------------------------------------" << std::endl;
+      DOUT_FCT << "<<<<<<<<<<<<<<<<<<<<" << std::endl;
       print_stack();
 
       context_ptr = _current_thread_slot->call_stack->back();
       _current_thread_slot->call_stack->pop_back();
-
       ASSERT(_current_thread_slot->call_stack->empty() == false);
 
-      DOUT_FCT << std::hex << _current_thread_slot << " pop " << context_ptr->call->symbol.name << std::endl;
+      DOUT_FCT << std::hex << _current_thread_slot << " popped " << context_ptr->call->symbol.name << std::endl;
+      std::cout << context_ptr->call->symbol.name << ":cost:" << std::dec << context_ptr->cost.instructions
+                << ":" << context_ptr->cost.cycles << std::endl;
 
-      std::cout << context_ptr->call->symbol.name << " cost = " << std::dec << context_ptr->cost.instructions << " / " << context_ptr->cost.cycles << std::endl;
       add_cost(&(context_ptr->call->cost), &(context_ptr->cost));
       add_cost(&(_current_thread_slot->call_stack->back()->cost), &(context_ptr->cost));
 
@@ -377,7 +404,6 @@ namespace libta
       }
 
       delete context_ptr;
-
     }
 
     void Analyzer::print_stack()
@@ -389,9 +415,9 @@ namespace libta
       level = 0;
       for( ; list_it != _current_thread_slot->call_stack->end(); list_it ++ , level ++)
       {
-        DOUT_FCT << std::hex << _current_thread_slot << ":" << level << " " << (*list_it)->call->symbol.name << std::endl;
+        DOUT_FCT << std::hex << _current_thread_slot << ":" << std::dec << level << " "
+                 << (*list_it)->call->symbol.name << std::endl;
       }
-
     }
 
     inline void Analyzer::add_cost(cost_t * c1, cost_t *c2)
@@ -402,6 +428,7 @@ namespace libta
 
     inline void Analyzer::compute_cost(basicblock_t *bb)
     {
+      // This copies the annotation info ... doesn't compute anything
       bb->cost.instructions = bb->annotation.db->InstructionCount;
       bb->cost.cycles = bb->annotation.db->CycleCount;
     }
@@ -466,9 +493,10 @@ namespace libta
         sym_list.pop_front();
       }
 
+      //std::cout << "Symbol Vector Table" << std::endl;
       for( uint32_t i = 0 ; i < _sym_vector.size() ; i++)
       {
-        //        DOUT_FCT << (void*)_sym_vector[i].base_addr << " " << _sym_vector[i].name << std::endl;
+        //DOUT_FCT << (void*)_sym_vector[i].base_addr << " " << _sym_vector[i].name << std::endl;
       }
 
       (void) elf_end(elf);
@@ -485,7 +513,7 @@ namespace libta
     {
       uintptr_t   address = offset - _link_map->l_addr;
 
-      // Check if symbol is in cash
+      // Check if symbol is in cache
       std::map< uintptr_t, sym_desc_t *>::iterator    it = _sym_cash.find(address);
       if( it != _sym_cash.end())
       {
@@ -518,16 +546,17 @@ namespace libta
 
       for( threads_it = _thread_slots.begin(), id = 0; threads_it != _thread_slots.end(); threads_it++, id++)
       {
+        // Seek to the begining of str_id stringstream.
         str_id.seekp(std::ios_base::beg);
         str_id << id;
-        //        filename = (std::string)_link_map->l_name + (std::string)"_" + str_id.str() + (std::string)".out";
-        filename = (std::string)"cachegrind.out." + _str_tag.str(); 
+
+        filename = (std::string)"cachegrind.out." + _str_tag.str();
         if(id > 0)
           filename += (std::string)"." + str_id.str();
 
+        // Create a New file for each thread. 
         DOUT_FCT << "Create " << filename << std::endl;
         callgrind_file.open(filename.data(), std::fstream::out);
-
 
         // Empty the context stack ...
         _current_thread_slot = threads_it->second;
@@ -548,28 +577,41 @@ namespace libta
           line_index = 0;
           //
           // The current basic block should be an entry here ...
-          ASSERT_MSG(cur_bb->annotation.db->Type & BB_ENTRY, "expected an ENTRY basicblock");
+          // ASSERT_MSG(cur_bb->annotation.db->Type & BB_ENTRY, "expected an ENTRY basicblock");
+          ASSERT_MSG(cur_bb->annotation.type & BB_ENTRY, "expected an ENTRY basicblock");
           sym = find_symbol(cur_bb->annotation.bb_addr);
           DOUT_FCT << "Begin function " << sym->name << std::endl;
           DOUT_FCT << "   BB @0x" << cur_bb->annotation.bb_addr << " -> " << sym->name;
-          DOUT << ((cur_bb->annotation.db->Type & BB_ENTRY) ? " ENTRY" : " ") <<  ((cur_bb->annotation.db->Type & BB_RETURN) ? " RETURN" : "")  << std::endl;
+//          DOUT << ((cur_bb->annotation.db->Type & BB_ENTRY) ? " ENTRY" : "")
+//               << ((cur_bb->annotation.db->Type & BB_RETURN) ? " RETURN" : "")  << std::endl;
+          DOUT << ((cur_bb->annotation.type & BB_ENTRY) ? " ENTRY" : "")
+               << ((cur_bb->annotation.type & BB_RETURN) ? " RETURN" : "")  << std::endl;
           callgrind_file << "fn=" << sym->name << std::endl;
-          callgrind_file << "0 " << cur_bb->cost.instructions * cur_bb->counter << " " << cur_bb->cost.cycles * cur_bb->counter << std::endl;
+          callgrind_file << "0 " << cur_bb->cost.instructions * cur_bb->counter 
+                         << " "  << cur_bb->cost.cycles * cur_bb->counter << std::endl;
 
+          // All the calls that originate in this basic block
           for( calls_it = cur_bb->calls->begin() ; calls_it != cur_bb->calls->end() ; calls_it++)
           {
             DOUT_FCT << "   + call to " << (*calls_it)->symbol.name << std::endl;
             callgrind_file << "cfn=" << (*calls_it)->symbol.name << std::endl;
             callgrind_file << "calls=" << (*calls_it)->counter << " 0" << std::endl;
-            callgrind_file << "+1 " << (*calls_it)->cost.instructions << " " << (*calls_it)->cost.cycles << std::endl;
+            callgrind_file << "+1 " << (*calls_it)->cost.instructions 
+                           << " "   << (*calls_it)->cost.cycles << std::endl;
           }
+
           cur_bb = cur_bb->next;
-          while( (cur_bb != NULL) && !(cur_bb->annotation.db->Type & BB_ENTRY))
+          //while( (cur_bb != NULL) && !(cur_bb->annotation.db->Type & BB_ENTRY))
+          while( (cur_bb != NULL) && !(cur_bb->annotation.type & BB_ENTRY))
           {
             sym = find_symbol(cur_bb->annotation.bb_addr);
             DOUT_FCT << "   BB @0x" << cur_bb->annotation.bb_addr << " -> " << sym->name;
-            DOUT << ((cur_bb->annotation.db->Type & BB_ENTRY) ? " ENTRY" : " ") <<  ((cur_bb->annotation.db->Type & BB_RETURN) ? " RETURN" : "")  << std::endl;
-            callgrind_file << "+1 " << cur_bb->cost.instructions * cur_bb->counter << " " << cur_bb->cost.cycles * cur_bb->counter << std::endl;
+            //DOUT << ((cur_bb->annotation.db->Type & BB_ENTRY) ? " ENTRY" : "")
+            //     << ((cur_bb->annotation.db->Type & BB_RETURN) ? " RETURN" : "")  << std::endl;
+            DOUT << ((cur_bb->annotation.type & BB_ENTRY) ? " ENTRY" : "")
+                 << ((cur_bb->annotation.type & BB_RETURN) ? " RETURN" : "")  << std::endl;
+            callgrind_file << "+1 " << cur_bb->cost.instructions * cur_bb->counter 
+                           << " "   << cur_bb->cost.cycles * cur_bb->counter << std::endl;
 
             for( calls_it = cur_bb->calls->begin() ; calls_it != cur_bb->calls->end() ; calls_it++)
             {
@@ -577,7 +619,8 @@ namespace libta
               callgrind_file << "cfn=" << (*calls_it)->symbol.name << std::endl;
               callgrind_file << "calls=" << (*calls_it)->counter << " 0" << std::endl;
               if( (*calls_it)->cost.instructions > 0 )
-                callgrind_file << "+1 " << (*calls_it)->cost.instructions << " " << (*calls_it)->cost.cycles << std::endl;
+                callgrind_file << "+1 " << (*calls_it)->cost.instructions 
+                               << " "   << (*calls_it)->cost.cycles << std::endl;
             }
 
             line_index++;
@@ -591,6 +634,5 @@ namespace libta
         callgrind_file.close();
       }
     }
-
   }
 }

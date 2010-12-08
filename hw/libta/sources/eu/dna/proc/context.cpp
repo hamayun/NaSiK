@@ -60,7 +60,7 @@ namespace libta
   void dna_eu::context_commute(CPU_CONTEXT_T *from, CPU_CONTEXT_T *to)
   {
     _current_thread_id = (uintptr_t)to;
-    DOUT_NAME << " communt context 0x" << std::hex << from << " to 0x" << std::hex << to << std::endl;
+    DOUT_NAME << " commute context 0x" << std::hex << from << " to 0x" << std::hex << to << std::endl;
     swapcontext(*((ucontext_t**)from), *((ucontext_t**)to));
   }
 

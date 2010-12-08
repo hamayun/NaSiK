@@ -28,11 +28,12 @@
 #include "utils.h"
 #include "debug.h"
 #include "errno.h"
+#include <iostream>
 
 namespace libta
 {
     void *     eu_base::_proccess_handle[MAX_EU];
-    eu_base *       eu_base::_eu[MAX_EU];
+    eu_base *  eu_base::_eu[MAX_EU];
     uint32_t   eu_base::_nb_eu = 0;
 
     std::map< void * , eu_base * > eu_base::_eu_map;
@@ -77,22 +78,27 @@ namespace libta
         _eu_map[(void*)key] = this;             // Current Object handle in map
         _proccess_handle[_nb_eu] = key;     // SystemC Process handle in _process_handle
         _eu[_nb_eu] = this;                         // Current Object handle in _eu
-        _nb_eu++;                                     // N° of EUs 
+        _nb_eu++;                                     // Nï¿½ of EUs 
 
-        _sw_entry = (entry_fct_t) p_linker_loader->get_start_addr();            // Where to Start Execution !!!
+        // Where to Start Execution !!!
+        _sw_entry = (entry_fct_t) p_linker_loader->get_start_addr();           
 
         DOUT_NAME << " registering to the execution_spy" << std::endl;
-        register_self(p_linker_loader->get_link_map());         // Creates Annotation Map with Buffers and Analyzer Object 
+
+        // Create Annotation Map with Buffers and Analyzer Object 
+        register_self(p_linker_loader->get_link_map());         
 
         DOUT_NAME << " BOOTING ... " << std::endl;
 
         while(1)
         {
+            // Call the OS Entry Function Here;
             _sw_entry();
             ASSERT_MSG( false, "Unexpected end of execution...");
         }
     }
 
+    // Here we get the Annotation Trace (A buffer containing pointers to Annotation DBs)
     void eu_base::compute(annotation::annotation_t *trace, uint32_t count)
     {
         uint32_t  index;
@@ -134,6 +140,7 @@ namespace libta
             eu_base::get_current_eu()->annotate(db);
         }
 
+        /* MMH: Commented because we are not inserting any calls to these functions in S/W
         void annotation_entry()
         {
             eu_base::get_current_eu()->annotate_entry();
@@ -142,7 +149,7 @@ namespace libta
         void annotation_return()
         {
             eu_base::get_current_eu()->annotate_return();
-        }
+        }*/
     }
 }
 

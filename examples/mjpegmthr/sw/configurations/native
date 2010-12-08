@@ -39,6 +39,7 @@ export TARGET_LDSCRIPT=""
 
 if [ $USE_ANNOTATIONS = "yes" ]; then
 	export ANNOTATION=-annotate=arm
+#	export ANNOTATION="-annotate=arm --print-dual-cfg --print-annotated-cfg"
 else 
 	export ANNOTATION=""
 fi

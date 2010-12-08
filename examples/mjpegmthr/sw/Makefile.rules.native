@@ -22,7 +22,7 @@ apes_objects : create_builddir $(OBJ)
 $(BUILDDIR)/%.o : %.c
 	echo '         | CC $<'
 	$(TARGET_LLVMGCC) -emit-llvm $(CFLAGS) $(STDINC) -o $(addsuffix .bc, $(basename $@)) -c $<
-	$(TARGET_LLC) $(ANNOTATION) $(addsuffix .bc, $(basename $@)) -f -o $(addsuffix .s, $(basename $@))
+	$(TARGET_LLC) $(ANNOTATION) $(addsuffix .bc, $(basename $@)) -o $(addsuffix .s, $(basename $@))
 	$(TARGET_AS) $(addsuffix .s, $(basename $@)) -o $@
 
 #	$(TARGET_LLC) $(ANNOTATION) -print-dual-cfg $(addsuffix .bc, $(basename $@)) -f -o $(addsuffix .s, $(basename $@))

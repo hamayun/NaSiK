@@ -36,6 +36,7 @@
 #include "semaphore.h"
 #include "dlfcn.h"
 #include <vector>
+#include <iostream>
 
 namespace libta
 {
@@ -66,6 +67,9 @@ namespace libta
       buffer_ptr->count = ((buffer_ptr->count) + 1) % BUFFER_SIZE;
       // Compute ONE annotation information
       compute(annotation_ptr, 1);
+
+      // In case of no_thread option, we don't care about the online analyze option.
+      // And always push annotations to anaylzer in case analyze option is set.
       if(_analyze == true)
       {
         DOUT_FCT << "push annotation" << std::endl;
@@ -82,7 +86,7 @@ namespace libta
       uint32_t             previous_buffer = 0;
       uint32_t             buffer_switched = 0;
 
-      // if no thread option is set, the annotation db are analyze one by one
+      // if no thread option is set, the annotation db are analyzed one by one
       // at each annotation call. This mode is for debug purpose.
       if(_no_thread)
       {
@@ -130,6 +134,7 @@ namespace libta
       {
         DOUT_FCT << ": new application ... " << std::endl;
         _annotation_shared = new annotation_shared_t;
+        memset(_annotation_shared, 0x0, sizeof(annotation_shared_t));
 
         _annotation_shared->current = 0;
         _annotation_shared->db_count = 0;
@@ -195,8 +200,11 @@ namespace libta
 
       buffer_ptr =  &(_annotation_shared->buffers[_annotation_shared->current]);
       annotation_ptr =  &(buffer_ptr->buffer[buffer_ptr->count]);
-      annotation_ptr->type = BB_DEFAULT;
+
+      // TODO: Unify the MBB_DEFAULT & BB_DEFAULT types together. 
+      annotation_ptr->type = db->Type;
       annotation_ptr->db = db;
+      // Get the Return Address of the Caller of the Current Function.
       annotation_ptr->bb_addr = (uintptr_t)__builtin_return_address (1);
 
       if(_no_thread)
@@ -208,7 +216,7 @@ namespace libta
       _annotation_shared->db_count++;
       buffer_ptr->count++;
       ASSERT(buffer_ptr->count <= BUFFER_SIZE);
-      // The computation trshold is used to break
+      // The computation treshold is used to break
       // dead lock in the annotated software.
       if( (_annotation_shared->db_count >= COMPUTATION_THRESHOLD) || (buffer_ptr->count >= BUFFER_SIZE))
       {

@@ -36,20 +36,18 @@ namespace libta
   namespace annotation
   {
 
-#define INIT_COST (cost_t){ 0 }
-#define INIT_CALL (call_t){ { 0, NULL} , 0 , 0, INIT_COST }
-#define INIT_ANNOTATION (annotation_t){ 0, 0, 0, NULL }
-#define INIT_BB   (basicblock_t){ INIT_ANNOTATION, 0, NULL, INIT_COST, NULL }
-#define INIT_THREAD_SLOT  (thread_slot_t){ 0, INIT_BB, NULL, NULL}
-#define INIT_CALL_CONTEXT (call_context_t){ NULL, NULL, INIT_COST }
+    #define INIT_COST (cost_t){ 0, 0 }
+    #define INIT_CALL (call_t){ { 0, NULL} , NULL , 0, INIT_COST }
+    #define INIT_ANNOTATION (annotation_t){ 0, 0, 0, 0, NULL, 0 }
+    #define INIT_BB   (basicblock_t){ INIT_ANNOTATION, 0, NULL, INIT_COST, NULL }
+    #define INIT_THREAD_SLOT  (thread_slot_t){ 0, INIT_BB, NULL, NULL}
+    #define INIT_CALL_CONTEXT (call_context_t){ NULL, NULL, INIT_COST }
 
     typedef struct
     {
       uint32_t    instructions;
       uint32_t    cycles;
     } cost_t;
-
-//    typedef struct bb_t basicblock_t;
 
     typedef struct
     {
@@ -96,6 +94,7 @@ namespace libta
       ~Analyzer(void);
 
       static void* thread_fct(void *args);
+      void print_annotation(annotation_t *bb); 
       void* _thread_fct();
       void        ending();
       void push(annotation_t * bb);
@@ -118,7 +117,6 @@ namespace libta
       std::map< uintptr_t, thread_slot_t * >  _thread_slots;
       uintptr_t                               _previous_thread_id;
       thread_slot_t                           *_current_thread_slot;
-      bool                                    _push_context_required;
       link_map                                *_link_map;
       uintptr_t                               _appli_base_addr;
       bool                                    _ending;
@@ -131,7 +129,6 @@ namespace libta
       std::stringstream                       _str_tag;
       bool                                    _online_analyze;
       bool                                    _analyze;
-
     };
 
   } // end namespace annotation

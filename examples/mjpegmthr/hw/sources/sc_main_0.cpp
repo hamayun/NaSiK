@@ -5,7 +5,7 @@
 
 
 /*A simple example*/
-
+// #define CHANNELS 1
 
 #include <systemc.h>
 #include <stdio.h>

@@ -5,7 +5,7 @@ APP_DIR=$PROJ_TOPDIR/examples/mjpegmthr
 
 export LIBTA_HOME=/opt/libs/libta
 export SYSTEMC=/opt/libs/systemc-2.2.0
-export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.4
+export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
 export SECONDARY_TOOLCHAIN=/opt/toolchains/gnu-dnaos-newlibc
 export CONFIGURATION=native
 # Answer 'yes' or 'no'

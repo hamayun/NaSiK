@@ -37,6 +37,7 @@
 
 namespace libta
 {
+    // eu is essentially a thread, which executes the OS+Application code inside it.
     class eu_base:
     public device_master,
     public annotation::ExecutionSpy
@@ -68,7 +69,7 @@ namespace libta
             static std::vector< const eu_base* > * get_all_eu();
 
         protected:
-            uintptr_t _current_thread_id;
+            uintptr_t _current_thread_id;           // Its 'the pointer' to current eu object
             sc_attribute < uint32_t > *_id;                 // sc_attribute is a 'name' and 'value' pair
 
             typedef void (*entry_fct_t) ();

@@ -51,11 +51,11 @@ namespace libta
 
     typedef struct {
       uintptr_t         eu;        // EU identifier (address)
-      uintptr_t         thread;    // Thread identifier (address)
+      uintptr_t         thread;    // Thread identifier (address); infact its the corresponding eu_base object (Needs Verification !!!)
       uintptr_t         bb_addr;   // Native basic bloc address
       uintptr_t         caller_addr;   // Address of the caller
       annotation_db_t   *db;       // Pointer to the annotation data 
-      uint8_t           type;
+      uint8_t           type;       // This is the type of Annotation; Copied from Type found in AnnotationDB
     } annotation_t;
 
     typedef struct {
