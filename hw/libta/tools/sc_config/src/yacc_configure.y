@@ -4,8 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "systemc.h"
-#include <vector.h>
-#include <map.h>
+#include <vector>
+#include <map>
+
+using std::vector;
+using std::map;
 
 #ifdef DEBUG
 #define PRINTF printf

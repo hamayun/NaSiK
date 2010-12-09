@@ -24,7 +24,7 @@
 #include "debug.h"
 #include <map>
 #include <iostream>
-#include <string>
+#include <string.h>
 
 namespace libta
 {

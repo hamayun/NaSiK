@@ -24,6 +24,7 @@
 #ifndef __SYMBOL_H__
 #define __SYMBOL_H__
 
+#include <stdint.h>
 #include <string>
 #include <vector>
 #include "assertion.h"

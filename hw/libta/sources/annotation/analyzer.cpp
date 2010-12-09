@@ -36,6 +36,7 @@
 #include "dlfcn.h"
 #include <vector>
 #include <string>
+#include <string.h>
 #include <fstream>
 #include "stdio.h"
 #include "stdlib.h"

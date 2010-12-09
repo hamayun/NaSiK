@@ -6,13 +6,31 @@ else
 	echo "Compiling and Installing TA Library ... "
 	cd $PROJ_TOPDIR/hw/libta 
 	make all install -s 
-
-	echo "Compiling Software Application ... "
-	cd $APP_DIR/sw 
-	make -s 
-
-	echo "Compiling Hardware Model ... "
-	cd $APP_DIR/hw
-	make -s 
+	if [ $? != 0 ]; then
+		echo "Compiling and/or Installation of TA Library Failed"
+		echo "Exiting ... !!!"
+		cd $PROJ_TOPDIR
+	else 
+		echo "Compiling Software Application ... "
+		cd $APP_DIR/sw 
+		make -s 
+		if [ $? != 0 ]; then
+			echo "Compilation Failed for Application"
+			echo "Exiting ... !!!"
+			cd $PROJ_TOPDIR
+		else
+			echo "Compiling Hardware Model ... "
+			cd $APP_DIR/hw
+			make -s 
+			if [ $? != 0 ]; then
+				echo "Compilation Failed for Hardware Model"
+				echo "Exiting ... !!!"
+				cd $PROJ_TOPDIR
+			else 
+				echo "Simulation Compiled Successfully !!!" 
+				echo "See run.sh for How to Run Simulation. " 
+			fi
+		fi 	
+	fi
 fi
 

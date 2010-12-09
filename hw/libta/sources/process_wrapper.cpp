@@ -36,7 +36,8 @@
 #include <signal.h>
 #include <sys/select.h>
 #include <vector>
-
+#include <string.h>
+#include <stdint.h>
 #include "assertion.h"
 
 namespace libta {

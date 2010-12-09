@@ -29,7 +29,7 @@
 #define SOCLIB_PROCESS_WRAPPER_H_
 
 #include <sys/types.h>
-
+#include <string>
 #include <vector>
 
 namespace libta { 

@@ -37,6 +37,7 @@
 #include "dlfcn.h"
 #include <vector>
 #include <iostream>
+#include <string.h>
 
 namespace libta
 {
