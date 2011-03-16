@@ -486,6 +486,9 @@ endif
 ifndef LBUGPOINT
 LBUGPOINT := $(LLVMToolDir)/bugpoint$(EXEEXT)
 endif
+ifndef TMSC6XDIS
+TMSC6XDIS := $(LLVMToolDir)/tmsc6x-dis$(EXEEXT)
+endif
 
 #--------------------------------------------------------------------
 # Adjust to user's request

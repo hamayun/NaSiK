@@ -36,6 +36,8 @@ add_subdirectory(llvm-stub)
 add_subdirectory(edis)
 add_subdirectory(llvmc)
 
+add_subdirectory(tmsc6x-dis)
+
 if( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/clang/CMakeLists.txt )
   add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/clang )
 endif( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/clang/CMakeLists.txt )
