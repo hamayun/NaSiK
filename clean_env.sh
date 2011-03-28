@@ -3,14 +3,14 @@
 if [ -z $PROJ_TOPDIR ] ; then
 	echo "$PROJ_TOPDIR variable is Undefined; Please Run the Configure Script First !!!"
 else
-	echo "Cleaning TA Library ... "
+	echo "Cleaning Native Library (libta) ... "
 
-    cd $PROJ_TOPDIR/hw/libta
+    cd $PROJ_TOPDIR/hw/native
     make clean -s
  
     echo "Cleaning Software Application ... "
     cd $APP_DIR/sw
-    make clean -s
+    apes-compose -c
 
     echo "Cleaning Hardware Model ... "
     cd $APP_DIR/hw

@@ -4,7 +4,7 @@ if [ -z $PROJ_TOPDIR ] ; then
 	echo "Environment Variables are Undefined; Please Run the Configure Script First !!!"
 else
 	echo "Compiling and Installing TA Library ... "
-	cd $PROJ_TOPDIR/hw/libta 
+	cd $PROJ_TOPDIR/hw/native 
 	make all install -s 
 	if [ $? != 0 ]; then
 		echo "Compiling and/or Installation of TA Library Failed"
@@ -13,7 +13,7 @@ else
 	else 
 		echo "Compiling Software Application ... "
 		cd $APP_DIR/sw 
-		make -s 
+		apes-compose  
 		if [ $? != 0 ]; then
 			echo "Compilation Failed for Application"
 			echo "Exiting ... !!!"
@@ -28,7 +28,7 @@ else
 				cd $PROJ_TOPDIR
 			else 
 				echo "Simulation Compiled Successfully !!!" 
-				echo "See run.sh for How to Run Simulation. " 
+				echo "Use run.sh for Simulation. " 
 			fi
 		fi 	
 	fi

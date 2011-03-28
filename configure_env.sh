@@ -1,36 +1,53 @@
-echo "[Setting up Hardware Platform environment]"
+echo "[Setting-up Hardware Platform Environment (Native {libta})]"
 PROJ_TOPDIR=$PWD
 HW_PLATFORM=$PROJ_TOPDIR/hw
-APP_DIR=$PROJ_TOPDIR/examples/mjpegmthr
-
-export LIBTA_HOME=/opt/libs/libta
 export SYSTEMC=/opt/libs/systemc-2.2.0
-export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
-export SECONDARY_TOOLCHAIN=/opt/toolchains/gnu-dnaos-newlibc
-export CONFIGURATION=native
-# Answer 'yes' or 'no'
-export USE_ANNOTATIONS=yes
+export NATIVE_HOME=/opt/libs/native
+export LD_LIBRARY_PATH=$NATIVE_HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH
 
-echo "LIBTA_HOME = $LIBTA_HOME"
-echo "SYSTEMC = $SYSTEMC"
-echo "PRIMARY_TOOLCHAIN = $PRIMARY_TOOLCHAIN"
-echo "SECONDARY_TOOLCHAIN = $SECONDARY_TOOLCHAIN"
-echo "APPLICATION = $APP_DIR"
-echo "CONFIGURATION = $CONFIGURATION"
+echo "[Setting-up Software Platform Environment (APES)]"
+export APES_ROOT=/opt/Apes
+APES_EXTRA_COMPS=$PROJ_TOPDIR/sw/apes-components
+source $APES_ROOT/install.sh
+export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-export LD_LIBRARY_PATH=$LIBTA_HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH
-export PATH=$PRIMARY_TOOLCHAIN/bin:$SECONDARY_TOOLCHAIN/bin:$PATH
+APP_NAME=ParallelMjpeg
+echo "[Setting-up Software Application Environment ($APP_NAME)]"
+APP_DIR=$PROJ_TOPDIR/examples/$APP_NAME
+cd $APP_DIR/sw
+source install.sh 
+
 # for tty_term
 export PATH=$PROJ_TOPDIR:$PATH
 
-echo "[Setting up Software platform environment]"
-SW_PLATFORM=$PWD/sw
-cd $SW_PLATFORM/apes-elements
-source install.sh
-
-# Now Install the Application Configurations
-cd $APP_DIR/sw
-source install.sh $CONFIGURATION
-
 cd $PROJ_TOPDIR
+
+echo "======================= GENERAL ENVIRONMENT SETTINGS ========================="
+echo "SYSTEMC               = $SYSTEMC"
+echo "NATIVE_HOME           = $NATIVE_HOME"
+echo "APPLICATION           = $APP_DIR"
+
+echo "======================= APES TOOLCHAIN SETTINGS =============================="
+echo "APES_ROOT             = $APES_ROOT"
+echo "APES_COMPILER         = $APES_COMPILER"
+echo "APES_CC_FLAGS         = $APES_CC_FLAGS"
+echo "APES_CC_OPTIMIZATIONS = $APES_CC_OPTIMIZATIONS"
+echo "APES_LINKER           = $APES_LINKER"
+echo "APES_LINKER_FLAGS     = $APES_LINKER_FLAGS"
+echo "APES EXTRA COMPONENTS = $APES_EXTRA_COMPS"
+echo "APES_PATH             = $APES_PATH"
+echo "=============================================================================="
+  
+#export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
+#export SECONDARY_TOOLCHAIN=/opt/toolchains/gnu-dnaos-newlibc
+#export CONFIGURATION=native
+# Answer 'yes' or 'no'
+#export USE_ANNOTATIONS=yes
+
+#export PATH=$PRIMARY_TOOLCHAIN/bin:$SECONDARY_TOOLCHAIN/bin:$PATH
+#echo "PRIMARY_TOOLCHAIN = $PRIMARY_TOOLCHAIN"
+#echo "SECONDARY_TOOLCHAIN = $SECONDARY_TOOLCHAIN"
+#echo "CONFIGURATION = $CONFIGURATION"
+
+
 

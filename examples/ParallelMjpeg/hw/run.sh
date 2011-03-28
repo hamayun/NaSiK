@@ -1,6 +1,9 @@
-#!/bin/bash
+# We execute without tracing and for one processor
+./arch.x 1 trace_off configurations/config_dna configurations/config_hw 
 
-./arch.x configurations/config_hw configurations/config_dna
+# Here are a few debug options for native (libta) library. 
+# Usage: --native-debug="<option-1, option-2, ...>"
+# Options: analyzer eu_base dna_eu spinlock dna_hal dna_eu_context generic_noc ... 
 
 # With Online Analysis  
 #./arch.x configurations/config_native --native-option="analyze online"  
@@ -16,3 +19,4 @@
 
 # GTKWave 
 # gtkwave -a waveforms.sav waveforms.vcd 
+
