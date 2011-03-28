@@ -23,13 +23,13 @@ OBJS=$(addprefix $(BUILD_DIR)/, $(TMPSRCS:.cpp=.o))
 DEPS=$(OBJS:.o=.d)
 
 INCDIR = -I$(SYSTEMC)/include
-INCDIR += -I$(LIBTA_HOME)/include
-INCDIR += -I$(LIBTA_HOME)/include/eu
-INCDIR += -I$(LIBTA_HOME)/include/annotation
-INCDIR += -I$(LIBTA_HOME)/include/linker
+INCDIR += -I$(NATIVE_HOME)/include
+INCDIR += -I$(NATIVE_HOME)/include/eu
+INCDIR += -I$(NATIVE_HOME)/include/annotation
+INCDIR += -I$(NATIVE_HOME)/include/linker
 
 LD = g++
-LIBDIR = -L$(SYSTEMC)/lib-linux -L$(LIBTA_HOME)/lib -Wl,--export-dynamic 
+LIBDIR = -L$(SYSTEMC)/lib-linux -L$(NATIVE_HOME)/lib -Wl,--export-dynamic 
 LIBS = -ldl -lnative -lsystemc -lsc_config
 LDFLAGS = 
 
@@ -46,8 +46,8 @@ ifndef SYSTEMC
 	@$(error SYSTEMC environment variable not set !!!)
 endif
 
-ifndef LIBTA_HOME 
-	@$(error LIBTA_HOME environment variable not set !!!)
+ifndef NATIVE_HOME 
+	@$(error NATIVE_HOME environment variable not set !!!)
 endif
 
 	@if [ ! -d $(SYSTEMC) ] ; then echo $(SYSTEMC) not found !!!; exit 1; fi;

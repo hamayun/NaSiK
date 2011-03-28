@@ -20,7 +20,7 @@ Pre-compiled in /opt/libs/native
 
 Rebuild in hw/native
 make all install -s
-# PREFIX variable in the makefiles have been replace with LIBTA_HOME
+# PREFIX variable in the makefiles have been replace with NATIVE_HOME
 
 -- ParallelMjpeg Application
 ------------------------------------------------------------------------------

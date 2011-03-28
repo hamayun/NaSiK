@@ -61,13 +61,13 @@ clean:
 
 install: 
 	@echo '[INSTALL...]'
-ifndef LIBTA_HOME 
-	$(error LIBTA_HOME environment variable not set !!!);
+ifndef NATIVE_HOME 
+	$(error NATIVE_HOME environment variable not set !!!);
 endif
-	install -d $(LIBTA_HOME)
-	install -d $(LIBTA_HOME)/lib
-	install -d $(LIBTA_HOME)/include
-	install $(NAME) $(LIBTA_HOME)/lib
-	install -m 644 include/sc_config.h $(LIBTA_HOME)/include
+	install -d $(NATIVE_HOME)
+	install -d $(NATIVE_HOME)/lib
+	install -d $(NATIVE_HOME)/include
+	install $(NAME) $(NATIVE_HOME)/lib
+	install -m 644 include/sc_config.h $(NATIVE_HOME)/include
 	
 

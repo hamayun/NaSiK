@@ -82,26 +82,26 @@ $(BUILD_DIR)/%.o:$(SRC_BASE_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(INCDIR) -o $@ -c $<
 
 define INSTALL
-	if [ -d $(1) ] ; then install -m 644 $(1)/*.h $(LIBTA_HOME)/$(1); fi;
+	if [ -d $(1) ] ; then install -m 644 $(1)/*.h $(NATIVE_HOME)/$(1); fi;
 
 endef
 
 install: 
 	@echo '[INSTALL...]'
-ifndef LIBTA_HOME 
-	$(error LIBTA_HOME environment variable not set !!!);
+ifndef NATIVE_HOME 
+	$(error NATIVE_HOME environment variable not set !!!);
 endif
-	install -d $(LIBTA_HOME)
-	install -d $(LIBTA_HOME)/lib
-	install -d $(LIBTA_HOME)/include
-	install -d $(LIBTA_HOME)/include/interfaces
-	install -d $(LIBTA_HOME)/include/annotation
-	install $(NAME) $(LIBTA_HOME)/lib
-	install -m 644 ./include/*.h $(LIBTA_HOME)/include
-	install -m 644 ./include/interfaces/*.h $(LIBTA_HOME)/include/interfaces
-	install -m 644 ./include/annotation/*.h $(LIBTA_HOME)/include/annotation
-	cp -rf ./include/eu $(LIBTA_HOME)/include/.
-	cp -rf ./include/linker $(LIBTA_HOME)/include/.
+	install -d $(NATIVE_HOME)
+	install -d $(NATIVE_HOME)/lib
+	install -d $(NATIVE_HOME)/include
+	install -d $(NATIVE_HOME)/include/interfaces
+	install -d $(NATIVE_HOME)/include/annotation
+	install $(NAME) $(NATIVE_HOME)/lib
+	install -m 644 ./include/*.h $(NATIVE_HOME)/include
+	install -m 644 ./include/interfaces/*.h $(NATIVE_HOME)/include/interfaces
+	install -m 644 ./include/annotation/*.h $(NATIVE_HOME)/include/annotation
+	cp -rf ./include/eu $(NATIVE_HOME)/include/.
+	cp -rf ./include/linker $(NATIVE_HOME)/include/.
 	@echo '[TOOLS.....]'
 	make -C ./tools install
 	
