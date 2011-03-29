@@ -31,6 +31,12 @@ apes-compose
 
 => MJPEG
 
+Using the 'APES_SPLIT_CC' environment variable; if set (even if null) we use 
+the LLVM compiler as Primary toolchain alogwith annotation support, if somehow 
+the compilation fails using the Primary toolchain we then use the Secondary 
+toolchain (usually APES); If 'APES_SPLIT_CC' variable is unset we use the APES 
+compilation toolchain only (and of course without annotations !!!)
+
 -- Simulation Platform
 ------------------------------------------------------------------------------
 in examples/ParallelMjpeg/hw
