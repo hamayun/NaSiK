@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2009 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
- * Bug Fixer(s) :   
+ * Bug Fixer(s) :   Mian-Muhammad, HAMAYUN mian-muhammad.hamayun@imag.fr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,7 +37,7 @@
 
 namespace native
 {
-    // eu is essentially a thread, which executes the OS+Application code inside it.
+    // EU is essentially a thread, which executes the OS+Application code inside it.
     class eu_base:
     public device_master,
     public annotation::ExecutionSpy
@@ -52,13 +52,9 @@ namespace native
 
             virtual void end_of_elaboration();
             void thread();
-			virtual void synchronize(void) = 0;
-            // annotation support
-            void compute(annotation::annotation_t *trace, uint32_t count);
 
-	protected:
-			sc_attribute < uint32_t > *_tps_synchro;
-			sc_time                    _sc_tps_synchro;
+            // Annotation Support; Calculate total number cycles then call SystemC Wait
+            void compute(annotation::annotation_t *trace, uint32_t count);
 
 	public:
             static inline eu_base * get_current_eu()
@@ -76,7 +72,7 @@ namespace native
 
 			/* current thread ID for trace */
         public:
-			uint32_t _current_thread_id;		// Its 'the pointer' to current eu object
+            uintptr_t _current_thread_id;		    // Pointer to current thread in this EU object
             char     _current_thread_name[256];
 
         protected:

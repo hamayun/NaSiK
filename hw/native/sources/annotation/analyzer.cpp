@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2008 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
- * Bug Fixer(s) :   
+ * Bug Fixer(s) :   Mian-Muhammad, HAMAYUN mian-muhammad.hamayun@imag.fr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -47,7 +47,6 @@ namespace native
 {
   namespace annotation
   {
-
     Analyzer::Analyzer(link_map *linkmap, annotation_buffer_t * buffers)
       : _buffers(buffers),
         _previous_thread_id(0),
@@ -85,7 +84,14 @@ namespace native
       }
 
       if(isDebugOptionSet(NO_THREAD_OPTION) == false)
+      {
+        DOUT_FCT << "No Thread Option is Disabled; Creating the Analyzer Thread" << std::endl;
         pthread_create(&_thread, NULL, Analyzer::thread_fct, (void*)this);
+      }
+      else
+      {
+        DOUT_FCT << "No Thread Option is Enabled; No Analyzer Thread will be Created" << std::endl;
+      }
     }
 
     Analyzer::~Analyzer()
@@ -105,14 +111,14 @@ namespace native
 
     void Analyzer::print_annotation(annotation_t *bb)
     {
-        std::cout << "\teu=0x" << std::hex << bb->eu
-                  << "\tthread=0x" << std::hex << bb->thread
-                  << "\tbb_addr=0x" << std::hex << bb->bb_addr
-                  << "\tcaller_addr=0x" << std::hex << bb->caller_addr
-                  << "\tdb->Type=0x" << std::hex << bb->db->Type
-                  << "\tdb->InstructionCount=" << std::dec << bb->db->InstructionCount
-                  << "\tdb->CycleCount=" << std::dec << bb->db->CycleCount
-                  << "\ttype=" << std::dec << bb->type << std::endl;
+        std::cout << "Annotation: eu=0x" << std::hex << bb->eu
+                  << " thread=0x" << std::hex << bb->thread
+                  << " bb_addr=0x" << std::hex << bb->bb_addr
+                  << " caller_addr=0x" << std::hex << bb->caller_addr
+                  << " db->Type=0x" << std::hex << bb->db->Type
+                  << " db->InstructionCount=" << std::dec << bb->db->InstructionCount
+                  << " db->CycleCount=" << std::dec << bb->db->CycleCount
+                  << " type=Ox" << std::hex << (int)bb->type << std::endl;
     }
 
     void * Analyzer::_thread_fct()
@@ -130,7 +136,7 @@ namespace native
 
         sem_wait(&_sem);
         // compute buffer
-        DOUT_FCT << _buffers[buffer_index].count << " annotation to push " << std::endl;
+        DOUT_FCT << std::dec << _buffers[buffer_index].count << " annotations to push " << std::endl;
         buffer = _buffers[buffer_index].buffer;
         for(uint32_t i = 0; i < _buffers[buffer_index].count; i++)
         {
@@ -155,7 +161,12 @@ namespace native
           else
           {
             // For offline anaylsis; write annotations in the buffer to the dump file.
-            write(_file_id, (const void *)buffer, sizeof(annotation_t) * _buffers[buffer_index].count);
+            if (write(_file_id, (const void *)buffer, sizeof(annotation_t) * _buffers[buffer_index].count) == -1)
+			{
+				std::cerr << "Error Writing to the Annotations File" << std::endl; 
+				::close(_file_id);
+				return(NULL); 
+			}
           }
         }
         _buffers[buffer_index].count = 0;
@@ -201,12 +212,25 @@ namespace native
       call_t           *call_ptr;
       call_context_t   *context_ptr;
 
+      /* 
+       * The push_count here corresponds to the annotate_count inside the Execution Spy's
+       * annotate function. For Example
+      static int        push_count = 0;
+      push_count++;
+      if(push_count >= 42200 && push_count <= 42500)
+      {
+        std::cout << "push_count: " << std::dec << push_count << std::endl;
+        print_annotation(bb);
+      }
+       */
+      
       // Avoid search in the map each time a new bb is pushed.
       // Most of pushes belong to the previous thread slot.
       if(bb->thread != _previous_thread_id)
       {
-        //std::cout << "Thread Switch, Current Thread=0x" << std::hex << bb->thread
-        //          << " Previous Thread=0x" << std::hex << _previous_thread_id << std::endl;
+        DOUT_FCT << "Thread Switch (A): bb->thread: 0x" << std::hex << bb->thread
+                 << " _previous_thread_id: 0x" << std::hex << _previous_thread_id
+                 << " _current_thread_slot: " << _current_thread_slot << std::endl;
 
         // if its not the previous thread, then search in the thread slots map.
         std::map< uintptr_t, thread_slot_t* >::iterator  it = _thread_slots.find(bb->thread);
@@ -215,7 +239,7 @@ namespace native
         if(it == _thread_slots.end())
         {
           // Create New thread slot ... and Initialize it. 
-          _current_thread_slot = new thread_slot_t;
+           _current_thread_slot = new thread_slot_t;
           *_current_thread_slot = INIT_THREAD_SLOT;
           _current_thread_slot->id = bb->thread;            
           _current_thread_slot->call_stack = new std::list< call_context_t* >();
@@ -232,19 +256,16 @@ namespace native
           context_ptr->call = call_ptr;
           _current_thread_slot->call_stack->push_back(context_ptr);
 
-          DOUT_FCT << "New thread ID=0x" << std::hex << bb->thread
-                   << " at 0x" << std::hex << _current_thread_slot
-                   << " bb->db->InstructionCount = " << std::dec <<  bb->db->InstructionCount
-                   << std::endl;
+          DOUT_FCT << "Thread New Slot (B): _current_thread_slot: " << std::hex << _current_thread_slot << std::endl;
         }
         else
         {
           _current_thread_slot = it->second;
+          DOUT_FCT << "Thread Found Slot (C), _current_thread_slot: " << std::hex << _current_thread_slot << std::endl;
         }
 
         // Save the previous thread id for the next comparison
         _previous_thread_id = bb->thread;
-        DOUT_FCT << "Current thread ID=0x" << std::hex << bb->thread << std::endl;
       }
 
       // Insert the bb ...
@@ -279,7 +300,8 @@ namespace native
       // Find symbol for the current bb_addr in symbol vector ... constructed earlier
       sym = find_symbol(bb_ptr->annotation.bb_addr); 
 
-      DOUT_FCT << "New BB belong to " << sym->name << "(0x" << bb_ptr->annotation.bb_addr << ")";
+      DOUT_FCT << "New BB belong to " << sym->name << "(0x" << bb_ptr->annotation.bb_addr << ")"
+               << "[_current_thread_slot: " << std::hex << _current_thread_slot << "] ";
       DOUT << ((bb_ptr->annotation.type & BB_ENTRY) ? " ENTRY" : "")
            << ((bb_ptr->annotation.type & BB_RETURN) ? " RETURN" : "")  << std::endl;
       
@@ -297,7 +319,7 @@ namespace native
 
       if(bb_ptr->annotation.type & BB_RETURN)
       {
-        pop_context();
+          pop_context();
       }
       else
       {
@@ -383,6 +405,9 @@ namespace native
       DOUT_FCT << "<<<<<<<<<<<<<<<<<<<<" << std::endl;
       print_stack();
 
+      //DOUT << "Inside pop_context (thread_switched = " << thread_switched << ") "
+      //     << "Current Thread Slot:" << std::hex << _current_thread_slot << std::endl;
+      
       context_ptr = _current_thread_slot->call_stack->back();
       _current_thread_slot->call_stack->pop_back();
       ASSERT(_current_thread_slot->call_stack->empty() == false);
@@ -578,13 +603,10 @@ namespace native
           line_index = 0;
           //
           // The current basic block should be an entry here ...
-          // ASSERT_MSG(cur_bb->annotation.db->Type & BB_ENTRY, "expected an ENTRY basicblock");
           ASSERT_MSG(cur_bb->annotation.type & BB_ENTRY, "expected an ENTRY basicblock");
           sym = find_symbol(cur_bb->annotation.bb_addr);
           DOUT_FCT << "Begin function " << sym->name << std::endl;
           DOUT_FCT << "   BB @0x" << cur_bb->annotation.bb_addr << " -> " << sym->name;
-//          DOUT << ((cur_bb->annotation.db->Type & BB_ENTRY) ? " ENTRY" : "")
-//               << ((cur_bb->annotation.db->Type & BB_RETURN) ? " RETURN" : "")  << std::endl;
           DOUT << ((cur_bb->annotation.type & BB_ENTRY) ? " ENTRY" : "")
                << ((cur_bb->annotation.type & BB_RETURN) ? " RETURN" : "")  << std::endl;
           callgrind_file << "fn=" << sym->name << std::endl;
@@ -602,13 +624,10 @@ namespace native
           }
 
           cur_bb = cur_bb->next;
-          //while( (cur_bb != NULL) && !(cur_bb->annotation.db->Type & BB_ENTRY))
           while( (cur_bb != NULL) && !(cur_bb->annotation.type & BB_ENTRY))
           {
             sym = find_symbol(cur_bb->annotation.bb_addr);
             DOUT_FCT << "   BB @0x" << cur_bb->annotation.bb_addr << " -> " << sym->name;
-            //DOUT << ((cur_bb->annotation.db->Type & BB_ENTRY) ? " ENTRY" : "")
-            //     << ((cur_bb->annotation.db->Type & BB_RETURN) ? " RETURN" : "")  << std::endl;
             DOUT << ((cur_bb->annotation.type & BB_ENTRY) ? " ENTRY" : "")
                  << ((cur_bb->annotation.type & BB_RETURN) ? " RETURN" : "")  << std::endl;
             callgrind_file << "+1 " << cur_bb->cost.instructions * cur_bb->counter 

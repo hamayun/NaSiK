@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2008 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
- * Bug Fixer(s) :   
+ * Bug Fixer(s) :   Mian-Muhammad, HAMAYUN mian-muhammad.hamayun@imag.fr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -51,8 +51,8 @@ namespace native
 
     typedef struct {
       uintptr_t         eu;        // EU identifier (address)
-      uintptr_t         thread;    // Thread identifier (address); infact its the corresponding eu_base object (Needs Verification !!!)
-      uintptr_t         bb_addr;   // Native basic bloc address
+      uintptr_t         thread;    // Thread identifier (address); Its the Current Thread inside the EU object. (Quite Sure!)
+      uintptr_t         bb_addr;   // Native basic block address
       uintptr_t         caller_addr;   // Address of the caller
       annotation_db_t   *db;       // Pointer to the annotation data 
       uint8_t           type;       // This is the type of Annotation; Copied from Type found in AnnotationDB

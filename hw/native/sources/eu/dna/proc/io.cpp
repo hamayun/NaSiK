@@ -62,10 +62,10 @@ namespace native
 
   void dna_eu::write(double *addr, double value)
   {
-    uint32_t * addr_32;
-    uint32_t val_32;
+    uint32_t * addr_32 = NULL;
+    uint32_t val_32 = 0;
 
-	uint32_t * val_addr = (uint32_t *)(&value);
+	//uint32_t * val_addr = (uint32_t *)(&value);
 
     //FIXME: big endian little endian??
     //addr_32 = (uint32_t *)addr;
@@ -80,8 +80,8 @@ namespace native
 
   void dna_eu::write(float *addr, float value)
   {
-    uint32_t * addr_32;
-    uint32_t val_32;
+    uint32_t * addr_32 = NULL;
+    uint32_t val_32 = 0;
 
     //addr_32 = (uint32_t *)addr;
     //val_32 = (uint32_t)value;
@@ -112,7 +112,7 @@ namespace native
 
   uint64_t dna_eu::read(uint64_t *addr)
   {
-    uint64_t result;
+    uint64_t result = 0;
     //FIXME: big endian little endian??
 	printf("ERROR: Not implemented!\n");
     return(result);
@@ -120,8 +120,7 @@ namespace native
 
   double dna_eu::read(double *addr)
   {
-    double result;
-
+    double result = 0;
     //FIXME: big endian little endian??
 	printf("ERROR: Not implemented!\n");
     return(result);

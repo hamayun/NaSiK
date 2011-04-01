@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2008 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
- * Bug Fixer(s) :   
+ * Bug Fixer(s) :   Mian-Muhammad, HAMAYUN mian-muhammad.hamayun@imag.fr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -69,7 +69,7 @@ namespace native
       buffer_ptr = &(_annotation_shared->buffers[0]);
       annotation_ptr = &(buffer_ptr->buffer[buffer_ptr->count]);
       buffer_ptr->count = ((buffer_ptr->count) + 1) % BUFFER_SIZE;
-      // Compute ONE annotation information
+      // Compute One annotation information
       compute(annotation_ptr, 1);
 
       // In case of no_thread option, we don't care about the online analyze option.
@@ -163,14 +163,12 @@ namespace native
 
     void ExecutionSpy::close()
     {
-//      if(_no_thread == true) return;
       std::map< std::string , annotation_shared_t* >::iterator  mapit;
 
       for( mapit = _annotation_shared_map.begin() ; mapit != _annotation_shared_map.end() ; mapit++)
       {
         mapit->second->analyzer->ending();
       }
-
     }
 
     void ExecutionSpy::annotate_entry()
@@ -211,6 +209,23 @@ namespace native
       // Get the Return Address of the Caller of the Current Function.
       annotation_ptr->bb_addr = (uintptr_t)__builtin_return_address (1);
 
+      /* We can use a Static Counter Here that will correspond with the Annotation Push
+       * count inside the Analyzer Thread for debugging the Thread Contexts Switches. 
+       * An Examples is given below.
+      {
+        static int        annotate_count = 0;       
+        annotate_count++;
+        if(annotate_count >= 42200 && annotate_count <= 42500)
+        {
+            std::cout << "annotate_count: " << std::dec << annotate_count << std::endl;
+            if (_annotation_shared->analyzer)
+                _annotation_shared->analyzer->print_annotation(annotation_ptr);
+            else
+                std::cout << "NO Analyzer Assigned !!!" << std::endl;
+        }
+      }
+       */
+
       if(_no_thread)
       {
         synchronize_no_thread();
@@ -220,8 +235,8 @@ namespace native
       _annotation_shared->db_count++;
       buffer_ptr->count++;
       ASSERT(buffer_ptr->count <= BUFFER_SIZE);
-      // The computation treshold is used to break
-      // dead lock in the annotated software.
+
+      // The computation treshold is used to break dead lock in the annotated software.
       if( (_annotation_shared->db_count >= COMPUTATION_THRESHOLD) || (buffer_ptr->count >= BUFFER_SIZE))
       {
         synchronize();
@@ -244,8 +259,7 @@ namespace native
       _annotation_shared->db_count++;
       buffer_ptr->count++;
       ASSERT(buffer_ptr->count <= BUFFER_SIZE);
-      // The computation trshold is used to break
-      // dead lock in the annotated software.
+      // The computation trshold is used to break dead lock in the annotated software.
       if( (_annotation_shared->db_count >= COMPUTATION_THRESHOLD) || (buffer_ptr->count >= BUFFER_SIZE))
       {
         synchronize();

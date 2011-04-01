@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2009 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
- * Bug Fixer(s) :   
+ * Bug Fixer(s) :   Mian-Muhammad, HAMAYUN mian-muhammad.hamayun@imag.fr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,9 +38,10 @@ namespace native
     _it_flag(false)
   {
     DOUT_CTOR << this->name() << std::endl;
-    _current_thread_id = 0xFFFFFFFF;
+    // Means that we haven't created a thread in the current EU.
+    // And we are currently in the main EU Process context (which itself is a SystemC Thread :).
+    _current_thread_id = 0xFFFFFFFF;        
     std::sprintf(_current_thread_name,"noname");
-
     exp_it(*this);
   }
 
@@ -54,22 +55,24 @@ namespace native
     eu_base::end_of_elaboration();
   }
 
-  // Check whether this functions is Really Executed OR the one found in Execution Spy is Executed
+  // This function should call the synchronize function in the ExecutionSpy and
+  // then do some stuff related to the interrupt handling if required.
+  // The wait on _sc_tps_synchro has been removed from here, which caused context_switch
+  // problems in the analyzer thread.
+  /*
   void dna_eu::synchronize()
   {
     dna_eu *ptr = this;
-//    hal_call_count[_id->value]++;
-//    _hal_call_profile++;
-    wait(_sc_tps_synchro);
-    if(ptr != this) cerr << "----\n";
+    hal_call_count[_id->value]++;
+    _hal_call_profile++;
 
     if(_it_status && _it_enable && _it_flag)
     {
       _it_enable = 0;
       it_handler();
-      _it_flag = false;
+     _it_flag = false;
     }
-  }
+  }*/
 
   void dna_eu::it_set(uint32_t id)
   {

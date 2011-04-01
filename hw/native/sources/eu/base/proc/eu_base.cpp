@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2009 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
- * Bug Fixer(s) :   
+ * Bug Fixer(s) :   Mian-Muhammad, HAMAYUN mian-muhammad.hamayun@imag.fr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -45,7 +45,6 @@ namespace native
     _id(NULL)
     {
         DOUT_CTOR << this->name() << std::endl;
-
         SC_THREAD(thread);
     }
 
@@ -60,11 +59,6 @@ namespace native
 
         GET_ATTRIBUTE("ID",_id,uint32_t,false);
         DOUT << name() << ": ID = " << _id->value << std::endl;
-
-		GET_ATTRIBUTE("TPS_SYNCHRO",_tps_synchro,uint32_t,false);
-		DOUT << name() << ": TPS_SYNCHRO = " << _tps_synchro->value << std::endl;
-
-		_sc_tps_synchro = sc_time(_tps_synchro->value, SC_NS);
     }
 
     void eu_base::thread()
@@ -106,11 +100,12 @@ namespace native
         uint32_t  index;
         uint32_t  instructions = 0;
         uint32_t  cycles = 0;
+
         DOUT_NAME << __func__ << " count " << count << std::endl;
         for( index = 0 ; index < count; index++ )
         {
             trace[index].eu = (uintptr_t)this;
-            trace[index].thread = _current_thread_id;
+            trace[index].thread = _current_thread_id; // Store the current thread id in annotation object
             if(trace[index].type == annotation::BB_DEFAULT)
             {
                 cycles += trace[index].db->CycleCount;

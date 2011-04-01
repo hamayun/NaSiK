@@ -78,7 +78,7 @@ namespace llvm
 
 using namespace llvm;
 
-//#define PRINT_ANNOTATION_DETAILS
+#define PRINT_ANNOTATION_DETAILS
 #ifdef PRINT_ANNOTATION_DETAILS
     #define ANNOUT if(1) std::cout
 #else

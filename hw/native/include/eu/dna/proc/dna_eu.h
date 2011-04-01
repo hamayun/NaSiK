@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2009 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
- * Bug Fixer(s) :   
+ * Bug Fixer(s) :   Mian-Muhammad, HAMAYUN mian-muhammad.hamayun@imag.fr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -49,7 +49,6 @@ namespace native
             ~dna_eu();
 
             void end_of_elaboration();
-			void synchronize();
 
             /* eu context */
             void context_init(CPU_CONTEXT_T *ctx, void *sp, int32_t ssize, void *entry, void *arg);

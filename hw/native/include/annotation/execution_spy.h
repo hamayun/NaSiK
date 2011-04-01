@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2008 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
- * Bug Fixer(s) :   
+ * Bug Fixer(s) :   Mian-Muhammad, HAMAYUN mian-muhammad.hamayun@imag.fr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -83,7 +83,6 @@ namespace native
       void synchronize_no_thread(void);
 
     };
-
   } // end namespace annotation
 } // end namespace native
 
