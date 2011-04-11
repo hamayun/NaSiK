@@ -79,5 +79,5 @@ uint32_t EXTFIFO_CHANNEL_NDEV __attribute__ ((section(".data")));
 uint32_t EXTFIFO_CHANNELS_PTR __attribute__ ((section(".data")));
 
 uint32_t SOCLIB_BLOCK_DEVICES_NDEV __attribute__ ((section(".data")));
-int32_t SOCLIB_BLOCK_DEVICES[32] __attribute__ ((section(".data")));
+uint32_t SOCLIB_BLOCK_DEVICES[3*3] __attribute__ ((section(".data")));
 
