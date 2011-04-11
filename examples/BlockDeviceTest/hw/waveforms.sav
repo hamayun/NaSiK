@@ -1,0 +1,86 @@
+@200
+-eu_channel_0:
+@20
++address SystemC.\eu_channel_0.address[31:0]
+@20
++data SystemC.\eu_channel_0.data[31:0]
+@2024
+^1 filter_op
++op SystemC.\eu_channel_0.op[7:0]
+@2024
+^1 filter_width
++width SystemC.\eu_channel_0.width[7:0]
+@200
+-tty_pool_channel:
+@20
++address SystemC.\tty_pool_channel.address[31:0]
+@20
++data SystemC.\tty_pool_channel.data[31:0]
+@2024
+^1 filter_op
++op SystemC.\tty_pool_channel.op[7:0]
+@2024
+^1 filter_width
++width SystemC.\tty_pool_channel.width[7:0]
+@200
+-ram0_channel:
+@20
++address SystemC.\ram0_channel.address[31:0]
+@20
++data SystemC.\ram0_channel.data[31:0]
+@2024
+^1 filter_op
++op SystemC.\ram0_channel.op[7:0]
+@2024
+^1 filter_width
++width SystemC.\ram0_channel.width[7:0]
+@200
+-fb_channel:
+@20
++address SystemC.\fb_channel.address[31:0]
+@20
++data SystemC.\fb_channel.data[31:0]
+@2024
+^1 filter_op
++op SystemC.\fb_channel.op[7:0]
+@2024
+^1 filter_width
++width SystemC.\fb_channel.width[7:0]
+@200
+-fdaccess_channel_slv:
+@20
++address SystemC.\fdaccess_channel_slv.address[31:0]
+@20
++data SystemC.\fdaccess_channel_slv.data[31:0]
+@2024
+^1 filter_op
++op SystemC.\fdaccess_channel_slv.op[7:0]
+@2024
+^1 filter_width
++width SystemC.\fdaccess_channel_slv.width[7:0]
+@200
+-fdaccess_channel_mst:
+@20
++address SystemC.\fdaccess_channel_mst.address[31:0]
+@20
++data SystemC.\fdaccess_channel_mst.data[31:0]
+@2024
+^1 filter_op
++op SystemC.\fdaccess_channel_mst.op[7:0]
+@2024
+^1 filter_width
++width SystemC.\fdaccess_channel_mst.width[7:0]
+@200
+-eu_inst_0:
+@20
++id SystemC.\eu_inst_0.id[31:0]
+@820
+#+thread (0)SystemC.\eu_inst_0.name(0)[7:0] (1)SystemC.\eu_inst_0.name(0)[7:0] (2)SystemC.\eu_inst_0.name(0)[7:0] (3)SystemC.\eu_inst_0.name(0)[7:0] (4)SystemC.\eu_inst_0.name(0)[7:0] (5)SystemC.\eu_inst_0.name(0)[7:0] (6)SystemC.\eu_inst_0.name(0)[7:0] (7)SystemC.\eu_inst_0.name(0)[7:0] (0)SystemC.\eu_inst_0.name(1)[7:0] (1)SystemC.\eu_inst_0.name(1)[7:0] (2)SystemC.\eu_inst_0.name(1)[7:0] (3)SystemC.\eu_inst_0.name(1)[7:0] (4)SystemC.\eu_inst_0.name(1)[7:0] (5)SystemC.\eu_inst_0.name(1)[7:0] (6)SystemC.\eu_inst_0.name(1)[7:0] (7)SystemC.\eu_inst_0.name(1)[7:0] (0)SystemC.\eu_inst_0.name(2)[7:0] (1)SystemC.\eu_inst_0.name(2)[7:0] (2)SystemC.\eu_inst_0.name(2)[7:0] (3)SystemC.\eu_inst_0.name(2)[7:0] (4)SystemC.\eu_inst_0.name(2)[7:0] (5)SystemC.\eu_inst_0.name(2)[7:0] (6)SystemC.\eu_inst_0.name(2)[7:0] (7)SystemC.\eu_inst_0.name(2)[7:0] (0)SystemC.\eu_inst_0.name(3)[7:0] (1)SystemC.\eu_inst_0.name(3)[7:0] (2)SystemC.\eu_inst_0.name(3)[7:0] (3)SystemC.\eu_inst_0.name(3)[7:0] (4)SystemC.\eu_inst_0.name(3)[7:0] (5)SystemC.\eu_inst_0.name(3)[7:0] (6)SystemC.\eu_inst_0.name(3)[7:0] (7)SystemC.\eu_inst_0.name(3)[7:0] (0)SystemC.\eu_inst_0.name(4)[7:0] (1)SystemC.\eu_inst_0.name(4)[7:0] (2)SystemC.\eu_inst_0.name(4)[7:0] (3)SystemC.\eu_inst_0.name(4)[7:0] (4)SystemC.\eu_inst_0.name(4)[7:0] (5)SystemC.\eu_inst_0.name(4)[7:0] (6)SystemC.\eu_inst_0.name(4)[7:0] (7)SystemC.\eu_inst_0.name(4)[7:0] (0)SystemC.\eu_inst_0.name(5)[7:0] (1)SystemC.\eu_inst_0.name(5)[7:0] (2)SystemC.\eu_inst_0.name(5)[7:0] (3)SystemC.\eu_inst_0.name(5)[7:0] (4)SystemC.\eu_inst_0.name(5)[7:0] (5)SystemC.\eu_inst_0.name(5)[7:0] (6)SystemC.\eu_inst_0.name(5)[7:0] (7)SystemC.\eu_inst_0.name(5)[7:0] (0)SystemC.\eu_inst_0.name(6)[7:0] (1)SystemC.\eu_inst_0.name(6)[7:0] (2)SystemC.\eu_inst_0.name(6)[7:0] (3)SystemC.\eu_inst_0.name(6)[7:0] (4)SystemC.\eu_inst_0.name(6)[7:0] (5)SystemC.\eu_inst_0.name(6)[7:0] (6)SystemC.\eu_inst_0.name(6)[7:0] (7)SystemC.\eu_inst_0.name(6)[7:0] (0)SystemC.\eu_inst_0.name(7)[7:0] (1)SystemC.\eu_inst_0.name(7)[7:0] (2)SystemC.\eu_inst_0.name(7)[7:0] (3)SystemC.\eu_inst_0.name(7)[7:0] (4)SystemC.\eu_inst_0.name(7)[7:0] (5)SystemC.\eu_inst_0.name(7)[7:0] (6)SystemC.\eu_inst_0.name(7)[7:0] (7)SystemC.\eu_inst_0.name(7)[7:0] (0)SystemC.\eu_inst_0.name(8)[7:0] (1)SystemC.\eu_inst_0.name(8)[7:0] (2)SystemC.\eu_inst_0.name(8)[7:0] (3)SystemC.\eu_inst_0.name(8)[7:0] (4)SystemC.\eu_inst_0.name(8)[7:0] (5)SystemC.\eu_inst_0.name(8)[7:0] (6)SystemC.\eu_inst_0.name(8)[7:0] (7)SystemC.\eu_inst_0.name(8)[7:0] (0)SystemC.\eu_inst_0.name(9)[7:0] (1)SystemC.\eu_inst_0.name(9)[7:0] (2)SystemC.\eu_inst_0.name(9)[7:0] (3)SystemC.\eu_inst_0.name(9)[7:0] (4)SystemC.\eu_inst_0.name(9)[7:0] (5)SystemC.\eu_inst_0.name(9)[7:0] (6)SystemC.\eu_inst_0.name(9)[7:0] (7)SystemC.\eu_inst_0.name(9)[7:0] (0)SystemC.\eu_inst_0.name(10)[7:0] (1)SystemC.\eu_inst_0.name(10)[7:0] (2)SystemC.\eu_inst_0.name(10)[7:0] (3)SystemC.\eu_inst_0.name(10)[7:0] (4)SystemC.\eu_inst_0.name(10)[7:0] (5)SystemC.\eu_inst_0.name(10)[7:0] (6)SystemC.\eu_inst_0.name(10)[7:0] (7)SystemC.\eu_inst_0.name(10)[7:0] (0)SystemC.\eu_inst_0.name(11)[7:0] (1)SystemC.\eu_inst_0.name(11)[7:0] (2)SystemC.\eu_inst_0.name(11)[7:0] (3)SystemC.\eu_inst_0.name(11)[7:0] (4)SystemC.\eu_inst_0.name(11)[7:0] (5)SystemC.\eu_inst_0.name(11)[7:0] (6)SystemC.\eu_inst_0.name(11)[7:0] (7)SystemC.\eu_inst_0.name(11)[7:0] (0)SystemC.\eu_inst_0.name(12)[7:0] (1)SystemC.\eu_inst_0.name(12)[7:0] (2)SystemC.\eu_inst_0.name(12)[7:0] (3)SystemC.\eu_inst_0.name(12)[7:0] (4)SystemC.\eu_inst_0.name(12)[7:0] (5)SystemC.\eu_inst_0.name(12)[7:0] (6)SystemC.\eu_inst_0.name(12)[7:0] (7)SystemC.\eu_inst_0.name(12)[7:0] (0)SystemC.\eu_inst_0.name(13)[7:0] (1)SystemC.\eu_inst_0.name(13)[7:0] (2)SystemC.\eu_inst_0.name(13)[7:0] (3)SystemC.\eu_inst_0.name(13)[7:0] (4)SystemC.\eu_inst_0.name(13)[7:0] (5)SystemC.\eu_inst_0.name(13)[7:0] (6)SystemC.\eu_inst_0.name(13)[7:0] (7)SystemC.\eu_inst_0.name(13)[7:0] (0)SystemC.\eu_inst_0.name(14)[7:0] (1)SystemC.\eu_inst_0.name(14)[7:0] (2)SystemC.\eu_inst_0.name(14)[7:0] (3)SystemC.\eu_inst_0.name(14)[7:0] (4)SystemC.\eu_inst_0.name(14)[7:0] (5)SystemC.\eu_inst_0.name(14)[7:0] (6)SystemC.\eu_inst_0.name(14)[7:0] (7)SystemC.\eu_inst_0.name(14)[7:0] (0)SystemC.\eu_inst_0.name(15)[7:0] (1)SystemC.\eu_inst_0.name(15)[7:0] (2)SystemC.\eu_inst_0.name(15)[7:0] (3)SystemC.\eu_inst_0.name(15)[7:0] (4)SystemC.\eu_inst_0.name(15)[7:0] (5)SystemC.\eu_inst_0.name(15)[7:0] (6)SystemC.\eu_inst_0.name(15)[7:0] (7)SystemC.\eu_inst_0.name(15)[7:0] (0)SystemC.\eu_inst_0.name(16)[7:0] (1)SystemC.\eu_inst_0.name(16)[7:0] (2)SystemC.\eu_inst_0.name(16)[7:0] (3)SystemC.\eu_inst_0.name(16)[7:0] (4)SystemC.\eu_inst_0.name(16)[7:0] (5)SystemC.\eu_inst_0.name(16)[7:0] (6)SystemC.\eu_inst_0.name(16)[7:0] (7)SystemC.\eu_inst_0.name(16)[7:0] (0)SystemC.\eu_inst_0.name(17)[7:0] (1)SystemC.\eu_inst_0.name(17)[7:0] (2)SystemC.\eu_inst_0.name(17)[7:0] (3)SystemC.\eu_inst_0.name(17)[7:0] (4)SystemC.\eu_inst_0.name(17)[7:0] (5)SystemC.\eu_inst_0.name(17)[7:0] (6)SystemC.\eu_inst_0.name(17)[7:0] (7)SystemC.\eu_inst_0.name(17)[7:0] (0)SystemC.\eu_inst_0.name(18)[7:0] (1)SystemC.\eu_inst_0.name(18)[7:0] (2)SystemC.\eu_inst_0.name(18)[7:0] (3)SystemC.\eu_inst_0.name(18)[7:0] (4)SystemC.\eu_inst_0.name(18)[7:0] (5)SystemC.\eu_inst_0.name(18)[7:0] (6)SystemC.\eu_inst_0.name(18)[7:0] (7)SystemC.\eu_inst_0.name(18)[7:0] (0)SystemC.\eu_inst_0.name(19)[7:0] (1)SystemC.\eu_inst_0.name(19)[7:0] (2)SystemC.\eu_inst_0.name(19)[7:0] (3)SystemC.\eu_inst_0.name(19)[7:0] (4)SystemC.\eu_inst_0.name(19)[7:0] (5)SystemC.\eu_inst_0.name(19)[7:0] (6)SystemC.\eu_inst_0.name(19)[7:0] (7)SystemC.\eu_inst_0.name(19)[7:0] (0)SystemC.\eu_inst_0.name(20)[7:0] (1)SystemC.\eu_inst_0.name(20)[7:0] (2)SystemC.\eu_inst_0.name(20)[7:0] (3)SystemC.\eu_inst_0.name(20)[7:0] (4)SystemC.\eu_inst_0.name(20)[7:0] (5)SystemC.\eu_inst_0.name(20)[7:0] (6)SystemC.\eu_inst_0.name(20)[7:0] (7)SystemC.\eu_inst_0.name(20)[7:0] (0)SystemC.\eu_inst_0.name(21)[7:0] (1)SystemC.\eu_inst_0.name(21)[7:0] (2)SystemC.\eu_inst_0.name(21)[7:0] (3)SystemC.\eu_inst_0.name(21)[7:0] (4)SystemC.\eu_inst_0.name(21)[7:0] (5)SystemC.\eu_inst_0.name(21)[7:0] (6)SystemC.\eu_inst_0.name(21)[7:0] (7)SystemC.\eu_inst_0.name(21)[7:0] (0)SystemC.\eu_inst_0.name(22)[7:0] (1)SystemC.\eu_inst_0.name(22)[7:0] (2)SystemC.\eu_inst_0.name(22)[7:0] (3)SystemC.\eu_inst_0.name(22)[7:0] (4)SystemC.\eu_inst_0.name(22)[7:0] (5)SystemC.\eu_inst_0.name(22)[7:0] (6)SystemC.\eu_inst_0.name(22)[7:0] (7)SystemC.\eu_inst_0.name(22)[7:0] (0)SystemC.\eu_inst_0.name(23)[7:0] (1)SystemC.\eu_inst_0.name(23)[7:0] (2)SystemC.\eu_inst_0.name(23)[7:0] (3)SystemC.\eu_inst_0.name(23)[7:0] (4)SystemC.\eu_inst_0.name(23)[7:0] (5)SystemC.\eu_inst_0.name(23)[7:0] (6)SystemC.\eu_inst_0.name(23)[7:0] (7)SystemC.\eu_inst_0.name(23)[7:0] (0)SystemC.\eu_inst_0.name(24)[7:0] (1)SystemC.\eu_inst_0.name(24)[7:0] (2)SystemC.\eu_inst_0.name(24)[7:0] (3)SystemC.\eu_inst_0.name(24)[7:0] (4)SystemC.\eu_inst_0.name(24)[7:0] (5)SystemC.\eu_inst_0.name(24)[7:0] (6)SystemC.\eu_inst_0.name(24)[7:0] (7)SystemC.\eu_inst_0.name(24)[7:0] (0)SystemC.\eu_inst_0.name(25)[7:0] (1)SystemC.\eu_inst_0.name(25)[7:0] (2)SystemC.\eu_inst_0.name(25)[7:0] (3)SystemC.\eu_inst_0.name(25)[7:0] (4)SystemC.\eu_inst_0.name(25)[7:0] (5)SystemC.\eu_inst_0.name(25)[7:0] (6)SystemC.\eu_inst_0.name(25)[7:0] (7)SystemC.\eu_inst_0.name(25)[7:0] (0)SystemC.\eu_inst_0.name(26)[7:0] (1)SystemC.\eu_inst_0.name(26)[7:0] (2)SystemC.\eu_inst_0.name(26)[7:0] (3)SystemC.\eu_inst_0.name(26)[7:0] (4)SystemC.\eu_inst_0.name(26)[7:0] (5)SystemC.\eu_inst_0.name(26)[7:0] (6)SystemC.\eu_inst_0.name(26)[7:0] (7)SystemC.\eu_inst_0.name(26)[7:0] (0)SystemC.\eu_inst_0.name(27)[7:0] (1)SystemC.\eu_inst_0.name(27)[7:0] (2)SystemC.\eu_inst_0.name(27)[7:0] (3)SystemC.\eu_inst_0.name(27)[7:0] (4)SystemC.\eu_inst_0.name(27)[7:0] (5)SystemC.\eu_inst_0.name(27)[7:0] (6)SystemC.\eu_inst_0.name(27)[7:0] (7)SystemC.\eu_inst_0.name(27)[7:0] (0)SystemC.\eu_inst_0.name(28)[7:0] (1)SystemC.\eu_inst_0.name(28)[7:0] (2)SystemC.\eu_inst_0.name(28)[7:0] (3)SystemC.\eu_inst_0.name(28)[7:0] (4)SystemC.\eu_inst_0.name(28)[7:0] (5)SystemC.\eu_inst_0.name(28)[7:0] (6)SystemC.\eu_inst_0.name(28)[7:0] (7)SystemC.\eu_inst_0.name(28)[7:0] (0)SystemC.\eu_inst_0.name(29)[7:0] (1)SystemC.\eu_inst_0.name(29)[7:0] (2)SystemC.\eu_inst_0.name(29)[7:0] (3)SystemC.\eu_inst_0.name(29)[7:0] (4)SystemC.\eu_inst_0.name(29)[7:0] (5)SystemC.\eu_inst_0.name(29)[7:0] (6)SystemC.\eu_inst_0.name(29)[7:0] (7)SystemC.\eu_inst_0.name(29)[7:0] (0)SystemC.\eu_inst_0.name(30)[7:0] (1)SystemC.\eu_inst_0.name(30)[7:0] (2)SystemC.\eu_inst_0.name(30)[7:0] (3)SystemC.\eu_inst_0.name(30)[7:0] (4)SystemC.\eu_inst_0.name(30)[7:0] (5)SystemC.\eu_inst_0.name(30)[7:0] (6)SystemC.\eu_inst_0.name(30)[7:0] (7)SystemC.\eu_inst_0.name(30)[7:0] (0)SystemC.\eu_inst_0.name(31)[7:0] (1)SystemC.\eu_inst_0.name(31)[7:0] (2)SystemC.\eu_inst_0.name(31)[7:0] (3)SystemC.\eu_inst_0.name(31)[7:0] (4)SystemC.\eu_inst_0.name(31)[7:0] (5)SystemC.\eu_inst_0.name(31)[7:0] (6)SystemC.\eu_inst_0.name(31)[7:0] (7)SystemC.\eu_inst_0.name(31)[7:0] 
+@20
++it_status SystemC.\eu_inst_0.it_status
+@20
++it_enable SystemC.\eu_inst_0.it_enable
+@20
++it_flag SystemC.\eu_inst_0.it_flag
+@20
++hal_call SystemC.\eu_inst_0.hal_call[31:0]

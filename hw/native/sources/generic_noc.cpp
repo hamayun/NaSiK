@@ -155,7 +155,7 @@ inline generic_noc::portmap_desc_t * generic_noc::decode(uintptr_t addr)
 		}
 	}
 
-        DOUT_NAME << " Decoding Failed addr = 0x" << std::hex << addr << std::endl;
+        std::cerr << " Decoding Failed addr = 0x" << std::hex << addr << std::endl;
 	ASSERT_MSG( false , "Invalide address");
 	return(NULL);
 }

@@ -213,6 +213,7 @@ void dna_linker::end_of_elaboration()
 	symbol_value->push_back((uint32_t)header);
 	_symbols_vector.push_back(symbol_value);
 #endif
+        
 	DOUT << "---------------------------------------------------------" << std::endl;
 }
 
@@ -225,7 +226,7 @@ void dna_linker::start_of_simulation()
 
 	// Link DNA OS symbols
 	DOUT << name() << ": DNA specific link" << std::endl;
-	DOUT << name() << ":     " << _symbols_vector.size() << " symbols to link" << std::endl;
+	DOUT << name() << ": " << std::dec  << _symbols_vector.size() << " symbols to link" << std::endl;
 	for( symbol_index = 0 ; symbol_index < _symbols_vector.size(); symbol_index++)
 	{
 		_symbols_vector[symbol_index]->link(_sw_image);
