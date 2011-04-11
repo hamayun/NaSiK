@@ -52,75 +52,75 @@ tty_pool::~tty_pool()
 
 void tty_pool::end_of_elaboration()
 {
-	char buffer[16];
-	int pipes[2];
-	unsigned int pid;
-  uint32_t index;
-  char *token;
+    char buffer[16];
+    int pipes[2];
+    unsigned int pid;
+    uint32_t index;
+    char *token;
 
-	device_slave::end_of_elaboration();
+    device_slave::end_of_elaboration();
 
-	GET_ATTRIBUTE("NB_TTY",_nb_tty,uint32_t,false);
-	DOUT << name() << ": NB_TTY = " << _nb_tty->value << std::endl;
+    GET_ATTRIBUTE("NB_TTY",_nb_tty,uint32_t,false);
+    DOUT << name() << ": NB_TTY = " << _nb_tty->value << std::endl;
 
-	GET_ATTRIBUTE("IRQ_CONFIG",_irq_config,char*,false);
-	DOUT << name() << ": IRQ_CONFIG = " << _irq_config->value << std::endl;
+    GET_ATTRIBUTE("IRQ_CONFIG",_irq_config,char*,false);
+    DOUT << name() << ": IRQ_CONFIG = " << _irq_config->value << std::endl;
 
-	GET_ATTRIBUTE("MODE",_mode,char*,false);
-	DOUT << name() << ": MODE = " << _mode->value << std::endl;
-  if(strcmp(_mode->value,"XTERM") == 0) _output_mode = XTERM;
-  if(strcmp(_mode->value,"STDOUT") == 0) _output_mode = STDOUT;
-  if(strcmp(_mode->value,"NONE") == 0) _output_mode = NONE;
-  if(_output_mode == NONE)
-    cerr << "\033[01;31m" << name() << ": No output will be generated" << "\033[00m" << "\n";
+    GET_ATTRIBUTE("MODE",_mode,char*,false);
+    DOUT << name() << ": MODE = " << _mode->value << std::endl;
+    if(strcmp(_mode->value,"XTERM") == 0) _output_mode = XTERM;
+    if(strcmp(_mode->value,"STDOUT") == 0) _output_mode = STDOUT;
+    if(strcmp(_mode->value,"NONE") == 0) _output_mode = NONE;
+    if(_output_mode == NONE)
+        cerr << "\033[01;31m" << name() << ": No output will be generated" << "\033[00m" << "\n";
 
-	_segments.push_back(mapping::init(name(), _nb_tty->value * TTY_SPAN * sizeof(uint32_t)));
-	_registers.ptr = _segments[0]->base_addr;
+    _segments.push_back(mapping::init(name(), _nb_tty->value * TTY_SPAN * sizeof(uint32_t)));
+    _registers.ptr = _segments[0]->base_addr;
 
-	symbol<uint32_t> * symbol_value;
-	symbol_value = new symbol<uint32_t>("SOCLIB_TTY_NDEV");
-	symbol_value->push_back(_nb_tty->value);
-	_symbols.push_back(symbol_value);
+    symbol<uint32_t> * symbol_value;
+    symbol_value = new symbol<uint32_t>("SOCLIB_TTY_NDEV");
+    symbol_value->push_back(_nb_tty->value);
+    _symbols.push_back(symbol_value);
 
-  // TTY configuration 
-  // SOCLIB_TTY_DEVICES = { tty_0.irq, tty_0.addr, tty_1.irq,  tty_1.addr  ... }
-  symbol_value = new symbol<uint32_t>("SOCLIB_TTY_DEVICES");
-  token = strtok(_irq_config->value, " ");
-  index = 0;
-  while(token != NULL)
-  {
-    symbol_value->push_back(strtol(token,NULL,10));
-    symbol_value->push_back((uint32_t)&(_registers.reg32[index*TTY_SPAN]));
-    index++;
-    token = strtok(NULL, " ");
-  }
-  _symbols.push_back(symbol_value);
-  ASSERT_MSG( index == _nb_tty->value, "IRQ_CONFIG doesn't match tty count!!!");
-
-  // PLATFORM_DEBUG_CHARPORT should equal to SOCLIB_TTY_DEVICES
-  // PLATFORM_DEBUG_CHARPORT = tty_0.addr (TTY_WRITE = 0)
-  symbol_value = new symbol<uint32_t>("PLATFORM_DEBUG_CHARPORT");
-  symbol_value->push_back((uint32_t)&(_registers.reg32[0]));
-  _symbols.push_back(symbol_value);
-
-  if(_output_mode == XTERM)
-  {
-    for(uint32_t i = 0 ; i < _nb_tty->value ; i++)
+    // TTY configuration
+    // SOCLIB_TTY_DEVICES = { tty_0.irq, tty_0.addr, tty_1.irq,  tty_1.addr  ... }
+    symbol_value = new symbol<uint32_t>("SOCLIB_TTY_DEVICES");
+    token = strtok(_irq_config->value, " ");
+    index = 0;
+    while(token != NULL)
     {
-      pipe(pipes); // pipes[0] = read ; pipes[1] = write
-      _registers.reg32[i*TTY_SPAN + TTY_WRITE] = (uint32_t)pipes[1];
-      _registers.reg32[i*TTY_SPAN + TTY_READ] = (uint32_t)pipes[0];
-      sprintf(buffer,"%d",pipes[0]);
-      if (!(pid = fork())) {
-        if (execlp("xterm","xterm","-sb","-sl","1000","-e","tty_term",
-              buffer,
-              NULL) == -1) {
-          ASSERT_MSG( false , strerror(errno));
-          exit(1);
-        }
-      }
+        symbol_value->push_back(strtol(token,NULL,10));
+        symbol_value->push_back((uint32_t)&(_registers.reg32[index*TTY_SPAN]));
+        index++;
+        token = strtok(NULL, " ");
     }
-  }
+    _symbols.push_back(symbol_value);
+    ASSERT_MSG( index == _nb_tty->value, "IRQ_CONFIG doesn't match tty count!!!");
+
+    // PLATFORM_DEBUG_CHARPORT should equal to SOCLIB_TTY_DEVICES
+    // PLATFORM_DEBUG_CHARPORT = tty_0.addr (TTY_WRITE = 0)
+    symbol_value = new symbol<uint32_t>("PLATFORM_DEBUG_CHARPORT");
+    symbol_value->push_back((uint32_t)&(_registers.reg32[0]));
+    _symbols.push_back(symbol_value);
+
+    if(_output_mode == XTERM)
+    {
+        for(uint32_t i = 0 ; i < _nb_tty->value ; i++)
+        {
+            pipe(pipes); // pipes[0] = read ; pipes[1] = write
+            _registers.reg32[i*TTY_SPAN + TTY_WRITE] = (uint32_t)pipes[1];
+            _registers.reg32[i*TTY_SPAN + TTY_READ] = (uint32_t)pipes[0];
+            sprintf(buffer,"%d",pipes[0]);
+            if (!(pid = fork())) {
+                if (execlp("xterm","xterm","-sb","-sl","1000","-e","tty_term",
+                            buffer,
+                            NULL) == -1) {
+                    ASSERT_MSG( false , strerror(errno));
+                    exit(1);
+                }
+            }
+        }
+    }
 }
 
 void tty_pool::slv_write (uint8_t *addr, uint8_t  data)

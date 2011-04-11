@@ -13,7 +13,8 @@ export APES_EXTRA_COMPS=$PROJ_TOPDIR/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-APP_NAME=ParallelMjpeg
+#APP_NAME=ParallelMjpeg
+APP_NAME=BlockDeviceTest
 echo "[Setting-up Software Application Environment ($APP_NAME)]"
 APP_DIR=$PROJ_TOPDIR/examples/$APP_NAME
 cd $APP_DIR/sw

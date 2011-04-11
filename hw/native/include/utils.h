@@ -41,6 +41,19 @@
 	{ \
 		attr_ptr = tmp_attr; \
 	} \
-} 
+}
+
+#define GET_ATTRIBUTE_STR(attr_name,attr_ptr,type,optional) \
+{ \
+	sc_attribute< type >* tmp_attr = (sc_attribute< type >*)get_attribute(attr_name); \
+	if(!optional) \
+	{ \
+		ASSERT_MSG(tmp_attr != NULL, "missing attribute \"" + attr_name + "\""); \
+	} \
+	if(tmp_attr != NULL) \
+	{ \
+		attr_ptr = tmp_attr; \
+	} \
+}
 
 #endif				// __UTILS_H__
