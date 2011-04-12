@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <sstream>
 #include <string>
+#include <errno.h>
 
 using namespace native;
 using namespace mapping;
@@ -63,14 +64,9 @@ soclib_blockdevice::soclib_blockdevice(sc_module_name _name, uint32_t master_id,
     m_status  = MASTER_READY;
     m_node_id = master_id;
 
-    DOUT << name() << "[" << m_node_id << "]: " << "Opening File: " << fname << std::endl;
-    m_fd = ::open(fname, O_RDWR);
-    if(m_fd < 0){
-        std::cerr << "[" << m_node_id << "]: " << "Error Opening File :" << fname << std::endl;
-        return;
-    }
+    m_fd = -1;
 
-    m_cs_regs->m_size = lseek(m_fd, 0, SEEK_END) / block_size;
+    open_host_file(fname); 
 
     SC_THREAD (control_thread);
     SC_THREAD (irq_update_thread);
@@ -80,6 +76,27 @@ soclib_blockdevice::~soclib_blockdevice()
 {
     ::close(m_fd);
     DOUT_DTOR << this->name() << std::endl;
+}
+
+void soclib_blockdevice::open_host_file (const char *fname)
+{
+    if (m_fd != -1)
+    {
+        ::close (m_fd);
+        m_fd = -1;
+    }
+    if (fname)
+    {
+        DOUT << name() << "[" << m_node_id << "]: " << "Opening File: " << fname << std::endl;
+        m_fd = ::open(fname, O_RDWR | O_CREAT, 0644);
+        if(m_fd < 0)
+        {
+            std::cerr << "[" << m_node_id << "]: " << "Error Opening File :" << fname << std::endl;
+            return;
+        }
+
+        m_cs_regs->m_size = (lseek (m_fd, 0, SEEK_END) + m_cs_regs->m_block_size - 1) / m_cs_regs->m_block_size;
+    }
 }
 
 sc_attribute < uint32_t > * soclib_blockdevice :: _nb_blockdevices;
@@ -154,11 +171,12 @@ void soclib_blockdevice::control_thread ()
     int func_ret = 0;
     uint32_t offset = 0;
     uint32_t addr = 0;
+    off_t seek_result = 0;
 
-    while(1){
-
-        switch(m_cs_regs->m_op){
-
+    while(1)
+    {
+        switch(m_cs_regs->m_op)
+        {
         case BLOCK_DEVICE_NOOP:
             DOUT << "[" << m_node_id << "]: " << "Got a BLOCK_DEVICE_NOOP" << std::endl;
             wait(ev_op_start);
@@ -175,21 +193,61 @@ void soclib_blockdevice::control_thread ()
             addr = m_cs_regs->m_buffer;
 
             /* Read in device */
-            lseek(m_fd, m_cs_regs->m_lba*m_cs_regs->m_block_size, SEEK_SET);
-            func_ret = ::read(m_fd, m_data, m_transfer_size);
-            if(func_ret < 0){
-                std::cerr << __FUNCTION__ << "Error in ::read()\n";
-                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
-                m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
+            DOUT << "[" << m_node_id << "]: " << "lseek with address 0x" << std::hex
+                 << m_cs_regs->m_lba*m_cs_regs->m_block_size << std::endl;
+            seek_result = lseek(m_fd, m_cs_regs->m_lba*m_cs_regs->m_block_size, SEEK_SET);
+            if (seek_result == -1) // need to check the errorno
+            {
+                switch (errno)
+                {
+                    case EBADF:
+                        std::cerr << "fd is not an open file descriptor." << std::endl;
+                        break;
+                    case EINVAL:
+                        std::cerr << "Whence is not one of SEEK_SET, SEEK_CUR, SEEK_END; "
+                                  << "or the resulting file offset would be negative, "
+                                  << "or beyond the end of a seekable device." << std::endl;
+                        break;
+                    case EOVERFLOW:
+                        std::cerr << "The resulting file offset cannot be represented in an off_t." << std::endl;
+                        break;
+                    case ESPIPE:
+                        std::cerr << "fd is associated with a pipe, socket, or FIFO." << std::endl; 
+                        break;
+                    default:
+                        std::cerr << "errno is unknown." << std::endl;
+                        break;
+                    }
+                    break;
             }
 
+            func_ret = ::read(m_fd, m_data, m_transfer_size);
+            if(func_ret < 0){
+                std::cerr << __FUNCTION__ << " Error in ::read()\n";
+                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
+                m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
+                m_cs_regs->m_count = 0;
+                m_cs_regs->m_finished_block_count = 0;
+                break;
+            }
+
+            if (func_ret == 0)
+            {
+                std::cerr << __FUNCTION__ << " Reach the EOF of source file." << std::endl;
+                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
+                m_cs_regs->m_status = BLOCK_DEVICE_READ_EOF;
+                m_cs_regs->m_count = 0;
+                m_cs_regs->m_finished_block_count = 0;
+                break;
+            }
+            m_cs_regs->m_finished_block_count = func_ret / m_cs_regs->m_block_size;
+            m_cs_regs->m_count = func_ret / m_cs_regs->m_block_size;
+
             /* Send data to memory */
-            for(offset = 0; offset < m_transfer_size; offset += 4){
-                DOUT_DATA << "BDR: mst_write @" << std::hex << (uint32_t *)(addr + offset)
-                          << " data: " << std::dec
-                          << (uint8_t)*(m_data + offset + 0) << (uint8_t)*(m_data + offset + 1)
-                          << (uint8_t)*(m_data + offset + 2) << (uint8_t)*(m_data + offset + 3) << std::endl;
-                mst_write((uint32_t *)(addr + offset), *((uint32_t *)(m_data + offset)));
+            for(offset = 0; offset < m_transfer_size; offset += 1){
+                DOUT_DATA << "BDR: mst_write @" << std::hex << (uint8_t *)(addr + offset)
+                          << " data: " << std::dec << (uint8_t)*(m_data + offset) << std::endl;
+                mst_write((uint8_t *)(addr + offset), *((uint8_t *)(m_data + offset)));
             }
 
             /* Update everything */
@@ -214,22 +272,15 @@ void soclib_blockdevice::control_thread ()
             addr = m_cs_regs->m_buffer;
 
             /* Read data from memory */
-            for(offset = 0; offset < m_transfer_size; offset += 4){
-                mst_read((uint32_t *)(addr + offset), (uint32_t *)(m_data + offset));
-                DOUT_DATA << "BDW: mst_read @" << std::hex << (uint32_t *)(addr + offset)
-                          << " data: " << std::dec
-                          << (uint8_t)*(m_data + offset + 0) << (uint8_t)*(m_data + offset + 1)
-                          << (uint8_t)*(m_data + offset + 2) << (uint8_t)*(m_data + offset + 3) << std::endl;
+            for(offset = 0; offset < m_transfer_size; offset += 1){
+                mst_read((uint8_t *)(addr + offset), (uint8_t *)(m_data + offset));
+                DOUT_DATA << "BDW: mst_read @" << std::hex << (uint8_t *)(addr + offset)
+                          << " data: " << std::dec << (uint8_t)*(m_data + offset) << std::endl;
             }
 
             /* Write in the device */
             lseek(m_fd, m_cs_regs->m_lba*m_cs_regs->m_block_size, SEEK_SET);
-            func_ret = ::write(m_fd, m_data, m_transfer_size);
-            if(func_ret < 0){
-                std::cerr << __FUNCTION__ << "Error in ::write()\n";
-                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
-                m_cs_regs->m_status = BLOCK_DEVICE_WRITE_ERROR;
-            }
+            m_cs_regs->m_finished_block_count = ::write(m_fd, m_data, m_transfer_size);
 
             /* Update everything */
             if(m_cs_regs->m_irqen){
@@ -348,6 +399,10 @@ void soclib_blockdevice::slv_read (uint32_t *addr, uint32_t *data)
     case BLOCK_DEVICE_BLOCK_SIZE :
         *val = m_cs_regs->m_block_size;
         DOUT << "[" << m_node_id << "]: " << "BLOCK_DEVICE_BLOCK_SIZE read: " << std::dec << *val << std::endl;
+        break;
+    case BLOCK_DEVICE_FINISHED_BLOCK_COUNT :
+        *val = m_cs_regs->m_finished_block_count;
+        DOUT << "[" << m_node_id << "]: " << "BLOCK_DEVICE_FINISHED_BLOCK_COUNT read: " << std::dec << *val << std::endl;
         break;
     default:
         std::cerr << __FUNCTION__ << ": Bad Register Index: " << std::dec << REGISTER_INDEX(UINT32,addr)

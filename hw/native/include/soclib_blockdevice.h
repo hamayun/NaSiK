@@ -39,13 +39,15 @@ namespace native {
         BLOCK_DEVICE_IRQ_ENABLE = 5,
         BLOCK_DEVICE_SIZE       = 6,
         BLOCK_DEVICE_BLOCK_SIZE = 7,
-        BLOCKDEVICE_SPAN        = 8,
+        BLOCK_DEVICE_FINISHED_BLOCK_COUNT = 8,
+        BLOCKDEVICE_SPAN        = 9,
     };
 
     enum sl_block_op {
         BLOCK_DEVICE_NOOP,
         BLOCK_DEVICE_READ,
         BLOCK_DEVICE_WRITE,
+        BLOCK_DEVICE_FILE_NAME,
     };
 
     enum sl_block_status {
@@ -56,6 +58,7 @@ namespace native {
         BLOCK_DEVICE_READ_ERROR    = 4,
         BLOCK_DEVICE_WRITE_ERROR   = 5,
         BLOCK_DEVICE_ERROR         = 6,
+        BLOCK_DEVICE_READ_EOF      = 7,
     };
 
     typedef struct sl_block_device_CSregs sl_block_device_CSregs_t;
@@ -70,6 +73,7 @@ namespace native {
         uint32_t m_block_size;
         uint32_t m_irqen;
         uint32_t m_irq;
+        uint32_t m_finished_block_count;
     };
 
     enum sl_block_master_status {
@@ -115,6 +119,7 @@ namespace native {
 
         void control_thread(void);
         void irq_update_thread(void);
+        void open_host_file (const char *fname);
 
         static sc_attribute < uint32_t >    *_nb_blockdevices;          // Shared between all Block Device Objects
         sc_attribute < uint32_t >           *p_should_enable_irq;

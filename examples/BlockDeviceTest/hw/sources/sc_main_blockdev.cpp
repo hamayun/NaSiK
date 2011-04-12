@@ -23,7 +23,6 @@
 #include "soclib_blockdevice.h"
 
 static bool quit = false;
-unsigned long no_frames_to_simulate = 0;
 
 extern int sc_configure(sc_simcontext * simcontext, char *filename);
 
@@ -81,8 +80,8 @@ int sc_main(int argc, char *argv[])
     memory                      ram0("ram0");
     soclib_timer                timer("timer");
     it_gen                      it_generator("it_generator");
-    soclib_blockdevice          blockdevice_0("blockdevice_0", 0, "input_data", 2);
-    soclib_blockdevice          blockdevice_1("blockdevice_1", 1, "output_data", 2);
+    soclib_blockdevice          blockdevice_0("blockdevice_0", 0, "input_data", 1);
+    soclib_blockdevice          blockdevice_1("blockdevice_1", 1, "output_data", 1);
 
     for(unsigned int i = 0 ; i < nb_cpu ; i++)
     {

@@ -3,10 +3,14 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 
+#define BUF_SIZE 64
+
 int main(void)
 {
-	char buffer[1024]; 
-	int bytecount; 
+	char buffer[BUF_SIZE]; 
+	int bytesread; 
+	int byteswritten; 
+	int tr = 0, tw = 0; 
 
 	printf ("BLK_DEV_TEST: Entered Main Function\r\n");
 
@@ -24,20 +28,16 @@ int main(void)
 		return(-1); 	
 	}
 
-	bytecount = 0; 
-	while (1)
+	printf("BLK_DEV_TEST: Copying .... \n");
+
+	while (!feof(fpr))
 	{
-		fread(&buffer[bytecount], 1, 1, fpr); 
-		//buffer[bytecount] = fgetc(fpr);
+		bytesread = fread(buffer, 1, BUF_SIZE, fpr);
+		tr += bytesread; 
+		byteswritten = fwrite(buffer, 1, bytesread, fpw); 
+		tw += byteswritten; 
 
-		printf("%c", buffer[bytecount]); 
-
-		fwrite(&buffer[bytecount], 1, 1, fpw); 
-		//fputc(buffer[bytecount], fpw);
-
-		bytecount++; 
-
-		if(bytecount == 60) break; 
+		printf("bytesread = %d, byteswritten = %d, tr = %d, tw = %d\n", bytesread, byteswritten, tr, tw);  
 	}	
 
 	fclose(fpr); 
