@@ -78,7 +78,7 @@ namespace llvm
 
 using namespace llvm;
 
-#define PRINT_ANNOTATION_DETAILS
+//#define PRINT_ANNOTATION_DETAILS
 #ifdef PRINT_ANNOTATION_DETAILS
     #define ANNOUT if(1) std::cout
 #else
@@ -113,6 +113,7 @@ namespace {
     void cleanLLVMBasicBlockMap(llvmBasicBlockMap_t * map);
 
     bool annotateFunction(MachineFunction & MF);
+    int  setAnnotationType(TargetAnnotationDB *MBBinfo, BasicBlock * BB);
     bool annotateLLVMBasicBlock(TargetAnnotationDB *MBBinfo, BasicBlock * BB);
     machineBB_list_t * getMBBSuccessors(machineBB_list_t * listMBB);
     llvmBB_list_t * insertAndAnnotateBB(const BasicBlock* pred, machineBB_list_t * succs);
@@ -202,6 +203,23 @@ bool MachineTargetAnnotation::runOnMachineFunction(MachineFunction &MF) {
   return (true);
 }
 
+// Set the Appropriate Annotation Type for this Basic Block.
+int MachineTargetAnnotation::setAnnotationType(TargetAnnotationDB *MBBinfo, BasicBlock * BB)
+{
+    if (BB->getNameStr() == "entry"){
+        MBBinfo->setType(MBBinfo->getType() | MBB_ENTRY);
+    }
+
+    for (BasicBlock::iterator CurrInstr = BB->begin(), LastInstr = BB->end(); CurrInstr != LastInstr; ++CurrInstr)
+    {
+        if(CurrInstr->getOpcode() == Instruction::Ret)
+        {
+            MBBinfo->setType(MBBinfo->getType() | MBB_RETURN);
+        }
+    }
+    return 0;
+}
+
 bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
   llvmBasicBlockMap_t *llvmBasicBlockMap;
   machineBB_list_t *listMachineBasicBlock;
@@ -216,16 +234,23 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
   _entry_flag = false;
   _return_flag = false;
 
-  for (llvmBasicBlockMap_t::const_iterator BBI = llvmBasicBlockMap->begin(), BBI_E = llvmBasicBlockMap->end(); BBI != BBI_E; ++BBI) {
+  for (llvmBasicBlockMap_t::const_iterator BBI = llvmBasicBlockMap->begin(), BBI_E = llvmBasicBlockMap->end(); 
+       BBI != BBI_E; ++BBI)
+  {
     llvmBasicBlock = (*BBI).first;
     assert(llvmBasicBlock && "NULL pointer!\n");
     listMachineBasicBlock = (*llvmBasicBlockMap)[llvmBasicBlock];
     assert(listMachineBasicBlock && "NULL pointer!\n");
-    if (listMachineBasicBlock->size() > 1) 
+
+    if (listMachineBasicBlock->size() > 1)
     {
+      /* TODO: *SPLIT* the LLVM Basic Block to Match the Number of Machine Basic Blocks
+       * and Annotate the newly split LLVM Basic Blocks w.r.t to the Machine Basic Blocks.
+       * This would _possibly_ make the simulation more accurate.
+       */
       TargetAnnotationDB compositeDB;
-      //_plotCFG = true;
-      ANNOUT << llvmBasicBlock->getNameStr() << " have multiple childs! (" << listMachineBasicBlock->size() << ")\n";
+
+      ANNOUT << llvmBasicBlock->getNameStr() << " have multiple childern ! (" << listMachineBasicBlock->size() << " MBBs)\n";
 
       // Iterate through the Machine Basic Block List 
       for (machineBB_list_t::const_iterator MBBI = listMachineBasicBlock->begin(), MBBI_E = listMachineBasicBlock->end(); MBBI != MBBI_E; ++MBBI)
@@ -234,19 +259,16 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
         assert(machineBasicBlock && "NULL pointer!\n");
 
         annotationDB = (TargetAnnotationDB*) _Target.MachineBasicBlockAnnotation(*machineBasicBlock);
-        if(annotationDB != NULL){
+        if(annotationDB != NULL)
+        {
             compositeDB.addDB(annotationDB);
         }
       }
 
-      // Handle the Entry/Return Types
-      // I wonder if there exists a possibility of having a Basic Block in
-      // (In Machine Independent LLVM) containing both Entry *AND* Return Types?
-      // This sheme will work when we *ALWAYS* have two different Entry/Return LLVM BBs.
-      if (llvmBasicBlock->getNameStr() == "entry")    compositeDB.setType(MBB_ENTRY);
-      if (llvmBasicBlock->getNameStr() == "return")   compositeDB.setType(MBB_RETURN);
+      // Set Proper Annotation Type.
+      setAnnotationType(&compositeDB, llvmBasicBlock);
 
-      // Set the Entry/Return flags for Checking Later on.
+      // Set the Entry/Return flags for Checking Later on. Each Function is supposed have both.
       if(compositeDB.getType() & MBB_ENTRY)   _entry_flag  = true;
       if(compositeDB.getType() & MBB_RETURN)  _return_flag = true;
 
@@ -298,19 +320,15 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
 
       annotationDB = (TargetAnnotationDB*) _Target.MachineBasicBlockAnnotation(*machineBasicBlock);
       if(annotationDB != NULL){
-        // Handle the Entry/Return Types
-        // I wonder if there exists a possibility of having a Basic Block in
-        // (In Machine Independent LLVM) containing both Entry *AND* Return Types?
-        // This sheme will work when we *ALWAYS* have two different Entry/Return LLVM BBs.
-        if (llvmBasicBlock->getNameStr() == "entry")    annotationDB->setType(MBB_ENTRY);
-        if (llvmBasicBlock->getNameStr() == "return")   annotationDB->setType(MBB_RETURN);
+          // Set Proper Annotation Type.
+          setAnnotationType(annotationDB, llvmBasicBlock); 
+          
+          // Set the Entry/Return flags for Checking Later on. Each Function is supposed have both.
+          if(annotationDB->getType() & MBB_ENTRY)   _entry_flag  = true;
+          if(annotationDB->getType() & MBB_RETURN)  _return_flag = true;
 
-        // Set the Entry/Return flags for Checking Later on.
-        if(annotationDB->getType() & MBB_ENTRY)   _entry_flag  = true;
-        if(annotationDB->getType() & MBB_RETURN)  _return_flag = true;
-
-        // Call this function to Insert 'annotate' call with 'annotation db' to the current basic block.
-        annotateLLVMBasicBlock(annotationDB, llvmBasicBlock);
+          // Call this function to Insert 'annotate' call with 'annotation db' to the current basic block.
+          annotateLLVMBasicBlock(annotationDB, llvmBasicBlock);
       }
     }
   }
@@ -331,30 +349,28 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
   // We Insert a dummy one with MBB_ENTRY/MBB_RETURN as Annotation Type.
   // This fix is neccessary for the online-analysis option of libta to get performance estimates.
 
-  //std::cout << "($) Function: " << _Function->getNameStr() << std::endl;
-  TargetAnnotationDB dummyEntryDB, dummyReturnDB;
-  dummyEntryDB.setType(MBB_ENTRY); 
-  dummyReturnDB.setType(MBB_RETURN);
-
+  // Go through all the basic blocks in this function.
   for (Function::iterator BBI = _Function->begin(), E = _Function->end(); BBI != E; ++BBI)
   {
       if(BBI->getAnnotationFlag() == false)
       {
-        // We check the entry flag as well to make sure that there is only *ONE* entry BB
-        if(BBI->getNameStr() == "entry" && (_entry_flag == false))
-        {
-            //std::cout << "Annotating with Dummy entry" << std::endl;
-            annotateLLVMBasicBlock(&dummyEntryDB, &(*BBI));
-        }
-        // We check the return flag as well to make sure that there is only *ONE* return BB
-        else if(BBI->getNameStr() == "return" && (_return_flag == false))
-        {
-            //std::cout << "Annotating with Dummy return" << std::endl;
-            annotateLLVMBasicBlock(&dummyReturnDB, &(*BBI));
+        TargetAnnotationDB dummyDB;
+
+        // This basic block has not been annotated for some reason; difficult to explain here ...
+        // Now go through all the instructions in this basic block to see if there exists a return instruction.
+        // We do this because we can have multiple basic blocks with return instruction.
+        setAnnotationType(&dummyDB, &(*BBI));
+
+        // It would be useless to add dummy annotation call of default type.
+        if(dummyDB.getType() != MBB_DEFAULT){
+            ANNOUT << "Warning: Forced Fix Added Dummy Annotation of Type [";
+            if(dummyDB.getType() & MBB_ENTRY)       ANNOUT << "MBB_ENTRY";
+            if(dummyDB.getType() & MBB_RETURN)      ANNOUT << "MBB_RETURN";
+            ANNOUT << "] for " <<  BBI->getNameStr() << std::endl;
+
+            annotateLLVMBasicBlock(&dummyDB, &(*BBI));
         }
       }
-      //std::cout << "($ After ) BB Name: " << BBI->getNameStr() << " IsAnnotated: " << BBI->getAnnotationFlag()
-      //          << "   Annotation Type: " << BBI->getAnnotationType() << std::endl;
   }
 
   return (false);
@@ -435,7 +451,11 @@ void MachineTargetAnnotation::cleanLLVMBasicBlockMap(llvmBasicBlockMap_t* map) {
 
 bool MachineTargetAnnotation::annotateLLVMBasicBlock(TargetAnnotationDB *MBBinfo, BasicBlock *BB) {
   LLVMContext &Context = _LLVM_M->getContext();  // The current Module Context
-  ANNOUT << "Annotating " << BB->getNameStr() << std::endl;
+  ANNOUT << "Annotating " << BB->getNameStr() << " Type: [ ";
+  if(MBBinfo->getType() == MBB_DEFAULT) ANNOUT << "MBB_DEFAULT ";
+  if(MBBinfo->getType() & MBB_ENTRY)    ANNOUT << "MBB_ENTRY ";
+  if(MBBinfo->getType() & MBB_RETURN)   ANNOUT << "MBB_RETURN ";
+  ANNOUT << "]" << std::endl;
 
   assert(MBBinfo && "NULL pointer!\n");
   assert(BB && "NULL pointer!\n");
@@ -467,8 +487,21 @@ bool MachineTargetAnnotation::annotateLLVMBasicBlock(TargetAnnotationDB *MBBinfo
   // A phi instruction is used to select appropriate version of a given variable in SSA form.
   // And usually this is done using grouping those variables togather and telling to compiler to use
   // the same register for storing them.
-  BasicBlock::iterator BBI = ((BasicBlock*) BB)->begin();
-  while (isa<PHINode > (BBI)) BBI++;
+
+  // We Add Annotation Call at Appropriate Place in the Basic Block
+  BasicBlock::iterator BBI;
+
+  if(MBBinfo->getType() & MBB_RETURN)
+  {
+      BBI = ((BasicBlock*) BB)->end();
+      // A BB must have at least one instruction. So this *SHOULD* work.
+      BBI--;
+  }
+  else
+  {
+      BBI = ((BasicBlock*) BB)->begin();
+      while (isa<PHINode > (BBI)) BBI++;
+  }
 
   // Create the Call Instruction for annotate function.
   CallInst*  annotationCall= CallInst::Create(_Fannotation, GEP, "");       
