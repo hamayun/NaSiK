@@ -93,8 +93,8 @@ void hosttime::slv_write (uint32_t *addr, uint32_t data)
     case HOSTTIME_WRITE:
     {
         // Discard what processor writes, only remember the time when we write.
-        fprintf(host_file, "[%d] Time is %lf\n", data, get_clock());
-        DOUT << name() << ": [" << data << "] Time is: " << get_clock() << std::endl;
+        fprintf(host_file, "[%d] Time is: %lf seconds.\n", data, get_clock());
+        DOUT << name() << ": [" << data << "] Time is: " << get_clock() << " seconds."<< std::endl;
         fflush(host_file);
         break;
     }
