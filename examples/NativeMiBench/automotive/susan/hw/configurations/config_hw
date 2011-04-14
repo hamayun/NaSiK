@@ -45,6 +45,9 @@
 [bridge_noc_0_1]
 	long ID = 1;
 
+[hosttime]
+	long ID = 1;
+
 [blockdevice_0]
 	long NB_BLOCKDEVICES = 3; 
 	long ENABLE_IRQ_BLOCKDEVICE_0 = 0; 

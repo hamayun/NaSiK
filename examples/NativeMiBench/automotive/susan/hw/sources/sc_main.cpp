@@ -21,6 +21,7 @@
 #include "it_gen.h"
 #include "bridge.h"
 #include "soclib_blockdevice.h"
+#include "hosttime.h"
 
 static bool quit = false;
 
@@ -81,11 +82,12 @@ int sc_main(int argc, char *argv[])
     memory                      ram0("ram0");
     soclib_timer                timer("timer");
     it_gen                      it_generator("it_generator");
-    //soclib_blockdevice          blockdevice_0("blockdevice_0", 0, "input_large.pgm", 1);
-    soclib_blockdevice          blockdevice_0("blockdevice_0", 0, "input_small.pgm", 1);
+    soclib_blockdevice          blockdevice_0("blockdevice_0", 0, "input_large.pgm", 1);
+    //soclib_blockdevice          blockdevice_0("blockdevice_0", 0, "input_small.pgm", 1);
     soclib_blockdevice          blockdevice_1("blockdevice_1", 1, "dummy-disk", 1);
-    //soclib_blockdevice          blockdevice_2("blockdevice_2", 2, "output_large.smoothing.pgm", 1);
-    soclib_blockdevice          blockdevice_2("blockdevice_2", 2, "output_small.smoothing.pgm", 1);
+    soclib_blockdevice          blockdevice_2("blockdevice_2", 2, "output_large.smoothing.pgm", 1);
+    //soclib_blockdevice          blockdevice_2("blockdevice_2", 2, "output_small.smoothing.pgm", 1);
+    hosttime                    hosttime_0("hosttime", "host_time_dump.txt"); 
 
     for(unsigned int i = 0 ; i < nb_cpu ; i++)
     {
@@ -101,6 +103,7 @@ int sc_main(int argc, char *argv[])
     generic_noc_inst_0.p_io(ram0.exp_io);
     generic_noc_inst_0.p_io(timer.exp_io);
     generic_noc_inst_0.p_io(it_generator.exp_io);
+    generic_noc_inst_0.p_io(hosttime_0.exp_io);
 
     // Connect Master and Slave Ports of BlockDevice to the NOC 0
     generic_noc_inst_0.p_io(blockdevice_0.exp_io);
@@ -131,6 +134,7 @@ int sc_main(int argc, char *argv[])
     linker_dna.p_linker(tty_pool_inst_0.exp_linker);
     linker_dna.p_linker(timer.exp_linker);
     linker_dna.p_linker(it_generator.exp_linker);
+    linker_dna.p_linker(hosttime_0.exp_linker);
     linker_dna.p_linker(blockdevice_0.exp_linker);
     linker_dna.p_linker(blockdevice_1.exp_linker);
     linker_dna.p_linker(blockdevice_2.exp_linker);

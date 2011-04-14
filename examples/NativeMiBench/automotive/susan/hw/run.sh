@@ -1,6 +1,6 @@
 # We execute without tracing and for one processor
 
-./arch.x 1 trace_off configurations/config_dna configurations/config_hw --native-option="analyze online" >& log.txt 
+./arch.x 1 trace_off configurations/config_dna configurations/config_hw  
 
 #./arch.x 1 trace_off configurations/config_dna configurations/config_hw --native-option="analyze online" >& output.txt
 

@@ -1966,6 +1966,25 @@ corner_list[n].info=7;
 /* }}} */
 
 /* }}} */
+
+/*
+ * Send command to the hosttime component to
+ * Dump System Time at this particuler instant i.e. checkpoint.
+ */
+#include <Processor/IO.h>
+extern unsigned int PLATFORM_HOSTTIME_BASE;
+void DumpHostTime(int checkpoint)
+{
+    if(PLATFORM_HOSTTIME_BASE){
+        cpu_write (UINT32, PLATFORM_HOSTTIME_BASE, checkpoint);
+    }
+    else
+    {
+        printf(stderr, "Invalid Address PLATFORM_HOSTTIME_BASE\n");
+        exit(1); 
+    }
+}
+
 /* {{{ main(argc, argv) */
 
 main(argc, argv)
@@ -1998,6 +2017,11 @@ char *myargv[4];
 FILE *fd0;
 FILE *fd1;
 FILE *fd2;
+
+  /* Dump Host Time to File
+   */
+  int checkpoint = 0;
+  DumpHostTime(checkpoint++);
 
   myargc = 4;
   myargv[0] = "susan";
@@ -2079,6 +2103,8 @@ printf("In main function\n\n");
 
   printf("Before mode.\n");
 
+  DumpHostTime(checkpoint++);
+
   switch (mode)
   {
     case 0:
@@ -2159,6 +2185,8 @@ printf("In main function\n\n");
 	fclose(fd0);
 	fclose(fd1);
 	fclose(fd2);
+
+    DumpHostTime(checkpoint++);
 }
 
 /* }}} */

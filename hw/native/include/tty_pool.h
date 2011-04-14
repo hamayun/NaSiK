@@ -58,11 +58,11 @@ namespace native {
 		} REGISTERS;
 
 		private:
-		sc_attribute < uint32_t >    *_nb_tty;
-    sc_attribute < char * >      *_irq_config;
-    sc_attribute < char * >      *_mode;
+                    sc_attribute < uint32_t >    *_nb_tty;
+                    sc_attribute < char * >      *_irq_config;
+                    sc_attribute < char * >      *_mode;
 
-    OUTPUT_MODE                  _output_mode;
+                    OUTPUT_MODE                  _output_mode;
 	};
 
 }
