@@ -35,7 +35,6 @@
 #include <stdio.h>
 #include <sstream>
 #include <string>
-#include <errno.h>
 
 using namespace native;
 using namespace mapping;
@@ -281,6 +280,11 @@ void soclib_blockdevice::control_thread ()
             /* Write in the device */
             lseek(m_fd, m_cs_regs->m_lba*m_cs_regs->m_block_size, SEEK_SET);
             m_cs_regs->m_finished_block_count = ::write(m_fd, m_data, m_transfer_size);
+
+            /**
+             * TODO: 
+             * Update the Block Device Size m_cs_regs->m_size Here
+             */
 
             /* Update everything */
             if(m_cs_regs->m_irqen){

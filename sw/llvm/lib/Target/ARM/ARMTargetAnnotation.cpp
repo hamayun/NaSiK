@@ -812,7 +812,7 @@ const TargetAnnotationDB * ARMTargetMachine::MachineBasicBlockAnnotation(Machine
 
         // The entry and return types will be handled in the Machine Independent Code
         annotationDB->setType(MBB_DEFAULT);
-        // annotationDB->setType( (MBB.pred_empty() ? MBB_ENTRY:0) | (MBB.succ_empty() ? MBB_RETURN:0) );
+        //annotationDB->setType( (MBB.pred_empty() ? MBB_ENTRY : MBB_DEFAULT) | (MBB.succ_empty() ? MBB_RETURN : MBB_DEFAULT) );
         // cout << "MBB Name: " << MBB.getName().str() << "  Annotation DB Type: " << annotationDB->getType() << endl;
 
         annotationDB->setInstructionCount(mbbInstructionCount);
