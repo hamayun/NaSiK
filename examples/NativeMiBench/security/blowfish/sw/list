@@ -1,0 +1,17 @@
+gcc  -static -O3 -fomit-frame-pointer   -c -o bf_skey.o bf_skey.c
+gcc  -static -O3 -fomit-frame-pointer   -c -o bf_ecb.o bf_ecb.c
+gcc  -static -O3 -fomit-frame-pointer   -c -o bf_enc.o bf_enc.c
+gcc  -static -O3 -fomit-frame-pointer   -c -o bf_cbc.o bf_cbc.c
+gcc  -static -O3 -fomit-frame-pointer   -c -o bf_cfb64.o bf_cfb64.c
+gcc  -static -O3 -fomit-frame-pointer   -c -o bf_ofb64.o bf_ofb64.c
+/bin/rm -f libblowfish.a
+ar cr libblowfish.a bf_skey.o bf_ecb.o bf_enc.o		 bf_cbc.o bf_cfb64.o bf_ofb64.o
+if test -s ranlib; then ssbig-na-sstrix-ranlib libblowfish.a; \
+	else if test -s ranlib; then ssbig-na-sstrix-ranlib libblowfish.a; \
+	else exit 0; fi; fi
+gcc  -static -O3 -fomit-frame-pointer   -c -o bftest.o bftest.c
+gcc  -static -O3 -fomit-frame-pointer -o bftest bftest.o libblowfish.a
+gcc  -static -O3 -fomit-frame-pointer   -c -o bfspeed.o bfspeed.c
+gcc  -static -O3 -fomit-frame-pointer -o bfspeed bfspeed.o libblowfish.a
+gcc  -static -O3 -fomit-frame-pointer   -c -o bf.o bf.c
+gcc  -static -O3 -fomit-frame-pointer -o bf bf.o libblowfish.a
