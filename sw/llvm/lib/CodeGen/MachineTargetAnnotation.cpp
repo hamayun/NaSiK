@@ -113,7 +113,7 @@ namespace {
     void cleanLLVMBasicBlockMap(llvmBasicBlockMap_t * map);
 
     bool annotateFunction(MachineFunction & MF);
-    int  setAnnotationType(TargetAnnotationDB *MBBinfo, BasicBlock * BB);
+    int  findAnnotationType(TargetAnnotationDB *MBBinfo, BasicBlock * BB);
     bool annotateLLVMBasicBlock(TargetAnnotationDB *MBBinfo, BasicBlock * BB);
     machineBB_list_t * getMBBSuccessors(machineBB_list_t * listMBB);
     llvmBB_list_t * insertAndAnnotateBB(const BasicBlock* pred, machineBB_list_t * succs);
@@ -203,9 +203,20 @@ bool MachineTargetAnnotation::runOnMachineFunction(MachineFunction &MF) {
   return (true);
 }
 
-// Set the Appropriate Annotation Type for this Basic Block.
-int MachineTargetAnnotation::setAnnotationType(TargetAnnotationDB *MBBinfo, BasicBlock * BB)
+// Find the Appropriate Annotation Type for this Basic Block.
+int MachineTargetAnnotation::findAnnotationType(TargetAnnotationDB *MBBinfo, BasicBlock * BB)
 {
+    if(pred_begin(BB) == pred_end(BB))
+    {
+        MBBinfo->setType(MBBinfo->getType() | MBB_ENTRY);
+    }
+
+    if(succ_begin(BB) == succ_end(BB))
+    {
+        MBBinfo->setType(MBBinfo->getType() | MBB_RETURN);
+    }
+
+    /*
     if (BB->getNameStr() == "entry"){
         MBBinfo->setType(MBBinfo->getType() | MBB_ENTRY);
     }
@@ -217,6 +228,7 @@ int MachineTargetAnnotation::setAnnotationType(TargetAnnotationDB *MBBinfo, Basi
             MBBinfo->setType(MBBinfo->getType() | MBB_RETURN);
         }
     }
+    */
     return 0;
 }
 
@@ -265,8 +277,8 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
         }
       }
 
-      // Set Proper Annotation Type.
-      setAnnotationType(&compositeDB, llvmBasicBlock);
+      // Find Proper Annotation Type.
+      findAnnotationType(&compositeDB, llvmBasicBlock);
 
       // Set the Entry/Return flags for Checking Later on. Each Function is supposed have both.
       if(compositeDB.getType() & MBB_ENTRY)   _entry_flag  = true;
@@ -320,8 +332,8 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
 
       annotationDB = (TargetAnnotationDB*) _Target.MachineBasicBlockAnnotation(*machineBasicBlock);
       if(annotationDB != NULL){
-          // Set Proper Annotation Type.
-          setAnnotationType(annotationDB, llvmBasicBlock); 
+          // Find Proper Annotation Type.
+          findAnnotationType(annotationDB, llvmBasicBlock);
           
           // Set the Entry/Return flags for Checking Later on. Each Function is supposed have both.
           if(annotationDB->getType() & MBB_ENTRY)   _entry_flag  = true;
@@ -359,7 +371,7 @@ bool MachineTargetAnnotation::annotateFunction(MachineFunction &MF) {
         // This basic block has not been annotated for some reason; difficult to explain here ...
         // Now go through all the instructions in this basic block to see if there exists a return instruction.
         // We do this because we can have multiple basic blocks with return instruction.
-        setAnnotationType(&dummyDB, &(*BBI));
+        findAnnotationType(&dummyDB, &(*BBI));
 
         // It would be useless to add dummy annotation call of default type.
         if(dummyDB.getType() != MBB_DEFAULT){

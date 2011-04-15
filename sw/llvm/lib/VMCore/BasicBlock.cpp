@@ -22,6 +22,7 @@
 #include "llvm/Support/LeakDetector.h"
 #include "SymbolTableListTraitsImpl.h"
 #include <algorithm>
+#include "llvm/Target/TargetAnnotationInfo.h"
 using namespace llvm;
 
 ValueSymbolTable *BasicBlock::getValueSymbolTable() {
@@ -56,7 +57,7 @@ BasicBlock::BasicBlock(LLVMContext &C, const Twine &Name, Function *NewParent,
   
   setName(Name);
   setAnnotationFlag(false);
-  setAnnotationType(0);
+  setAnnotationType(MBB_DEFAULT);
 }
 
 BasicBlock::~BasicBlock() {
