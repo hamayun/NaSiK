@@ -25,7 +25,8 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APP_NAME=CRC32
 #APP_NAME=bitcount
 #APP_NAME=cjpeg
-APP_NAME=djpeg
+#APP_NAME=djpeg
+APP_NAME=stringsearch
 echo "[Setting-up Software Application Environment ($APP_NAME)]"
 APP_DIR=$(find $PROJ_TOPDIR/examples -name "$APP_NAME")
 cd $APP_DIR/sw
