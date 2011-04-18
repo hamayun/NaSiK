@@ -4,7 +4,7 @@ export CRT0="${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/lib/crt0.o"
 CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/i386-sls-dnaos/4.4.2/include/"
 
 # Try and Do the Split Compilation using the Primary Compiler.
-export APES_SPLIT_CC=""
+#export APES_SPLIT_CC=""
 export APES_CC1="llvm-gcc"
 export APES_CC2="llc"
 export APES_CC1_FLAGS="-pipe -Wall -Wno-format -std=c99 -O3 -U__linux__ --emit-llvm $CUSTOM_INCLUDES"
