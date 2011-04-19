@@ -7,7 +7,7 @@ export LD_LIBRARY_PATH=$NATIVE_HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
-export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-native
+export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-native-annotated
 export APES_ROOT=/opt/Apes
 export APES_EXTRA_COMPS=$PROJ_TOPDIR/sw/apes-components
 source $APES_ROOT/install.sh
@@ -16,7 +16,7 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APP_NAME=ParallelMjpeg
 #APP_NAME=BlockDeviceTest
 #APP_NAME=susan
-#APP_NAME=qsort
+APP_NAME=qsort
 #APP_NAME=dijkstra
 #APP_NAME=patricia
 #APP_NAME=blowfish
@@ -26,7 +26,7 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APP_NAME=bitcount
 #APP_NAME=cjpeg
 #APP_NAME=djpeg
-APP_NAME=stringsearch
+#APP_NAME=stringsearch
 echo "[Setting-up Software Application Environment ($APP_NAME)]"
 APP_DIR=$(find $PROJ_TOPDIR/examples -name "$APP_NAME")
 cd $APP_DIR/sw
