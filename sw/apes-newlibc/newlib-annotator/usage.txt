@@ -1,0 +1,1 @@
+make all install PREFIX=/opt/toolchains/llvm-cross/ INSTALL_NAME=i386-sls-dnaos-gcc
