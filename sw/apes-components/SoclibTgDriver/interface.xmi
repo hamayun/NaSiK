@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<APES:Interface
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:APES="http://www.ocm.org/APES"
+  xsi:schemaLocation="http://www.ocm.org/APES APESInterface.ecore"
+  author="hao.shen@imag.fr"
+  unique="false"
+  wrapper="false">
+
+  <id name="SoclibTgDriver" version="1.0"/>
+
+  <provide>
+    <context name="Driver">
+      <variable name="tg_module" type="driver_t"/>
+    </context>
+  </provide>
+
+  <require>
+    <type name="driver_t"/>
+    <type name="device_cmd_t"/>
+
+    <method name="cpu_write" result="">
+      <argument name="size" type="int32_t" direction="In"/>
+      <argument name="address" type="access" direction="In"/>
+      <argument name="value" type="access" direction="In"/>
+    </method>
+
+    <method name="kernel_malloc" result="access">
+      <argument name="size" type="int32_t" direction="In"/>
+      <argument name="erase" type="boolean" direction="In"/>
+    </method>
+
+  </require>
+
+</APES:Interface>
