@@ -1,23 +1,21 @@
 #!/bin/bash
 
-if [ -z $PROJ_TOPDIR ] ; then
-	echo "$PROJ_TOPDIR variable is Undefined; Please Run the Configure Script First !!!"
+if [ -z $NASIK_HOME ] ; then
+	echo "$NASIK_HOME variable is Undefined; Please Run the Configure Script First !!!"
 else
 	echo "Cleaning Native Library (libta) ... "
-
-    cd $PROJ_TOPDIR/hw/native
-    make clean -s
+  cd $NASIK_HOME/hw/native
+  make clean -s
  
-    echo "Cleaning Software Application ... "
-    cd $APP_DIR/sw
-    apes-compose -c
+  echo "Cleaning Software Application ... "
+  cd $APP_DIR/sw
+  apes-compose -c
 
-    echo "Cleaning Hardware Model ... "
-    cd $APP_DIR/hw
-    make clean -s
+  echo "Cleaning Hardware Model ... "
+  cd $APP_DIR/hw
+  make clean -s
 
-	cd $PROJ_TOPDIR
-
+	cd $NASIK_HOME
   echo "Environment Cleanup Done !!!"
 fi
 

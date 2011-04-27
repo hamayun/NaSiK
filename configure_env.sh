@@ -1,6 +1,6 @@
 echo "[Setting-up Hardware Platform Environment (Native {libta})]"
-PROJ_TOPDIR=$PWD
-HW_PLATFORM=$PROJ_TOPDIR/hw
+export NASIK_HOME=$PWD
+export HW_PLATFORM=$NASIK_HOME/hw
 export SYSTEMC=/opt/libs/systemc-2.2.0
 export NATIVE_HOME=/opt/libs/native
 export LD_LIBRARY_PATH=$NATIVE_HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH
@@ -9,7 +9,7 @@ echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
 export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-native-annotated
 export APES_ROOT=/opt/Apes
-export APES_EXTRA_COMPS=$PROJ_TOPDIR/sw/apes-components
+export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
@@ -28,14 +28,14 @@ APP_NAME=qsort
 #APP_NAME=djpeg
 #APP_NAME=stringsearch
 echo "[Setting-up Software Application Environment ($APP_NAME)]"
-APP_DIR=$(find $PROJ_TOPDIR/examples -name "$APP_NAME")
+APP_DIR=$(find $NASIK_HOME/examples -name "$APP_NAME")
 cd $APP_DIR/sw
 source install.sh 
 
 # for tty_term
-export PATH=$PROJ_TOPDIR:$PATH
+export PATH=$NASIK_HOME:$PATH
 
-cd $PROJ_TOPDIR
+cd $NASIK_HOME
 
 echo "======================= GENERAL ENVIRONMENT SETTINGS ========================="
 echo "SYSTEMC                 = $SYSTEMC"
