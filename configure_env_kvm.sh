@@ -2,6 +2,7 @@ echo "[Setting-up Hardware Platform Environment (SystemC, LIBKVM)]"
 export NASIK_HOME=$PWD
 export SYSTEMC=/opt/libs/systemc-2.2.0
 export LIBKVM_HOME=${NASIK_HOME}/hw/kvm-85
+export LIBSOCKVM_HOME=${NASIK_HOME}/hw/soc_kvm
 export LIBKVM_PREFIX=/opt/libs/libkvm
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
@@ -14,7 +15,7 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
 export APPLICATION=kvmParallelMjpeg
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
-APP_DIR=$(find $NASIK_HOME/examples -name "$APPLICATION")
+export APP_DIR=$(find $NASIK_HOME/examples -name "$APPLICATION")
 cd $APP_DIR/sw
 source install.sh 
 
