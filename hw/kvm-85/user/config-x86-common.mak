@@ -1,6 +1,6 @@
 #This is a make file with common rules for both x86 & x86-64
 
-all: kvmctl kvmtrace test_cases dnastart
+all: kvmctl kvmtrace test_cases
 
 kvmctl_objs= main.o iotable.o ../libkvm/libkvm.a
 balloon_ctl: balloon_ctl.o
@@ -18,10 +18,17 @@ FLATLIBS = test/lib/libcflat.a $(libgcc)
 %.flat: %.o $(FLATLIBS)
 	$(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,flat.lds $^ $(FLATLIBS)
 
+%.elf: %.o $(FLATLIBS)
+	$(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,elf.lds $^ $(FLATLIBS)
+
+%.lelf: %.o $(FLATLIBS)
+	$(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,elf.lds $^
+
 tests-common = $(TEST_DIR)/bootstrap \
 			$(TEST_DIR)/vmexit.flat $(TEST_DIR)/tsc.flat \
-			$(TEST_DIR)/smptest.flat  $(TEST_DIR)/port80.flat \
-			$(TEST_DIR)/realmode.flat $(TEST_DIR)/msr.flat
+			$(TEST_DIR)/smptest.flat $(TEST_DIR)/smptest.elf $(TEST_DIR)/port80.flat \
+			$(TEST_DIR)/realmode.flat $(TEST_DIR)/msr.flat	\
+                        $(TEST_DIR)/simple.lelf
 
 test_cases: $(tests-common) $(tests)
 
@@ -30,8 +37,6 @@ $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I test/lib -I test/lib/x86
 $(TEST_DIR)/bootstrap: $(TEST_DIR)/bootstrap.o
 	$(CC) -nostdlib -o $@ -Wl,-T,bootstrap.lds $^
 
-dnastart: $(TEST_DIR)/dnastart.o
- 
 $(TEST_DIR)/irq.flat: $(TEST_DIR)/print.o
  
 $(TEST_DIR)/access.flat: $(cstart.o) $(TEST_DIR)/access.o $(TEST_DIR)/print.o
@@ -46,6 +51,10 @@ $(TEST_DIR)/vmexit.flat: $(cstart.o) $(TEST_DIR)/vmexit.o
 $(TEST_DIR)/test32.flat: $(TEST_DIR)/test32.o
 
 $(TEST_DIR)/smptest.flat: $(cstart.o) $(TEST_DIR)/smptest.o
+
+$(TEST_DIR)/smptest.elf: $(cstart.o) $(TEST_DIR)/smptest.o
+
+$(TEST_DIR)/simple.lelf: $(dnastart.o) $(TEST_DIR)/simple.o
  
 $(TEST_DIR)/emulator.flat: $(cstart.o) $(TEST_DIR)/vm.o $(TEST_DIR)/print.o
 

@@ -68,16 +68,15 @@ namespace noc
     };
 
 
-
     class vci_response
     {
     public:
         uint8_t   rdata[8];
         bool      reop;
         bool      rerror;
-        uint16_t  rsrcid;
-        uint8_t   rtrdid;
-        uint8_t   rpktid;
+        uint16_t  rsrcid;       // Response Source ID
+        uint8_t   rtrdid;       // Response Transaction ID
+        uint8_t   rpktid;       // Response Packet ID
 
         // **************
         // Extra field

@@ -1,5 +1,6 @@
 TEST_DIR=test/x86
 cstart.o = $(TEST_DIR)/cstart64.o
+dnastart.o = $(TEST_DIR)/dnastart64.o
 bits = 64
 ldarch = elf64-x86-64
 CFLAGS += -D__x86_64__

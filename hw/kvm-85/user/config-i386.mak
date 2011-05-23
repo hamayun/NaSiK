@@ -1,5 +1,6 @@
 TEST_DIR=test/x86
 cstart.o = $(TEST_DIR)/cstart.o
+dnastart.o = $(TEST_DIR)/dnastart.o
 bits = 32
 ldarch = elf32-i386
 CFLAGS += -D__i386__
