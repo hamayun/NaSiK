@@ -47,8 +47,8 @@ using namespace std;
 extern "C" {
 
 #include <soc_kvm.h>
-	extern soc_kvm_data soc_kvm_init_data;
-  int soc_kvm_init(char *bootstrap, char *elf_file); 
+    extern soc_kvm_data soc_kvm_init_data;
+    int soc_kvm_init(char *bootstrap, char *elf_file);
 }
 
 void *p_kvm_cpu_adaptor;
@@ -70,8 +70,8 @@ void simulation_stop()
 
 void usage_and_exit(char * name)
 {
-	cerr << "usage : " << name << "  <bootstrap_file> <application_path>" << endl;
-	exit(EXIT_FAILURE);
+    cerr << "usage : " << name << "  <bootstrap_file> <application_path>" << endl;
+    exit(EXIT_FAILURE);
 }
 
 mem_device          *shared_ram = NULL, *ram = NULL;
@@ -82,10 +82,9 @@ int                 nslaves = 0;
 int sc_main (int argc, char ** argv)
 {
     int             i, retVal;
-    unsigned int	kvm_nb_cpu;
-    bool			trace_on = false;
+    unsigned int    kvm_nb_cpu;
 
-		if(argc < 3) usage_and_exit(argv[0]); 
+    if(argc < 3) usage_and_exit(argv[0]);
 			
     /* Initialize the kvm. */
     retVal = soc_kvm_init(argv[1], argv[2]);
@@ -96,8 +95,8 @@ int sc_main (int argc, char ** argv)
     }
     kvm_nb_cpu = soc_kvm_init_data.ncpus;
 
-    /* Initialize the adaptor */
-    kvm_cpu_wrapper_t	kvm_cpu_adaptor("kvm_cpu");
+    /* Initialize the adaptor, also pass the application name to execute*/
+    kvm_cpu_wrapper_t	kvm_cpu_adaptor("kvm_cpu", argv[2], (uintptr_t)soc_kvm_init_data.vm_mem);
     p_kvm_cpu_adaptor = &kvm_cpu_adaptor;
 
     sl_block_device   *bl   = new sl_block_device("block", 1, "input_data", 1024);

@@ -21,22 +21,37 @@
 #define __KVM_CPU_WRAPPER_H__
 
 #include <qemu_wrapper_request.h>
-
+//#include <execution_spy.h>
 #include <master_device.h>
 
-using namespace noc;
+// Will remove this typedef once the execution_spy is integrated.
+typedef struct {
+      uint32_t          Type;
+      uint32_t          InstructionCount;
+      uint32_t          CycleCount;
+      uint32_t          LoadCount;
+      uint32_t          StoreCount;
+      uint32_t          FuncAddr;
+} annotation_db_t;
 
+using namespace noc;
 class cpu_logs;
 
-class kvm_cpu_wrapper : public master_device
+#define ANALYZE_OPTION true
+#define ONLINE_OPTION true
+#define NO_THREAD_OPTION true        // if true analyzer thread will *NOT* be created.
+
+class kvm_cpu_wrapper : public master_device /*, public ExecutionSpy*/
 {
 public:
     SC_HAS_PROCESS (kvm_cpu_wrapper);
-    kvm_cpu_wrapper (sc_module_name name, int node_id=0);
+    kvm_cpu_wrapper (sc_module_name name, char *elf_file, uintptr_t app_base_addr, int node_id=0);
     ~kvm_cpu_wrapper ();
 
 private:
     void cpuThread ();
+//    void compute(annotation_t *trace, uint32_t count);
+
     void receiveThread ();
     void rcv_rsp(unsigned char tid, unsigned char *data, bool bErr, bool bWrite);
 
@@ -46,8 +61,8 @@ public:
                 int nbytes, int bIO);
 
 private:
-    qemu_wrapper_requests                   *m_rqs;
-    bool        m_unblocking_write;
+    qemu_wrapper_requests          *m_rqs;
+    bool                            m_unblocking_write;
 };
 
 typedef kvm_cpu_wrapper kvm_cpu_wrapper_t;

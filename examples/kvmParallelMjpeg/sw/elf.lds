@@ -1,7 +1,7 @@
 
 MEMORY
 {
-	text :    ORIGIN = 1M,    LENGTH = 30M
+	mem :    ORIGIN = 1M,    LENGTH = 30M
 }
 
 PHDRS
@@ -20,10 +20,10 @@ PHDRS
 SECTIONS
 {
 	.init 0x00100000: { stext = .; *(.init) } > text :text
-    .text ALIGN(8): { *(.text) *(.text.*) } > text :text
+  .text ALIGN(8): { *(.text) *(.text.*) } > mem :text
 	.fini ALIGN(8): { *(.fini*) } > text :text
     
-    .data ALIGN(4K) : { *(.data) *(.glue_7*) *(.eh_frame*) } > text :data
+  .data ALIGN(4K) : { *(.data) *(.glue_7*) *(.eh_frame*) } > mem :data
 	.os_config ALIGN(0x8): {
 		OS_N_DRIVERS = .; LONG(0x5)
 		OS_DRIVERS_LIST = .; LONG(soclib_platform_module) LONG(rdv_module)
@@ -43,7 +43,7 @@ SECTIONS
 		OS_USER_HEAP_ADDRESS = .; LONG(ADDR(.uheap))
 		OS_EXTENSIONS_LIST = .; LONG(0x0)
 		OS_N_EXTENSIONS = .; LONG(0x0)
-	} > text :data
+	} > mem :data
 	.hal ALIGN(0x8): {
 		PLATFORM_DEBUG_CHARPORT = .; LONG(0xC0100000)
 		APP_ENTRY_POINT = .; LONG(main);
@@ -74,22 +74,22 @@ SECTIONS
 		PLATFORM_AICU_BASE = .; LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0)
 		EXTFIFO_CHANNEL_NDEV = .; LONG(0x0)
 		EXTFIFO_CHANNELS_PTR = .; LONG(0x0)
-	} > text :data
+	} > mem :data
 
-    .rodata ALIGN(16) : { *(.rodata) *(.rodata.str1.*) } > text :data
+  .rodata ALIGN(16) : { *(.rodata) *(.rodata.str1.*) } > mem :data
 
-	.sysstack ALIGN(0x8) + 0x10000 : { } > text :stack
+	.sysstack ALIGN(0x8) + 0x10000 : { } > mem :stack
 
-    .bss ALIGN(16): {
+  .bss ALIGN(16): {
 		*(.bss)  *(.rel*) *(COMMON) __hal_bss_end = .; 
-	} > text :bss
+	} > mem :bss
 
-	.kheap ALIGN(0x8) : {} > text :heap
+	.kheap ALIGN(0x8) : {} > mem :heap
 
-	.uheap ALIGN(0x8) + 0x100000: {_end = .;}  > text :heap
+	.uheap ALIGN(0x8) + 0x100000: {_end = .;}  > mem :heap
 
 
-    edata = .;
+  edata = .;
 
 	. = 10M;
 	.note : { *(.note) *(.note.gnu.build-id) *(.comment) }

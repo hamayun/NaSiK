@@ -51,3 +51,24 @@ int io_table_register(struct io_table *io_table, uint64_t start, uint64_t size,
 
 	return 0;
 }
+
+int io_table_print(struct io_table *io_table)
+{
+    struct io_table_entry *entry;
+    int index;
+
+    printf("The IO Table: \n");
+    printf("==============================================\n");
+    printf("Start       End         Handler     Opaque\n");
+    printf("==============================================\n");
+    for (index = 0; index < io_table->nr_entries; index++)
+    {
+        entry = &io_table->entries[index];
+        printf("0x%08x  0x%08x  0x%08x  0x%08x\n",
+                (uintptr_t)entry->start, (uintptr_t)entry->end,
+                (uintptr_t)entry->handler, (uintptr_t)entry->opaque);
+    }
+    printf("==============================================\n");
+
+    return 0;
+}

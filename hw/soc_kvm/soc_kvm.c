@@ -201,6 +201,56 @@ static int irqchip_io(void *opaque, int size, int is_write,
 	return 0;
 }
 
+#define PMIO_TRACE_OPTION true
+typedef struct pmio_trace
+{
+    uint32_t db_addr;
+    uint64_t rip;
+}pmio_trace_t;
+
+pmio_trace_t pmio_trace_buff[5*1024*1024] = {0, 0};
+uint32_t pmio_trace_index = 0;
+
+void dump_pmio_trace_to_file(char *fname)
+{
+    FILE * dump_file = NULL;
+    uint32_t index = 0;
+
+    dump_file = fopen(fname, "w");
+    if(!dump_file)
+    {
+        fprintf(stderr, "Error Opening the Dump PMIO File\n");
+        return;
+    }
+
+    printf("Dumping %d PMIO accesses trace to \'%s\'\n", pmio_trace_index, fname);
+    for(index = 0; index < pmio_trace_index; index++)
+    {
+        fprintf(dump_file, "rip=0x%016llx @bb=0x%08x\n",
+                pmio_trace_buff[index].rip, pmio_trace_buff[index].db_addr);
+    }
+
+    fclose(dump_file);
+    return;
+}
+
+#define ANNOTATION_BASE 0x4000
+static int annotation_handler(void *opaque, int size, int is_write,
+                              uint64_t addr, uint64_t *value)
+{
+    if(PMIO_TRACE_OPTION){
+        struct kvm_regs regs;
+        kvm_get_regs(kvm, 0, &regs);
+
+        pmio_trace_buff[pmio_trace_index].db_addr = (uint32_t)(*value);
+        pmio_trace_buff[pmio_trace_index].rip = regs.rip;
+        pmio_trace_index++;
+    }
+
+    systemc_annotate_function(p_kvm_cpu_adaptor, (*value + opaque));
+    return 0;
+}
+
 static int test_inb(void *opaque, uint16_t addr, uint8_t *value)
 {
 	struct io_table_entry *entry;
@@ -212,7 +262,7 @@ static int test_inb(void *opaque, uint16_t addr, uint8_t *value)
 		*value = val;
 	} else {
 		*value = -1;
-		printf("inb 0x%x\n", addr);
+		printf("test_inb: inb 0x%x\n", addr);
 	}
 
 	return 0;
@@ -229,7 +279,7 @@ static int test_inw(void *opaque, uint16_t addr, uint16_t *value)
 		*value = val;
 	} else {
 		*value = -1;
-		printf("inw 0x%x\n", addr);
+		printf("test_inw: inw 0x%x\n", addr);
 	}
 
 	return 0;
@@ -246,9 +296,9 @@ static int test_inl(void *opaque, uint16_t addr, uint32_t *value)
 		*value = val;
 	} else {
 		*value = -1;
-		printf("inl 0x%x\n", addr);
+		printf("test_inl: inl 0x%x\n", addr);
 	}
-
+    //printf("test_inl: addr = 0x%x, value = Ox%x\n", addr, *value);
 	return 0;
 }
 
@@ -261,7 +311,7 @@ static int test_outb(void *opaque, uint16_t addr, uint8_t value)
 		uint64_t val = value;
 		entry->handler(entry->opaque, 1, 1, addr, &val);
 	} else
-		printf("outb $0x%x, 0x%x\n", value, addr);
+        printf("test_outb: outb $0x%x, 0x%x\n", value, addr);
 
 	return 0;
 }
@@ -275,7 +325,7 @@ static int test_outw(void *opaque, uint16_t addr, uint16_t value)
 		uint64_t val = value;
 		entry->handler(entry->opaque, 2, 1, addr, &val);
 	} else
-		printf("outw $0x%x, 0x%x\n", value, addr);
+		printf("test_outw: outw $0x%x, 0x%x\n", value, addr);
 
 	return 0;
 }
@@ -284,12 +334,13 @@ static int test_outl(void *opaque, uint16_t addr, uint32_t value)
 {
 	struct io_table_entry *entry;
 
+    //printf("test_outl: addr = 0x%x, value = Ox%x\n", addr, value);
 	entry = io_table_lookup(&pio_table, addr);
 	if (entry) {
 		uint64_t val = value;
 		entry->handler(entry->opaque, 4, 1, addr, &val);
 	} else
-		printf("outl $0x%x, 0x%x\n", value, addr);
+		printf("test_outl: outl $0x%x, 0x%x\n", value, addr);
 
 	return 0;
 }
@@ -338,16 +389,60 @@ static int test_pre_kvm_run(void *opaque, void *vcpu)
 	return 0;
 }
 
+#define MMIO_TRACE_OPTION true
+typedef struct mmio_trace
+{
+    uint64_t addr;
+    uint8_t  is_write;
+}mmio_trace_t;
+
+mmio_trace_t mmio_trace_buff[10*1024*1024] = {0, 0};
+uint32_t mmio_trace_index = 0;
+
+void dump_mmio_trace_to_file(char *fname)
+{
+    FILE * dump_file = NULL;
+    uint32_t index = 0;
+
+    dump_file = fopen(fname, "w");
+    if(!dump_file)
+    {
+        fprintf(stderr, "Error Opening the Dump MMIO File\n");
+        return;
+    }
+
+    printf("Dumping %d MMIO accesses trace to \'%s\'\n", mmio_trace_index, fname);
+    for(index = 0; index < mmio_trace_index; index++)
+    {
+        char *mmio_type = mmio_trace_buff[index].is_write ? "WRITE" : "READ";
+        fprintf(dump_file, "[%s]:0x%016llx\n", mmio_type, mmio_trace_buff[index].addr);
+    }
+
+    fclose(dump_file);
+    return;
+}
+
 static int test_mmio_read(void *opaque, uint64_t addr, uint8_t *data, int len)
 {
     uint64_t value;
     int i;
 
+    if(MMIO_TRACE_OPTION){
+        mmio_trace_buff[mmio_trace_index].addr = addr;
+        mmio_trace_buff[mmio_trace_index].is_write = 0;
+        mmio_trace_index++;
+    }
+
     if (addr < IORAM_BASE_PHYS || addr + len > IORAM_BASE_PHYS + IORAM_LEN)
     {
         fprintf(stderr, "%s: IORAM_BASE_PHYS: 0x%x, IORAM_BASE_PHYS + IORAM_LEN: 0x%x\n",
-                __func__, (unsigned int) IORAM_BASE_PHYS, (unsigned int) (IORAM_BASE_PHYS + IORAM_LEN));
-        fprintf(stderr, "%s: Address: 0x%x, Address End: 0x%x\n", __func__, (unsigned int) addr, (unsigned int) addr+len);
+                __func__, (unsigned int) IORAM_BASE_PHYS, (unsigned int) (IORAM_BASE_PHYS + IORAM_LEN - 1));
+        fprintf(stderr, "%s: Address: 0x%x, Address End: 0x%x (len = %d)\n",
+                __func__, (unsigned int) addr, (unsigned int) addr+len-1, len);
+
+        if(MMIO_TRACE_OPTION) dump_mmio_trace_to_file("mmio_read_error_trace.dump");
+        if(PMIO_TRACE_OPTION) dump_pmio_trace_to_file("pmio_read_error_trace.dump");
+        kvm_show_regs(kvm, 0);
         return 1;
     }
 
@@ -365,11 +460,22 @@ static int test_mmio_read(void *opaque, uint64_t addr, uint8_t *data, int len)
 
 static int test_mmio_write(void *opaque, uint64_t addr, uint8_t *data, int len)
 {
+    if(MMIO_TRACE_OPTION){
+        mmio_trace_buff[mmio_trace_index].addr = addr;
+        mmio_trace_buff[mmio_trace_index].is_write = 1;
+        mmio_trace_index++;
+    }
+
     if (addr < IORAM_BASE_PHYS || addr + len > IORAM_BASE_PHYS + IORAM_LEN)
     {
         fprintf(stderr, "%s: IORAM_BASE_PHYS: 0x%x, IORAM_BASE_PHYS + IORAM_LEN: 0x%x\n",
-                __func__, (unsigned int) IORAM_BASE_PHYS, (unsigned int) (IORAM_BASE_PHYS + IORAM_LEN));
-        fprintf(stderr, "%s: Address: 0x%x, Address End: 0x%x\n", __func__, (unsigned int) addr, (unsigned int) addr+len);
+                __func__, (unsigned int) IORAM_BASE_PHYS, (unsigned int) (IORAM_BASE_PHYS + IORAM_LEN - 1));
+        fprintf(stderr, "%s: Address: 0x%x, Address End: 0x%x (len = %d)\n",
+		__func__, (unsigned int) addr, (unsigned int) addr+len-1, len);
+
+        if(MMIO_TRACE_OPTION) dump_mmio_trace_to_file("mmio_write_error_trace.dump");
+        if(PMIO_TRACE_OPTION) dump_pmio_trace_to_file("pmio_write_error_trace.dump");
+        kvm_show_regs(kvm, 0);
         return 1;
     }
 
@@ -383,6 +489,8 @@ static int test_mmio_write(void *opaque, uint64_t addr, uint8_t *data, int len)
 static int test_shutdown(void *opaque, void *env)
 {
 	printf("shutdown\n");
+    if(MMIO_TRACE_OPTION) dump_mmio_trace_to_file("mmio_shutdown_trace.dump");
+    if(PMIO_TRACE_OPTION) dump_pmio_trace_to_file("pmio_shutdown_trace.dump");
 	kvm_show_regs(kvm, 0);
 	exit(1);
 	return 1;
@@ -669,7 +777,6 @@ int load_elf(void *vm_addr, int vm_size, char *file)
     return 0;
 }
 
-//int soc_kvm_init(int argc, char **argv)
 int soc_kvm_init(char *bootstrap, char *elf_file)
 {
 	unsigned char *vm_mem;
@@ -789,6 +896,9 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 
 	io_table_register(&pio_table, IRQCHIP_IO_BASE, 0x20, irqchip_io, NULL);
 
+    // Register the Annotation Handler; Also pass the Virtual Memory Address allocated to KVM
+    io_table_register(&pio_table, ANNOTATION_BASE, 0x04, annotation_handler, vm_mem);
+
 	sem_init(&init_sem, 0, 0);
 	for (i = 0; i < ncpus; ++i)
 		start_vcpu(i);
@@ -804,6 +914,9 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 void soc_kvm_run()
 {
     int ret = 0;
+
+    io_table_print(&pio_table);
+
     printf("%s: Calling kvm_run ...\n", __func__);
     ret = kvm_run(kvm, 0, &vcpus[0]);
     printf("%s Exited; Return Value = %d\n", __func__, ret);

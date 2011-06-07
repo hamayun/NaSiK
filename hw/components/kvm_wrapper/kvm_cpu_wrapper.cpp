@@ -1,6 +1,9 @@
 
 #include <kvm_cpu_wrapper.h>
 
+#define DEBUG_KVM_WRAPPER true
+#define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
+
 extern "C" {
 	void soc_kvm_run();
 }
@@ -9,8 +12,9 @@ extern "C" {
 static unsigned char s_st_operation_codes[] = {0xDE, 0x00, 0x10, 0xDE, 0x20, 0xDE, 0xDE, 0xDE, 0x30};
 static unsigned char s_st_operation_mask_be[] = {0xDE, 0x01, 0x03, 0xDE, 0x0F, 0xDE, 0xDE, 0xDE, 0xFF};
 
-kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, int node_id)
-	: master_device (name)
+kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, char *elf_file, uintptr_t app_base_addr, int node_id)
+	: master_device (name)/*,
+          ExecutionSpy(ANALYZE_OPTION, ONLINE_OPTION, NO_THREAD_OPTION, elf_file, app_base_addr)*/
 {
     m_rqs = new qemu_wrapper_requests (100);
     m_unblocking_write = 0;
@@ -27,12 +31,35 @@ kvm_cpu_wrapper::~kvm_cpu_wrapper ()
 // A thread used to simulate the kvm
 void kvm_cpu_wrapper::cpuThread ()
 {
-	while (1)
-	{
-		soc_kvm_run();
-	}
+    //while (1)
+    {
+        soc_kvm_run();
+    }
 }
 
+// Here we get the Annotation Trace (A buffer containing pointers to Annotation DBs)
+/*
+void kvm_cpu_wrapper::compute(annotation_t *trace, uint32_t count)
+{
+    uint32_t  index;
+    uint32_t  instructions = 0;
+    uint32_t  cycles = 0;
+
+    DOUT_NAME << __func__ << " count " << count << std::endl;
+    for( index = 0 ; index < count; index++ )
+    {
+        trace[index].eu = (uintptr_t)this;
+        //trace[index].thread = _current_thread_id; // Store the current thread id in annotation object
+        if(trace[index].type == BB_DEFAULT)
+        {
+            cycles += trace[index].db->CycleCount;
+            instructions += trace[index].db->InstructionCount;
+        }
+    }
+    DOUT_NAME << __func__ << " wait " << cycles << std::endl;
+    wait(cycles, SC_NS);
+}
+*/
 void kvm_cpu_wrapper::rcv_rsp(unsigned char tid, unsigned char *data,
                                bool bErr, bool bWrite)
 {
@@ -149,7 +176,30 @@ extern "C"
         unsigned char *data, int nbytes, unsigned long *ns, int bIO)
     {
        _this->write (addr, data, nbytes, bIO);
-	}
-	
+    }
+
+    void print_annotation_db(annotation_db_t *db)
+    {
+        printf("@db = 0x%08x\t", (uint32_t) db);
+        printf("Type: [ ");
+        if(db->Type == BB_DEFAULT) printf("BB_DEFAULT ");
+        else
+        {
+            if(db->Type & BB_ENTRY) printf("BB_ENTRY ");
+            if(db->Type & BB_RETURN) printf("BB_RETURN ");
+        }
+        printf("]\t");
+
+        printf("Instr. Cnt = 0x%x, Cycle Cnt = 0x%x, Load Cnt = 0x%x, Store Cnt = 0x%x, FuncAddr = 0x%x\n",
+               db->InstructionCount, db->CycleCount, db->LoadCount, db->StoreCount, db->FuncAddr);
+    }
+
+    void
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *db)
+    {
+        //this->annotate((annotation_db_t *) db);
+        annotation_db_t *pdp = (annotation_db_t *) db;
+        wait(pdp->CycleCount, SC_NS);
+    }
 }
 

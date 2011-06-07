@@ -3,8 +3,8 @@ COMPONENTS   = hw/components
 PLATFORM     = examples/$(APPLICATION)/hw
 SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/mem                \
-               $(COMPONENTS)/kvm_wrapper        \
                $(COMPONENTS)/ramdac             \
+               $(COMPONENTS)/kvm_wrapper        \
                $(COMPONENTS)/framebuffer        \
                $(COMPONENTS)/sem                \
                $(COMPONENTS)/slave_device       \
@@ -16,6 +16,9 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/sl_blockdevice     \
                $(COMPONENTS)/hosttime           \
                $(PLATFORM)
+
+#               $(COMPONENTS)/analyzer           \
+#               $(COMPONENTS)/execution_spy      \
 
 CC           = g++
 OPT          = -O0 

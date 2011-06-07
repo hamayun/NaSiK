@@ -133,6 +133,8 @@ namespace native
 
       DOUT_FCT << ": application " << linkmap->l_name << std::endl;
 
+      // l_name is the abs. path of dynamic library
+      // search in the map if its already there?
       mapit = _annotation_shared_map.find(linkmap->l_name);
       if(mapit == _annotation_shared_map.end())
       {

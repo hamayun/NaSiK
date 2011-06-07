@@ -719,6 +719,7 @@ static int handle_io(kvm_context_t kvm, struct kvm_run *run, int vcpu)
 	for (i = 0; i < run->io.count; ++i) {
 		switch (run->io.direction) {
 		case KVM_EXIT_IO_IN:
+                        //printf("handle_io (IN): addr = 0x%x, size = %d\n", addr, run->io.size);
 			switch (run->io.size) {
 			case 1:
 				r = kvm->callbacks->inb(kvm->opaque, addr, p);
@@ -735,6 +736,7 @@ static int handle_io(kvm_context_t kvm, struct kvm_run *run, int vcpu)
 			}
 			break;
 		case KVM_EXIT_IO_OUT:
+                        //printf("handle_io (OUT): addr = 0x%x, size = %d\n", addr, run->io.size);
 		    	switch (run->io.size) {
 			case 1:
 				r = kvm->callbacks->outb(kvm->opaque, addr,
@@ -836,12 +838,16 @@ static int handle_mmio(kvm_context_t kvm, struct kvm_run *kvm_run)
 	if ((addr > 0xa0000-4 && addr <= 0xa0000) && kvm_run->mmio.len == 3)
 	    return 0;
 
-	if (kvm_run->mmio.is_write)
+	if (kvm_run->mmio.is_write){
+                //printf("handle_mmio (Write): addr = 0x%x, size = %d\n", addr, kvm_run->mmio.len);
 		return kvm->callbacks->mmio_write(kvm->opaque, addr, data,
 					kvm_run->mmio.len);
-	else
+        }
+	else{
+                ///printf("handle_mmio (Read): addr = 0x%x, size = %d\n", addr, kvm_run->mmio.len);
 		return kvm->callbacks->mmio_read(kvm->opaque, addr, data,
 					kvm_run->mmio.len);
+        }
 }
 
 int handle_io_window(kvm_context_t kvm)
