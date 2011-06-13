@@ -47,16 +47,16 @@ if [ $? != 0 ]; then
 fi
 
 print_step "Compiling Software Application ... ${APPLICATION}"
-cd ${APP_DIR}/sw 
+cd ${APP_DIR}
 apes-compose
 if [ $? != 0 ]; then
     print_error "Compilation Failed for Application"
     exit 3 
 fi
 
-print_step "Compiling Hardware Model ... "
-cd ${APP_DIR}/hw
-make 
+print_step "Compiling Platform Model ... "
+cd ${PLATFORM_DIR}
+make -j2
 if [ $? != 0 ]; then
     print_error "Compilation Failed for Hardware Model"
     exit 4 

@@ -1,6 +1,6 @@
 SRC_BASE_DIR = $(NASIK_HOME)
 COMPONENTS   = hw/components
-PLATFORM     = examples/$(APPLICATION)/hw
+PLATFORM     = examples/platforms/tuzki
 SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/mem                \
                $(COMPONENTS)/ramdac             \

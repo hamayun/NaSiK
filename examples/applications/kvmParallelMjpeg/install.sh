@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export CRT0="${LIBKVM_HOME}/user/test/x86/dnastart.o"
-export ANOT="/home/hamayun/workspace/NaSiK/examples/kvmParallelMjpeg/sw/annotation.o"
+export ANOT="/home/hamayun/workspace/NaSiK/examples/applications/kvmParallelMjpeg/annotation.o"
 CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/i386-sls-dnaos/4.4.2/include/"
 
 # Try and Do the Split Compilation using the Primary Compiler. 

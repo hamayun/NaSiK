@@ -14,10 +14,13 @@ source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
 export APPLICATION=kvmParallelMjpeg
+export PLATFORM=tuzki
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
-export APP_DIR=$(find $NASIK_HOME/examples -name "$APPLICATION")
-cd $APP_DIR/sw
+export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
+cd $APP_DIR
 source install.sh 
+
+export PLATFORM_DIR=$(find $NASIK_HOME/examples/platforms -name "$PLATFORM")
 
 # for tty_terms
 export PATH=$NASIK_HOME:$PATH
@@ -31,6 +34,7 @@ echo "SYSTEMC                 = $SYSTEMC"
 echo "LIBKVM_HOME             = $LIBKVM_HOME"
 echo "LIBKVM_PREFIX           = $LIBKVM_PREFIX"
 echo "APPLICATION             = $APP_DIR"
+echo "PLATFORM                = $PLATFORM_DIR"
 echo "APES_ROOT               = $APES_ROOT"
 echo "APES EXTRA COMPONENTS   = $APES_EXTRA_COMPS"
 echo "APES_PATH               = $APES_PATH"

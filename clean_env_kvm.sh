@@ -34,11 +34,11 @@ cd ${LIBSOCKVM_HOME}
 make clean 
 
 print_substep "Cleaning Software Application ... ${APPLICATION}"
-cd ${APP_DIR}/sw 
+cd ${APP_DIR}
 apes-compose -c
 
 print_substep "Cleaning Hardware Model ... "
-cd ${APP_DIR}/hw
+cd ${PLATFORM_DIR}
 make clean 
 
 print_step "Environment Cleanup Done !!!"
