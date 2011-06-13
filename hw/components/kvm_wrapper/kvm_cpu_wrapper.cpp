@@ -177,7 +177,7 @@ extern "C"
     {
        _this->write (addr, data, nbytes, bIO);
     }
-
+		/*
     void print_annotation_db(annotation_db_t *db)
     {
         printf("@db = 0x%08x\t", (uint32_t) db);
@@ -193,7 +193,7 @@ extern "C"
         printf("Instr. Cnt = 0x%x, Cycle Cnt = 0x%x, Load Cnt = 0x%x, Store Cnt = 0x%x, FuncAddr = 0x%x\n",
                db->InstructionCount, db->CycleCount, db->LoadCount, db->StoreCount, db->FuncAddr);
     }
-
+		*/
     void
     systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *db)
     {

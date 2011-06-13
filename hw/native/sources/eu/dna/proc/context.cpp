@@ -69,7 +69,7 @@ namespace native
 
   void dna_eu::context_commute(CPU_CONTEXT_T *from, CPU_CONTEXT_T *to)
   {
-    // MMH: Observation; context commute is never called by DNA 2.0 (Needs Verification);
+    // MMH: Observation; context commute is never called by DNA 2.0;
     // Instead context load and context store are used.
     _current_thread_id = (uintptr_t)to;
     DOUT_NAME << " context_commute: " << std::hex << from << " to 0x" << std::hex << to << std::endl;
