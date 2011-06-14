@@ -42,7 +42,7 @@ interconnect_master::interconnect_master (sc_module_name name, interconnect *par
     i = 0;
     while (1)
     {
-        k = fscanf (file, "0x%lX 0x%lX 0x%lX %d\n", 
+        k = fscanf (file, "0x%X 0x%X 0x%X %d\n",
                     &m_map[i].begin_address, &m_map[i].end_address, &m_map[i].intern_offset, &m_map[i].slave_id);
         if (k <= 0)
             break;
@@ -105,7 +105,7 @@ void interconnect_master::dispatch_requests_thread ()
                 break;
         if (i == m_nmap)
         {
-            printf ("Error (masterid=%d): Cannot map the address 0x%lx to a slave!\n", m_srcid, addr);
+            printf ("Error (masterid=%d): Cannot map the address 0x%x to a slave!\n", m_srcid, addr);
             exit (1);
         }
         slave = m_parent->get_slave (m_map[i].slave_id);
