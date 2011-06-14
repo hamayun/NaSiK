@@ -153,7 +153,7 @@ static uint32_t s_mask[16] = { 0x00000000, 0x000000FF, 0x0000FF00, 0x0000FFFF,
                                0xFF000000, 0xFF0000FF, 0xFF00FF00, 0xFF00FFFF,
                                0xFFFF0000, 0xFFFF00FF, 0xFFFFFF00, 0xFFFFFFFF };
 
-void sl_fb_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_fb_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     uint32_t  *val = (uint32_t *)data;
     uint32_t   lofs = ofs;
@@ -177,8 +177,8 @@ void sl_fb_device::write (unsigned long ofs, unsigned char be, unsigned char *da
         EPRINTF("write outside mem area: %x / %x\n", ofs, mem_size);
         EPRINTF("Bad %s::%s ofs=0x%X, be=0x%X, data=0x%X-%X\n",
                 name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned long*)data + 0),
-                (unsigned int) *((unsigned long*)data + 1));
+                (unsigned int) *((unsigned int *)data + 0),
+                (unsigned int) *((unsigned int *)data + 1));
         bErr = true;
         exit(EXIT_FAILURE);
     }
@@ -200,7 +200,7 @@ void sl_fb_device::write (unsigned long ofs, unsigned char be, unsigned char *da
 
 }
 
-void sl_fb_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_fb_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     bErr = false;
     EPRINTF("Bad %s::%s ofs=0x%X, be=0x%X\n", name (), __FUNCTION__,
@@ -407,7 +407,7 @@ sl_fb_device::convert_frame_yv12(void){
 }
 
 
-void sl_fb_device::rcv_rqst (unsigned long ofs, unsigned char be,
+void sl_fb_device::rcv_rqst (unsigned int ofs, unsigned char be,
                               unsigned char *data, bool bWrite)
 {
 

@@ -167,7 +167,7 @@ get_sample (scope_state_t *scope, uint64_t time)
 }
 
 void
-etrace_if_mode_change (scope_state_t *scope, periph_t *pperiph, unsigned long mode,
+etrace_if_mode_change (scope_state_t *scope, periph_t *pperiph, unsigned int mode,
     unsigned long long time_stamp)
 {
 
@@ -486,14 +486,14 @@ etrace_if::roll_average (uint64_t new_samp)
 
 
 void 
-etrace_if::change_energy_mode (unsigned long periph_id, unsigned long mode)
+etrace_if::change_energy_mode (unsigned int periph_id, unsigned int mode)
 {
     etrace_if_mode_change (m_scope, 
         (periph_t *) periph_id, mode, sc_time_stamp ().value () / 1000);
 }
 
 void 
-etrace_if::energy_event (unsigned long periph_id, unsigned long event_id, unsigned long value)
+etrace_if::energy_event (unsigned int periph_id, unsigned int event_id, unsigned int value)
 {
 }
 
@@ -505,7 +505,7 @@ etrace_if::start_measure (void)
     m_measure_nbsamp  = 0;
 }
  
-unsigned long
+unsigned int
 etrace_if::stop_measure (void)
 {
     uint64_t  samp_per    = m_scope->sample_period;
@@ -513,7 +513,7 @@ etrace_if::stop_measure (void)
 
     m_measure_started = 0;
 
-    return (unsigned long) val;
+    return (unsigned int ) val;
 }
 
 etrace_if       etrace ("Etrace_Interface");

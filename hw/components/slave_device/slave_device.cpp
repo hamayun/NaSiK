@@ -19,7 +19,7 @@
 
 #include <slave_device.h>
 
-//void invalidate_address (unsigned long addr, unsigned int node_id);
+void invalidate_address (unsigned int addr, unsigned int node_id);
 
 slave_device::slave_device (sc_module_name module_name) : sc_module (module_name)
 {
@@ -35,7 +35,7 @@ slave_device::~slave_device ()
 void slave_device::request_thread ()
 {
     unsigned char           be, cmd;
-    unsigned long           addr;
+    unsigned int            addr;
 
     while (1)
     {
@@ -80,7 +80,7 @@ slave_device::send_rsp (bool bErr)
         //invalidate_address (m_req.initial_address, m_req.srcid);
         printf("Request of invalidate\n");
     }
-        
+
     m_rsp.rerror = bErr;
     put_port->put (m_rsp);
 

@@ -34,12 +34,12 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
-    void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
 
     void timer_thread ();
 
@@ -48,7 +48,7 @@ public:
     sc_out<bool>        irq;
 
 private:
-    unsigned long       divisor;
+    unsigned int        divisor;
     double              ns_period;
     sc_event            ev_wake;
     bool                divisor_changed;

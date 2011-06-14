@@ -53,7 +53,7 @@ hosttime::~hosttime()
         fclose (host_file);
 }
 
-void hosttime::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void hosttime::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
 #if 0
     switch (ofs)
@@ -69,7 +69,7 @@ void hosttime::write (unsigned long ofs, unsigned char be, unsigned char *data, 
     default:
         printf ("Bad %s:%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n", name (),
                 __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
+                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int*)data + 1));
         exit (1);
         break;
     }
@@ -77,19 +77,19 @@ void hosttime::write (unsigned long ofs, unsigned char be, unsigned char *data, 
     bErr = false;
 }
 
-void hosttime::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void hosttime::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int             i;
 
-    *((unsigned long *)data + 0) = 0x1234;
-    *((unsigned long *)data + 1) = 0x5678;
+    *((unsigned int *)data + 0) = 0x1234;
+    *((unsigned int *)data + 1) = 0x5678;
 
     printf ("Bad %s:%s ofs=0x%X, be=0x%X!\n",  name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be);
     exit (1);
     bErr = false;
 }
 
-void hosttime::rcv_rqst (unsigned long ofs, unsigned char be,
+void hosttime::rcv_rqst (unsigned int ofs, unsigned char be,
                           unsigned char *data, bool bWrite)
 {
 

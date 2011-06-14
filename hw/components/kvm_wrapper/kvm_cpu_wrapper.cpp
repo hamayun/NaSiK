@@ -1,4 +1,3 @@
-
 #include <kvm_cpu_wrapper.h>
 
 #define DEBUG_KVM_WRAPPER true
@@ -70,7 +69,7 @@ void kvm_cpu_wrapper::rcv_rsp(unsigned char tid, unsigned char *data,
     if (localrq == NULL)
     {
         cout << "[Error: " << name () << " received a response for an unknown TID 0x"
-             << std::hex << (unsigned long) tid << "]" << endl;
+             << std::hex << (unsigned int) tid << "]" << endl;
         return;
     }
 
@@ -80,8 +79,8 @@ void kvm_cpu_wrapper::rcv_rsp(unsigned char tid, unsigned char *data,
         return;
     }
 
-    localrq->low_word = *((unsigned long *)data + 0);
-    localrq->high_word = *((unsigned long *)data + 1);
+    localrq->low_word = *((unsigned int *)data + 0);
+    localrq->high_word = *((unsigned int *)data + 1);
     localrq->bDone = 1;
     localrq->evDone.notify ();
 
@@ -113,8 +112,8 @@ uint64_t kvm_cpu_wrapper::read (uint64_t addr,
     if (!localrq->bDone)
         wait (localrq->evDone);
 
-    *((unsigned long *) adata + 0) = localrq->low_word;
-    *((unsigned long *) adata + 1) = localrq->high_word;
+    *((unsigned int *) adata + 0) = localrq->low_word;
+    *((unsigned int *) adata + 1) = localrq->high_word;
 
     m_rqs->FreeRequest (localrq);
 
@@ -162,7 +161,7 @@ extern "C"
 {
     uint64_t
     systemc_kvm_read_memory (kvm_cpu_wrapper_t *_this, uint64_t addr,
-        int nbytes, unsigned long *ns, int bIO)
+        int nbytes, unsigned int *ns, int bIO)
     {
         uint64_t						ret;
  
@@ -173,7 +172,7 @@ extern "C"
 
     void
     systemc_kvm_write_memory (kvm_cpu_wrapper_t *_this, uint64_t addr,
-        unsigned char *data, int nbytes, unsigned long *ns, int bIO)
+        unsigned char *data, int nbytes, unsigned int *ns, int bIO)
     {
        _this->write (addr, data, nbytes, bIO);
     }

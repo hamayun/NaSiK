@@ -26,9 +26,9 @@
 typedef struct
 {
     int								slave_id;
-    unsigned long					begin_address;
-    unsigned long					end_address;
-    unsigned long                   intern_offset;
+    unsigned int 					begin_address;
+    unsigned int 					end_address;
+    unsigned int                    intern_offset;
 } interconnect_master_map_el;
 
 template <typename ITEM>
@@ -53,7 +53,7 @@ public:
         m_queue_responses->Write (rsp);
     }
 
-    inline int get_slave_id_for_mem_addr (unsigned long &addr)
+    inline int get_slave_id_for_mem_addr (unsigned int &addr)
     {
         interconnect_master_map_el      *map;
         int                             i;

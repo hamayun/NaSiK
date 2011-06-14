@@ -24,20 +24,22 @@
 #include <master_device.h>
 
 enum sl_block_registers {
-    BLOCK_DEVICE_BUFFER     = 0,
-    BLOCK_DEVICE_LBA        = 1,
-    BLOCK_DEVICE_COUNT      = 2,
-    BLOCK_DEVICE_OP         = 3,
-    BLOCK_DEVICE_STATUS     = 4,
-    BLOCK_DEVICE_IRQ_ENABLE = 5,
-    BLOCK_DEVICE_SIZE       = 6,
-    BLOCK_DEVICE_BLOCK_SIZE = 7,
+    BLOCK_DEVICE_BUFFER               = 0,
+    BLOCK_DEVICE_LBA                  = 1,
+    BLOCK_DEVICE_COUNT                = 2,
+    BLOCK_DEVICE_OP                   = 3,
+    BLOCK_DEVICE_STATUS               = 4,
+    BLOCK_DEVICE_IRQ_ENABLE           = 5,
+    BLOCK_DEVICE_SIZE                 = 6,
+    BLOCK_DEVICE_BLOCK_SIZE           = 7,
+    BLOCK_DEVICE_FINISHED_BLOCK_COUNT = 8,
 };
 
 enum sl_block_op {
 	BLOCK_DEVICE_NOOP,
 	BLOCK_DEVICE_READ,
 	BLOCK_DEVICE_WRITE,
+	BLOCK_DEVICE_FILE_NAME,
 };
 
 enum sl_block_status {
@@ -48,6 +50,7 @@ enum sl_block_status {
 	BLOCK_DEVICE_READ_ERROR    = 4,
 	BLOCK_DEVICE_WRITE_ERROR   = 5,
 	BLOCK_DEVICE_ERROR         = 6,
+	BLOCK_DEVICE_READ_EOF      = 7,
 };
 
 
@@ -63,6 +66,7 @@ struct sl_block_device_CSregs {
     uint32_t m_block_size;
     uint32_t m_irqen;
     uint32_t m_irq;
+	uint32_t m_finished_block_count;
 };
 
 /*
@@ -82,15 +86,14 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned long ofs, unsigned char be,
+    void write (unsigned int ofs, unsigned char be,
                 unsigned char *data, bool &bErr);
-    void read (unsigned long ofs, unsigned char be,
+    void read (unsigned int ofs, unsigned char be,
                unsigned char *data, bool &bErr);
-
 
 private:
     sc_event                 *ev_op_start;
@@ -117,7 +120,7 @@ public:
 public:
     /*
      *   Obtained from father
-     *    void send_req(unsigned char tid, unsigned long addr, unsigned char *data, 
+     *    void send_req(unsigned char tid, unsigned int addr, unsigned char *data, 
      * 			  unsigned char bytes, bool bWrite);
      */
     virtual void rcv_rsp (unsigned char tid, unsigned char *data,
@@ -156,6 +159,7 @@ public:
 private:
     void irq_update_thread(void);
     void control_thread(void);
+    void open_host_file (const char *fname);
 
 public:
     sc_out<bool>        irq;

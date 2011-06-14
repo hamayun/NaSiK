@@ -38,7 +38,7 @@ public:
     void send_rsp (bool bErr);
 
     // Slave modules have to implement the recieve function ...
-    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
                            unsigned char *data, bool bWrite) = 0;
     virtual unsigned char *get_mem () {return 0;}
 

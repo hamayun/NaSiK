@@ -16,12 +16,12 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 	// IO interfaces methods
-    virtual void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
-    virtual void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    virtual void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    virtual void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
 
 private:
     void screen_init(uint32_t width, uint32_t height);

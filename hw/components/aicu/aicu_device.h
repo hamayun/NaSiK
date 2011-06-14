@@ -80,12 +80,12 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
-    void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
 
     void irq_update_thread (void);
     void reset_registers (void);

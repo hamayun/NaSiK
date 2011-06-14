@@ -106,7 +106,7 @@ void master_device::response_thread ()
 
 }
 
-void master_device::send_req(unsigned char tid, unsigned long addr,
+void master_device::send_req(unsigned char tid, unsigned int addr,
                              unsigned char *data, unsigned char bytes, bool bWrite)
 {
 

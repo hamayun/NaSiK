@@ -57,7 +57,7 @@ sl_mailbox_device::~sl_mailbox_device ()
 {
 }
 
-void sl_mailbox_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_mailbox_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     uint32_t                value;
     uint32_t mailbox;
@@ -99,8 +99,8 @@ void sl_mailbox_device::write (unsigned long ofs, unsigned char be, unsigned cha
     default:
         DPRINTF ("Bad %s::%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
                  name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                 (unsigned int) *((unsigned long*)data + 0),
-                 (unsigned int) *((unsigned long*)data + 1));
+                 (unsigned int) *((unsigned int *)data + 0),
+                 (unsigned int) *((unsigned int *)data + 1));
         exit (1);
         break;
     }
@@ -109,7 +109,7 @@ void sl_mailbox_device::write (unsigned long ofs, unsigned char be, unsigned cha
     bErr = false;
 }
 
-void sl_mailbox_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_mailbox_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int        i;
     int        mailbox = 0;
@@ -153,7 +153,7 @@ void sl_mailbox_device::read (unsigned long ofs, unsigned char be, unsigned char
     bErr = false;
 }
 
-void sl_mailbox_device::rcv_rqst (unsigned long ofs, unsigned char be,
+void sl_mailbox_device::rcv_rqst (unsigned int ofs, unsigned char be,
                                 unsigned char *data, bool bWrite)
 {
 

@@ -32,7 +32,7 @@
 #define DCOUT if (0) cout
 #endif
 
-mem_device::mem_device (const char *_name, unsigned long _size) : slave_device (_name)
+mem_device::mem_device (const char *_name, unsigned int _size) : slave_device (_name)
 {
     m_write_invalidate = true;
     mem = NULL;
@@ -40,11 +40,11 @@ mem_device::mem_device (const char *_name, unsigned long _size) : slave_device (
     mem = new unsigned char [size];
     memset (mem, 0, size);
 
-    printf("mem_device: Memory area location: 0x%08x\n", (int)mem);
+    printf("mem_device: Memory area location: 0x%08x\n", (long)mem);
 
 }
 
-mem_device::mem_device (const char *_name, unsigned long _size, unsigned char* _mem) : slave_device (_name)
+mem_device::mem_device (const char *_name, unsigned int _size, unsigned char* _mem) : slave_device (_name)
 {
     m_write_invalidate = false;
     size = _size;
@@ -57,7 +57,7 @@ mem_device::~mem_device ()
         delete [] mem;
 }
 
-void mem_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void mem_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int                 offset_dd = 0;
     int                 mod = 0;
@@ -96,7 +96,7 @@ void mem_device::write (unsigned long ofs, unsigned char be, unsigned char *data
 
         default:
         {
-            unsigned long       tbe = be;
+            unsigned int        tbe = be;
             while ((tbe & 1) == 0)
             {
                 tbe >>= 1;
@@ -146,12 +146,12 @@ void mem_device::write (unsigned long ofs, unsigned char be, unsigned char *data
     {
         printf ("Bad %s:%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
                 name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
+                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int *)data + 1));
         //exit (1);
     }
 }
 
-void mem_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void mem_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     uint32_t be_off = 0;
 
@@ -167,7 +167,7 @@ void mem_device::read (unsigned long ofs, unsigned char be, unsigned char *data,
         be_off = 4;
     }
 
-    *((unsigned long *) (data + be_off)) = (unsigned long) (mem + ofs + be_off);
+    *((unsigned int *) (data + be_off)) = (unsigned int ) (mem + ofs + be_off);
 
     DPRINTF("read rsp: 0x%08x\n", *((uint32_t *)data));
 #endif
@@ -175,7 +175,7 @@ void mem_device::read (unsigned long ofs, unsigned char be, unsigned char *data,
     wait (26, SC_NS);
 }
 
-void mem_device::rcv_rqst (unsigned long ofs, unsigned char be,
+void mem_device::rcv_rqst (unsigned int ofs, unsigned char be,
                            unsigned char *data, bool bWrite)
 {
     bool bErr = false;

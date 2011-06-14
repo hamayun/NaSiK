@@ -118,19 +118,19 @@ sl_tty_device::~sl_tty_device ()
     close_ttys ();
 }
 
-void sl_tty_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_tty_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     unsigned char           val, tty, be_ok = true;
-    unsigned long           value;
+    unsigned int            value;
 
     ofs >>= 2;
     if (be & 0xF0)
     {
         ofs++;
-        value = * ((unsigned long *) data + 1);
+        value = * ((unsigned int *) data + 1);
     }
     else
-        value = * ((unsigned long *) data + 0);
+        value = * ((unsigned int *) data + 0);
 
 
     tty = ofs / TTY_SPAN;
@@ -139,7 +139,7 @@ void sl_tty_device::write (unsigned long ofs, unsigned char be, unsigned char *d
     if(tty >= nb_tty){
         DPRINTF("(TTY too high) Bad %s::%s tty=%d ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
                 name (), __FUNCTION__, tty, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
+                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int *)data + 1));
         exit (1);
     }
 
@@ -154,20 +154,20 @@ void sl_tty_device::write (unsigned long ofs, unsigned char be, unsigned char *d
     default:
         printf ("Bad %s::%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
                 name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
+                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int *)data + 1));
         exit (1);
     }
     bErr = false;
 }
 
-void sl_tty_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_tty_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int             i;
-    unsigned long               value;
+    unsigned int               value;
 
 
-    *((unsigned long *)data + 0) = 0;
-    *((unsigned long *)data + 1) = 0;
+    *((unsigned int *)data + 0) = 0;
+    *((unsigned int *)data + 1) = 0;
 
     switch (ofs)
     {
@@ -180,7 +180,7 @@ void sl_tty_device::read (unsigned long ofs, unsigned char be, unsigned char *da
 }
 
 
-void sl_tty_device::rcv_rqst (unsigned long ofs, unsigned char be,
+void sl_tty_device::rcv_rqst (unsigned int ofs, unsigned char be,
                               unsigned char *data, bool bWrite)
 {
 

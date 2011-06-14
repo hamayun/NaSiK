@@ -94,7 +94,7 @@ void aicu_device::reset_registers(void)
 
 }
 
-void aicu_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void aicu_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     uint32_t                value;
 
@@ -159,8 +159,8 @@ void aicu_device::write (unsigned long ofs, unsigned char be, unsigned char *dat
             exit (1);
         }
     }else{
-        unsigned long nb_icu  = (ofs - AICU_LOCAL) / AICU_SPAN;
-        unsigned long lcl_ofs = (ofs - AICU_LOCAL)%(AICU_SPAN);
+        unsigned int nb_icu  = (ofs - AICU_LOCAL) / AICU_SPAN;
+        unsigned int lcl_ofs = (ofs - AICU_LOCAL)%(AICU_SPAN);
 
         if(nb_icu >= O){
             fprintf(stderr, "Out of range\n");
@@ -192,7 +192,7 @@ void aicu_device::write (unsigned long ofs, unsigned char be, unsigned char *dat
     bErr = false;
 }
 
-void aicu_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void aicu_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
 
     uint32_t  *val = (uint32_t *)data;
@@ -299,7 +299,7 @@ public:
 
 void aicu_device::irq_update_thread ()
 {
-    unsigned long       flags;
+    unsigned int       flags;
     int i = 0, j = 0;
     my_sc_event_or_list event_list(ev_irq_update);
 
@@ -355,7 +355,7 @@ void aicu_device::irq_update_thread ()
     }
 }
 
-void aicu_device::rcv_rqst (unsigned long ofs, unsigned char be,
+void aicu_device::rcv_rqst (unsigned int ofs, unsigned char be,
                                 unsigned char *data, bool bWrite)
 {
 

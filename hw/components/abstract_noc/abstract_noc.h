@@ -68,6 +68,7 @@ namespace noc
     };
 
 
+
     class vci_response
     {
     public:

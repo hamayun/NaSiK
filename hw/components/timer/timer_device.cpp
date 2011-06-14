@@ -22,7 +22,7 @@
 #include <timer_device.h>
 #include <cfg.h>
 
-#define DEBUG_DEVICE_TIMER
+//#define DEBUG_DEVICE_TIMER
 
 #ifdef DEBUG_DEVICE_TIMER
 #define DPRINTF(fmt, args...)                               \
@@ -49,10 +49,10 @@ timer_device::~timer_device ()
 {
 }
 
-void timer_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void timer_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
-    unsigned long           val1 = ((unsigned long*)data)[0];
-    unsigned long           val2 = ((unsigned long*)data)[1];
+    unsigned int            val1 = ((unsigned int *)data)[0];
+    unsigned int            val2 = ((unsigned int *)data)[1];
 
     switch (ofs)
     {
@@ -78,26 +78,26 @@ void timer_device::write (unsigned long ofs, unsigned char be, unsigned char *da
     default:
         printf ("Bad %s::%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
                 name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
+                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int *)data + 1));
         exit (1);
         break;
     }
     bErr = false;
 }
 
-void timer_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void timer_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int             i;
 
-    *((unsigned long *)data + 0) = 0;
-    *((unsigned long *)data + 1) = 0;
+    *((unsigned int *)data + 0) = 0;
+    *((unsigned int *)data + 1) = 0;
 
     switch (ofs)
     {
     case 0x00:
         if (be == 0x0F)
         {
-            *((unsigned long *) data + 0) = 1;
+            *((unsigned int *) data + 0) = 1;
         }
         else
         {
@@ -139,7 +139,7 @@ void timer_device::timer_thread ()
     }
 }
 
-void timer_device::rcv_rqst (unsigned long ofs, unsigned char be,
+void timer_device::rcv_rqst (unsigned int ofs, unsigned char be,
                              unsigned char *data, bool bWrite)
 {
     bool bErr = false;

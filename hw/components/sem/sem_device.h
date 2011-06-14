@@ -25,7 +25,7 @@
 class sem_device : public slave_device
 {
 public:
-    sem_device (const char *_name, unsigned long _size);
+    sem_device (const char *_name, unsigned int _size);
     virtual ~sem_device ();
 
 public:
@@ -33,15 +33,15 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
-    void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
 
 private:
-    unsigned long       size;
+    unsigned int        size;
     unsigned char       *mem;
 };
 

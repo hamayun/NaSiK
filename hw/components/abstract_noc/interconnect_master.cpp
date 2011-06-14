@@ -88,7 +88,7 @@ void interconnect_master::get (vci_response &rsp)
 
 void interconnect_master::dispatch_requests_thread ()
 {
-    unsigned long			addr;
+    unsigned int			addr;
     int						i;
     vci_request				req;
     interconnect_slave		*slave;

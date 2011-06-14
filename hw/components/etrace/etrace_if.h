@@ -80,11 +80,11 @@ public:
 public:
     unsigned long add_periph (const char *name, const periph_class_t *pclass, int &group_id,
         const char * group_name);
-    void change_energy_mode (unsigned long periph_id, unsigned long mode);
-    void energy_event (unsigned long periph_id, unsigned long event_id, unsigned long value);
+    void change_energy_mode (unsigned int periph_id, unsigned int mode);
+    void energy_event (unsigned int periph_id, unsigned int event_id, unsigned int value);
 
 	void start_measure (void);
-	unsigned long stop_measure (void);
+	unsigned int stop_measure (void);
 
 private:
     void display_init (void);

@@ -44,7 +44,7 @@ void framebuffer_device::end_of_elaboration()
 
 }
 
-void framebuffer_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void framebuffer_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int             i;
 	int				offset_dd = 0;
@@ -93,7 +93,7 @@ void framebuffer_device::write (unsigned long ofs, unsigned char be, unsigned ch
     	screen_update();
 }
 
-void framebuffer_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
+void framebuffer_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     printf ("Bad %s::%s ofs=0x%X, be=0x%X\n", name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be);
 	exit(1);
@@ -147,7 +147,7 @@ void framebuffer_device::screen_update()
   SDL_DisplayYUVOverlay(_image,&_rect);
 }
 
-void framebuffer_device::rcv_rqst (unsigned long ofs, unsigned char be,
+void framebuffer_device::rcv_rqst (unsigned int ofs, unsigned char be,
                               unsigned char *data, bool bWrite)
 {
 

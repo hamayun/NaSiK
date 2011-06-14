@@ -7,13 +7,14 @@ export LIBKVM_PREFIX=/opt/libs/libkvm
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
-export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-native
+export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386
 export APES_ROOT=/opt/Apes
 export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-export APPLICATION=kvmParallelMjpeg
+#export APPLICATION=kvmParallelMjpeg
+export APPLICATION=qsort
 export PLATFORM=tuzki
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")

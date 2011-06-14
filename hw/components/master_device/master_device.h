@@ -35,7 +35,7 @@ private:
     void response_thread ();
 
 public:
-    void send_req(unsigned char tid, unsigned long addr,
+    void send_req(unsigned char tid, unsigned int addr,
                   unsigned char *data, unsigned char bytes, bool bWrite);
 
     // Master modules have to implement the recieve function ...
