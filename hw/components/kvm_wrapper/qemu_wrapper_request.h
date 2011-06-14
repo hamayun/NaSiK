@@ -33,8 +33,8 @@ public:
     unsigned char			bDone;
     unsigned char           bWrite;
     sc_event				evDone;
-    unsigned long			low_word;
-    unsigned long			high_word;
+    unsigned int			low_word;
+    unsigned int			high_word;
 
     qemu_wrapper_request		*m_next;
 };
