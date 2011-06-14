@@ -46,7 +46,7 @@ SECTIONS
 	} > mem :data
 	.hal ALIGN(0x8): {
 		PLATFORM_DEBUG_CHARPORT = .; LONG(0xC0100000)
-		APP_ENTRY_POINT = .; LONG(main);
+		APP_ENTRY_POINT = .; LONG(_main);
 
 		CPU_MIPS32_COUNT = .; LONG(0x2)
 		CPU_SVC_STACK_ADDR  = ABSOLUTE(ADDR(.sysstack));

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export CRT0="${LIBKVM_HOME}/user/test/x86/dnastart.o"
+export CRT0="${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/lib/crt0.o"
+export DNASTART="${LIBKVM_HOME}/user/test/x86/dnastart.o"
 export ANOT="/home/hamayun/workspace/NaSiK/examples/applications/kvmParallelMjpeg/annotation.o"
 CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/i386-sls-dnaos/4.4.2/include/"
 
@@ -18,7 +19,7 @@ export APES_CC_FLAGS="-D__i386__ -D__KERNEL__ -Wall -Werror -Wno-format -std=c99
 export APES_ASSEMBLER="i386-sls-dnaos-as"
 
 export APES_LINKER="i386-sls-dnaos-gcc"
-export APES_LINKER_FLAGS="${CRT0} ${ANOT} -D__i386__ -D__KERNEL__ -Wl,-T,elf.lds"
+export APES_LINKER_FLAGS="${DNASTART} ${CRT0} ${ANOT} -D__i386__ -D__KERNEL__ -Wl,-T,elf.lds"
 export APES_LINKER_TRAIL_FLAGS="-L${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/lib -lc -lgcc -lm"
 
 APES_CC_OPTIMIZATIONS="-g"
