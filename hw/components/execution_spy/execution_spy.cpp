@@ -181,6 +181,8 @@ void ExecutionSpy::annotate(annotation_db_t *db)
   if(m_no_thread)
   {
     synchronize_no_thread();
+    // Must match the no_thread option at the software level as well.
+    // There should be only one db_t entry in the db_buffer.
     return;
   }
 

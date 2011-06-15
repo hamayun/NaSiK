@@ -6,11 +6,11 @@ export ANOT="${APP_DIR}/annotation.o"
 CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/i386-sls-dnaos/4.4.2/include/"
 
 # Try and Do the Split Compilation using the Primary Compiler. 
-#export APES_SPLIT_CC=""
+export APES_SPLIT_CC=""
 export APES_CC1="llvm-gcc"
 export APES_CC2="llc"
-export APES_CC1_FLAGS="-Wall -Wno-format -std=c99 -O3 -U__linux__ --emit-llvm -nostdinc $CUSTOM_INCLUDES"
-export APES_CC2_FLAGS="-annotate=arm -soft-float "
+export APES_CC1_FLAGS="-Wall -Werror -Wno-format -std=c99 -U__linux__ --emit-llvm -nostdinc $CUSTOM_INCLUDES"
+export APES_CC2_FLAGS="-annotate=arm -soft-float"
 # "-march=arm --print-dual-cfg --print-annotated-cfg
 
 # On Failure Use the default APES_COMPILER
