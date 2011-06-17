@@ -120,8 +120,7 @@ uint64_t kvm_cpu_wrapper::read (uint64_t addr,
     for (i = 0; i < nbytes; i++)
         *((unsigned char *) &ret + i) = adata[i];
 
-	wait(20, SC_US);
-
+    wait(20, SC_US);
     return ret;
 }
 
@@ -151,8 +150,7 @@ void kvm_cpu_wrapper::write (uint64_t addr,
         m_rqs->FreeRequest (localrq);
     }
 
-	  wait(20, SC_US);
-
+    wait(20, SC_US);
     return;
 
 }
@@ -176,7 +174,8 @@ extern "C"
     {
        _this->write (addr, data, nbytes, bIO);
     }
-		/*
+
+    /*
     void print_annotation_db(annotation_db_t *db)
     {
         printf("@db = 0x%08x\t", (uint32_t) db);
@@ -192,13 +191,41 @@ extern "C"
         printf("Instr. Cnt = 0x%x, Cycle Cnt = 0x%x, Load Cnt = 0x%x, Store Cnt = 0x%x, FuncAddr = 0x%x\n",
                db->InstructionCount, db->CycleCount, db->LoadCount, db->StoreCount, db->FuncAddr);
     }
-		*/
+    */
+
+    typedef struct {
+        uint32_t          BufferID;
+        uint32_t          StartIndex;       // First Valid db entry
+        uint32_t          EndIndex;         // Last Valid db entry
+        uint32_t          Capacity;         // The Size of DB Buffer to For H/W Knowledge
+        annotation_db_t  *Buffer[];
+    } db_buffer_desc_t;
+
     void
-    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *db)
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *pdesc)
     {
         //this->annotate((annotation_db_t *) db);
-        annotation_db_t *pdp = (annotation_db_t *) db;
-        wait(pdp->CycleCount, SC_NS);
+
+        db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) pdesc;
+        annotation_db_t *pdb = NULL;
+        uint32_t buffer_cycles = 0;
+
+        while(pbuff_desc->StartIndex != pbuff_desc->EndIndex)
+        {
+            // Get pointer to the annotation db;
+            pdb = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex]);
+            buffer_cycles += pdb->CycleCount;
+
+            pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
+        }
+
+        wait(buffer_cycles, SC_NS);
     }
 }
+
+/*
+printf("BufferID = %d, StartIndex = %d,  EndIndex = %d, Capacity = %d\n",
+    pbuff_desc->BufferID, pbuff_desc->StartIndex,
+    pbuff_desc->EndIndex, pbuff_desc->Capacity);
+*/
 

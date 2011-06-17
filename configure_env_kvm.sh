@@ -13,9 +13,9 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-export APPLICATION=kvmParallelMjpeg
+#export APPLICATION=kvmParallelMjpeg
 #export APPLICATION=qsort
-#export APPLICATION=pi
+export APPLICATION=pi
 export PLATFORM=tuzki
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
@@ -29,6 +29,8 @@ export PATH=$NASIK_HOME:$PATH
 
 # add toolchain paths
 export PATH=${PRIMARY_TOOLCHAIN}/bin:${SECONDARY_TOOLCHAIN}/bin:$PATH
+export LD_LIBRARY_PATH=${LIBKVM_PREFIX}/lib:$LD_LIBRARY_PATH
+
 cd $NASIK_HOME
 
 echo "======================= GENERAL ENVIRONMENT SETTINGS ========================="

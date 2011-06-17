@@ -1,6 +1,8 @@
+LIBSOCKVM    = libsoc_kvm.so
 CC           = gcc
 OPT          = -O0 
 DEBUG        = -g
+OTHER        = -fPIC
 
 CFLAGS       = $(DEBUG) $(OTHER) $(OPT)
 LDFLAGS      = -shared
@@ -8,10 +10,12 @@ CINCDIR      = -I${LIBKVM_HOME}/user/test/lib/x86
 CINCDIR     += -I${LIBKVM_HOME}/user/test/x86/
 CINCDIR     += -I${LIBKVM_HOME}/libkvm
 
-all: libsoc_kvm.a
+all: $(LIBSOCKVM)
 
-libsoc_kvm.a: iotable.o soc_kvm.o
-	$(AR) rcs $@ $^ 
+$(LIBSOCKVM): iotable.o soc_kvm.o
+	$(CC) -shared -o $@ $^
+
+#	$(AR) rcs $@ $^
 
 iotable.o: iotable.c
 	$(CC) $(CFLAGS) $(CINCDIR) -c $^ -o $@ 
@@ -24,5 +28,5 @@ clean:
 
 install: 
 	install -D -m 644 soc_kvm.h $(LIBKVM_PREFIX)/include/soc_kvm.h
-	install -D -m 644 libsoc_kvm.a $(LIBKVM_PREFIX)/lib/libsoc_kvm.a
+	install -D -m 644 $(LIBSOCKVM) $(LIBKVM_PREFIX)/lib/$(LIBSOCKVM)
 

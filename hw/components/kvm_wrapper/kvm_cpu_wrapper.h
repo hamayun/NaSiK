@@ -26,12 +26,11 @@
 
 // Will remove this typedef once the execution_spy is integrated.
 typedef struct {
-      uint32_t          Type;
-      uint32_t          InstructionCount;
-      uint32_t          CycleCount;
-      uint32_t          LoadCount;
-      uint32_t          StoreCount;
-      uint32_t          FuncAddr;
+    uint32_t          Type;
+    uint32_t          InstructionCount;
+    uint32_t          CycleCount;
+    uint32_t          LoadCount;
+    uint32_t          StoreCount;
 } annotation_db_t;
 
 using namespace noc;

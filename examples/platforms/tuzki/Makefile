@@ -21,12 +21,12 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
 #               $(COMPONENTS)/execution_spy      \
 
 CC           = g++
-OPT          = -O0 
+OPT          = -O0 -fpermissive
 DEBUG        = -g
 OTHER        =  -Wno-deprecated
 CFLAGS       = $(DEBUG) $(OTHER) $(OPT)
 LIBDIR       = -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(LIBKVM_PREFIX)/lib 
-LIBS         = -lsystemc -ldl -lpthread -lelf -lsoc_kvm -lkvm -lSDL -lc -lstdc++
+LIBS         = -lsystemc -lelf -lSDL -lsoc_kvm -lkvm
 TARGET_ARCH  = linux
 
 INCDIR += -I$(SYSTEMC)/include
@@ -59,9 +59,11 @@ $(EXE): $(OBJS)
 $(BUILD_DIR)/%.o:$(SRC_BASE_DIR)/%.cpp
 	@echo "Compiling $(notdir $<) ..."
 	@rm -fr $(addsuffix .d, $(basename $@))
-	@$(CC) $(CFLAGS) $(INCDIR) -o $@ -c $< -fvisibility=hidden 
+	@$(CC) $(CFLAGS) $(INCDIR) -o $@ -c $<
 	@echo -n "$(dir $@)" > $(addsuffix .d, $(basename $@))
 	@$(CC) $(CFLAGS) $(INCDIR) -M $< >> $(addsuffix .d, $(basename $@))
+
+#	@$(CC) $(CFLAGS) $(INCDIR) -o $@ -c $< -fvisibility=hidden
 
 clean:
 	@echo Cleaning ...

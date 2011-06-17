@@ -225,7 +225,7 @@ int main()
       time_t T1, T2;
 
       int argc = 2; 
-      char *argv[2] = {"PIKVM", "50000"}; 
+      char *argv[2] = {"PIKVM", "10000"};
       volatile int *htime;
       htime = (int *)0xCE000000;
 
