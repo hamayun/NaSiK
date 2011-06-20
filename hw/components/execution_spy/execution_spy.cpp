@@ -1,5 +1,5 @@
 /*************************************************************************************
- * File   : execution_spy.cpp,     
+ * File   : execution_spy.cpp,
  *
  * Copyright (C) 2008 TIMA Laboratory
  * Author(s) :      Patrice, GERIN patrice.gerin@imag.fr
@@ -35,9 +35,9 @@
 #include <string.h>
 #include <iostream>
 
-using namespace std; 
+using namespace std;
 
-#define DEBUG_EXECUTION_SPY true
+#define DEBUG_EXECUTION_SPY false
 #define DOUT_FCT  if(DEBUG_EXECUTION_SPY) std::cout << __func__ << ": "
 #define DOUT      if(DEBUG_EXECUTION_SPY) std::cout
 
@@ -131,7 +131,7 @@ void ExecutionSpy::register_self(char * elf_file, uintptr_t app_base_addr)
     m_annotation_buffer_set->current = 0;
     m_annotation_buffer_set->db_count = 0;
 
-    for( int i = 0 ; i < NB_BUFFER ; i ++) 
+    for( int i = 0 ; i < NB_BUFFER ; i ++)
     {
       sem_init(&(m_annotation_buffer_set->buffers[i].sem), 0, 0);
       sem_init(&(m_annotation_buffer_set->buffers[i].ack), 0, 1);
@@ -147,53 +147,62 @@ void ExecutionSpy::close()
     m_annotation_buffer_set->analyzer->ending();
 }
 
-void ExecutionSpy::annotate(annotation_db_t *db)
+void ExecutionSpy::annotate(void *vm_addr, db_buffer_desc_t *pbuff_desc)
 {
   annotation_buffer_t  *buffer_ptr;
   annotation_t  *annotation_ptr;
+  annotation_db_t *db;
 
-  buffer_ptr =  &(m_annotation_buffer_set->buffers[m_annotation_buffer_set->current]);
-  annotation_ptr =  &(buffer_ptr->buffer[buffer_ptr->count]);
-
-  // TODO: Unify the MBB_DEFAULT & BB_DEFAULT types together.
-  annotation_ptr->type = db->Type;
-  annotation_ptr->db = db;
-  // Get the Return Address of the Caller of the Current Function.
-  annotation_ptr->bb_addr = (uintptr_t)__builtin_return_address (1);
-
-  /* We can use a Static Counter Here that will correspond with the Annotation Push
-   * count inside the Analyzer Thread for debugging the Thread Contexts Switches.
-   * An Examples is given below.
+  while(pbuff_desc->StartIndex != pbuff_desc->EndIndex)
   {
-    static int        annotate_count = 0;
-    annotate_count++;
-    if(annotate_count >= 42200 && annotate_count <= 42500)
+    buffer_ptr =  &(m_annotation_buffer_set->buffers[m_annotation_buffer_set->current]);
+    annotation_ptr =  &(buffer_ptr->buffer[buffer_ptr->count]);
+
+    // Get pointer to the annotation db;
+    db = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex]);
+    pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
+
+    // TODO: Unify the MBB_DEFAULT & BB_DEFAULT types together.
+    annotation_ptr->type = db->Type;
+    annotation_ptr->db = db;
+    // Get the Return Address of the Caller of the mbb_annotation Function.
+    annotation_ptr->bb_addr = (uint32_t) db->FuncAddr;
+
+    /* We can use a Static Counter Here that will correspond with the Annotation Push
+     * count inside the Analyzer Thread for debugging the Thread Contexts Switches.
+     * An Examples is given below.
     {
-        std::cout << "annotate_count: " << std::dec << annotate_count << std::endl;
-        if (m_annotation_buffer_set->analyzer)
-            m_annotation_buffer_set->analyzer->print_annotation(annotation_ptr);
-        else
-            std::cout << "NO Analyzer Assigned !!!" << std::endl;
+        static int        annotate_count = 0;
+        annotate_count++;
+        //if(annotate_count >= 42200 && annotate_count <= 42500)
+        {
+            std::cout << "annotate_count: " << std::dec << annotate_count << std::endl;
+            if (m_annotation_buffer_set->analyzer)
+                m_annotation_buffer_set->analyzer->print_annotation(annotation_ptr);
+            else
+                std::cout << "No Analyzer Assigned !!!" << std::endl;
+        }
     }
-  }
-  */
+    */
 
-  if(m_no_thread)
-  {
-    synchronize_no_thread();
-    // Must match the no_thread option at the software level as well.
-    // There should be only one db_t entry in the db_buffer.
-    return;
-  }
+    if(m_no_thread)
+    {
+        // The buffer should contain one db entry only for this option.
+        ASSERT(pbuff_desc->StartIndex == pbuff_desc->EndIndex);
 
-  m_annotation_buffer_set->db_count++;
-  buffer_ptr->count++;
-  ASSERT(buffer_ptr->count <= BUFFER_SIZE);
+        synchronize_no_thread();
+        return;
+    }
 
-  // The computation treshold is used to break dead lock in the annotated software.
-  if( (m_annotation_buffer_set->db_count >= COMPUTATION_THRESHOLD) || (buffer_ptr->count >= BUFFER_SIZE))
-  {
-    synchronize();
+    m_annotation_buffer_set->db_count++;
+    buffer_ptr->count++;
+    ASSERT(buffer_ptr->count <= BUFFER_SIZE);
+
+    // The computation treshold is used to break dead lock in the annotated software.
+    if( (m_annotation_buffer_set->db_count >= COMPUTATION_THRESHOLD) || (buffer_ptr->count >= BUFFER_SIZE))
+    {
+        synchronize();
+    }
   }
 }
 

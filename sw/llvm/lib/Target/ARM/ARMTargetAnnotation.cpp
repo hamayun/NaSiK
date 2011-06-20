@@ -819,6 +819,14 @@ const TargetAnnotationDB * ARMTargetMachine::MachineBasicBlockAnnotation(Machine
         annotationDB->setCycleCount(mbbTotalCycles);
         annotationDB->setLoadCount(mbbLoadCount);
         annotationDB->setStoreCount(mbbStoreCount);        
+
+        /*
+        annotationDB->setInstructionCount(0x1C1C1C1C);
+        annotationDB->setCycleCount(0xCCCCCCCC);
+        annotationDB->setLoadCount(0xDDDDDDDD);
+        annotationDB->setStoreCount(0xEEEEEEEE);
+        annotationDB->setFuncAddr(0xFADDFADD);
+        */
     }
 
     return(annotationDB);

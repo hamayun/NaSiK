@@ -43,14 +43,20 @@ int  buffer_add_db(db_buffer_desc_t *pbuff_desc, annotation_db_t *pdb)
 
 /*
  * This functions has been explicity placed in this C file;
- * So llvm fails to annotate all the functions of this file.
+ * So llvm fails to annotate all functions of this file.
  */
 void mbb_annotation(annotation_db_t *pdb)
 {
     // TO DECIDE: Do we need to Take a Semaphore Here ???
     // TODO: Add dynamisim to buffers here; Allocate and Init at Runtime.
-    
-    int is_full_buffer = buffer_add_db(&buff_desc[current_buffer], pdb);
+    int is_full_buffer = 0;
+
+    // Get the Return Address of Current Function;
+    // Its the address of next instruction that will be executed after mbb_annotation call.
+    // TODO: Make the following store conditional !!!
+    pdb->FuncAddr = (uint32_t) __builtin_return_address (0);
+
+    is_full_buffer = buffer_add_db(&buff_desc[current_buffer], pdb);
     if(is_full_buffer)
     {
         // If we are here it means that the current buffer is full;
@@ -65,5 +71,4 @@ void mbb_annotation(annotation_db_t *pdb)
         // Now Switch to the Next Buffer
         current_buffer = (current_buffer + 1) % ANNOTATION_BUFFER_COUNT;
     }
-
 }

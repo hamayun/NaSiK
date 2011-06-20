@@ -5,6 +5,8 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/mem                \
                $(COMPONENTS)/ramdac             \
                $(COMPONENTS)/kvm_wrapper        \
+               $(COMPONENTS)/analyzer           \
+               $(COMPONENTS)/execution_spy      \
                $(COMPONENTS)/framebuffer        \
                $(COMPONENTS)/sem                \
                $(COMPONENTS)/slave_device       \
@@ -16,9 +18,6 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/sl_blockdevice     \
                $(COMPONENTS)/hosttime           \
                $(PLATFORM)
-
-#               $(COMPONENTS)/analyzer           \
-#               $(COMPONENTS)/execution_spy      \
 
 CC           = g++
 OPT          = -O0 -fpermissive

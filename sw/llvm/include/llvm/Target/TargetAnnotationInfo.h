@@ -38,12 +38,14 @@ public:
   void setLoadCount(unsigned int value);
   void setStoreCount(unsigned int value);
   void setType(unsigned int value);
+  void setFuncAddr(unsigned int value);
 
   unsigned int getInstructionCount();
   unsigned int getCycleCount();
   unsigned int getLoadCount();
   unsigned int getStoreCount();
   unsigned int getType();
+  unsigned int getFuncAddr();
 
   TargetAnnotationDB * addDB(TargetAnnotationDB * pDB); 
   unsigned int DumpSize();
@@ -55,6 +57,7 @@ public:
     unsigned int  _CycleCount;
     unsigned int  _LoadCount;
     unsigned int  _StoreCount;
+    unsigned int  _FuncAddr;   // Address of the host function containing this Basic Block
   } db_struct;
 
 private:

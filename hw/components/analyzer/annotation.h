@@ -36,14 +36,24 @@ typedef enum {
   BB_RETURN = 2
 } BB_TYPE;
 
+// This definition comes from the S/W AnnotationManager
 typedef struct {
-  uint32_t          Type;
-  uint32_t          InstructionCount;
-  uint32_t          CycleCount;
-  uint32_t          LoadCount;
-  uint32_t          StoreCount;
-  uint32_t          FuncAddr; 
+    uint32_t          Type;
+    uint32_t          InstructionCount;
+    uint32_t          CycleCount;
+    uint32_t          LoadCount;
+    uint32_t          StoreCount;
+    uint32_t          FuncAddr;
 } annotation_db_t;
+
+// This definition comes from the S/W AnnotationManager
+typedef struct {
+    uint32_t          BufferID;
+    uint32_t          StartIndex;       // First Valid db entry
+    uint32_t          EndIndex;         // Last Valid db entry
+    uint32_t          Capacity;         // The Size of DB Buffer to For H/W Knowledge
+    annotation_db_t  *Buffer[];
+} db_buffer_desc_t;
 
 typedef struct {
   uintptr_t         eu;        // EU identifier (address)

@@ -484,7 +484,7 @@ bool MachineTargetAnnotation::annotateLLVMBasicBlock(TargetAnnotationDB *MBBinfo
   // Here we create a Global Variable in the current module and Dump Annotation Info for the Current BB into it.
   GlobalVariable * DumpVar = new GlobalVariable(*_LLVM_M,
                                                 ArrayType::get(IntegerType::get(Context, 8), MBBinfo->DumpSize()),
-                                                true,
+                                                false, /* isConstantGlobal */
                                                 GlobalValue::InternalLinkage,
                                                 ConstantArray::get(ArrayType::get(IntegerType::get(Context, 8), MBBinfo->DumpSize()), DumpValues),
                                                 VarName.data());

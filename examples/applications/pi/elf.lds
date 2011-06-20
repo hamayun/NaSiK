@@ -72,7 +72,7 @@ SECTIONS
 		EXTFIFO_CHANNELS_PTR = .; LONG(0x0)
 	} > mem :data
 
-  .rodata ALIGN(16) : { *(.rodata) *(.rodata.str1.*) } > mem :data
+  .rodata ALIGN(16) : { *(.rodata) *(.rodata.str1.*) *(.rodata.cst*) } > mem :data
 
 	.sysstack ALIGN(0x8) + 0x10000 : { } > mem :stack
 

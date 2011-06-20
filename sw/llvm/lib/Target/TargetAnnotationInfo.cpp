@@ -49,6 +49,10 @@ void TargetAnnotationDB::setType(unsigned int value) {
     _db._struct._Type = value;
 }
 
+void TargetAnnotationDB::setFuncAddr(unsigned int value) {
+    _db._struct._FuncAddr = value;
+}
+
 unsigned int TargetAnnotationDB::getInstructionCount() {
     return (_db._struct._InstructionCount);
 }
@@ -67,6 +71,10 @@ unsigned int TargetAnnotationDB::getStoreCount() {
 
 unsigned int TargetAnnotationDB::getType() {
     return (_db._struct._Type);
+}
+
+unsigned int TargetAnnotationDB::getFuncAddr() {
+    return (_db._struct._FuncAddr);
 }
 
 TargetAnnotationDB * TargetAnnotationDB::addDB(TargetAnnotationDB * pDB)

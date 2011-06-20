@@ -25,6 +25,7 @@ typedef struct {
     uint32_t          CycleCount;
     uint32_t          LoadCount;
     uint32_t          StoreCount;
+    uint32_t          FuncAddr;
 } annotation_db_t;
 
 void mbb_annotation(annotation_db_t *pdb);

@@ -20,27 +20,23 @@
 #ifndef __KVM_CPU_WRAPPER_H__
 #define __KVM_CPU_WRAPPER_H__
 
-#include <qemu_wrapper_request.h>
-//#include <execution_spy.h>
-#include <master_device.h>
+//#define USE_EXECUTION_SPY
 
-// Will remove this typedef once the execution_spy is integrated.
-typedef struct {
-    uint32_t          Type;
-    uint32_t          InstructionCount;
-    uint32_t          CycleCount;
-    uint32_t          LoadCount;
-    uint32_t          StoreCount;
-} annotation_db_t;
+#include <qemu_wrapper_request.h>
+#include <execution_spy.h>
+#include <master_device.h>
 
 using namespace noc;
 class cpu_logs;
 
 #define ANALYZE_OPTION true
 #define ONLINE_OPTION true
-#define NO_THREAD_OPTION true        // if true analyzer thread will *NOT* be created.
+#define NO_THREAD_OPTION false        // if true analyzer thread will *NOT* be created.
 
-class kvm_cpu_wrapper : public master_device /*, public ExecutionSpy*/
+class kvm_cpu_wrapper : public master_device
+#ifdef USE_EXECUTION_SPY
+    , public ExecutionSpy
+#endif
 {
 public:
     SC_HAS_PROCESS (kvm_cpu_wrapper);
@@ -49,7 +45,9 @@ public:
 
 private:
     void cpuThread ();
-//    void compute(annotation_t *trace, uint32_t count);
+#ifdef USE_EXECUTION_SPY
+    void compute(annotation_t *trace, uint32_t count);
+#endif
 
     void receiveThread ();
     void rcv_rsp(unsigned char tid, unsigned char *data, bool bErr, bool bWrite);

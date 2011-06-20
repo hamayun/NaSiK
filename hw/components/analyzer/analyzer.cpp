@@ -38,7 +38,7 @@
 #include <time.h>
 #include <iostream>
 
-#define DEBUG_ANALYZER true
+#define DEBUG_ANALYZER false
 #define DOUT_FCT if(DEBUG_ANALYZER) std::cout << __func__ << ": "
 #define DOUT     if(DEBUG_ANALYZER) std::cout  
 
@@ -131,6 +131,8 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
         // compute buffer
         DOUT_FCT << std::dec << _buffers[buffer_index].count << " annotations to push " << std::endl;
         buffer = _buffers[buffer_index].buffer;
+
+        /* // We don't need this anymore. MMH
         for(uint32_t i = 0; i < _buffers[buffer_index].count; i++)
         {
           // All addresses must be relative to the base address of the
@@ -138,6 +140,7 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
           buffer[i].bb_addr = buffer[i].bb_addr - _appli_base_addr;
           buffer[i].db = (annotation_db_t*)((uintptr_t)(buffer[i].db) - _appli_base_addr);
         }
+        */
 
         if(_analyze == true)
         {
@@ -516,7 +519,7 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
       //std::cout << "Symbol Vector Table" << std::endl;
       for( uint32_t i = 0 ; i < _sym_vector.size() ; i++)
       {
-        DOUT_FCT << (void*)_sym_vector[i].base_addr << " " << _sym_vector[i].name << std::endl;
+        //DOUT_FCT << (void*)_sym_vector[i].base_addr << " " << _sym_vector[i].name << std::endl;
       }
 
       (void) elf_end(elf);
@@ -529,10 +532,8 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
       return(false);
     }
 
-    sym_desc_t * Analyzer::find_symbol(uintptr_t offset)
+    sym_desc_t * Analyzer::find_symbol(uintptr_t address)
     {
-      uintptr_t   address = offset - _appli_base_addr;
-
       // Check if symbol is in cache
       std::map< uintptr_t, sym_desc_t *>::iterator    it = _sym_cash.find(address);
       if( it != _sym_cash.end())

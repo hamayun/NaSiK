@@ -1,6 +1,7 @@
 #include <kvm_cpu_wrapper.h>
+#include <streambuf>
 
-#define DEBUG_KVM_WRAPPER true
+#define DEBUG_KVM_WRAPPER false
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
@@ -12,8 +13,10 @@ static unsigned char s_st_operation_codes[] = {0xDE, 0x00, 0x10, 0xDE, 0x20, 0xD
 static unsigned char s_st_operation_mask_be[] = {0xDE, 0x01, 0x03, 0xDE, 0x0F, 0xDE, 0xDE, 0xDE, 0xFF};
 
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, char *elf_file, uintptr_t app_base_addr, int node_id)
-	: master_device (name)/*,
-          ExecutionSpy(ANALYZE_OPTION, ONLINE_OPTION, NO_THREAD_OPTION, elf_file, app_base_addr)*/
+	: master_device (name)
+#ifdef USE_EXECUTION_SPY
+          , ExecutionSpy(ANALYZE_OPTION, ONLINE_OPTION, NO_THREAD_OPTION, elf_file, app_base_addr)
+#endif
 {
     m_rqs = new qemu_wrapper_requests (100);
     m_unblocking_write = 0;
@@ -37,28 +40,32 @@ void kvm_cpu_wrapper::cpuThread ()
 }
 
 // Here we get the Annotation Trace (A buffer containing pointers to Annotation DBs)
-/*
+#ifdef USE_EXECUTION_SPY
 void kvm_cpu_wrapper::compute(annotation_t *trace, uint32_t count)
 {
     uint32_t  index;
     uint32_t  instructions = 0;
     uint32_t  cycles = 0;
 
-    DOUT_NAME << __func__ << " count " << count << std::endl;
+    DOUT_NAME << __func__ << std::dec << " count = " << count << std::endl;
     for( index = 0 ; index < count; index++ )
     {
         trace[index].eu = (uintptr_t)this;
+        //TODO: Store a Valid Thread ID; Take it from the Context Load/Save
         //trace[index].thread = _current_thread_id; // Store the current thread id in annotation object
+        trace[index].thread = 1;
         if(trace[index].type == BB_DEFAULT)
         {
             cycles += trace[index].db->CycleCount;
             instructions += trace[index].db->InstructionCount;
         }
     }
-    DOUT_NAME << __func__ << " wait " << cycles << std::endl;
+
+    DOUT_NAME << __func__ << " wait " << std::dec << cycles << " cycles" << std::endl;
     wait(cycles, SC_NS);
 }
-*/
+#endif
+
 void kvm_cpu_wrapper::rcv_rsp(unsigned char tid, unsigned char *data,
                                bool bErr, bool bWrite)
 {
@@ -162,7 +169,7 @@ extern "C"
         int nbytes, unsigned int *ns, int bIO)
     {
         uint64_t						ret;
- 
+
         ret = _this->read (addr, nbytes, bIO);
 
         return ret;
@@ -193,19 +200,16 @@ extern "C"
     }
     */
 
-    typedef struct {
-        uint32_t          BufferID;
-        uint32_t          StartIndex;       // First Valid db entry
-        uint32_t          EndIndex;         // Last Valid db entry
-        uint32_t          Capacity;         // The Size of DB Buffer to For H/W Knowledge
-        annotation_db_t  *Buffer[];
-    } db_buffer_desc_t;
-
+#ifdef USE_EXECUTION_SPY
     void
     systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *pdesc)
     {
-        //this->annotate((annotation_db_t *) db);
-
+        _this->annotate((void *)vm_addr, (db_buffer_desc_t *) pdesc);
+    }
+#else
+    void
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *pdesc)
+    {
         db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) pdesc;
         annotation_db_t *pdb = NULL;
         uint32_t buffer_cycles = 0;
@@ -221,11 +225,16 @@ extern "C"
 
         wait(buffer_cycles, SC_NS);
     }
+#endif
+
 }
 
 /*
 printf("BufferID = %d, StartIndex = %d,  EndIndex = %d, Capacity = %d\n",
     pbuff_desc->BufferID, pbuff_desc->StartIndex,
     pbuff_desc->EndIndex, pbuff_desc->Capacity);
+
+printf("@db: 0x%08x, Type: %d, CC = %d, FuncAddr: 0x%08x\n",
+       (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex], pdb->Type, pdb->CycleCount, pdb->FuncAddr);
 */
 

@@ -52,7 +52,7 @@ class ExecutionSpy
       ~ExecutionSpy(void);
 
       void synchronize(void);
-      void annotate(annotation_db_t *db);
+      void annotate(void *vm_addr, db_buffer_desc_t *pbuff_desc);
       void close(void);
 
   protected:
