@@ -13,10 +13,7 @@ static unsigned char s_st_operation_codes[] = {0xDE, 0x00, 0x10, 0xDE, 0x20, 0xD
 static unsigned char s_st_operation_mask_be[] = {0xDE, 0x01, 0x03, 0xDE, 0x0F, 0xDE, 0xDE, 0xDE, 0xFF};
 
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, char *elf_file, uintptr_t app_base_addr, int node_id)
-	: master_device (name)
-#ifdef USE_EXECUTION_SPY
-          , ExecutionSpy(ANALYZE_OPTION, ONLINE_OPTION, NO_THREAD_OPTION, elf_file, app_base_addr)
-#endif
+	: master_device (name), ExecutionSpy(ANALYZE_OPTION, ONLINE_OPTION, NO_THREAD_OPTION, elf_file, app_base_addr)
 {
     m_rqs = new qemu_wrapper_requests (100);
     m_unblocking_write = 0;
@@ -40,7 +37,6 @@ void kvm_cpu_wrapper::cpuThread ()
 }
 
 // Here we get the Annotation Trace (A buffer containing pointers to Annotation DBs)
-#ifdef USE_EXECUTION_SPY
 void kvm_cpu_wrapper::compute(annotation_t *trace, uint32_t count)
 {
     uint32_t  index;
@@ -61,7 +57,6 @@ void kvm_cpu_wrapper::compute(annotation_t *trace, uint32_t count)
     DOUT_NAME << __func__ << " wait " << std::dec << cycles << " cycles" << std::endl;
     wait(cycles, SC_NS);
 }
-#endif
 
 void kvm_cpu_wrapper::rcv_rsp(unsigned char tid, unsigned char *data,
                                bool bErr, bool bWrite)

@@ -29,10 +29,7 @@
 using namespace noc;
 class cpu_logs;
 
-class kvm_cpu_wrapper : public master_device
-#ifdef USE_EXECUTION_SPY
-    , public ExecutionSpy
-#endif
+class kvm_cpu_wrapper : public master_device, public ExecutionSpy
 {
 public:
     SC_HAS_PROCESS (kvm_cpu_wrapper);
@@ -41,9 +38,7 @@ public:
 
 private:
     void cpuThread ();
-#ifdef USE_EXECUTION_SPY
     void compute(annotation_t *trace, uint32_t count);
-#endif
 
     void receiveThread ();
     void rcv_rsp(unsigned char tid, unsigned char *data, bool bErr, bool bWrite);
