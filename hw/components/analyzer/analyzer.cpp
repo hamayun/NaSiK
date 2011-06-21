@@ -123,24 +123,14 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
 
       while(!_ending)
       {
-        DOUT_FCT << "wait on buffer " << buffer_index << " (" << &(_buffers[buffer_index].sem) << ")" << std::endl;
+        DOUT_FCT << "waiting on buffer " << buffer_index << " (" << &(_buffers[buffer_index].sem) << ")" << std::endl;
         sem_wait(&(_buffers[buffer_index].sem));
-        DOUT_FCT << "buffer " << buffer_index << " ready"<< std::endl;
+        DOUT_FCT << "buffer " << buffer_index << " ready for analysis"<< std::endl;
 
         sem_wait(&_sem);
         // compute buffer
         DOUT_FCT << std::dec << _buffers[buffer_index].count << " annotations to push " << std::endl;
         buffer = _buffers[buffer_index].buffer;
-
-        /* // We don't need this anymore. MMH
-        for(uint32_t i = 0; i < _buffers[buffer_index].count; i++)
-        {
-          // All addresses must be relative to the base address of the
-          // loaded application in memory.
-          buffer[i].bb_addr = buffer[i].bb_addr - _appli_base_addr;
-          buffer[i].db = (annotation_db_t*)((uintptr_t)(buffer[i].db) - _appli_base_addr);
-        }
-        */
 
         if(_analyze == true)
         {
@@ -170,7 +160,7 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
         sem_post(&_sem);
 
         sem_post(&(_buffers[buffer_index].ack));
-        DOUT_FCT << "unlock buffer " << buffer_index << " (" << &(_buffers[buffer_index].sem) << ")" << std::endl;
+        DOUT_FCT << "unlocking buffer " << buffer_index << " (" << &(_buffers[buffer_index].sem) << ")" << std::endl;
         buffer_index = (buffer_index + 1) % NB_BUFFER;
       }
       DOUT_FCT << "exit ..." << std::endl;
@@ -299,7 +289,7 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
       DOUT_FCT << "New BB belong to " << sym->name << "(0x" << bb_ptr->annotation.bb_addr << ")"
                << "[_current_thread_slot: " << std::hex << _current_thread_slot << "] ";
       DOUT << ((bb_ptr->annotation.type & BB_ENTRY) ? " ENTRY" : "")
-           << ((bb_ptr->annotation.type & BB_RETURN) ? " RETURN" : "")  << std::endl;
+           << ((bb_ptr->annotation.type & BB_RETURN) ? " RETURN" : "") << std::endl;
       
       // If the bb is an entry basic block ... push context (It marks the start of a new function)
       if(bb_ptr->annotation.type & BB_ENTRY)
@@ -384,7 +374,7 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
         call_ptr->entry = bb;
         call_ptr->symbol = *sym;
 
-        DOUT << "entry: 0x" << std::hex << call_ptr->entry << " symbol: " << call_ptr->symbol.name << std::endl;
+        DOUT << "entry: " << std::hex << call_ptr->entry << " symbol: " << call_ptr->symbol.name << std::endl;
         context_ptr = new call_context_t;
         *context_ptr = INIT_CALL_CONTEXT;
         context_ptr->call = call_ptr;

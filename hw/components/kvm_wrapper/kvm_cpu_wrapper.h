@@ -29,10 +29,6 @@
 using namespace noc;
 class cpu_logs;
 
-#define ANALYZE_OPTION true
-#define ONLINE_OPTION true
-#define NO_THREAD_OPTION false        // if true analyzer thread will *NOT* be created.
-
 class kvm_cpu_wrapper : public master_device
 #ifdef USE_EXECUTION_SPY
     , public ExecutionSpy

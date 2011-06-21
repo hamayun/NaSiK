@@ -30,6 +30,10 @@
 #include <link.h>
 #include <string>
 
+#define ANALYZE_OPTION true
+#define ONLINE_OPTION true
+#define NO_THREAD_OPTION false        // if true analyzer thread will *NOT* be created.
+
 #define COMPUTATION_THRESHOLD   128
 #define BUFFER_THRESHOLD        ((BUFFER_SIZE) - (COMPUTATION_THRESHOLD) - 1)
 
@@ -57,7 +61,6 @@ class ExecutionSpy
 
   protected:
       void register_self(char *elf_file, uintptr_t app_base_addr);
-
       virtual void compute(annotation_t *trace, uint32_t count) = 0;
 
   // Annotation buffer management
@@ -66,7 +69,6 @@ class ExecutionSpy
       bool                         m_no_thread;
       bool                         m_analyze;
       bool                         m_online_analyze;
-
       void synchronize_no_thread(void);
 };
 

@@ -48,11 +48,17 @@ typedef struct {
 
 // This definition comes from the S/W AnnotationManager
 typedef struct {
-    uint32_t          BufferID;
-    uint32_t          StartIndex;       // First Valid db entry
-    uint32_t          EndIndex;         // Last Valid db entry
-    uint32_t          Capacity;         // The Size of DB Buffer to For H/W Knowledge
-    annotation_db_t  *Buffer[];
+    uint32_t          thread_context;  // The thread context for which this db was used.
+    annotation_db_t  *pdb;
+} annotation_db_ctx_t;
+
+// This definition comes from the S/W AnnotationManager
+typedef struct {
+    uint32_t            BufferID;
+    uint32_t            StartIndex;       // First Valid db entry
+    uint32_t            EndIndex;         // Last Valid db entry
+    uint32_t            Capacity;         // The Size of DB Buffer to For H/W Knowledge
+    annotation_db_ctx_t Buffer[];
 } db_buffer_desc_t;
 
 typedef struct {

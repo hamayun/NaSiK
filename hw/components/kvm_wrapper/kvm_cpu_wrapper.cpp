@@ -5,7 +5,7 @@
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
-	void soc_kvm_run();
+    void soc_kvm_run();
 }
 
 #define QEMU_STNOC_ADDRESS_DIFFERENCE 0x00000000
@@ -51,9 +51,6 @@ void kvm_cpu_wrapper::compute(annotation_t *trace, uint32_t count)
     for( index = 0 ; index < count; index++ )
     {
         trace[index].eu = (uintptr_t)this;
-        //TODO: Store a Valid Thread ID; Take it from the Context Load/Save
-        //trace[index].thread = _current_thread_id; // Store the current thread id in annotation object
-        trace[index].thread = 1;
         if(trace[index].type == BB_DEFAULT)
         {
             cycles += trace[index].db->CycleCount;
@@ -217,7 +214,7 @@ extern "C"
         while(pbuff_desc->StartIndex != pbuff_desc->EndIndex)
         {
             // Get pointer to the annotation db;
-            pdb = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex]);
+            pdb = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb);
             buffer_cycles += pdb->CycleCount;
 
             pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
@@ -226,7 +223,6 @@ extern "C"
         wait(buffer_cycles, SC_NS);
     }
 #endif
-
 }
 
 /*
@@ -238,3 +234,16 @@ printf("@db: 0x%08x, Type: %d, CC = %d, FuncAddr: 0x%08x\n",
        (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex], pdb->Type, pdb->CycleCount, pdb->FuncAddr);
 */
 
+/*
+db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) pdesc;
+uint32_t db_count = 0;
+
+if(pbuff_desc->EndIndex > pbuff_desc->StartIndex)
+    db_count = pbuff_desc->EndIndex - pbuff_desc->StartIndex;
+else
+    db_count = pbuff_desc->Capacity - (pbuff_desc->StartIndex - pbuff_desc->EndIndex);
+
+printf("BufferID [%d] %5d --> %5d (Count = %d)\n",
+        pbuff_desc->BufferID, pbuff_desc->StartIndex,
+        pbuff_desc->EndIndex, db_count);
+ */

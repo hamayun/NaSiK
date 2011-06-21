@@ -21,12 +21,12 @@
 #include <stdio.h>
 #include <Private/AnnotationManager.h>
 
-static db_buffer_desc_t buff_desc[ANNOTATION_BUFFER_COUNT] = {{0, 0, 0, ANNOTATION_BUFFER_SIZE, {NULL}},
-                                                              {1, 0, 0, ANNOTATION_BUFFER_SIZE, {NULL}},
-                                                              {2, 0, 0, ANNOTATION_BUFFER_SIZE, {NULL}},
-                                                              {3, 0, 0, ANNOTATION_BUFFER_SIZE, {NULL}},
-                                                              {4, 0, 0, ANNOTATION_BUFFER_SIZE, {NULL}}}; // Empty Descriptors;
+static db_buffer_desc_t buff_desc[ANNOTATION_BUFFER_COUNT] = {{0, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}},
+                                                              {1, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}},
+                                                              {2, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}}};  //Empty Descriptors;
+
 static uint32_t current_buffer = 0;
+volatile uint32_t current_thread_context = 0xFFFFFFFF;
 
 int  buffer_add_db(db_buffer_desc_t *pbuff_desc, annotation_db_t *pdb)
 {
@@ -36,7 +36,8 @@ int  buffer_add_db(db_buffer_desc_t *pbuff_desc, annotation_db_t *pdb)
         return (1);
     }
 
-    pbuff_desc->Buffer[pbuff_desc->EndIndex] = pdb;
+    pbuff_desc->Buffer[pbuff_desc->EndIndex].thread_context = current_thread_context;
+    pbuff_desc->Buffer[pbuff_desc->EndIndex].pdb = pdb;
     pbuff_desc->EndIndex = (pbuff_desc->EndIndex + 1) % pbuff_desc->Capacity;
     return 0;
 }

@@ -21,15 +21,15 @@
 
 #include <Public/AnnotationManager.h>
 
-#define ANNOTATION_BUFFER_COUNT 5
-#define ANNOTATION_BUFFER_SIZE  2048
+#define ANNOTATION_BUFFER_COUNT 3
+#define ANNOTATION_BUFFER_SIZE  2*1024
 
 typedef struct {
-    uint32_t          BufferID;
-    uint32_t          StartIndex;       // First Valid db entry
-    uint32_t          EndIndex;         // Last Valid db entry
-    uint32_t          Capacity;         // The Size of DB Buffer to For H/W Knowledge
-    annotation_db_t  *Buffer[ANNOTATION_BUFFER_SIZE];
+    uint32_t            BufferID;
+    uint32_t            StartIndex;       // First Valid db entry
+    uint32_t            EndIndex;         // Last Valid db entry
+    uint32_t            Capacity;         // The Size of DB Buffer to For H/W Knowledge
+    annotation_db_ctx_t Buffer[ANNOTATION_BUFFER_SIZE];
 } db_buffer_desc_t;
 
 int  buffer_add_db(db_buffer_desc_t *pbuff_desc, annotation_db_t *pdb);

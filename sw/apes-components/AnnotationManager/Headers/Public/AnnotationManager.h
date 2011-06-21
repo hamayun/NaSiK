@@ -28,6 +28,11 @@ typedef struct {
     uint32_t          FuncAddr;
 } annotation_db_t;
 
+typedef struct {
+    uint32_t          thread_context;  // The thread context for which this db was used.
+    annotation_db_t  *pdb;
+} annotation_db_ctx_t;
+
 void mbb_annotation(annotation_db_t *pdb);
 
 #endif

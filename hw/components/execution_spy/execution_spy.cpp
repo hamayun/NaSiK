@@ -159,14 +159,16 @@ void ExecutionSpy::annotate(void *vm_addr, db_buffer_desc_t *pbuff_desc)
     annotation_ptr =  &(buffer_ptr->buffer[buffer_ptr->count]);
 
     // Get pointer to the annotation db;
-    db = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex]);
-    pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
+    db = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb);
 
     // TODO: Unify the MBB_DEFAULT & BB_DEFAULT types together.
     annotation_ptr->type = db->Type;
     annotation_ptr->db = db;
     // Get the Return Address of the Caller of the mbb_annotation Function.
     annotation_ptr->bb_addr = (uint32_t) db->FuncAddr;
+    annotation_ptr->thread = (uint32_t) pbuff_desc->Buffer[pbuff_desc->StartIndex].thread_context;
+
+    pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
 
     /* We can use a Static Counter Here that will correspond with the Annotation Push
      * count inside the Analyzer Thread for debugging the Thread Contexts Switches.

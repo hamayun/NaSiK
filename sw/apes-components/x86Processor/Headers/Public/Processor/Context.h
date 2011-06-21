@@ -13,6 +13,8 @@ void cpu_context_init (cpu_context_t * ctx, void * sp, int32_t ssize, void * ent
 void cpu_context_save (cpu_context_t * ctx, uint32_t *entry);
 void cpu_context_load (cpu_context_t * ctx);
 
+extern volatile uint32_t current_thread_context;
+
 #ifdef DEBUG_PROCESSOR_CONTEXT
 void print_context(cpu_context_t *ctx);
 void print_context_mem(cpu_context_t *ctx);
@@ -50,6 +52,7 @@ void cpu_context_load (cpu_context_t * ctx);
 */
 #define cpu_context_load(ctx) \
     do{ \
+        current_thread_context = (uint32_t) ctx;\
         __asm__ volatile (\
             "mov %0, %%esp \n"   /*switch to ctx*/\
             "\n"\
