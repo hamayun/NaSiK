@@ -22,7 +22,7 @@
 #include <Public/AnnotationManager.h>
 
 #define ANNOTATION_BUFFER_COUNT 3
-#define ANNOTATION_BUFFER_SIZE  2*1024
+#define ANNOTATION_BUFFER_SIZE  2048
 
 typedef struct {
     uint32_t            BufferID;

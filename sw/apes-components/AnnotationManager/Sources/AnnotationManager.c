@@ -25,14 +25,14 @@ static db_buffer_desc_t buff_desc[ANNOTATION_BUFFER_COUNT] = {{0, 0, 0, ANNOTATI
                                                               {1, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}},
                                                               {2, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}}};  //Empty Descriptors;
 
-static uint32_t current_buffer = 0;
+static volatile uint32_t current_buffer = 0;
 volatile uint32_t current_thread_context = 0xFFFFFFFF;
 
 int  buffer_add_db(db_buffer_desc_t *pbuff_desc, annotation_db_t *pdb)
 {
     if(((pbuff_desc->EndIndex + 1) % pbuff_desc->Capacity) == pbuff_desc->StartIndex)
     {
-        //printf("Error: Annotation Buffer Full; Activate Switching Logic\n");
+        // Annotation Buffer Full; Activate Switching Logic
         return (1);
     }
 
@@ -46,16 +46,22 @@ int  buffer_add_db(db_buffer_desc_t *pbuff_desc, annotation_db_t *pdb)
  * This functions has been explicity placed in this C file;
  * So llvm fails to annotate all functions of this file.
  */
+
+/*
+ * IMPORTANT NOTE: We should _ONLY_ call NON ANNOTATED functions from Here.
+ * Otherwise We will find ourselves in a Vicious Loop ... :(
+ */
 void mbb_annotation(annotation_db_t *pdb)
 {
     // TO DECIDE: Do we need to Take a Semaphore Here ???
     // TODO: Add dynamisim to buffers here; Allocate and Init at Runtime.
     int is_full_buffer = 0;
-
     // Get the Return Address of Current Function;
     // Its the address of next instruction that will be executed after mbb_annotation call.
-    // TODO: Make the following store conditional !!!
-    pdb->FuncAddr = (uint32_t) __builtin_return_address (0);
+    // TODO: Store this Return Address inside LLVM; When the Annotation Call is Added.
+    if(!pdb->FuncAddr){
+        pdb->FuncAddr = (uint32_t) __builtin_return_address (0);
+    }
 
     is_full_buffer = buffer_add_db(&buff_desc[current_buffer], pdb);
     if(is_full_buffer)
@@ -71,5 +77,20 @@ void mbb_annotation(annotation_db_t *pdb)
     
         // Now Switch to the Next Buffer
         current_buffer = (current_buffer + 1) % ANNOTATION_BUFFER_COUNT;
+
+        // Now Try Again into the Next Buffer
+        is_full_buffer = buffer_add_db(&buff_desc[current_buffer], pdb);
+
+        // Here we send an NULL Pointer to the SystemC; Indicating that
+        // an Overflow condition has occured.
+        if(is_full_buffer)
+        {
+            __asm__ volatile(
+                "   mov   $0x4000,%%dx\n\t"
+                "   mov   %0,%%eax\n\t"
+                "   out   %%eax,(%%dx)\n\t"
+                ::"r" ((db_buffer_desc_t *) (NULL)):"%dx"
+            );
+        }
     }
 }

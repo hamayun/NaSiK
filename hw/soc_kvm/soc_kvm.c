@@ -312,15 +312,23 @@ static int annotation_handler(void *opaque, int size, int is_write,
     {
         printf("Not Enough Space in PMIO Trace Buffer (Entry#: %d, Max: %d)\n",
                 pmio_trace_index, PMIO_TRACE_ENTRIES - 1);
+#ifdef MMIO_TRACE_OPTION
         printf("MMIO Trace Buffer Status (Entry#: %d, Max: %d)\n",
                 mmio_trace_index, MMIO_TRACE_ENTRIES - 1);
-        while(1);
+#endif
+        exit(1);
     }
 #endif
 
     // opaque is the virtual memory addr allocated to kvm.
     // value contains a pointer to the annotation buffer descriptor offset in the allocated virtual memory.
-    systemc_annotate_function(p_kvm_cpu_adaptor, opaque, (opaque + *value));
+    if(*value){
+        systemc_annotate_function(p_kvm_cpu_adaptor, opaque, (opaque + *value));
+    }
+    else{
+        printf("%s: Overflow in S/W: *value = 0x%08x\n", __func__, (uint32_t)(*value));
+        exit(1);
+    }
     return 0;
 }
 
