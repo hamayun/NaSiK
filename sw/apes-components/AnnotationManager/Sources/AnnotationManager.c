@@ -26,7 +26,7 @@ static db_buffer_desc_t buff_desc[ANNOTATION_BUFFER_COUNT] = {{0, 0, 0, ANNOTATI
                                                               {2, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}}};  //Empty Descriptors;
 
 static volatile uint32_t current_buffer = 0;
-volatile uint32_t current_thread_context = 0xFFFFFFFF;
+extern volatile uint32_t current_thread_context;
 
 int  buffer_add_db(db_buffer_desc_t *pbuff_desc, annotation_db_t *pdb)
 {

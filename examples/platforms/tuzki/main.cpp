@@ -59,13 +59,14 @@ void *p_kvm_cpu_adaptor;
 
 unsigned long no_frames_to_simulate = 0;
 
-void simulation_stop()
+void simulation_stop(int signo)
 {
 	cout << "************************************************************" << endl;
 	cout << "              USER REQUEST END OF SIMULATION                " << endl;
 	cout << " Simulation time : " << sc_time_stamp() << endl;	
 	cout << "************************************************************" << endl;
 	sc_stop();
+	exit(0);
 }
 
 void usage_and_exit(char * name)
@@ -85,6 +86,7 @@ int sc_main (int argc, char ** argv)
     unsigned int    kvm_nb_cpu;
 
     if(argc < 3) usage_and_exit(argv[0]);
+    signal(SIGINT,simulation_stop);
 			
     /* Initialize the kvm. */
     retVal = soc_kvm_init(argv[1], argv[2]);
@@ -166,7 +168,6 @@ int sc_main (int argc, char ** argv)
                             bl3->get_master()->get_port);
 
     sc_start(-1);
-    simulation_stop();
     return (EXIT_SUCCESS);
 }
 

@@ -20,10 +20,11 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(PLATFORM)
 
 CC           = g++
-OPT          = -O0 -fpermissive
-DEBUG        = -g
-OTHER        =  -Wno-deprecated
-CFLAGS       = $(DEBUG) $(OTHER) $(OPT)
+OPT          = -O3
+DEBUG        = -Wall -g
+#PROFILE      = -pg
+OTHER        = -Wno-deprecated
+CFLAGS       = $(DEBUG) $(OTHER) $(OPT) $(PROFILE)
 LIBDIR       = -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(LIBKVM_PREFIX)/lib 
 LIBS         = -lsystemc -lelf -lSDL -lsoc_kvm -lkvm
 TARGET_ARCH  = linux

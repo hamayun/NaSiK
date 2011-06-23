@@ -2,6 +2,9 @@
 #include <DnaTools/C.h>
 #include <string.h>
 
+// This is used by AnnotationManager
+volatile uint32_t current_thread_context = 0xFFFFFFFF;
+
 void cpu_context_init(cpu_context_t * ctx, void * sp, int32_t ssize, void * entry, void * arg)
 {
     uintptr_t *pnewstack, *pctx, *ebp_orig;

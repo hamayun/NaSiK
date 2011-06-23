@@ -15,8 +15,8 @@ source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
 #export APPLICATION=kvmParallelMjpeg
-#export APPLICATION=qsort
-export APPLICATION=pi
+export APPLICATION=qsort
+#export APPLICATION=pi
 export PLATFORM=tuzki
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")

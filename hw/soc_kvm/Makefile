@@ -1,19 +1,20 @@
 LIBSOCKVM    = libsoc_kvm.so
 CC           = gcc
-OPT          = -O0 
-DEBUG        = -g
-OTHER        = -fPIC
+OPT          = -O3
+DEBUG        = -Wall -g
+#PROFILE      = -pg
+OTHER        = -Wno-deprecated
 
-CFLAGS       = $(DEBUG) $(OTHER) $(OPT)
-LDFLAGS      = -shared
-CINCDIR      = -I${LIBKVM_HOME}/user/test/lib/x86 
+CFLAGS       = $(DEBUG) $(OTHER) $(OPT) $(PROFILE)
+LDFLAGS      = -shared $(PROFILE)
+CINCDIR      = -I${LIBKVM_HOME}/user/test/lib/x86
 CINCDIR     += -I${LIBKVM_HOME}/user/test/x86/
 CINCDIR     += -I${LIBKVM_HOME}/libkvm
 
 all: $(LIBSOCKVM)
 
 $(LIBSOCKVM): iotable.o soc_kvm.o
-	$(CC) -shared -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 
 #	$(AR) rcs $@ $^
 
