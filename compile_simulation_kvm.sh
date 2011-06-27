@@ -54,8 +54,8 @@ if [ $? != 0 ]; then
     exit 3 
 fi
 
-print_step "Compiling Platform Model ... "
-cd ${PLATFORM_DIR}
+print_step "Compiling Platform Model ... ${PLATFORM}"
+cd ${PFORM_DIR}
 make -j2
 if [ $? != 0 ]; then
     print_error "Compilation Failed for Hardware Model"

@@ -48,12 +48,16 @@ main(int argc, char *argv[]) {
 #endif
   printf("\nSorting %d elements.\n\n",count);
 
+  /* Dump Host Time to File
+   */
+  int checkpoint = 0;
   volatile int *htime;
   htime = (int *)0xCE000000;  
-  *htime = 1;
+  *htime = checkpoint++;
 
   qsort(array,count,sizeof(struct myStringStruct),compare);
   
+  *htime = checkpoint++;
 
   for(i=0;i<count;i++)
     fprintf(fp2, "%s\n", array[i].qstring);
@@ -62,7 +66,7 @@ main(int argc, char *argv[]) {
   fclose(fp1);
   fclose(fp2);
 
-  *htime = 2;
+  *htime = checkpoint++;
 
   return 0;
 }

@@ -14,22 +14,41 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-#export APPLICATION=kvmParallelMjpeg
-export APPLICATION=qsort
-#export APPLICATION=pi
-export PLATFORM=tuzki
-echo "[Setting-up Software Application Environment ($APPLICATION)]"
+#APPLICATION=kvmParallelMjpeg
+APPLICATION=qsort
+#APPLICATION=susan
+#APPLICATION=qsort
+#APPLICATION=dijkstra
+#APPLICATION=patricia
+#APPLICATION=blowfish
+#APPLICATION=rijndael
+#APPLICATION=sha
+#APPLICATION=CRC32
+#APPLICATION=bitcount
+#APPLICATION=cjpeg
+#APPLICATION=djpeg
+#APPLICATION=stringsearch
+#APPLICATION=kvmPi
+export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
-cd $APP_DIR
-source install.sh 
 
-export PLATFORM_DIR=$(find $NASIK_HOME/examples/platforms -name "$PLATFORM")
+export PLATFORM=tuzki
+export PFORM_DIR=$NASIK_HOME/examples/platforms/$PLATFORM
+
+echo "[Setting-up Software Application Environment ($APPLICATION)]"
+cd $NASIK_HOME/examples/applications
+source config-kvm-apps.sh
+
+if [ -e ${APP_DIR}/app_specific_config.sh ]; then
+	echo "Application Specific Configuration Found ... Sourcing it."
+	cd ${APP_DIR}
+	source app_specific_config.sh
+fi
 
 # for tty_terms
 export PATH=$NASIK_HOME:$PATH
-
-# add toolchain paths
-export PATH=${PRIMARY_TOOLCHAIN}/bin:${SECONDARY_TOOLCHAIN}/bin:$PATH
+export PATH=${SECONDARY_TOOLCHAIN}/bin:$PATH
+export PATH=${PRIMARY_TOOLCHAIN}/bin:$PATH
 export LD_LIBRARY_PATH=${LIBKVM_PREFIX}/lib:$LD_LIBRARY_PATH
 
 cd $NASIK_HOME
@@ -39,7 +58,7 @@ echo "SYSTEMC                 = $SYSTEMC"
 echo "LIBKVM_HOME             = $LIBKVM_HOME"
 echo "LIBKVM_PREFIX           = $LIBKVM_PREFIX"
 echo "APPLICATION             = $APP_DIR"
-echo "PLATFORM                = $PLATFORM_DIR"
+echo "PLATFORM                = $PFORM_DIR"
 echo "APES_ROOT               = $APES_ROOT"
 echo "APES EXTRA COMPONENTS   = $APES_EXTRA_COMPS"
 echo "APES_PATH               = $APES_PATH"

@@ -55,6 +55,9 @@ all: $(EXE)
 $(EXE): $(OBJS)
 	@echo Building $@ ...
 	@$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) $(RLIBDIR) -o $@ $(OBJS) $(LIBS) 2>&1 | c++filt
+	@echo "    | Updating Application and Input File Symbolic Links ..."
+	@ln -sf ${APP_DIR}/APPLICATION.X APPLICATION.X
+	@ln -sf ${APP_DIR}/input_data input_data
 
 $(BUILD_DIR)/%.o:$(SRC_BASE_DIR)/%.cpp
 	@echo "Compiling $(notdir $<) ..."
@@ -69,10 +72,12 @@ clean:
 	@echo Cleaning ...
 	@rm -f $(EXE)
 	@rm -f logCPU*
-	@rm -f aa
+	@rm -f tty*.log host_time.txt output_data
 	@rm -f $(addsuffix /*.o, $(addprefix $(BUILD_DIR)/, $(SUB_DIRS)))
 	@rm -f $(addsuffix /*.d, $(addprefix $(BUILD_DIR)/, $(SUB_DIRS)))
 	@rm -fr $(BUILD_DIR)
+	@ln -sf /dev/null APPLICATION.X
+	@ln -sf /dev/null input_data
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPS)
