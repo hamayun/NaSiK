@@ -226,6 +226,10 @@ int main()
 
       int argc = 2; 
       char *argv[2] = {"PIKVM", "20000"};
+
+      /* Dump Host Time to File
+       */
+      int checkpoint = 0;
       volatile int *htime;
       htime = (int *)0xCE000000;
 
@@ -259,7 +263,7 @@ int main()
             pi[x] = 0;
 
       T1 = time(NULL);
-      *htime = 1;
+      *htime = checkpoint++;
 
 #if defined ARC3
       arctan(8, 3, 1);
@@ -282,7 +286,7 @@ int main()
       arctan(4, 239, -1);
 #endif
 
-      *htime = 2;
+      *htime = checkpoint++;
       T2 = time(NULL);
 
       Print(pi);

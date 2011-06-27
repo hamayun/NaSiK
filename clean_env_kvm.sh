@@ -38,7 +38,7 @@ cd ${APP_DIR}
 apes-compose -c
 
 print_substep "Cleaning Hardware Model ... "
-cd ${PLATFORM_DIR}
+cd ${PFORM_DIR}
 make clean 
 
 print_step "Environment Cleanup Done !!!"
