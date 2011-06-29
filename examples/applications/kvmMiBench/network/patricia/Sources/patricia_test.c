@@ -48,6 +48,7 @@
 //#include <arpa/inet.h>
 
 #include "patricia.h"
+#include <Processor/Profile.h>
 
 # define htonl(x)	(x)
 
@@ -82,13 +83,6 @@ char *myargv[2];
 
 FILE *fout;
 
-  /* Dump Host Time to File
-   */
-  int checkpoint = 0;
-  volatile int *htime;
-  htime = (int *)0xCE000000;  
-  *htime = checkpoint++;
-
   myargc = 2;
   myargv[0] = "./patricia";
   myargv[1] = "/devices/disk/simulator/0";
@@ -110,10 +104,9 @@ FILE *fout;
 	}
 
 	if ((fout = fopen("/devices/disk/simulator/2", "w")) == NULL) {
-		printf("File /devices/disk/simulator/1 doesn't seem to exist\n");
+		printf("File /devices/disk/simulator/2 doesn't seem to exist\n");
 		exit(0);
 	}
-	
 
 	/*
 	 * Initialize the Patricia trie by doing the following:
@@ -158,13 +151,16 @@ FILE *fout;
 	 * The main loop to insert nodes.
 	 */
 	while (fgets(line, 128, fp)) {
+                CPU_PROFILE_IO_START();
 		/*
 		 * Read in each IP address and mask and convert them to
 		 * more usable formats.
 		 */
 		sscanf(line, "%f %d", &time, (unsigned int *)&addr);
 		//inet_aton(addr_str, &addr);
+                CPU_PROFILE_IO_END();
 
+                CPU_PROFILE_COMP_START();
 		/*
 		 * Create a Patricia trie node to insert.
 		 */
@@ -208,20 +204,26 @@ FILE *fout;
 		pfind=pat_search(addr.s_addr,phead);
 		//printf("%08x %08x %08x\n",p->p_key, addr.s_addr, p->p_m->pm_mask);
 		//if(pfind->p_key==(addr.s_addr&pfind->p_m->pm_mask))
+                CPU_PROFILE_COMP_END();
+
 		if(pfind->p_key==addr.s_addr)
 		{
+                        CPU_PROFILE_IO_START();
 			fprintf(fout, "%f %08x: ", time, addr.s_addr);
 			fprintf(fout, "Found.\n");
+                        CPU_PROFILE_IO_END();
 		}
 		else
 		{
-			/*
-		 	* Insert the node.
-		 	* Returns the node it inserted on success, 0 on failure.
-		 	*/
-			//printf("%08x: ", addr.s_addr);
-			//printf("Inserted.\n");
+            /*
+            * Insert the node.
+            * Returns the node it inserted on success, 0 on failure.
+            */
+            //printf("%08x: ", addr.s_addr);
+            //printf("Inserted.\n");
+            CPU_PROFILE_COMP_START();
 			p = pat_insert(p, phead);
+            CPU_PROFILE_COMP_END();
 		}
 		if (!p) {
 			fprintf(stderr, "Failed on pat_insert\n");
@@ -233,7 +235,6 @@ FILE *fout;
 	fclose(fp);
 	fclose(fout);
 
-    *htime = checkpoint++;
-
-	exit(1);
+    CPU_PROFILE_FLUSH_DATA();
+    return 0;
 }

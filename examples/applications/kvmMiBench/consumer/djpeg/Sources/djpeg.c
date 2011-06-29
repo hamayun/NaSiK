@@ -27,6 +27,7 @@
 #include "jversion.h"		/* for version message */
 
 #include <ctype.h>		/* to declare isprint() */
+#include <Processor/Profile.h>
 
 #ifdef USE_CCOMMAND		/* command-line reader for Macintosh */
 #ifdef __MWERKS__
@@ -431,13 +432,6 @@ main (int argc, char **argv)
   int myargc;
   char *myargv[7];
 
-  /* Dump Host Time to File
-   */
-  int checkpoint = 0;
-  volatile int *htime;
-  htime = (int *)0xCE000000;  
-  *htime = checkpoint++;
-
   /* jpeg-6a/djpeg -dct int -ppm -outfile output_large_decode.ppm input_large.jpg */
   myargc = 7;
   
@@ -460,6 +454,8 @@ main (int argc, char **argv)
   if (progname == NULL || progname[0] == 0)
     progname = "djpeg";		/* in case C library doesn't provide it */
 
+  CPU_PROFILE_CURRENT_TIME();
+  CPU_PROFILE_COMP_START();
   /* Initialize the JPEG decompression object with default error handling. */
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
@@ -537,11 +533,15 @@ main (int argc, char **argv)
 
   /* Specify data source for decompression */
   jpeg_stdio_src(&cinfo, input_file);
+  CPU_PROFILE_COMP_END();
 
   /* Read file header, set default decompression parameters */
+  CPU_PROFILE_IO_START();
   (void) jpeg_read_header(&cinfo, TRUE);
+  CPU_PROFILE_IO_END();
 
   /* Adjust default decompression parameters by re-parsing the options */
+  CPU_PROFILE_COMP_START();
   file_index = parse_switches(&cinfo, myargc, myargv, 0, TRUE);
 
   /* Initialize the output module now to let it override any crucial
@@ -584,15 +584,22 @@ main (int argc, char **argv)
 
   /* Start decompressor */
   (void) jpeg_start_decompress(&cinfo);
+  CPU_PROFILE_COMP_END();
 
+  CPU_PROFILE_IO_START();
   /* Write output file header */
   (*dest_mgr->start_output) (&cinfo, dest_mgr);
+  CPU_PROFILE_IO_END();
 
   /* Process data */
   while (cinfo.output_scanline < cinfo.output_height) {
+    CPU_PROFILE_COMP_START();
     num_scanlines = jpeg_read_scanlines(&cinfo, dest_mgr->buffer,
 					dest_mgr->buffer_height);
+    CPU_PROFILE_COMP_END();
+    CPU_PROFILE_IO_START();
     (*dest_mgr->put_pixel_rows) (&cinfo, dest_mgr, num_scanlines);
+    CPU_PROFILE_IO_END();
   }
 
 #ifdef PROGRESS_REPORT
@@ -606,9 +613,11 @@ main (int argc, char **argv)
    * I must do it in this order because output module has allocated memory
    * of lifespan JPOOL_IMAGE; it needs to finish before releasing memory.
    */
+  CPU_PROFILE_COMP_START();
   (*dest_mgr->finish_output) (&cinfo, dest_mgr);
   (void) jpeg_finish_decompress(&cinfo);
   jpeg_destroy_decompress(&cinfo);
+  CPU_PROFILE_COMP_END();
 
   /* Close files, if we opened them */
   if (input_file != stdin)
@@ -620,8 +629,8 @@ main (int argc, char **argv)
   end_progress_monitor((j_common_ptr) &cinfo);
 #endif
 
-  *htime = checkpoint++;
-
+  CPU_PROFILE_CURRENT_TIME();
+  CPU_PROFILE_FLUSH_DATA();
   /* All done. */
   exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
   return 0;			/* suppress no-return-value warnings */

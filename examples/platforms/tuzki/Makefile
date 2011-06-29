@@ -35,6 +35,7 @@ INCDIR += $(foreach SUB_DIR, $(SUB_DIRS), $(addprefix -I$(SRC_BASE_DIR)/, $(SUB_
 
 MODULE       = arch
 EXE          = $(MODULE).x
+SYMLINKS     = links
 
 BUILD_DIR    = ./objs
 define FIND_SRCS
@@ -50,17 +51,19 @@ $(shell mkdir -p $(addprefix $(BUILD_DIR)/, $(SUB_DIRS)))
 .SUFFIXES: .cc .cpp .o .x
 .PHONY: clean all graphs verif
 
-all: $(EXE)
+all: $(SYMLINKS) $(EXE)
 
 $(EXE): $(OBJS)
-	@echo Building $@ ...
+	@echo "    | Building $@ ..."
 	@$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) $(RLIBDIR) -o $@ $(OBJS) $(LIBS) 2>&1 | c++filt
+
+$(SYMLINKS): ${APP_DIR}/APPLICATION.X
 	@echo "    | Updating Application and Input File Symbolic Links ..."
 	@ln -sf ${APP_DIR}/APPLICATION.X APPLICATION.X
 	@ln -sf ${APP_DIR}/input_data input_data
 
 $(BUILD_DIR)/%.o:$(SRC_BASE_DIR)/%.cpp
-	@echo "Compiling $(notdir $<) ..."
+	@echo "    | Compiling $(notdir $<) ..."
 	@rm -fr $(addsuffix .d, $(basename $@))
 	@$(CC) $(CFLAGS) $(INCDIR) -o $@ -c $<
 	@echo -n "$(dir $@)" > $(addsuffix .d, $(basename $@))

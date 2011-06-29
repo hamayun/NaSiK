@@ -13,6 +13,7 @@
 
   <inject>
     <id name="SoclibPlatformDriver" version="1.0"/>
+    <id name="SoclibBlockDeviceDriver" version="1.0"/>
     <id name="RendezVousChannelDriver" version="1.0"/>
     <id name="DeviceFileSystem" version="1.0"/>
     <id name="RootFileSystem" version="1.0"/>

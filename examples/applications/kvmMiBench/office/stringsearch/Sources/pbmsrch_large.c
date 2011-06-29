@@ -15,6 +15,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <limits.h>
+#include <Processor/Profile.h>
 
 static size_t table[UCHAR_MAX + 1];
 static size_t len;
@@ -2739,37 +2740,42 @@ NULL};
 "worth But trust me on the sunscreen"
 };
       int i;
-
-      /* Dump Host Time to File
-       */
-      int checkpoint = 0;
-      volatile int *htime;
-      htime = (int *)0xCE000000;  
-      *htime = checkpoint++;
+      CPU_PROFILE_CURRENT_TIME();
 
       for (i = 0; find_strings[i]; i++)
       {
+            CPU_PROFILE_COMP_START();
             init_search(find_strings[i]);
             here = strsearch(search_strings[i]);
+            CPU_PROFILE_COMP_END();
+
+            CPU_PROFILE_IO_START();
             printf("\"%s\" is%s in \"%s\"", find_strings[i],
                   here ? "" : " not", search_strings[i]);
             if (here)
                   printf(" [\"%s\"]", here);
             putchar('\n');
+            CPU_PROFILE_IO_END();
       }
 
       for (i = 0; find_strings[i]; i++)
       {
+            CPU_PROFILE_COMP_START();
             init_search(find_strings[i]);
             here = strsearch(search_strings[i]);
+            CPU_PROFILE_COMP_END();
+
+            CPU_PROFILE_IO_START();
             printf("\"%s\" is%s in \"%s\"", find_strings[i],
                   here ? "" : " not", search_strings[i]);
             if (here)
                   printf(" [\"%s\"]", here);
             putchar('\n');
+            CPU_PROFILE_IO_END();
       }
 
-    *htime = checkpoint++;
+    CPU_PROFILE_CURRENT_TIME();
+    CPU_PROFILE_FLUSH_DATA();
     return 0;
 }
 

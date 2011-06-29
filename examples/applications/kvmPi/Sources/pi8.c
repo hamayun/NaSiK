@@ -62,6 +62,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <Processor/Profile.h>
 
 //#define SHOWTIME
 
@@ -219,19 +220,13 @@ void arctan(int multiplier, int denom, int sign)
       }
 }
 
-int main()
+int main(void)
 {
       INDEXER x;
       time_t T1, T2;
 
       int argc = 2; 
-      char *argv[2] = {"PIKVM", "20000"};
-
-      /* Dump Host Time to File
-       */
-      int checkpoint = 0;
-      volatile int *htime;
-      htime = (int *)0xCE000000;
+      char *argv[2] = {"PI", "50000"};
 
       if (argc != 2)
       {
@@ -263,7 +258,7 @@ int main()
             pi[x] = 0;
 
       T1 = time(NULL);
-      *htime = checkpoint++;
+      CPU_PROFILE_COMP_START();
 
 #if defined ARC3
       arctan(8, 3, 1);
@@ -286,14 +281,17 @@ int main()
       arctan(4, 239, -1);
 #endif
 
-      *htime = checkpoint++;
+      CPU_PROFILE_COMP_END();
       T2 = time(NULL);
 
+      CPU_PROFILE_IO_START();
       Print(pi);
+      CPU_PROFILE_IO_END();
 
 #ifdef SHOWTIME
       printf("\nCalculation time %0.0lf\n", difftime(T2, T1));
 #endif
 
+      CPU_PROFILE_FLUSH_DATA();
       return EXIT_SUCCESS;
 }

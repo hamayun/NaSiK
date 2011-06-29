@@ -303,6 +303,7 @@ typedef float      TOTAL_TYPE; /* for my PowerPC accelerator only */
 #include <math.h>
 #include <sys/file.h>    /* may want to remove this line */
 #include <malloc.h>      /* may want to remove this line */
+#include <Processor/Profile.h>
 #define  exit_error(IFB,IFC) { fprintf(stderr,IFB,IFC); exit(0); }
 #define  FTOI(a) ( (a) < 0 ? ((int)(a-0.5)) : ((int)(a+0.5)) )
 typedef  unsigned char uchar;
@@ -2000,13 +2001,6 @@ FILE *fd0;
 FILE *fd1;
 FILE *fd2;
 
-  /* Dump Host Time to File
-   */
-  int checkpoint = 0;
-  volatile int *htime;
-  htime = (int *)0xCE000000;  
-  *htime = checkpoint++;
-
   myargc = 4;
   myargv[0] = "susan";
   myargv[1] = "/devices/disk/simulator/0";
@@ -2023,8 +2017,10 @@ FILE *fd2;
   fd1 = fopen("/devices/disk/simulator/1", "r");
   fd2 = fopen("/devices/disk/simulator/2", "w");
   
+  CPU_PROFILE_IO_START();
   //get_image(myargv[1],&in,&x_size,&y_size);
   get_image(fd0,&in,&x_size,&y_size);
+  CPU_PROFILE_IO_END();
 
   printf("After get_image.\n");
 
@@ -2086,15 +2082,12 @@ FILE *fd2;
   /* {{{ main processing */
 
   printf("Before mode.\n");
-
-  *htime = checkpoint++;
-
+  CPU_PROFILE_COMP_START();
   switch (mode)
   {
     case 0:
       /* {{{ smoothing */
-
-  	  printf("Mode 0.\n");
+      printf("Mode 0.\n");
       setup_brightness_lut(&bp,bt,2);
       susan_smoothing(three_by_three,in,dt,x_size,y_size,bp);
       break;
@@ -2103,7 +2096,7 @@ FILE *fd2;
     case 1:
       /* {{{ edges */
 
-  	  printf("Mode 1.\n");
+      printf("Mode 1.\n");
       r   = (int *) malloc(x_size * y_size * sizeof(int));
       setup_brightness_lut(&bp,bt,6);
 
@@ -2135,7 +2128,7 @@ FILE *fd2;
     case 2:
       /* {{{ corners */
 
-  	  printf("Mode 2.\n");
+      printf("Mode 2.\n");
       r   = (int *) malloc(x_size * y_size * sizeof(int));
       setup_brightness_lut(&bp,bt,6);
 
@@ -2157,20 +2150,19 @@ FILE *fd2;
 
 /* }}} */
   }    
-    *htime = checkpoint++;
-  	printf("After mode.\n");
+  CPU_PROFILE_COMP_END();
 
 /* }}} */
 
-    printf("Before put.\n");
+    CPU_PROFILE_IO_START();
     put_image(fd2,in,x_size,y_size);
-	printf("After put.\n");
-    *htime = checkpoint++;
+    CPU_PROFILE_IO_END();
 
-	fclose(fd0);
-	fclose(fd1);
-	fclose(fd2);
+    fclose(fd0);
+    fclose(fd1);
+    fclose(fd2);
 
+    CPU_PROFILE_FLUSH_DATA();
 }
 
 /* }}} */

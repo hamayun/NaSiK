@@ -38,3 +38,5 @@ struct io_table_entry *io_table_lookup(struct io_table *io_table,
                                        uint64_t addr);
 int io_table_register(struct io_table *io_table, uint64_t start, uint64_t size,
                       io_table_handler_t *handler, void *opaque);
+
+int io_table_print(struct io_table *io_table);

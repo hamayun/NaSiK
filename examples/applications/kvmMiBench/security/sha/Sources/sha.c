@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "sha.h"
+#include <Processor/Profile.h>
 
 /* SHA f()-functions */
 
@@ -188,6 +189,7 @@ void sha_final(SHA_INFO *sha_info)
 
 #define BLOCK_SIZE	8192
 
+#if 0 // Original
 void sha_stream(SHA_INFO *sha_info, FILE *fin)
 {
     int i;
@@ -199,6 +201,32 @@ void sha_stream(SHA_INFO *sha_info, FILE *fin)
     }
     sha_final(sha_info);
 }
+#else
+void sha_stream(SHA_INFO *sha_info, FILE *fin)
+{
+    int i;
+    BYTE data[BLOCK_SIZE];
+
+    CPU_PROFILE_COMP_START();
+    sha_init(sha_info);
+    CPU_PROFILE_COMP_END();
+
+    while (1) {
+        CPU_PROFILE_IO_START();
+        i = fread(data, 1, BLOCK_SIZE, fin);
+        CPU_PROFILE_IO_END();
+
+        if(i <= 0) break;
+
+        CPU_PROFILE_COMP_START();
+	sha_update(sha_info, data, i);
+        CPU_PROFILE_COMP_END();
+    }
+    CPU_PROFILE_COMP_START();
+    sha_final(sha_info);
+    CPU_PROFILE_COMP_END();
+}
+#endif
 
 /* print a SHA digest */
 

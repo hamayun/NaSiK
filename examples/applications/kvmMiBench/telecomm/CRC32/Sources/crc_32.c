@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include "crc.h"
+#include <Processor/Profile.h>
 
 #ifdef __TURBOC__
  #pragma warn -cln
@@ -122,11 +123,14 @@ DWORD updateCRC32(unsigned char ch, DWORD crc)
       return UPDC32(ch, crc);
 }
 
+#define BUFF_SIZE 1024
 Boolean_T crc32file(char *name, DWORD *crc, long *charcnt)
 {
       register FILE *fin;
       register DWORD oldcrc32;
       register int c;
+      int bytes_read, index;
+      char     buffer[BUFF_SIZE] = {0};
 
       oldcrc32 = 0xFFFFFFFF; *charcnt = 0;
 #ifdef MSDOS
@@ -138,11 +142,32 @@ Boolean_T crc32file(char *name, DWORD *crc, long *charcnt)
             perror(name);
             return Error_;
       }
+
+#if 0  // Original Implementation
       while ((c=getc(fin))!=EOF)
       {
             ++*charcnt;
             oldcrc32 = UPDC32(c, oldcrc32);
       }
+#else
+      while (1)
+      {
+            CPU_PROFILE_IO_START();
+            bytes_read = fread(buffer, sizeof(char), BUFF_SIZE, fin);
+            CPU_PROFILE_IO_END();
+
+            if(bytes_read == 0 && feof(fin)) break;
+
+            CPU_PROFILE_COMP_START();
+            for(index = 0; index < bytes_read; index++)
+            {
+                c = (int) buffer[index];
+                ++*charcnt;
+                oldcrc32 = UPDC32(c, oldcrc32);
+            }
+            CPU_PROFILE_COMP_END();
+      }
+#endif
 
       if (ferror(fin))
       {
@@ -151,8 +176,9 @@ Boolean_T crc32file(char *name, DWORD *crc, long *charcnt)
       }
       fclose(fin);
 
+      CPU_PROFILE_COMP_START();
       *crc = oldcrc32 = ~oldcrc32;
-
+      CPU_PROFILE_COMP_END();
       return Success_;
 }
 
@@ -168,7 +194,7 @@ DWORD crc32buf(char *buf, size_t len)
       }
 
       return ~oldcrc32;
-      
+
 }
 
 int
@@ -177,21 +203,17 @@ main(int argc, char *argv[])
       DWORD crc;
       long charcnt;
       register errors = 0;
-      
-      /* Dump Host Time to File
-       */
-      int checkpoint = 0;
-      volatile int *htime;
-      htime = (int *)0xCE000000;  
-      *htime = checkpoint++;
 
 //      while(--argc > 0)
 //      {
 //            errors |= crc32file(*++argv, &crc, &charcnt);
             errors |= crc32file("/devices/disk/simulator/0", &crc, &charcnt);
+
+            CPU_PROFILE_IO_START();
             printf("%08lX %7ld %s\n", crc, charcnt, *argv);
+            CPU_PROFILE_IO_END();
 //      }
 
-      *htime = checkpoint++;
+      CPU_PROFILE_FLUSH_DATA();
       return(errors != 0);
 }

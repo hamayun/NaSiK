@@ -30,11 +30,14 @@
 soc_kvm_data soc_kvm_init_data;
 
 extern void * p_kvm_cpu_adaptor;
+uint64_t systemc_kvm_read_memory (void *_this, uint64_t addr, int nbytes, unsigned int *ns, int bIO);
+void systemc_kvm_write_memory (void *_this, uint64_t addr, unsigned char *data, int nbytes, unsigned int *ns, int bIO);
+void systemc_annotate_function(void *_this, void *vm_addr, void *pdesc);
 
 static char *section_copy[] = {".init", ".text", ".data", ".rodata", ".rodata.str1.1", ".os_config", ".hal", ".note", ""};
 static char *section_bss = {".bss"};
 
-static uint8_t ioram[IORAM_LEN];
+//static uint8_t ioram[IORAM_LEN];
 
 static int gettid(void)
 {
@@ -545,8 +548,8 @@ static int test_mmio_write(void *opaque, uint64_t addr, uint8_t *data, int len)
 
     //memcpy(ioram + addr - IORAM_BASE_PHYS, data, len);
     //printf("%s: address: 0x%x, len: 0x%x\n", __func__, (unsigned int) addr, len);
-    data = (uint8_t *)systemc_kvm_write_memory(p_kvm_cpu_adaptor, addr, data, len, NULL, 1);
 
+    systemc_kvm_write_memory(p_kvm_cpu_adaptor, addr, data, len, NULL, 1);
     return 0;
 }
 
@@ -666,7 +669,7 @@ static void start_vcpu(int n)
 	sem_init(&vcpus[n].sipi_sem, 0, 0);
 	pthread_create(&thread, NULL, do_create_vcpu, (void *)(long)n);
 }
-
+/*
 static void usage(const char *progname)
 {
 	fprintf(stderr,
@@ -682,10 +685,11 @@ static void usage(const char *progname)
 "Report bugs to <kvm@vger.kernel.org>.\n"
 		, progname);
 }
+*/
 
 static void sig_ignore(int sig)
 {
-	write(1, "boo\n", 4);
+    write(1, "boo\n", 4);
 }
 
 
@@ -694,7 +698,7 @@ int load_elf(void *vm_addr, int vm_size, char *file)
     Elf32_Ehdr *elf_header = NULL;  /* ELF header */
     Elf *elf = NULL;                /* Our Elf pointer for libelf */
     Elf_Scn *scn = NULL;            /* Section Descriptor */
-    GElf_Sym sym;                   /* Symbol */
+    //GElf_Sym sym;                   /* Symbol */
     GElf_Shdr shdr;                 /* Section Header */
 
     int fd;                         // File Descriptor
@@ -844,7 +848,8 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 {
 	unsigned char *vm_mem;
 	int i;
-	const char *sopts = "s:phm:";
+	/*
+        const char *sopts = "s:phm:";
 	struct option lopts[] = {
 		{ "smp", 1, 0, 's' },
 		{ "protected-mode", 0, 0, 'p' },
@@ -853,9 +858,9 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 		{ 0 },
 	};
 	int opt_ind, ch;
-	bool enter_protected_mode = false;
 	int nb_args;
-	char *endptr;
+	char *endptr;*/
+	bool enter_protected_mode = false;
 
 #if 0
 	while ((ch = getopt_long(argc, argv, sopts, lopts, &opt_ind)) != -1) {

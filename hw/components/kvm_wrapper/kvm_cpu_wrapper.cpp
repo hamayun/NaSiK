@@ -8,9 +8,9 @@ extern "C" {
     void soc_kvm_run();
 }
 
-#define QEMU_STNOC_ADDRESS_DIFFERENCE 0x00000000
-static unsigned char s_st_operation_codes[] = {0xDE, 0x00, 0x10, 0xDE, 0x20, 0xDE, 0xDE, 0xDE, 0x30};
-static unsigned char s_st_operation_mask_be[] = {0xDE, 0x01, 0x03, 0xDE, 0x0F, 0xDE, 0xDE, 0xDE, 0xFF};
+//#define QEMU_STNOC_ADDRESS_DIFFERENCE 0x00000000
+//static unsigned char s_st_operation_codes[] = {0xDE, 0x00, 0x10, 0xDE, 0x20, 0xDE, 0xDE, 0xDE, 0x30};
+//static unsigned char s_st_operation_mask_be[] = {0xDE, 0x01, 0x03, 0xDE, 0x0F, 0xDE, 0xDE, 0xDE, 0xFF};
 
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, char *elf_file, uintptr_t app_base_addr, int node_id)
 	: master_device (name), ExecutionSpy(ANALYZE_OPTION, ONLINE_OPTION, NO_THREAD_OPTION, elf_file, app_base_addr)

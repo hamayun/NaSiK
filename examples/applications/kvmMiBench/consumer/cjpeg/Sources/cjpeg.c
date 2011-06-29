@@ -25,6 +25,7 @@
 
 #include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
 #include "jversion.h"		/* for version message */
+#include <Processor/Profile.h>
 
 #ifdef USE_CCOMMAND		/* command-line reader for Macintosh */
 #ifdef __MWERKS__
@@ -473,13 +474,6 @@ main (int argc, char **argv)
   int myargc;
   char *myargv[8];
 
-  /* Dump Host Time to File
-   */
-  int checkpoint = 0;
-  volatile int *htime;
-  htime = (int *)0xCE000000;  
-  *htime = checkpoint++;
-
   /* jpeg-6a/cjpeg -dct int -progressive -opt -outfile output_large_encode.jpeg input_large.ppm */
   /*         */
   myargc = 8;
@@ -587,12 +581,16 @@ main (int argc, char **argv)
 #endif
 
   /* Figure out the input file format, and set up to read it. */
+  CPU_PROFILE_CURRENT_TIME();
+  CPU_PROFILE_IO_START();
   src_mgr = select_file_type(&cinfo, input_file);
   src_mgr->input_file = input_file;
 
   /* Read the input file header to obtain file size & colorspace. */
   (*src_mgr->start_input) (&cinfo, src_mgr);
+  CPU_PROFILE_IO_END();
 
+  CPU_PROFILE_COMP_START();
   /* Now that we know input colorspace, fix colorspace-dependent defaults */
   jpeg_default_colorspace(&cinfo);
 
@@ -604,17 +602,25 @@ main (int argc, char **argv)
 
   /* Start compressor */
   jpeg_start_compress(&cinfo, TRUE);
+  CPU_PROFILE_COMP_END();
 
   /* Process data */
   while (cinfo.next_scanline < cinfo.image_height) {
+    CPU_PROFILE_IO_START();
     num_scanlines = (*src_mgr->get_pixel_rows) (&cinfo, src_mgr);
+    CPU_PROFILE_IO_END();
+
+    CPU_PROFILE_COMP_START();
     (void) jpeg_write_scanlines(&cinfo, src_mgr->buffer, num_scanlines);
+    CPU_PROFILE_COMP_END();
   }
 
   /* Finish compression and release memory */
+  CPU_PROFILE_COMP_START();
   (*src_mgr->finish_input) (&cinfo, src_mgr);
   jpeg_finish_compress(&cinfo);
   jpeg_destroy_compress(&cinfo);
+  CPU_PROFILE_COMP_END();
 
   /* Close files, if we opened them */
   if (input_file != stdin)
@@ -626,8 +632,8 @@ main (int argc, char **argv)
   end_progress_monitor((j_common_ptr) &cinfo);
 #endif
 
-  *htime = checkpoint++;
-
+  CPU_PROFILE_CURRENT_TIME();
+  CPU_PROFILE_FLUSH_DATA();
   /* All done. */
   exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
   return 0;			/* suppress no-return-value warnings */

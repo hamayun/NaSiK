@@ -42,6 +42,7 @@
 #include <ctype.h>
 
 #include "aes.h"
+#include <Processor/Profile.h>
 
 /* A Pseudo Random Number Generator (PRNG) used for the     */
 /* Initialisation Vector. The PRNG is George Marsaglia's    */
@@ -101,32 +102,40 @@ int encfile(FILE *fin, FILE *fout, aes *ctx, char* fn)
     unsigned long   i=0, l=0;
 
     fillrand(outbuf, 16);           /* set an IV for CBC mode           */
+    CPU_PROFILE_IO_START();
     fseek(fin, 0, SEEK_END);        /* get the length of the file       */
     fgetpos(fin, &flen);            /* and then reset to start          */
     fseek(fin, 0, SEEK_SET);        
     fwrite(outbuf, 1, 16, fout);    /* write the IV to the output       */
+    CPU_PROFILE_IO_END();
     fillrand(inbuf, 1);             /* make top 4 bits of a byte random */
     l = 15;                         /* and store the length of the last */
                                     /* block in the lower 4 bits        */
     //inbuf[0] = ((char)(flen.__pos) & (char)15) | (inbuf[0] & (~((char)15)));
-	inbuf[0] = ((char)(flen) & (char)15) | (inbuf[0] & (~((char)15)));
+    inbuf[0] = ((char)(flen) & (char)15) | (inbuf[0] & (~((char)15)));
 
     while(!feof(fin))               /* loop to encrypt the input file   */
     {                               /* input 1st 16 bytes to buf[1..16] */
+        CPU_PROFILE_IO_START();
         i = fread(inbuf + 16 - l, 1, l, fin);  /*  on 1st round byte[0] */
+        CPU_PROFILE_IO_END();
                                                /* is the length code    */
         if(i < l) break;            /* if end of the input file reached */
 
+        CPU_PROFILE_COMP_START();
         for(i = 0; i < 16; ++i)         /* xor in previous cipher text  */
             inbuf[i] ^= outbuf[i]; 
 
         encrypt(inbuf, outbuf, ctx);    /* and do the encryption        */
+        CPU_PROFILE_COMP_END();
 
+        CPU_PROFILE_IO_START();
         if(fwrite(outbuf, 1, 16, fout) != 16)
         {
             printf("Error writing to output file: %s\n", fn);
             return -7;
         }
+        CPU_PROFILE_IO_END();
                                     /* in all but first round read 16   */
         l = 16;                     /* bytes into the buffer            */
     }
@@ -142,6 +151,7 @@ int encfile(FILE *fin, FILE *fout, aes *ctx, char* fn)
 
     if(i)                               /* if bytes remain to be output */
     {
+        CPU_PROFILE_COMP_START();
         while(i < 16)                   /* clear empty buffer positions */
             inbuf[i++] = 0;
      
@@ -149,12 +159,15 @@ int encfile(FILE *fin, FILE *fout, aes *ctx, char* fn)
             inbuf[i] ^= outbuf[i]; 
 
         encrypt(inbuf, outbuf, ctx);    /* encrypt and output it        */
+        CPU_PROFILE_COMP_END();
 
+        CPU_PROFILE_IO_START();
         if(fwrite(outbuf, 1, 16, fout) != 16)
         {
             printf("Error writing to output file: %s\n", fn);
             return -8;
         }
+        CPU_PROFILE_IO_END();
     }
         
     return 0;
@@ -241,13 +254,13 @@ int main(int argc, char *argv[])
     int myargc;
     char *myargv[5];
 
-	// ./rijndael input_large.asc output_large.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
-	myargc = 5;
-	myargv[0] = "./rijndael";
-	myargv[1] = "/devices/disk/simulator/0";
-	myargv[2] = "/devices/disk/simulator/2";
-	myargv[3] = "e";
-	myargv[4] = "1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321";
+    // ./rijndael input_large.asc output_large.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
+    myargc = 5;
+    myargv[0] = "./rijndael";
+    myargv[1] = "/devices/disk/simulator/0";
+    myargv[2] = "/devices/disk/simulator/2";
+    myargv[3] = "e";
+    myargv[4] = "1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321";
 
     if(myargc != 5 || (toupper(*myargv[3]) != 'D' && toupper(*myargv[3]) != 'E'))
     {
@@ -258,13 +271,7 @@ int main(int argc, char *argv[])
     cp = myargv[4];   /* this is a pointer to the hexadecimal key digits  */
     i = 0;          /* this is a count for the input digits processed   */
 
-    /* Dump Host Time to File
-    */
-    int checkpoint = 0;
-    volatile int *htime;
-    htime = (int *)0xCE000000;  
-    *htime = checkpoint++;
-    
+    CPU_PROFILE_COMP_START();
     while(i < 64 && *cp)    /* the maximum key length is 32 bytes and   */
     {                       /* hence at most 64 hexadecimal digits      */
         ch = toupper(*cp++);            /* process a hexadecimal digit  */
@@ -295,6 +302,7 @@ int main(int argc, char *argv[])
     }
 
     key_len = i / 2;
+    CPU_PROFILE_COMP_END();
 
     if(!(fin = fopen(myargv[1], "rb")))   /* try to open the input file */
     {
@@ -309,13 +317,15 @@ int main(int argc, char *argv[])
     }
 
     if(toupper(*myargv[3]) == 'E')
-    {                           /* encryption in Cipher Block Chaining mode */
+    {   /* encryption in Cipher Block Chaining mode */
+        CPU_PROFILE_COMP_START();
         set_key(key, key_len, enc, ctx);
+        CPU_PROFILE_COMP_END();
 
         err = encfile(fin, fout, ctx, myargv[1]);
     }
     else
-    {                           /* decryption in Cipher Block Chaining mode */
+    {   /* decryption in Cipher Block Chaining mode */
         set_key(key, key_len, dec, ctx);
     
         err = decfile(fin, fout, ctx, myargv[1], myargv[2]);
@@ -326,6 +336,6 @@ exit:
     if(fin)
         fclose(fin);
 
-    *htime = checkpoint++;
+    CPU_PROFILE_FLUSH_DATA();
     return err;
 }

@@ -42,6 +42,19 @@ private:
 
 private:
     FILE                *host_file;
+
+    double               m_comp_start;
+    double               m_comp_end;
+    double               m_comp_total;
+    double               m_io_start;
+    double               m_io_end;
+    double               m_io_total;
+
+    // Counters for Sanity Check of Profile Info
+    uint32_t             m_comp_start_count;
+    uint32_t             m_comp_end_count;
+    uint32_t             m_io_start_count;
+    uint32_t             m_io_end_count;
 };
 
 #endif

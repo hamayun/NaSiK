@@ -1,24 +1,24 @@
 #!/bin/bash
 
 export CRT0="${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/lib/crt0.o"
+export CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/i386-sls-dnaos/4.4.2/include/"
 export DNASTART="${LIBKVM_HOME}/user/test/x86/dnastart.o"
-CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/i386-sls-dnaos/4.4.2/include/"
 
 # Try and Do the Split Compilation using the Primary Compiler. 
 #export APES_SPLIT_CC=""
 export APES_CC1="llvm-gcc"
 export APES_CC2="llc"
 export APES_CC1_FLAGS="-Wall -Wno-format -std=c99 -U__linux__ --emit-llvm -nostdinc $CUSTOM_INCLUDES"
-export APES_CC2_FLAGS="-annotate=arm -soft-float"
-# "-march=arm --print-dual-cfg --print-annotated-cfg
+export APES_CC2_FLAGS="-soft-float -annotate=arm"
+# "-march=arm --print-dual-cfg --print-annotated-cfg"
 
 # On Failure Use the default APES_COMPILER
 export APES_COMPILER="i386-sls-dnaos-gcc"
-export APES_CC_FLAGS="-D__i386__ -D__KERNEL__ -Wall -Wno-format -std=c99 -O3 $CUSTOM_INCLUDES"
+export APES_CC_FLAGS="-Wall -Wno-format -std=c99 -O3 $CUSTOM_INCLUDES"
 export APES_ASSEMBLER="i386-sls-dnaos-as"
 
 export APES_LINKER="i386-sls-dnaos-gcc"
-export APES_LINKER_FLAGS="${DNASTART} ${CRT0} -D__i386__ -D__KERNEL__ -Wl,-T,elf.lds"
+export APES_LINKER_FLAGS="${CRT0} ${DNASTART} -Wl,-T,elf.lds"
 export APES_LINKER_TRAIL_FLAGS="-L${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/lib -lc -lgcc -lm"
 
 APES_CC_OPTIMIZATIONS="-g"

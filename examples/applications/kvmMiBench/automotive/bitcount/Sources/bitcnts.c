@@ -14,8 +14,10 @@
 #include <float.h>
 #include "bitops.h"
 #include <math.h>
+#include <Processor/Profile.h>
 
 #define FUNCS  7
+#define IO_ON
 
 static int CDECL bit_shifter(long int x);
 
@@ -55,24 +57,17 @@ int main(int argc, char *argv[])
 //    exit(-1);
 //	}
 //  iterations=atoi(argv[1]);
-  
-    /* Dump Host Time to File
-    */
-    int checkpoint = 0;
-    volatile int *htime;
-    htime = (int *)0xCE000000;  
-    *htime = checkpoint++;
 
   iterations=1125000; // runme_large
-  
   puts("Bit counter algorithm benchmark\n");
-  
+
   for (i = 0; i < FUNCS; i++) {
+    CPU_PROFILE_COMP_START();
     start = clock();
-    
+
     for (j = n = 0, seed = rand(); j < iterations; j++, seed += 13)
 	 n += pBitCntFunc[i](seed);
-    
+
     stop = clock();
     ct = (stop - start) / (double)CLOCKS_PER_SEC;
     if (ct < cmin) {
@@ -83,24 +78,30 @@ int main(int argc, char *argv[])
 	 cmax = ct;
 	 cmaxix = i;
     }
+    CPU_PROFILE_COMP_END();
     
 #ifdef IO_ON
+    CPU_PROFILE_IO_START();
     printf("%-38s> Time: %7.3f sec.; Bits: %ld\n", text[i], ct, n);
+    CPU_PROFILE_IO_END();
 #endif
   }
+
 #ifdef IO_ON
+  CPU_PROFILE_IO_START();
   printf("\nBest  > %s\n", text[cminix]);
   printf("Worst > %s\n", text[cmaxix]);
+  CPU_PROFILE_IO_END();
 #endif
 
-  *htime = checkpoint++;
+  CPU_PROFILE_FLUSH_DATA();
   return 0;
 }
 
 static int CDECL bit_shifter(long int x)
 {
   int i, n;
-  
+
   for (i = n = 0; x && (i < (sizeof(long) * CHAR_BIT)); ++i, x >>= 1)
     n += (int)(x & 1L);
   return n;
