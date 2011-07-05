@@ -7,7 +7,7 @@ export LIBKVM_PREFIX=/opt/libs/libkvm
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
-export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386
+export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-arm
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-annotated
 export APES_ROOT=/opt/Apes
 export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
@@ -16,7 +16,7 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
 #APPLICATION=kvmParallelMjpeg
 #APPLICATION=susan
-#APPLICATION=qsort
+APPLICATION=qsort
 #APPLICATION=dijkstra
 #APPLICATION=patricia
 #APPLICATION=blowfish
@@ -27,7 +27,7 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=cjpeg
 #APPLICATION=djpeg
 #APPLICATION=stringsearch
-APPLICATION=kvmPi
+#APPLICATION=kvmPi
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
@@ -36,7 +36,7 @@ export PFORM_DIR=$NASIK_HOME/examples/platforms/$PLATFORM
 
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
 cd $NASIK_HOME/examples/applications
-source config-apps-kvm.sh
+source config-apps-arm.sh
 
 if [ -e ${APP_DIR}/app_specific_config.sh ]; then
 	echo "Application Specific Configuration Found ... Sourcing it."
@@ -47,8 +47,8 @@ fi
 #Update Links in Application.
 echo "Updating Application Specific Symlinks ..."
 cd ${APP_DIR}
-ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm elf.lds
-ln -sf interface.xmi.kvm interface.xmi
+ln -sf $NASIK_HOME/examples/applications/ldscript_elf.arm elf.lds
+ln -sf interface.xmi.arm interface.xmi
 
 # for tty_terms
 export PATH=$NASIK_HOME:$PATH

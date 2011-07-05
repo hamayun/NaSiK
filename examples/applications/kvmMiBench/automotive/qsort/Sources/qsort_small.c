@@ -55,12 +55,15 @@ main(int argc, char *argv[]) {
 
   CPU_PROFILE_IO_START();
   for(i=0;i<count;i++)
+  {
     fprintf(fp2, "%s\n", array[i].qstring);
+  }
   CPU_PROFILE_IO_END();
 
   fclose(fp);
   fclose(fp1);
   fclose(fp2);
   CPU_PROFILE_FLUSH_DATA();
+  printf("\nDone\n");
   return 0;
 }

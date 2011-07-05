@@ -103,7 +103,7 @@ int sc_main (int argc, char ** argv)
 
     sl_block_device   *bl   = new sl_block_device("block", 1, "input_data", 1);
     sl_block_device   *bl2  = new sl_block_device("block2", 2, "input_data", 1);
-    sl_block_device   *bl3  = new sl_block_device("block2", 3, "output_data", 1);
+    sl_block_device   *bl3  = new sl_block_device("block3", 3, "output_data", 1);
 
     mem_device		*ram  = new mem_device("ram", soc_kvm_init_data.memory_size, soc_kvm_init_data.vm_mem);
     shared_ram                = new mem_device("shared_ram", 0x10000);
