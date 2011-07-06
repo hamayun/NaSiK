@@ -1,6 +1,6 @@
 ENTRY (_start)
 STARTUP(crt0.o)
-GROUP(-lc -lgcc)
+GROUP(-lc -lm -lgcc)
 
 MEMORY
 {

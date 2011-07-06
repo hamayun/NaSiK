@@ -1,1 +1,1 @@
-../kvm_apps_elf.lds
+/home/hamayun/workspace/NaSiK/examples/applications/ldscript_elf.arm
