@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<APES:Interface
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:APES="http://www.ocm.org/APES"
+  xsi:schemaLocation="http://www.ocm.org/APES APESInterface.ecore"
+  author="@imag.fr"
+  unique="true"
+  wrapper="false">
+
+  <id name="SELFPROF" version="1.0"/>
+
+  <inject>
+    <id name="SoclibPlatformDriver" version="1.0"/>
+    <id name="SoclibFramebufferDriver" version="1.0"/>
+    <id name="SoclibBlockDeviceDriver" version="1.0"/>
+    <id name="RendezVousChannelDriver" version="1.0"/>
+    <id name="DeviceFileSystem" version="1.0"/>
+    <id name="RootFileSystem" version="1.0"/>
+  </inject>
+
+  <restrict>
+    <id name="ArmV6Processor" version="1.0"/>
+    <id name="DnaCore" version="1.0"/>
+    <id name="DnaMM_WorstFit" version="1.0"/>
+    <id name="PosixThreadsLibrary" version="1.0"/>
+  </restrict>
+
+  <provide>
+    <context name="Application">
+      <method name="main" result="int32_t">
+        <argument name="argc" type="int32_t" direction="In"/>
+        <argument name="argv" type="array of string" direction="In"/>
+      </method>
+    </context>
+  </provide>
+
+  <require>
+
+    <type name="kpn_channel_t"/>
+    <type name="kpn_status_t"/>
+
+    <method name="printf" result="int32_t">
+      <argument name="format" type="string" direction="In"/>
+      <argument name="..." type="array of void" direction="In"/>
+    </method>
+
+    <method name="kpn_channel_create" result="kpn_status_t">
+      <argument name="name" type="string" direction="In"/>
+      <argument name="size" type="int32_t" direction="In"/>
+      <argument name="channel" type="kpn_channel_t" direction="Out"/>
+    </method>
+ 
+    <method name="kpn_channel_read" result="kpn_status_t">
+      <argument name="channel" type="kpn_channel_t" direction="In"/>
+      <argument name="buffer" type="access" direction="In"/>
+      <argument name="size" type="uint32_t" direction="In"/>
+    </method>
+
+    <method name="kpn_channel_write" result="kpn_status_t">
+      <argument name="channel" type="kpn_channel_t" direction="In"/>
+      <argument name="buffer" type="access" direction="In"/>
+      <argument name="size" type="uint32_t" direction="In"/>
+    </method>
+
+    <method name="pthread_create" result="int32_t">
+      <argument name="thread" type="pthread_t" direction="Out"/>
+      <argument name="attrs" type="pthread_attr_t" direction="InOut"/>
+      <argument name="func" type="pthread_func_t" direction="In"/>
+      <argument name="args" type="access" direction="In"/>
+    </method>
+
+  </require>
+
+</APES:Interface>

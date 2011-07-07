@@ -24,6 +24,10 @@
 #include <sys/resource.h>
 #include <sys/times.h>
 
+// This value is used to calculate the profiling overhead.
+// This particular value is for KVM Platform on my Desktop Machine.
+#define ONE_PROFILE_CALL_COST 0.000010975
+
 double get_clock(void) {
   /* Unix or Linux: use resource usage */
   struct rusage t;
@@ -90,7 +94,7 @@ void hosttime::write (unsigned int ofs, unsigned char be, unsigned char *data, b
             }
             /*
             else{
-                printf ("Invalide Computation Start (%lf) and End Times (%lf)\n", m_comp_start, m_comp_end);
+                printf ("Invalide Computation Start (%f) and End Times (%f) Delta (%f)\n", m_comp_start, m_comp_end, (m_comp_end - m_comp_start));
                 exit(1);
             }*/
             break;
@@ -116,23 +120,46 @@ void hosttime::write (unsigned int ofs, unsigned char be, unsigned char *data, b
             break;
 
         case 0x28:
-            if((m_comp_start_count != m_comp_end_count) || (m_io_start_count != m_io_end_count))
             {
-                fprintf(host_file, "\n***WARNING: Profile Results Possibly Incorrect; Mismatch in Start/End Counters\n\n");
-                fprintf(stderr,    "\n***WARNING: Profile Results Possibly Incorrect; Mismatch in Start/End Counters\n\n");
+                double io_profile_overhead = 0.0, net_io_cost = 0.0;
+                double comp_profile_overhead = 0.0, net_comp_cost = 0.0;
+
+                if((m_comp_start_count != m_comp_end_count) || (m_io_start_count != m_io_end_count))
+                {
+                    fprintf(host_file, "\n***WARNING: Profile Results Possibly Incorrect; Mismatch in Start/End Counters\n\n");
+                    fprintf(stderr,    "\n***WARNING: Profile Results Possibly Incorrect; Mismatch in Start/End Counters\n\n");
+                }
+
+                io_profile_overhead = ONE_PROFILE_CALL_COST * (m_io_start_count + m_io_end_count);
+                net_io_cost = m_io_total - io_profile_overhead;
+
+                comp_profile_overhead = ONE_PROFILE_CALL_COST * (m_comp_start_count + m_comp_end_count);
+                net_comp_cost = m_comp_total - comp_profile_overhead;
+
+                fprintf(host_file, "Total I/O Time              : %lf    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        m_io_total, m_io_start_count, m_io_end_count, io_profile_overhead, net_io_cost);
+                fprintf(stderr,    "Total I/O Time              : %lf    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        m_io_total, m_io_start_count, m_io_end_count, io_profile_overhead, net_io_cost);
+
+                fprintf(host_file, "Total Computation Time      : %lf    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        m_comp_total, m_comp_start_count, m_comp_end_count, comp_profile_overhead, net_comp_cost);
+                fprintf(stderr,    "Total Computation Time      : %lf    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        m_comp_total, m_comp_start_count, m_comp_end_count, comp_profile_overhead, net_comp_cost);
+
+                fprintf(host_file, "Total I/O + Computation Time: %lf    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        m_io_total + m_comp_total,
+                        m_io_start_count + m_comp_start_count,
+                        m_io_end_count + m_comp_end_count,
+                        io_profile_overhead + comp_profile_overhead,
+                        net_io_cost + net_comp_cost);
+                fprintf(stderr,    "Total I/O + Computation Time: %lf    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        m_io_total + m_comp_total,
+                        m_io_start_count + m_comp_start_count,
+                        m_io_end_count + m_comp_end_count,
+                        io_profile_overhead + comp_profile_overhead,
+                        net_io_cost + net_comp_cost);
+                fflush(host_file);
             }
-
-            fprintf(host_file, "Total I/O Time              : %lf    [%06d/%06d]\n", m_io_total, m_io_start_count, m_io_end_count);
-            fprintf(stderr,    "Total I/O Time              : %lf    [%06d/%06d]\n", m_io_total, m_io_start_count, m_io_end_count);
-
-            fprintf(host_file, "Total Computation Time      : %lf    [%06d/%06d]\n", m_comp_total, m_comp_start_count, m_comp_end_count);
-            fprintf(stderr,    "Total Computation Time      : %lf    [%06d/%06d]\n", m_comp_total, m_comp_start_count, m_comp_end_count);
-
-            fprintf(host_file, "Total I/O + Computation Time: %lf    [%06d/%06d]\n",
-                    m_comp_total + m_io_total, m_io_start_count + m_comp_start_count, m_io_end_count + m_comp_end_count);
-            fprintf(stderr,    "Total I/O + Computation Time: %lf    [%06d/%06d]\n",
-                    m_comp_total + m_io_total, m_io_start_count + m_comp_start_count, m_io_end_count + m_comp_end_count);
-            fflush(host_file);
             break;
 
         default:
