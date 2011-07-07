@@ -24,6 +24,7 @@
 #include <libelf.h>
 #include <gelf.h>
 #include "soc_kvm.h"
+#include "hosttime.h"
 
 #define ERR -1
 
@@ -64,6 +65,7 @@ static sigset_t ipi_sigmask;
 static uint64_t memory_size = 128 * 1024 * 1024;
 
 static struct io_table pio_table;
+static hosttime_t hosttime_instance = {0};
 
 struct vcpu_info {
 	int id;
@@ -297,7 +299,7 @@ void dump_trace_files(char *mmio_tfile, char *pmio_tfile)
 #endif
 }
 
-#define ANNOTATION_BASE 0x4000
+#define ANNOTATION_BASEPORT 0x4000
 static int annotation_handler(void *opaque, int size, int is_write,
                               uint64_t addr, uint64_t *value)
 {
@@ -965,7 +967,10 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 	io_table_register(&pio_table, IRQCHIP_IO_BASE, 0x20, irqchip_io, NULL);
 
         // Register the Annotation Handler; Also pass the Virtual Memory Address allocated to KVM
-        io_table_register(&pio_table, ANNOTATION_BASE, 0x04, annotation_handler, vm_mem);
+        io_table_register(&pio_table, ANNOTATION_BASEPORT, 0x04, annotation_handler, vm_mem);
+
+        // Register the HostTime Handler
+        io_table_register(&pio_table, HOSTTIME_BASEPORT, 0x4, hosttime_handler, &hosttime_instance);
 
 	sem_init(&init_sem, 0, 0);
 	for (i = 0; i < ncpus; ++i)
@@ -986,6 +991,12 @@ void soc_kvm_run()
     if(allocate_trace_buffers())
     {
         printf("%s: Error Allocating Trace Buffers\n", __func__);
+        return;
+    }
+
+    if(init_hosttime(& hosttime_instance, "hosttime_kvm.txt"))
+    {
+        printf("%s: Error Initializing Hosttime Instance\n", __func__);
         return;
     }
 

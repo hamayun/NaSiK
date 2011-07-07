@@ -16,7 +16,6 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/timer              \
                $(COMPONENTS)/tty_serial         \
                $(COMPONENTS)/sl_blockdevice     \
-               $(COMPONENTS)/hosttime           \
                $(PLATFORM)
 
 CC           = g++

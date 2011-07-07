@@ -13,21 +13,18 @@ CINCDIR     += -I${LIBKVM_HOME}/libkvm
 
 all: $(LIBSOCKVM)
 
-$(LIBSOCKVM): iotable.o soc_kvm.o
-	$(CC) $(LDFLAGS) -o $@ $^
+$(LIBSOCKVM): iotable.o soc_kvm.o hosttime.o
+	@$(CC) $(LDFLAGS) -o $@ $^
 
 #	$(AR) rcs $@ $^
 
-iotable.o: iotable.c
-	$(CC) $(CFLAGS) $(CINCDIR) -c $^ -o $@ 
-
-soc_kvm.o: soc_kvm.c
-	$(CC) $(CFLAGS) $(CINCDIR) -c $^ -o $@ 
+%.o: %.c
+	@$(CC) $(CFLAGS) $(CINCDIR) -c $^ -o $@
 
 clean:
-	$(RM) *.o *.a .*.d
+	@$(RM) *.o *.a .*.d
 
 install: 
-	install -D -m 644 soc_kvm.h $(LIBKVM_PREFIX)/include/soc_kvm.h
-	install -D -m 644 $(LIBSOCKVM) $(LIBKVM_PREFIX)/lib/$(LIBSOCKVM)
+	@install -D -m 644 soc_kvm.h $(LIBKVM_PREFIX)/include/soc_kvm.h
+	@install -D -m 644 $(LIBSOCKVM) $(LIBKVM_PREFIX)/lib/$(LIBSOCKVM)
 

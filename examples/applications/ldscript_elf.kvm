@@ -74,12 +74,7 @@ SECTIONS
 		EXTFIFO_CHANNEL_NDEV = .; LONG(0x0)
 		EXTFIFO_CHANNELS_PTR = .; LONG(0x0)
 
-        HOSTTIME_REG_BASE       = .; LONG(0xCE000000)
-        HOSTTIME_REG_COMP_START = .; LONG(0xCE000008)
-        HOSTTIME_REG_COMP_END   = .; LONG(0xCE000010)
-        HOSTTIME_REG_IO_START   = .; LONG(0xCE000018)
-        HOSTTIME_REG_IO_END     = .; LONG(0xCE000020)
-        HOSTTIME_REG_FLUSH      = .; LONG(0xCE000028)
+        HOSTTIME_BASEPORT    = .; SHORT(0x5000)
 	} > mem :data
 
   .rodata ALIGN(16) : { *(.rodata) *(.rodata.str1.*) *(.rodata.cst*)} > mem :data

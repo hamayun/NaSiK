@@ -40,7 +40,6 @@
 #include <mem_device.h>
 
 #include <sl_block_device.h>
-#include <hosttime.h>
 
 using namespace std;
 
@@ -112,7 +111,6 @@ int sc_main (int argc, char ** argv)
     sl_tg_device	*tg   = new sl_tg_device ("tg", "fdaccess.0.0");
     framebuffer_device	*ramdac = new framebuffer_device ("framebuffer");
     sem_device		*sem    = new sem_device("sem", 0x100000);
-    hosttime		*htime  = new hosttime("host_time", "host_time.txt");
 
     slaves[nslaves++] = ram;			// 0	0x00000000 - 0x08000000
     slaves[nslaves++] = shared_ram;		// 1	0xAF000000 - 0xAFF00000
@@ -122,9 +120,8 @@ int sc_main (int argc, char ** argv)
     slaves[nslaves++] = ramdac;			// 5	0xC4000000 - 0xC4000200
     slaves[nslaves++] = sem;			// 6	0xC5000000 - 0xC5100000
     slaves[nslaves++] = bl->get_slave();// 7	0xC6000000 - 0xC6100000
-    slaves[nslaves++] = htime;			// 8	0xCE000000 - 0xCE000100
-    slaves[nslaves++] = bl2->get_slave();// 9	0xC6500000 - 0xC6600000
-    slaves[nslaves++] = bl3->get_slave();// A	0xC6A00000 - 0xC6B00000
+    slaves[nslaves++] = bl2->get_slave();// 8	0xC6500000 - 0xC6600000
+    slaves[nslaves++] = bl3->get_slave();// 9	0xC6A00000 - 0xC6B00000
 
     timer_device	*timers[4];
     int				ntimers = sizeof (timers) / sizeof (timer_device *);
