@@ -19,7 +19,7 @@ typedef enum hosttime_port_offset
 #define CPU_PROFILE_CURRENT_TIME()                              \
     do{                                                         \
         __asm__ volatile(                                       \
-            "   mov  %0,%%dx\n\t"                               \
+            "   mov  $0x5000,%%dx\n\t"                               \
             "   mov  %1,%%eax\n\t"                              \
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
@@ -31,7 +31,7 @@ typedef enum hosttime_port_offset
 #define CPU_PROFILE_COMP_START()                                \
     do{                                                         \
         __asm__ volatile(                                       \
-            "   mov  %0,%%dx\n\t"                               \
+            "   mov  $0x5000,%%dx\n\t"                               \
             "   mov  %1,%%eax\n\t"                              \
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
@@ -43,7 +43,7 @@ typedef enum hosttime_port_offset
 #define CPU_PROFILE_COMP_END()                                  \
     do{                                                         \
         __asm__ volatile(                                       \
-            "   mov  %0,%%dx\n\t"                               \
+            "   mov  $0x5000,%%dx\n\t"                               \
             "   mov  %1,%%eax\n\t"                              \
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
@@ -55,7 +55,7 @@ typedef enum hosttime_port_offset
 #define CPU_PROFILE_IO_START()                                  \
     do{                                                         \
         __asm__ volatile(                                       \
-            "   mov  %0,%%dx\n\t"                               \
+            "   mov  $0x5000,%%dx\n\t"                               \
             "   mov  %1,%%eax\n\t"                              \
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
@@ -67,7 +67,7 @@ typedef enum hosttime_port_offset
 #define CPU_PROFILE_IO_END()                                    \
     do{                                                         \
         __asm__ volatile(                                       \
-            "   mov  %0,%%dx\n\t"                               \
+            "   mov  $0x5000,%%dx\n\t"                               \
             "   mov  %1,%%eax\n\t"                              \
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
@@ -79,7 +79,7 @@ typedef enum hosttime_port_offset
 #define CPU_PROFILE_FLUSH_DATA()                                \
     do{                                                         \
         __asm__ volatile(                                       \
-            "   mov  %0,%%dx\n\t"                               \
+            "   mov  $0x5000,%%dx\n\t"                               \
             "   mov  %1,%%eax\n\t"                              \
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \

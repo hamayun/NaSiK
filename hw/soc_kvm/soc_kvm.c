@@ -420,13 +420,13 @@ static int test_outl(void *opaque, uint16_t addr, uint32_t value)
 {
 	struct io_table_entry *entry;
 
-    //printf("test_outl: addr = 0x%x, value = Ox%x\n", addr, value);
+        //printf("test_outl: addr = 0x%x, value = Ox%x\n", addr, value);
 	entry = io_table_lookup(&pio_table, addr);
 	if (entry) {
 		uint64_t val = value;
 		entry->handler(entry->opaque, 4, 1, addr, &val);
 	} else
-		printf("test_outl: outl $0x%x, 0x%x\n", value, addr);
+		printf("test_outl: value = $0x%x, addr = 0x%x\n", value, addr);
 
 	return 0;
 }
