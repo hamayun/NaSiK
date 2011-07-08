@@ -14,12 +14,12 @@ CINCDIR     += -I${LIBKVM_HOME}/libkvm
 all: $(LIBSOCKVM)
 
 $(LIBSOCKVM): iotable.o soc_kvm.o hosttime.o
-	@$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 
 #	$(AR) rcs $@ $^
 
 %.o: %.c
-	@$(CC) $(CFLAGS) $(CINCDIR) -c $^ -o $@
+	$(CC) $(CFLAGS) $(CINCDIR) -c $^ -o $@
 
 clean:
 	@$(RM) *.o *.a .*.d

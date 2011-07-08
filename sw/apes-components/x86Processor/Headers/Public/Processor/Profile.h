@@ -24,7 +24,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_CURRENT_TIME)      \
-            :"%dx"                                              \
+            :"%dx","%eax"                                           \
         );                                                      \
     } while (0)
 
@@ -36,7 +36,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_COMP_START)        \
-            :"%dx"                                              \
+            :"%dx","%eax"                                              \
         );                                                      \
     } while (0)
 
@@ -48,7 +48,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_COMP_END)          \
-            :"%dx"                                              \
+            :"%dx","%eax"                                              \
         );                                                      \
     } while (0)
 
@@ -60,7 +60,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_IO_START)          \
-            :"%dx"                                              \
+            :"%dx","%eax"                                              \
         );                                                      \
     } while (0)
 
@@ -72,7 +72,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_IO_END)            \
-            :"%dx"                                              \
+            :"%dx","%eax"                                              \
         );                                                      \
     } while (0)
 
@@ -84,7 +84,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_FLUSH_DATA)        \
-            :"%dx"                                              \
+            :"%dx","%eax"                                              \
         );                                                      \
     } while (0)
 #else
