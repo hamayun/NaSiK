@@ -9,7 +9,7 @@
   unique="true"
   wrapper="false">
 
-  <id name="CRC32" version="1.0"/>
+  <id name="CRC32APP" version="1.0"/>
 
   <inject>
     <id name="SoclibPlatformDriver" version="1.0"/>
