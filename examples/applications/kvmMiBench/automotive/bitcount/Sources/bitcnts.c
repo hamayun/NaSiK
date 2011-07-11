@@ -17,7 +17,7 @@
 #include <Processor/Profile.h>
 
 #define FUNCS  7
-//#define IO_ON
+#define IO_ON
 
 static int CDECL bit_shifter(long int x);
 

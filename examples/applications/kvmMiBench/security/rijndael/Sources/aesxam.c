@@ -271,6 +271,7 @@ int main(int argc, char *argv[])
     cp = myargv[4];   /* this is a pointer to the hexadecimal key digits  */
     i = 0;          /* this is a count for the input digits processed   */
 
+    CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_COMP_START();
     while(i < 64 && *cp)    /* the maximum key length is 32 bytes and   */
     {                       /* hence at most 64 hexadecimal digits      */
@@ -335,7 +336,7 @@ exit:
         fclose(fout);
     if(fin)
         fclose(fin);
-
+    CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_FLUSH_DATA();
     return err;
 }

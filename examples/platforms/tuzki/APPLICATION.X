@@ -1,1 +1,1 @@
-/home/hamayun/workspace/NaSiK/examples/applications/selfProf/APPLICATION.X
+/dev/null

@@ -146,21 +146,21 @@ FILE *fout;
 	phead->p_mlen = 1;
 	phead->p_left = phead->p_right = phead;
 
-
+    CPU_PROFILE_CURRENT_TIME();
 	/*
 	 * The main loop to insert nodes.
 	 */
 	while (fgets(line, 128, fp)) {
-                CPU_PROFILE_IO_START();
+        CPU_PROFILE_IO_START();
 		/*
 		 * Read in each IP address and mask and convert them to
 		 * more usable formats.
 		 */
 		sscanf(line, "%f %d", &time, (unsigned int *)&addr);
 		//inet_aton(addr_str, &addr);
-                CPU_PROFILE_IO_END();
+        CPU_PROFILE_IO_END();
 
-                CPU_PROFILE_COMP_START();
+        CPU_PROFILE_COMP_START();
 		/*
 		 * Create a Patricia trie node to insert.
 		 */
@@ -204,14 +204,14 @@ FILE *fout;
 		pfind=pat_search(addr.s_addr,phead);
 		//printf("%08x %08x %08x\n",p->p_key, addr.s_addr, p->p_m->pm_mask);
 		//if(pfind->p_key==(addr.s_addr&pfind->p_m->pm_mask))
-                CPU_PROFILE_COMP_END();
+        CPU_PROFILE_COMP_END();
 
 		if(pfind->p_key==addr.s_addr)
 		{
-                        CPU_PROFILE_IO_START();
+            CPU_PROFILE_IO_START();
 			fprintf(fout, "%f %08x: ", time, addr.s_addr);
 			fprintf(fout, "Found.\n");
-                        CPU_PROFILE_IO_END();
+            CPU_PROFILE_IO_END();
 		}
 		else
 		{
@@ -234,7 +234,7 @@ FILE *fout;
 	fflush(fout);
 	fclose(fp);
 	fclose(fout);
-
+    CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_FLUSH_DATA();
     return 0;
 }

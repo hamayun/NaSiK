@@ -2739,9 +2739,9 @@ NULL};
 "and recycling it for more than its",
 "worth But trust me on the sunscreen"
 };
-      int i;
+      int i, j;
       CPU_PROFILE_CURRENT_TIME();
-
+      for (j = 0; j < 100; j++){
       for (i = 0; find_strings[i]; i++)
       {
             CPU_PROFILE_COMP_START();
@@ -2773,7 +2773,7 @@ NULL};
             putchar('\n');
             CPU_PROFILE_IO_END();
       }
-
+    }
     CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_FLUSH_DATA();
     return 0;

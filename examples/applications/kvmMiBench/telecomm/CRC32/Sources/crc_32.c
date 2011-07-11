@@ -204,6 +204,7 @@ main(int argc, char *argv[])
       long charcnt;
       register errors = 0;
 
+      CPU_PROFILE_CURRENT_TIME();
 //      while(--argc > 0)
 //      {
 //            errors |= crc32file(*++argv, &crc, &charcnt);
@@ -214,6 +215,7 @@ main(int argc, char *argv[])
             CPU_PROFILE_IO_END();
 //      }
 
+      CPU_PROFILE_CURRENT_TIME();
       CPU_PROFILE_FLUSH_DATA();
       return(errors != 0);
 }

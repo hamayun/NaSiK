@@ -21,16 +21,18 @@
 #define _HOSTTIME_H_
 
 #include <stdint.h>
+#include <time.h>
 
 #define HOSTTIME_BASEPORT 0x5000
 
 // This value is used to calculate the profiling overhead.
 // This particular value is for KVM Platform on my Desktop Machine.
 //#define ONE_PROFILE_CALL_COST 0.000010975
-//#define ONE_PROFILE_CALL_COST   0.00000309
-//#define ONE_PROFILE_CALL_COST   0.000003085
-//#define ONE_PROFILE_CALL_COST 0.000003075
-#define ONE_PROFILE_CALL_COST 0.00000309
+//#define ONE_PROFILE_CALL_COST 0.00000309
+//#define ONE_PROFILE_CALL_COST 0.000003496
+//#define ONE_PROFILE_CALL_COST 0.000001761
+//#define ONE_PROFILE_CALL_COST 0.00000152
+#define ONE_PROFILE_CALL_COST 0.000001515
 
 typedef enum hosttime_port_offset
 {
@@ -43,14 +45,17 @@ typedef enum hosttime_port_offset
 } hosttime_port_t;
 
 typedef struct hosttime {
-    FILE                *host_file;
+    FILE                *m_host_file;
+    clockid_t            m_clk_id;
+    struct timespec      m_clk_res;                 // clock resolution
 
-    double               m_comp_start;
-    double               m_comp_end;
-    double               m_comp_total;
-    double               m_io_start;
-    double               m_io_end;
-    double               m_io_total;
+    struct timespec      m_comp_start_ts;              // computation start timestamp
+    struct timespec      m_comp_end_ts;                // computation end timestamp
+    struct timespec      m_comp_total_ts;              // computation total timestamp
+
+    struct timespec      m_io_start_ts;                // i/o start timestamp
+    struct timespec      m_io_end_ts;                  // i/o end timestamp
+    struct timespec      m_io_total_ts;                // i/o total timestamp
 
     // Counters for Sanity Check of Profile Info
     uint32_t             m_comp_start_count;
@@ -59,9 +64,9 @@ typedef struct hosttime {
     uint32_t             m_io_end_count;
 } hosttime_t;
 
-int init_hosttime(hosttime_t* phosttime, const char *filename);
+int init_hosttime(hosttime_t* pht, const char *filename);
 int hosttime_handler(void *opaque, int size, int is_write, uint64_t addr, uint64_t *value);
-void close_hosttime(hosttime_t* phosttime);
+void close_hosttime(hosttime_t* pht);
 
 #endif
 

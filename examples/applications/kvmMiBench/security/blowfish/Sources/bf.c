@@ -40,7 +40,8 @@ main(int argc, char *argv[])
 	    printf("Usage: blowfish {e|d} <intput> <output> key\n");
 	    exit(-1);
     }
-					
+
+    CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_COMP_START();
     /* Read the key */
     cp = myargv[4];
@@ -69,7 +70,7 @@ main(int argc, char *argv[])
 	    printf("Bad key value.\n");
 	    exit(-1);
     }
-            CPU_PROFILE_COMP_END();
+    CPU_PROFILE_COMP_END();
 
     /* open the input and output files */
     if ((fp = fopen(myargv[2],"r"))==0)
@@ -108,7 +109,7 @@ main(int argc, char *argv[])
 
     close(fp);
     close(fp2);
-
+    CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_FLUSH_DATA();
     return 0;
 }
