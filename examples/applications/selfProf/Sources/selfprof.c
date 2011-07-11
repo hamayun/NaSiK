@@ -5,15 +5,15 @@ int main(void)
 {
     int count = 0;
 
-    CPU_PROFILE_CURRENT_TIME() ;
+    CPU_PROFILE_COST_FACTOR();
     for(count = 0; count < 1000000; count++)
     {
-        CPU_PROFILE_COMP_START(); CPU_PROFILE_COMP_END();
+        CPU_PROFILE_COMP_START();
+        CPU_PROFILE_COMP_END();
+        CPU_PROFILE_IO_START();
+        CPU_PROFILE_IO_END();
     }
-    CPU_PROFILE_CURRENT_TIME();
-
     CPU_PROFILE_FLUSH_DATA();
-
     return 0;
 }
 

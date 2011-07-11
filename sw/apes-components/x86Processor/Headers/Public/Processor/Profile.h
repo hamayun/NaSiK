@@ -13,7 +13,8 @@ typedef enum hosttime_port_offset
     HOSTTIME_COMP_END = 2,
     HOSTTIME_IO_START = 3,
     HOSTTIME_IO_END = 4,
-    HOSTTIME_FLUSH_DATA = 5
+    HOSTTIME_FLUSH_DATA = 5,
+    HOSTTIME_PROFILE_COST_FACTOR = 6
 } hosttime_port_t;
 
 #ifdef ENABLE_PROFILING
@@ -42,7 +43,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_COMP_START)        \
-            :"%dx","%eax"                                              \
+            :"%dx","%eax"                                       \
         );                                                      \
     } while (0)
 
@@ -54,7 +55,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_COMP_END)          \
-            :"%dx","%eax"                                              \
+            :"%dx","%eax"                                       \
         );                                                      \
     } while (0)
 
@@ -66,7 +67,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_IO_START)          \
-            :"%dx","%eax"                                              \
+            :"%dx","%eax"                                       \
         );                                                      \
     } while (0)
 
@@ -78,7 +79,7 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_IO_END)            \
-            :"%dx","%eax"                                              \
+            :"%dx","%eax"                                       \
         );                                                      \
     } while (0)
 
@@ -90,15 +91,29 @@ typedef enum hosttime_port_offset
             "   out  %%eax,(%%dx)\n\t"                          \
             ::"r"((short int) HOSTTIME_BASEPORT),               \
               "r"((hosttime_port_t) HOSTTIME_FLUSH_DATA)        \
-            :"%dx","%eax"                                              \
+            :"%dx","%eax"                                       \
         );                                                      \
     } while (0)
+
+#define CPU_PROFILE_COST_FACTOR()                               \
+    do{                                                         \
+        __asm__ volatile(                                       \
+            "   mov  $0x5000,%%dx\n\t"                               \
+            "   mov  %1,%%eax\n\t"                              \
+            "   out  %%eax,(%%dx)\n\t"                          \
+            ::"r"((short int) HOSTTIME_BASEPORT),               \
+              "r"((hosttime_port_t)HOSTTIME_PROFILE_COST_FACTOR)\
+            :"%dx","%eax"                                       \
+        );                                                      \
+    } while (0)
+
 #else
 #define CPU_PROFILE_COMP_START()
 #define CPU_PROFILE_COMP_END()
 #define CPU_PROFILE_IO_START()
 #define CPU_PROFILE_IO_END()
 #define CPU_PROFILE_FLUSH_DATA()
+#define CPU_PROFILE_COST_FACTOR()
 #endif /* ENABLE_FULL_PROFILING */
 #endif /* ENABLE_PROFILING */
 

@@ -20,9 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "hosttime.h"
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <sys/times.h>
 
 #if 0
 double get_clock(void) {
@@ -39,9 +36,9 @@ double get_clock(void) {
 }
 #endif
 
-int init_hosttime(hosttime_t* pht, const char *filename)
+int32_t init_hosttime(hosttime_t* pht, const char *filename)
 {
-    int status;
+    int32_t status;
 
     pht->m_host_file = fopen (filename, "wb");
     if(pht->m_host_file == NULL)
@@ -67,6 +64,11 @@ int init_hosttime(hosttime_t* pht, const char *filename)
     pht->m_io_start_count = 0;
     pht->m_io_end_count = 0;
 
+    pht->m_estimate_cost_factor = 0;
+    pht->m_first_ts.tv_sec = 0;
+    pht->m_first_ts.tv_nsec = 0;
+    pht->m_last_ts.tv_sec = 0;
+    pht->m_last_ts.tv_nsec = 0;
     return 0;
 }
 
@@ -79,10 +81,11 @@ void close_hosttime(hosttime_t* pht)
     }
 
     // Make the Simulation Stop
+    //simulation_stop(SIGINT);
     exit(0);
 }
 
-int hosttime_handler(void *opaque, int size, int is_write, uint64_t addr, uint64_t *value)
+int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t addr, uint64_t *value)
 {
     hosttime_t* pht = (hosttime_t *) opaque;
     hosttime_port_t port = (hosttime_port_t) *value;
@@ -165,6 +168,15 @@ int hosttime_handler(void *opaque, int size, int is_write, uint64_t addr, uint64
                 double net_io_cost_ts, net_comp_cost_ts;
                 struct timespec        total_cost;
 
+                if(pht->m_estimate_cost_factor)
+                {
+                    struct timespec        curr_time;
+                    clock_gettime(pht->m_clk_id, & curr_time);
+
+                    pht->m_last_ts.tv_sec = curr_time.tv_sec;
+                    pht->m_last_ts.tv_nsec = curr_time.tv_nsec;
+                }
+
                 if((pht->m_comp_start_count != pht->m_comp_end_count) ||
                    (pht->m_io_start_count != pht->m_io_end_count))
                 {
@@ -226,8 +238,40 @@ int hosttime_handler(void *opaque, int size, int is_write, uint64_t addr, uint64
                         io_profile_overhead + comp_profile_overhead,
                         net_io_cost_ts + net_comp_cost_ts);
 
+                if(pht->m_estimate_cost_factor)
+                {
+                    uint32_t cost_nsec, cost_sec;
+                    double prof_call_factor = 0.0, total_cost = 0.0;
+                    if((pht->m_last_ts.tv_nsec - pht->m_first_ts.tv_nsec) < 0)
+                    {
+                        pht->m_last_ts.tv_nsec += 1e9;
+                        pht->m_last_ts.tv_sec--;
+                    }
+
+                    cost_sec  = pht->m_last_ts.tv_sec - pht->m_first_ts.tv_sec;
+                    cost_nsec = pht->m_last_ts.tv_nsec - pht->m_first_ts.tv_nsec;
+
+                    total_cost = cost_sec + (cost_nsec * 1e-9);
+                    prof_call_factor = total_cost / (pht->m_io_start_count + pht->m_io_end_count +
+                                                     pht->m_comp_start_count + pht->m_comp_end_count);
+
+                    prof_call_factor /= 2.0;        // We do this because half of the Guest2Host mode switch time can't be measured.
+                    fprintf(stderr, "Profile Call Factor Estimate : %0.9f\n", prof_call_factor);
+                }
+
                 fflush(pht->m_host_file);
                 close_hosttime(pht);
+            }
+            break;
+
+        case HOSTTIME_PROFILE_COST_FACTOR:
+            {
+                struct timespec        curr_time;
+
+                pht->m_estimate_cost_factor = 1;
+                clock_gettime(pht->m_clk_id, & curr_time);
+                pht->m_first_ts.tv_sec = curr_time.tv_sec;
+                pht->m_first_ts.tv_nsec = curr_time.tv_nsec;
             }
             break;
 

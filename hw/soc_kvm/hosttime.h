@@ -27,12 +27,8 @@
 
 // This value is used to calculate the profiling overhead.
 // This particular value is for KVM Platform on my Desktop Machine.
-//#define ONE_PROFILE_CALL_COST 0.000010975
-//#define ONE_PROFILE_CALL_COST 0.00000309
-//#define ONE_PROFILE_CALL_COST 0.000003496
-//#define ONE_PROFILE_CALL_COST 0.000001761
-//#define ONE_PROFILE_CALL_COST 0.00000152
-#define ONE_PROFILE_CALL_COST 0.000001515
+// Use selfProf Application to get this Value.
+#define ONE_PROFILE_CALL_COST 0.000001614
 
 typedef enum hosttime_port_offset
 {
@@ -41,7 +37,8 @@ typedef enum hosttime_port_offset
     HOSTTIME_COMP_END = 2,
     HOSTTIME_IO_START = 3,
     HOSTTIME_IO_END = 4,
-    HOSTTIME_FLUSH_DATA = 5
+    HOSTTIME_FLUSH_DATA = 5,
+    HOSTTIME_PROFILE_COST_FACTOR = 6
 } hosttime_port_t;
 
 typedef struct hosttime {
@@ -62,10 +59,14 @@ typedef struct hosttime {
     uint32_t             m_comp_end_count;
     uint32_t             m_io_start_count;
     uint32_t             m_io_end_count;
+
+    uint8_t              m_estimate_cost_factor;
+    struct timespec      m_first_ts;
+    struct timespec      m_last_ts;
 } hosttime_t;
 
-int init_hosttime(hosttime_t* pht, const char *filename);
-int hosttime_handler(void *opaque, int size, int is_write, uint64_t addr, uint64_t *value);
+int32_t init_hosttime(hosttime_t* pht, const char *filename);
+int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t addr, uint64_t *value);
 void close_hosttime(hosttime_t* pht);
 
 #endif
