@@ -48,6 +48,7 @@ fi
 
 print_step "Compiling Software Application ... ${APPLICATION}"
 cd ${APP_DIR}
+apes-compose -c
 apes-compose
 if [ $? != 0 ]; then
     print_error "Compilation Failed for Application"

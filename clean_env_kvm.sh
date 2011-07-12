@@ -33,9 +33,9 @@ print_substep "Cleaning the LIBSOCKVM ... "
 cd ${LIBSOCKVM_HOME}
 make clean 
 
-print_substep "Cleaning Software Application ... ${APPLICATION}"
-cd ${APP_DIR}
-apes-compose -c
+print_substep "Removing Software Application Symlinks ..."
+rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "interface.xmi")
+rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "elf.lds")
 
 print_substep "Cleaning Hardware Model ... "
 cd ${PFORM_DIR}
