@@ -2,14 +2,15 @@
 #include "blowfish.h"
 #include <Processor/Profile.h>
 
-int app_repeat_count = 0;
-
 int
 main(int argc, char *argv[])
 {
-    BF_KEY key;
-    unsigned char ukey[8];
-    unsigned char indata[40],outdata[40],ivec[8];
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 5; app_repeat_count++)
+    {
+    BF_KEY key = {0,0};
+    unsigned char ukey[32] = {0};
+    unsigned char indata[40] = {0}, outdata[40] = {0}, ivec[8] = {0};
     int num;
     int by=0,i=0;
     int encordec=-1;
@@ -17,9 +18,8 @@ main(int argc, char *argv[])
     FILE *fp,*fp2;
 
     int myargc;
-    char *myargv[4];
+    char *myargv[5];
 
-again:
     /* ./bf e input_large.asc output_large.enc 1234567890abcdeffedcba0987654321 */
     myargc = 5;
     myargv[0] = "./bf";
@@ -113,12 +113,7 @@ again:
     fflush(fp2);
     fclose(fp);
     fclose(fp2);
-
-    app_repeat_count++;
-    if(app_repeat_count < 5)
-        goto again;
-    
-    printf("Just Before Flush : app_repeat_count = %d\n\n", app_repeat_count);
+    }
     CPU_PROFILE_FLUSH_DATA();
     return 0;
 }

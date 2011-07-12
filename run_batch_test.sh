@@ -5,6 +5,7 @@ RESULTSDIR=$PFORM_DIR/batchtest-results-${TIMESTAMP}
 
 APP_LIST="susan qsort dijkstra patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"
 
+echo "Batch Test ... Started: $(date)"
 mkdir -p ${RESULTSDIR}
 
 for APPLICATION in ${APP_LIST}
@@ -45,5 +46,7 @@ done
 
 mv hosttime_kvm_results.txt ${RESULTSDIR}/
 mv logCPUs ${RESULTSDIR}/
+
+echo "Batch Test ... Completed: $(date)"
 echo "Done !"
 

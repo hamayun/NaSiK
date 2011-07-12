@@ -74,7 +74,7 @@ clean:
 	@echo Cleaning ...
 	@rm -f $(EXE)
 	@rm -f logCPU*
-	@rm -f tty*.log host_time.txt output_data
+	@rm -f tty*.log hosttime_kvm.txt output_data
 	@rm -f $(addsuffix /*.o, $(addprefix $(BUILD_DIR)/, $(SUB_DIRS)))
 	@rm -f $(addsuffix /*.d, $(addprefix $(BUILD_DIR)/, $(SUB_DIRS)))
 	@rm -fr $(BUILD_DIR)
