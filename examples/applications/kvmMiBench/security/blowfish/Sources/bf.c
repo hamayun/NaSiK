@@ -2,29 +2,33 @@
 #include "blowfish.h"
 #include <Processor/Profile.h>
 
+int app_repeat_count = 0;
+
 int
 main(int argc, char *argv[])
 {
-	BF_KEY key;
-	unsigned char ukey[8];
-	unsigned char indata[40],outdata[40],ivec[8];
-	int num;
-	int by=0,i=0;
-	int encordec=-1;
-	char *cp,ch;
-	FILE *fp,*fp2;
+    BF_KEY key;
+    unsigned char ukey[8];
+    unsigned char indata[40],outdata[40],ivec[8];
+    int num;
+    int by=0,i=0;
+    int encordec=-1;
+    char *cp,ch;
+    FILE *fp,*fp2;
 
     int myargc;
     char *myargv[4];
 
-	/* ./bf e input_large.asc output_large.enc 1234567890abcdeffedcba0987654321 */
-	myargc = 5;
-	myargv[0] = "./bf";
-	myargv[1] = "e";
-	myargv[2] = "/devices/disk/simulator/0";
-	myargv[3] = "/devices/disk/simulator/2";
-	myargv[4] = "1234567890abcdeffedcba0987654321";
+again:
+    /* ./bf e input_large.asc output_large.enc 1234567890abcdeffedcba0987654321 */
+    myargc = 5;
+    myargv[0] = "./bf";
+    myargv[1] = "e";
+    myargv[2] = "/devices/disk/simulator/0";
+    myargv[3] = "/devices/disk/simulator/2";
+    myargv[4] = "1234567890abcdeffedcba0987654321";
 
+    printf("BLOWFISH: In main function : For %d time\n\n", app_repeat_count);
     if (myargc<3)
     {
 	    printf("Usage: blowfish {e|d} <intput> <output> key\n");
@@ -41,7 +45,6 @@ main(int argc, char *argv[])
 	    exit(-1);
     }
 
-    CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_COMP_START();
     /* Read the key */
     cp = myargv[4];
@@ -107,9 +110,15 @@ main(int argc, char *argv[])
         i=0;
     }
 
-    close(fp);
-    close(fp2);
-    CPU_PROFILE_CURRENT_TIME();
+    fflush(fp2);
+    fclose(fp);
+    fclose(fp2);
+
+    app_repeat_count++;
+    if(app_repeat_count < 5)
+        goto again;
+    
+    printf("Just Before Flush : app_repeat_count = %d\n\n", app_repeat_count);
     CPU_PROFILE_FLUSH_DATA();
     return 0;
 }

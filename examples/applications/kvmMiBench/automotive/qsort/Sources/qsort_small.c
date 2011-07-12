@@ -22,11 +22,15 @@ struct myStringStruct array[MAXARRAY];
 
 int
 main(int argc, char *argv[]) {
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 100; app_repeat_count++)
+    {
   FILE *fp;
   FILE *fp1;
   FILE *fp2;
   int i,count=0;
 
+    printf("QSORT: In main function : For %d time\n\n", app_repeat_count);
 #if 0
   if (argc<2) {
     fprintf(stderr,"Usage: qsort_small <file>\n");
@@ -38,8 +42,6 @@ main(int argc, char *argv[]) {
     fp  = fopen("/devices/disk/simulator/0", "r");
     fp1 = fopen("/devices/disk/simulator/1", "r");
     fp2 = fopen("/devices/disk/simulator/2", "w");
-
-    CPU_PROFILE_CURRENT_TIME();
 
     CPU_PROFILE_IO_START();
     while((fscanf(fp, "%s", &array[count].qstring) == 1) && (count < MAXARRAY)) {
@@ -61,12 +63,12 @@ main(int argc, char *argv[]) {
     fprintf(fp2, "%s\n", array[i].qstring);
   }
   CPU_PROFILE_IO_END();
-  CPU_PROFILE_CURRENT_TIME();
 
   fclose(fp);
   fclose(fp1);
   fclose(fp2);
 
+  }
   CPU_PROFILE_FLUSH_DATA();
   printf("\nDone\n");
   return 0;

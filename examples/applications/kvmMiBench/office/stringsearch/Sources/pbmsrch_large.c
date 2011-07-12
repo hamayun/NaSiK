@@ -17,6 +17,8 @@
 #include <limits.h>
 #include <Processor/Profile.h>
 
+//#define ENABLE_OUTPUT
+
 static size_t table[UCHAR_MAX + 1];
 static size_t len;
 static char *findme;
@@ -2739,9 +2741,11 @@ NULL};
 "and recycling it for more than its",
 "worth But trust me on the sunscreen"
 };
-      int i, j;
-      CPU_PROFILE_CURRENT_TIME();
-      for (j = 0; j < 100; j++){
+    int i;
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 1000; app_repeat_count++)
+    {
+      printf("STRINGSEARCH: In main function : For %d time\n\n", app_repeat_count);
       for (i = 0; find_strings[i]; i++)
       {
             CPU_PROFILE_COMP_START();
@@ -2749,6 +2753,7 @@ NULL};
             here = strsearch(search_strings[i]);
             CPU_PROFILE_COMP_END();
 
+#ifdef ENABLE_OUTPUT
             CPU_PROFILE_IO_START();
             printf("\"%s\" is%s in \"%s\"", find_strings[i],
                   here ? "" : " not", search_strings[i]);
@@ -2756,6 +2761,7 @@ NULL};
                   printf(" [\"%s\"]", here);
             putchar('\n');
             CPU_PROFILE_IO_END();
+#endif
       }
 
       for (i = 0; find_strings[i]; i++)
@@ -2765,6 +2771,7 @@ NULL};
             here = strsearch(search_strings[i]);
             CPU_PROFILE_COMP_END();
 
+#ifdef ENABLE_OUTPUT
             CPU_PROFILE_IO_START();
             printf("\"%s\" is%s in \"%s\"", find_strings[i],
                   here ? "" : " not", search_strings[i]);
@@ -2772,9 +2779,10 @@ NULL};
                   printf(" [\"%s\"]", here);
             putchar('\n');
             CPU_PROFILE_IO_END();
+#endif
       }
     }
-    CPU_PROFILE_CURRENT_TIME();
+
     CPU_PROFILE_FLUSH_DATA();
     return 0;
 }

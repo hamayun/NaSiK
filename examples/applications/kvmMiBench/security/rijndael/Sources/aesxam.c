@@ -246,13 +246,19 @@ int decfile(FILE *fin, FILE *fout, aes *ctx, char* ifn, char* ofn)
 }
 
 int main(int argc, char *argv[])
-{   FILE    *fin = 0, *fout = 0;
+{   
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 5; app_repeat_count++)
+    {
+    FILE    *fin = 0, *fout = 0;
     char    *cp, ch, key[32];
     int     i=0, by=0, key_len=0, err = 0;
     aes     ctx[1];
 
     int myargc;
     char *myargv[5];
+
+    printf("RIJNDAEL: In main function : For %d time\n\n", app_repeat_count);
 
     // ./rijndael input_large.asc output_large.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
     myargc = 5;
@@ -271,7 +277,6 @@ int main(int argc, char *argv[])
     cp = myargv[4];   /* this is a pointer to the hexadecimal key digits  */
     i = 0;          /* this is a count for the input digits processed   */
 
-    CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_COMP_START();
     while(i < 64 && *cp)    /* the maximum key length is 32 bytes and   */
     {                       /* hence at most 64 hexadecimal digits      */
@@ -336,7 +341,9 @@ exit:
         fclose(fout);
     if(fin)
         fclose(fin);
-    CPU_PROFILE_CURRENT_TIME();
+
+    }
+
     CPU_PROFILE_FLUSH_DATA();
-    return err;
+    return 0;
 }

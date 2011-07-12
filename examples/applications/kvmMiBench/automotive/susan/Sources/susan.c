@@ -1975,7 +1975,9 @@ main(argc, argv)
   char  *argv [];
 {
 /* {{{ vars */
-
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 5; app_repeat_count++)
+    {
 FILE   *ofp;
 char   filename [80],
        *tcp;
@@ -2007,7 +2009,7 @@ FILE *fd2;
   myargv[2] = "/devices/disk/simulator/2";
   myargv[3] = "-s";
 
-  printf("In main function\n\n");
+  printf("SUSAN: In main function : For %d time\n\n", app_repeat_count);
 /* }}} */
 
   if (myargc<3)
@@ -2161,6 +2163,8 @@ FILE *fd2;
     fclose(fd0);
     fclose(fd1);
     fclose(fd2);
+    
+    }
 
     CPU_PROFILE_FLUSH_DATA();
 }

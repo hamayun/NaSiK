@@ -460,6 +460,9 @@ parse_switches (j_compress_ptr cinfo, int myargc, char **myargv,
 int
 main (int argc, char **argv)
 {
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 5; app_repeat_count++)
+    {
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;
 #ifdef PROGRESS_REPORT
@@ -474,6 +477,7 @@ main (int argc, char **argv)
   int myargc;
   char *myargv[8];
 
+  printf("CJPEG: In main function : For %d time\n\n", app_repeat_count);
   /* jpeg-6a/cjpeg -dct int -progressive -opt -outfile output_large_encode.jpeg input_large.ppm */
   /*         */
   myargc = 8;
@@ -581,7 +585,6 @@ main (int argc, char **argv)
 #endif
 
   /* Figure out the input file format, and set up to read it. */
-  CPU_PROFILE_CURRENT_TIME();
   CPU_PROFILE_IO_START();
   src_mgr = select_file_type(&cinfo, input_file);
   src_mgr->input_file = input_file;
@@ -632,9 +635,9 @@ main (int argc, char **argv)
   end_progress_monitor((j_common_ptr) &cinfo);
 #endif
 
-  CPU_PROFILE_CURRENT_TIME();
+  }
   CPU_PROFILE_FLUSH_DATA();
   /* All done. */
-  exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
+  //exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
   return 0;			/* suppress no-return-value warnings */
 }

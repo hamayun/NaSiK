@@ -148,6 +148,9 @@ int dijkstra(int chStart, int chEnd)
 }
 
 int main(int argc, char *argv[]) {
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 10; app_repeat_count++)
+    {
   int i,j,k;
   FILE *fp;
 
@@ -158,6 +161,7 @@ int main(int argc, char *argv[]) {
 
   /* open the adjacency matrix file */
 //  fp = fopen (argv[1],"r");
+    printf("DIJKSTRA: In main function : For %d time\n\n", app_repeat_count);
 
   fp = fopen ("/devices/disk/simulator/0","r");
   fout = fopen ("/devices/disk/simulator/2","w");
@@ -181,8 +185,8 @@ int main(int argc, char *argv[]) {
 
   fclose(fp);
   fclose(fout);
-
+  }
   CPU_PROFILE_FLUSH_DATA();
-  exit(0);
+  return (0);
 }
 

@@ -200,11 +200,14 @@ DWORD crc32buf(char *buf, size_t len)
 int
 main(int argc, char *argv[])
 {
-      DWORD crc;
-      long charcnt;
-      register errors = 0;
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 5; app_repeat_count++)
+    {
+        DWORD crc;
+        long charcnt;
+        register errors = 0;
 
-      CPU_PROFILE_CURRENT_TIME();
+        printf("CRC32: In main function : For %d time\n\n", app_repeat_count);
 //      while(--argc > 0)
 //      {
 //            errors |= crc32file(*++argv, &crc, &charcnt);
@@ -215,7 +218,8 @@ main(int argc, char *argv[])
             CPU_PROFILE_IO_END();
 //      }
 
-      CPU_PROFILE_CURRENT_TIME();
-      CPU_PROFILE_FLUSH_DATA();
-      return(errors != 0);
+    }
+    CPU_PROFILE_FLUSH_DATA();
+    //return(errors != 0);
+    return(0);
 }

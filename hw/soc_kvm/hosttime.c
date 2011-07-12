@@ -102,8 +102,8 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             {
                 struct timespec        curr_time;
                 clock_gettime(pht->m_clk_id, & curr_time);
-                fprintf(pht->m_host_file, "Current Time is : %ld.%ld\n", curr_time.tv_sec, curr_time.tv_nsec);
-                fprintf(stderr,         "Current Time is : %ld.%ld\n", curr_time.tv_sec, curr_time.tv_nsec);
+                fprintf(pht->m_host_file, "Current Time is : %ld.%09ld\n", curr_time.tv_sec, curr_time.tv_nsec);
+                fprintf(stderr,           "Current Time is : %ld.%09ld\n", curr_time.tv_sec, curr_time.tv_nsec);
                 fflush(pht->m_host_file);
             }
             break;
@@ -199,19 +199,19 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
                 }
 
                 fprintf(stderr,
-                        "Total IO Time                : %ld.%ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        "Total IO Time                : %ld.%09ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
                         pht->m_io_total_ts.tv_sec, pht->m_io_total_ts.tv_nsec,
                         pht->m_io_start_count, pht->m_io_end_count,
                         io_profile_overhead, net_io_cost_ts);
 
                 fprintf(stderr,
-                        "Total Computation Time       : %ld.%ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        "Total Computation Time       : %ld.%09ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
                         pht->m_comp_total_ts.tv_sec, pht->m_comp_total_ts.tv_nsec,
                         pht->m_comp_start_count, pht->m_comp_end_count,
                         comp_profile_overhead, net_comp_cost_ts);
 
                 fprintf(stderr,
-                        "Total I/O + Computation Time : %ld.%ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        "Total I/O + Computation Time : %ld.%09ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
                         total_cost.tv_sec, total_cost.tv_nsec,
                         pht->m_io_start_count + pht->m_comp_start_count,
                         pht->m_io_end_count + pht->m_comp_end_count,
@@ -219,19 +219,19 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
                         net_io_cost_ts + net_comp_cost_ts);
 
                 fprintf(pht->m_host_file,
-                        "Total IO Time                : %ld.%ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        "Total IO Time                : %ld.%09ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
                         pht->m_io_total_ts.tv_sec, pht->m_io_total_ts.tv_nsec,
                         pht->m_io_start_count, pht->m_io_end_count,
                         io_profile_overhead, net_io_cost_ts);
 
                 fprintf(pht->m_host_file,
-                        "Total Computation Time       : %ld.%ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        "Total Computation Time       : %ld.%09ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
                         pht->m_comp_total_ts.tv_sec, pht->m_comp_total_ts.tv_nsec,
                         pht->m_comp_start_count, pht->m_comp_end_count,
                         comp_profile_overhead, net_comp_cost_ts);
 
                 fprintf(pht->m_host_file,
-                        "Total I/O + Computation Time : %ld.%ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
+                        "Total I/O + Computation Time : %ld.%09ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
                         total_cost.tv_sec, total_cost.tv_nsec,
                         pht->m_io_start_count + pht->m_comp_start_count,
                         pht->m_io_end_count + pht->m_comp_end_count,

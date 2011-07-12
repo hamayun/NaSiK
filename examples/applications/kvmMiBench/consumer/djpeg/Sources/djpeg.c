@@ -418,6 +418,9 @@ COM_handler (j_decompress_ptr cinfo)
 int
 main (int argc, char **argv)
 {
+int app_repeat_count;
+for (app_repeat_count = 0; app_repeat_count < 10; app_repeat_count++)
+{
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
 #ifdef PROGRESS_REPORT
@@ -432,6 +435,7 @@ main (int argc, char **argv)
   int myargc;
   char *myargv[7];
 
+  printf("DJPEG: In main function : For %d time\n\n", app_repeat_count);
   /* jpeg-6a/djpeg -dct int -ppm -outfile output_large_decode.ppm input_large.jpg */
   myargc = 7;
   
@@ -454,7 +458,6 @@ main (int argc, char **argv)
   if (progname == NULL || progname[0] == 0)
     progname = "djpeg";		/* in case C library doesn't provide it */
 
-  CPU_PROFILE_CURRENT_TIME();
   CPU_PROFILE_COMP_START();
   /* Initialize the JPEG decompression object with default error handling. */
   cinfo.err = jpeg_std_error(&jerr);
@@ -629,9 +632,9 @@ main (int argc, char **argv)
   end_progress_monitor((j_common_ptr) &cinfo);
 #endif
 
-  CPU_PROFILE_CURRENT_TIME();
+  }
   CPU_PROFILE_FLUSH_DATA();
   /* All done. */
-  exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
+  //exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
   return 0;			/* suppress no-return-value warnings */
 }

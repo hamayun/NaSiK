@@ -68,6 +68,9 @@ struct MyNode {
 int
 main(int argc, char **argv)
 {
+    int app_repeat_count;
+    for (app_repeat_count = 0; app_repeat_count < 5; app_repeat_count++)
+    {
 	struct ptree *phead;
 	struct ptree *p,*pfind;
 	struct ptree_mask *pm;
@@ -78,15 +81,16 @@ main(int argc, char **argv)
 	unsigned long mask=0xffffffff;
 	float time;
 
-int myargc;
-char *myargv[2];
+    int myargc;
+    char *myargv[2];
 
-FILE *fout;
+    FILE *fout;
 
-  myargc = 2;
-  myargv[0] = "./patricia";
-  myargv[1] = "/devices/disk/simulator/0";
+    printf("PATRICIA: In main function : For %d time\n\n", app_repeat_count);
 
+    myargc = 2;
+    myargv[0] = "./patricia";
+    myargv[1] = "/devices/disk/simulator/0";
 
 	if (myargc<2) {
 		printf("Usage: %s <TCP stream>\n", argv[0]);
@@ -146,7 +150,6 @@ FILE *fout;
 	phead->p_mlen = 1;
 	phead->p_left = phead->p_right = phead;
 
-    CPU_PROFILE_CURRENT_TIME();
 	/*
 	 * The main loop to insert nodes.
 	 */
@@ -234,7 +237,7 @@ FILE *fout;
 	fflush(fout);
 	fclose(fp);
 	fclose(fout);
-    CPU_PROFILE_CURRENT_TIME();
+    }
     CPU_PROFILE_FLUSH_DATA();
     return 0;
 }
