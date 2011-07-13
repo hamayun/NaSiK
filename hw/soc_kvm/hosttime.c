@@ -88,7 +88,7 @@ void close_hosttime(hosttime_t* pht)
 int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t addr, uint64_t *value)
 {
     hosttime_t* pht = (hosttime_t *) opaque;
-    hosttime_port_t port = (hosttime_port_t) *value;
+    hosttime_port_value_t port_value = (hosttime_port_value_t) *value;
 
     if((!pht) || pht->m_host_file == NULL)
     {
@@ -96,7 +96,7 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
         return (1);
     }
 
-    switch (port)
+    switch (port_value)
     {
         case HOSTTIME_CURRENT_TIME:
             {
@@ -276,7 +276,7 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             break;
 
         default:
-            printf ("%s: Bad Port Address = %d\n", __func__, port);
+            printf ("%s: Bad Port Value = %d\n", __func__, port_value);
             exit (1);
             break;
     }

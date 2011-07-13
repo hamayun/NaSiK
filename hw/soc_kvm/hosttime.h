@@ -30,7 +30,7 @@
 // Use selfProf Application to get this Value.
 #define ONE_PROFILE_CALL_COST 0.000001614
 
-typedef enum hosttime_port_offset
+typedef enum hosttime_port_value
 {
     HOSTTIME_CURRENT_TIME = 0,
     HOSTTIME_COMP_START = 1,
@@ -39,12 +39,12 @@ typedef enum hosttime_port_offset
     HOSTTIME_IO_END = 4,
     HOSTTIME_FLUSH_DATA = 5,
     HOSTTIME_PROFILE_COST_FACTOR = 6
-} hosttime_port_t;
+} hosttime_port_value_t;
 
 typedef struct hosttime {
     FILE                *m_host_file;
     clockid_t            m_clk_id;
-    struct timespec      m_clk_res;                 // clock resolution
+    struct timespec      m_clk_res;                    // clock resolution
 
     struct timespec      m_comp_start_ts;              // computation start timestamp
     struct timespec      m_comp_end_ts;                // computation end timestamp
