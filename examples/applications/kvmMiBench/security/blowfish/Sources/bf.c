@@ -11,7 +11,7 @@ main(int argc, char *argv[])
     BF_KEY key = {0,0};
     unsigned char ukey[32] = {0};
     unsigned char indata[40] = {0}, outdata[40] = {0}, ivec[8] = {0};
-    int num;
+    int num = 0;
     int by=0,i=0;
     int encordec=-1;
     char *cp,ch;
