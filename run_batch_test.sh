@@ -34,7 +34,7 @@ do
     cd $PFORM_DIR
     make 
 
-    echo "Simulating ..."
+    echo "Simulation of $APPLICATION Started At: $(date)"
     ./run.sh
 
     echo "Profile Results for $APPLICATION ..." >> hosttime_kvm_results.txt
