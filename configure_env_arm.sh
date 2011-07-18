@@ -13,7 +13,7 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=dijkstra
 #APPLICATION=patricia
 #APPLICATION=blowfish
-APPLICATION=rijndael
+#APPLICATION=rijndael
 #APPLICATION=sha
 #APPLICATION=CRC32
 #APPLICATION=bitcount
@@ -21,6 +21,7 @@ APPLICATION=rijndael
 #APPLICATION=djpeg
 #APPLICATION=stringsearch
 #APPLICATION=kvmPi
+APPLICATION=selfProf
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 

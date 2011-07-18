@@ -7,6 +7,7 @@ export APES_ASSEMBLER="arm-sls-dnaos-as"
 
 export APES_LINKER="arm-sls-dnaos-gcc"
 export APES_LINKER_FLAGS="-mfpu=fpa -mlittle-endian -march=armv6 -Wl,-T,elf.lds"
+export APES_LINKER_TRAIL_FLAGS="-L${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/lib -lc -lgcc -lm"
 
 APES_CC_OPTIMIZATIONS="-g -mlittle-endian -O3 -mfpu=fpa -march=armv6"
 #APES_CC_OPTIMIZATIONS+=" -DDNA_ENABLE_LOG=INFO_LEVEL"

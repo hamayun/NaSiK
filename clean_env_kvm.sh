@@ -36,6 +36,7 @@ make clean
 print_substep "Removing Software Application Symlinks ..."
 rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "interface.xmi")
 rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "elf.lds")
+rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "APPLICATION.X.bin")
 
 print_substep "Cleaning Hardware Model ... "
 cd ${PFORM_DIR}

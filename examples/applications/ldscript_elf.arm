@@ -105,12 +105,7 @@ SECTIONS
 
 		CHANNEL_RDV_NDEV = .; LONG(24);
 
-        HOSTTIME_REG_BASE       = .; LONG(0xCE000000)
-        HOSTTIME_REG_COMP_START = .; LONG(0xCE000008)
-        HOSTTIME_REG_COMP_END   = .; LONG(0xCE000010)
-        HOSTTIME_REG_IO_START   = .; LONG(0xCE000018)
-        HOSTTIME_REG_IO_END     = .; LONG(0xCE000020)
-        HOSTTIME_REG_FLUSH      = .; LONG(0xCE000028)
+        HOSTTIME_BASEPORT       = .; LONG(0xCE000000)
 	} > text :data
 
 	.sysstack ALIGN(0x8) + 0x10000 : { } > text :stack
