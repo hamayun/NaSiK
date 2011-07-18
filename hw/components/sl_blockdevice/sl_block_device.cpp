@@ -126,6 +126,7 @@ sl_block_device::control_thread ()
     uint32_t offset = 0;
     uint32_t addr = 0;
 	off_t seek_result = 0;
+    uint32_t transfer_size_words = 0;
 
     while(1)
     {
@@ -196,9 +197,8 @@ sl_block_device::control_thread ()
             m_cs_regs->m_finished_block_count = func_ret / m_cs_regs->m_block_size;
             m_cs_regs->m_count = func_ret / m_cs_regs->m_block_size;
 
+#if 0
             /* Send data in memory */
-//            for(offset = 0; offset < m_transfer_size; offset += 4){
-//                func_ret = master->cmd_write(addr + offset, m_data + offset, 4);
             for(offset = 0; offset < m_transfer_size; ++ offset){
                 func_ret = master->cmd_write(addr + offset, m_data + offset, 1);
                 if(!func_ret){
@@ -210,6 +210,38 @@ sl_block_device::control_thread ()
                 m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
                 m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
             }
+#else
+            /* Send data to memory */
+            transfer_size_words = m_transfer_size / 4;
+
+            /* Write Words */
+            for(offset = 0; offset < (transfer_size_words * 4); offset += 4){
+                func_ret = master->cmd_write(addr + offset, m_data + offset, 4);
+                if(!func_ret){
+                    break;
+                }
+            }
+            if(!func_ret){
+                EPRINTF("Error in BlockDevice Read\n");
+                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
+                m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
+                break;
+            }
+
+            /* Write Remaining Bytes */
+            for(; offset < m_transfer_size; offset += 1){
+                func_ret = master->cmd_write(addr + offset, m_data + offset, 1);
+                if(!func_ret){
+                    break;
+                }
+            }
+            if(!func_ret){
+                EPRINTF("Error in BlockDevice Read\n");
+                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
+                m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
+                break;
+            }
+#endif
 
             /* Update everything */
             if(m_cs_regs->m_irqen){
@@ -219,9 +251,10 @@ sl_block_device::control_thread ()
 
             m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
             m_cs_regs->m_status = BLOCK_DEVICE_READ_SUCCESS;
-            delete m_data;
 
+            delete m_data;
             break;
+
         case BLOCK_DEVICE_WRITE:
             DPRINTF("Got a BLOCK_DEVICE_WRITE\n");
             m_cs_regs->m_status = BLOCK_DEVICE_BUSY;
@@ -230,6 +263,7 @@ sl_block_device::control_thread ()
             m_data = new uint8_t[m_transfer_size];
             addr = m_cs_regs->m_buffer;
 
+#if 0
             /* Read data from memory */
 //            for(offset = 0; offset < m_transfer_size; offset += 4){
 //                func_ret = master->cmd_read(addr + offset, m_data + offset, 4);
@@ -244,6 +278,38 @@ sl_block_device::control_thread ()
                 m_cs_regs->m_status = BLOCK_DEVICE_WRITE_ERROR;
                 break;
             }
+#else
+            /* Read data from memory */
+            transfer_size_words = m_transfer_size / 4;
+
+            /* Read Words */
+            for(offset = 0; offset < (transfer_size_words * 4); offset += 4){
+                func_ret = master->cmd_read(addr + offset, m_data + offset, 4);
+                if(!func_ret){
+                    break;
+                }
+            }
+            if(!func_ret){
+                EPRINTF("Error in BlockDevice Write\n");
+                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
+                m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
+                break;
+            }
+
+            /* Read Remaining Bytes */
+            for(; offset < m_transfer_size; offset += 1){
+                func_ret = master->cmd_read(addr + offset, m_data + offset, 1);
+                if(!func_ret){
+                    break;
+                }
+            }
+            if(!func_ret){
+                EPRINTF("Error in BlockDevice Write\n");
+                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
+                m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
+                break;
+            }
+#endif
 
             /* Write in the device */
             lseek(m_fd, m_cs_regs->m_lba*m_cs_regs->m_block_size, SEEK_SET);

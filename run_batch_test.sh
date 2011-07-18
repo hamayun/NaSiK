@@ -2,6 +2,10 @@
 
 TIMESTAMP=$(date +%Y-%m-%d-%Hh%M)
 RESULTSDIR=$PFORM_DIR/batchtest-results-${TIMESTAMP}
+RESULTFILE=hosttime_kvm.txt
+TTYLOGFILE=logCPUs
+ALL_TTYLOGS_FILE=logCPUs_all_tests.txt
+ALL_RESULTS_FILE=hosttime_kvm_results.txt
 
 APP_LIST="susan qsort dijkstra patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"
 
@@ -37,16 +41,16 @@ do
     echo "Simulation of $APPLICATION Started At: $(date)"
     ./run.sh
 
-    echo "Profile Results for $APPLICATION ..." >> hosttime_kvm_results.txt
-    cat hosttime_kvm.txt >> hosttime_kvm_results.txt
-    echo "===============================================================================================================" >> hosttime_kvm_results.txt
+    echo "Profile Results for $APPLICATION ..." >> ${ALL_RESULTS_FILE}
+    cat ${RESULTFILE} >> ${ALL_RESULTS_FILE}
+    echo "===============================================================================================================" >> ${ALL_RESULTS_FILE}
     mv output_data ${RESULTSDIR}/output_data_$APPLICATION
-    rm hosttime_kvm.txt
+    cat ${TTYLOGFILE} >> ${ALL_TTYLOGS_FILE}
+    rm -f ${RESULTFILE} ${TTYLOGFILE}
 done
 
-mv hosttime_kvm_results.txt ${RESULTSDIR}/
-mv logCPUs ${RESULTSDIR}/
-
+mv ${ALL_RESULTS_FILE} ${RESULTSDIR}/
+mv ${ALL_TTYLOGS_FILE} ${RESULTSDIR}/
 echo "Batch Test ... Completed: $(date)"
 echo "Done !"
 
