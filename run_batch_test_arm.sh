@@ -10,8 +10,8 @@ TTYLOGFILE=tty100
 ALL_TTYLOGS_FILE=tty100_all_tests.txt
 ALL_RESULTS_FILE=hosttime_arm_results.txt
 
-#APP_LIST="susan qsort dijkstra patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"
-APP_LIST="patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"
+APP_LIST="susan qsort dijkstra patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"
+#APP_LIST="patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"
 
 echo "Batch Test ... Started: $(date)"
 mkdir -p ${RESULTSDIR}
@@ -39,13 +39,13 @@ do
 
     echo "Building Application ..."
     apes-compose
-    arm-sls-dnaos-objcopy -Obinary APPLICATION.X APP.bin
+    arm-sls-dnaos-objcopy -Obinary APPLICATION.X APPLICATION.X.bin
     
     cd ${ARM_PLATFORM}
     ln -sf ${APP_DIR}/input_data input_data
 
     echo "Simulation of $APPLICATION Started At: $(date)"
-    ./run.x -cpu arm11mpcore -kernel ${APP_DIR}/APP.bin -ncpu 1
+    ./run.x -cpu arm11mpcore -kernel ${APP_DIR}/APPLICATION.X.bin -ncpu 1
 
     echo "Profile Results for $APPLICATION ..." >> ${ALL_RESULTS_FILE}
     cat ${RESULTFILE} >> ${ALL_RESULTS_FILE}
@@ -53,6 +53,7 @@ do
     mv output_data ${RESULTSDIR}/output_data_$APPLICATION
     cat ${TTYLOGFILE} >> ${ALL_TTYLOGS_FILE}
     rm -f ${RESULTFILE} ${TTYLOGFILE}
+    killall -9 xterm fbviewer
 done
 
 mv ${ALL_RESULTS_FILE} ${RESULTSDIR}/

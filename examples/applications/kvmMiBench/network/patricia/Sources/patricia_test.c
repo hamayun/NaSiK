@@ -49,6 +49,11 @@
 
 #include "patricia.h"
 #include <Processor/Profile.h>
+#include "custom_mem.h"
+
+#ifdef USE_CUSTOM_MEM
+custom_memory_t custom_mem;
+#endif
 
 # define htonl(x)	(x)
 
@@ -68,6 +73,9 @@ struct MyNode {
 int
 main(int argc, char **argv)
 {
+#ifdef USE_CUSTOM_MEM
+    init_mem(& custom_mem);
+#endif
     int app_repeat_count;
     for (app_repeat_count = 0; app_repeat_count < 5; app_repeat_count++)
     {
@@ -122,23 +130,44 @@ main(int argc, char **argv)
 	 *   5. Point the head's 'left' and 'right' pointers to itself.
 	 * NOTE: This should go into an intialization function.
 	 */
+#ifdef USE_CUSTOM_MEM
+	phead = (struct ptree *) alloc_mem(& custom_mem);
+#else
 	phead = (struct ptree *)malloc(sizeof(struct ptree));
+#endif
 	if (!phead) {
 		perror("Allocating p-trie node");
+#ifdef USE_CUSTOM_MEM
+        print_mem_state(& custom_mem);
+#endif
 		exit(0);
 	}
 	bzero(phead, sizeof(*phead));
-	phead->p_m = (struct ptree_mask *)malloc(
-			sizeof(struct ptree_mask));
+
+#ifdef USE_CUSTOM_MEM
+	phead->p_m = (struct ptree_mask *)alloc_mem(& custom_mem);
+#else
+	phead->p_m = (struct ptree_mask *)malloc(sizeof(struct ptree_mask));
+#endif
 	if (!phead->p_m) {
 		perror("Allocating p-trie mask data");
+#ifdef USE_CUSTOM_MEM
+        print_mem_state(& custom_mem);
+#endif
 		exit(0);
 	}
 	bzero(phead->p_m, sizeof(*phead->p_m));
 	pm = phead->p_m;
+#ifdef USE_CUSTOM_MEM
+	pm->pm_data = (struct MyNode *)alloc_mem(& custom_mem);
+#else
 	pm->pm_data = (struct MyNode *)malloc(sizeof(struct MyNode));
+#endif
 	if (!pm->pm_data) {
 		perror("Allocating p-trie mask's node data");
+#ifdef USE_CUSTOM_MEM
+        print_mem_state(& custom_mem);
+#endif
 		exit(0);
 	}
 	bzero(pm->pm_data, sizeof(*pm->pm_data));
@@ -167,9 +196,16 @@ main(int argc, char **argv)
 		/*
 		 * Create a Patricia trie node to insert.
 		 */
+#ifdef USE_CUSTOM_MEM
+	    p = (struct ptree *)alloc_mem(& custom_mem);
+#else
 		p = (struct ptree *)malloc(sizeof(struct ptree));
+#endif
 		if (!p) {
 			perror("Allocating p-trie node");
+#ifdef USE_CUSTOM_MEM
+        print_mem_state(& custom_mem);
+#endif
 			exit(0);
 		}
 		bzero(p, sizeof(*p));
@@ -177,10 +213,16 @@ main(int argc, char **argv)
 		/*
 		 * Allocate the mask data.
 		 */
-		p->p_m = (struct ptree_mask *)malloc(
-				sizeof(struct ptree_mask));
+#ifdef USE_CUSTOM_MEM
+	    p->p_m = (struct ptree_mask *)alloc_mem(& custom_mem);
+#else
+		p->p_m = (struct ptree_mask *)malloc(sizeof(struct ptree_mask));
+#endif
 		if (!p->p_m) {
 			perror("Allocating p-trie mask data");
+#ifdef USE_CUSTOM_MEM
+        print_mem_state(& custom_mem);
+#endif
 			exit(0);
 		}
 		bzero(p->p_m, sizeof(*p->p_m));
@@ -190,9 +232,16 @@ main(int argc, char **argv)
 		 * Replace 'struct MyNode' with whatever you'd like.
 		 */
 		pm = p->p_m;
+#ifdef USE_CUSTOM_MEM
+	    pm->pm_data = (struct MyNode *)alloc_mem(& custom_mem);
+#else
 		pm->pm_data = (struct MyNode *)malloc(sizeof(struct MyNode));
+#endif
 		if (!pm->pm_data) {
 			perror("Allocating p-trie mask's node data");
+#ifdef USE_CUSTOM_MEM
+        print_mem_state(& custom_mem);
+#endif
 			exit(0);
 		}
 		bzero(pm->pm_data, sizeof(*pm->pm_data));
@@ -212,7 +261,8 @@ main(int argc, char **argv)
 		if(pfind->p_key==addr.s_addr)
 		{
             CPU_PROFILE_IO_START();
-			fprintf(fout, "%f %08x: ", time, addr.s_addr);
+			//fprintf(fout, "%f %08x: ", time, addr.s_addr);
+            fprintf(fout, "%d %08x: ", (int)time, addr.s_addr);
 			fprintf(fout, "Found.\n");
             CPU_PROFILE_IO_END();
 		}

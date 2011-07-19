@@ -17,8 +17,8 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=kvmParallelMjpeg
 #APPLICATION=susan
 #APPLICATION=qsort
-APPLICATION=dijkstra
-#APPLICATION=patricia
+#APPLICATION=dijkstra
+APPLICATION=patricia
 #APPLICATION=blowfish
 #APPLICATION=rijndael
 #APPLICATION=sha
@@ -30,6 +30,7 @@ APPLICATION=dijkstra
 #APPLICATION=kvmPi
 #APPLICATION=selfProf
 #APPLICATION=dynMemTest
+#APPLICATION=printFloats
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 

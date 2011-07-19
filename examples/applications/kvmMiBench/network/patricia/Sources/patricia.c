@@ -26,6 +26,10 @@
 #include <string.h>	/* bcopy() */
 #include "patricia.h"
 
+#include "custom_mem.h"
+#ifdef USE_CUSTOM_MEM
+extern custom_memory_t custom_mem;
+#endif
 
 /*
  * Private function used to return whether
@@ -123,8 +127,13 @@ pat_insert(struct ptree *n, struct ptree *head)
 		for (i=0; i < t->p_mlen; i++) {
 			if (n->p_m->pm_mask == t->p_m[i].pm_mask) {
 				t->p_m[i].pm_data = n->p_m->pm_data;
+#ifdef USE_CUSTOM_MEM
+                free_mem (& custom_mem, n->p_m);
+                free_mem (& custom_mem, n);
+#else
 				free(n->p_m);
 				free(n);
+#endif
 				n = 0;
 				return t;
 			}
@@ -263,16 +272,28 @@ pat_remove(struct ptree *n, struct ptree *head)
 		 * Delete the target's data and copy in its parent's
 		 * data, but not the bit value.
 		 */
+
+#ifdef USE_CUSTOM_MEM
+		if (t->p_m->pm_data)
+            free_mem (& custom_mem, t->p_m->pm_data);
+        free_mem (& custom_mem, t->p_m);
+#else
 		if (t->p_m->pm_data)
 			free(t->p_m->pm_data);
 		free(t->p_m);
+#endif
+
 		if (t != p) {
 			t->p_key = p->p_key;
 			t->p_m = p->p_m;
 			t->p_mlen = p->p_mlen;
 		}
-		free(p);
 
+#ifdef USE_CUSTOM_MEM
+        free_mem (& custom_mem, p);
+#else
+		free(p);
+#endif
 		return 1;
 	}
 
@@ -302,7 +323,12 @@ pat_remove(struct ptree *n, struct ptree *head)
 	 * Free old masks and point to new ones.
 	 */
 	t->p_mlen--;
+
+#ifdef USE_CUSTOM_MEM
+    free_mem (& custom_mem, t->p_m);
+#else
 	free(t->p_m);
+#endif
 	t->p_m = buf;
 	return 1;
 }

@@ -1,5 +1,12 @@
 #include <stdio.h>
 #include <Processor/Profile.h>
+
+//#define USE_CUSTOM_MEM
+#ifdef USE_CUSTOM_MEM
+#include "custom_mem.h"
+custom_memory_t custom_mem;
+#endif
+
 #define NUM_NODES                          100
 #define NONE                               9999
 
@@ -12,6 +19,7 @@ struct _NODE
 };
 typedef struct _NODE NODE;
 
+#ifndef USE_CUSTOM_MEM
 struct _QITEM
 {
   int iNode;
@@ -20,10 +28,9 @@ struct _QITEM
   struct _QITEM *qNext;
 };
 typedef struct _QITEM QITEM;
+#endif
 
 QITEM *qHead = NULL;
-
-
 
 int AdjMatrix[NUM_NODES][NUM_NODES];
 
@@ -48,12 +55,19 @@ void print_path (NODE *rgnNodes, int chNode)
 
 void enqueue (int iNode, int iDist, int iPrev)
 {
+#ifdef USE_CUSTOM_MEM
+  QITEM *qNew = alloc_mem(& custom_mem);
+#else
   QITEM *qNew = (QITEM *) malloc(sizeof(QITEM));
+#endif
   QITEM *qLast = qHead;
 
   if (!qNew)
     {
       fprintf(stderr, "Out of memory.\n");
+#ifdef USE_CUSTOM_MEM
+      print_mem_state(& custom_mem);
+#endif
       exit(1);
     }
   qNew->iNode = iNode;
@@ -86,7 +100,11 @@ void dequeue (int *piNode, int *piDist, int *piPrev)
       *piDist = qHead->iDist;
       *piPrev = qHead->iPrev;
       qHead = qHead->qNext;
+#ifdef USE_CUSTOM_MEM
+      free_mem (& custom_mem, qKill);
+#else
       free(qKill);
+#endif
       g_qCount--;
     }
 }
@@ -148,6 +166,9 @@ int dijkstra(int chStart, int chEnd)
 }
 
 int main(int argc, char *argv[]) {
+#ifdef USE_CUSTOM_MEM
+    init_mem(& custom_mem);
+#endif
     int app_repeat_count;
     for (app_repeat_count = 0; app_repeat_count < 10; app_repeat_count++)
     {

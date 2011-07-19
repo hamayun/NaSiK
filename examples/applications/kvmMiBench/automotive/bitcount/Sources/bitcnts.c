@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
 #ifdef IO_ON
     CPU_PROFILE_IO_START();
     printf("%-38s> Time: %7.3f sec.; Bits: %ld\n", text[i], ct, n);
+    //printf("%-38s> Time: %d sec.; Bits: %ld\n", text[i], (int)ct, n);
     CPU_PROFILE_IO_END();
 #endif
   }
