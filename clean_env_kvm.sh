@@ -37,6 +37,18 @@ print_substep "Removing Software Application Symlinks ..."
 rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "interface.xmi")
 rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "elf.lds")
 rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "APPLICATION.X.bin")
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/automotive/bitcount/BITCOUNT
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/automotive/qsort/QSORT
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/automotive/susan/SUSAN
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/consumer/cjpeg/CJPEG
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/consumer/djpeg/DJPEG
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/network/dijkstra/DIJKSTRA
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/network/patricia/PATRICIA
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/office/stringsearch/STRINGSEARCH
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/security/blowfish/BLOWFISH
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/security/rijndael/RIJNDAEL
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/security/sha/SHA
+rm -f $NASIK_HOME/examples/applications/kvmMiBench/telecomm/CRC32/CRC32APP
 
 print_substep "Cleaning Hardware Model ... "
 cd ${PFORM_DIR}

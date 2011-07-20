@@ -5,10 +5,10 @@ ARM_PLATFORM=/home/hamayun/workspace/Rabbits-sls/platforms/thumper
 export PATH=/home/hamayun/workspace/Rabbits-sls/rabbits/tools:$PATH
 
 RESULTSDIR=${ARM_PLATFORM}/batchtest-results-${TIMESTAMP}
-RESULTFILE=hosttime_arm.txt
+RESULTFILE=hosttime_qemu.txt
 TTYLOGFILE=tty100
 ALL_TTYLOGS_FILE=tty100_all_tests.txt
-ALL_RESULTS_FILE=hosttime_arm_results.txt
+ALL_RESULTS_FILE=hosttime_qemu_results.txt
 
 APP_LIST="susan qsort dijkstra patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"
 #APP_LIST="patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"
