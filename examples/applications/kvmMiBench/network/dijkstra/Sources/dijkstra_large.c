@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <Processor/Profile.h>
 
-//#define USE_CUSTOM_MEM
-#ifdef USE_CUSTOM_MEM
 #include "custom_mem.h"
+
+#ifdef USE_CUSTOM_MEM
 custom_memory_t custom_mem;
 #endif
 
@@ -18,17 +18,6 @@ struct _NODE
   int iPrev;
 };
 typedef struct _NODE NODE;
-
-#ifndef USE_CUSTOM_MEM
-struct _QITEM
-{
-  int iNode;
-  int iDist;
-  int iPrev;
-  struct _QITEM *qNext;
-};
-typedef struct _QITEM QITEM;
-#endif
 
 QITEM *qHead = NULL;
 

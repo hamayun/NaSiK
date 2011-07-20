@@ -2,6 +2,8 @@
 #ifndef CUSTOM_MEM_H
 #define CUSTOM_MEM_H
 
+//#define USE_CUSTOM_MEM
+
 struct _QITEM
 {
   int iNode;
