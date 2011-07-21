@@ -2743,46 +2743,47 @@ NULL};
 };
     int i;
     int app_repeat_count;
-    for (app_repeat_count = 0; app_repeat_count < 1000; app_repeat_count++)
+    CPU_PROFILE_CURRENT_TIME();
+    for (app_repeat_count = 0; app_repeat_count < 500; app_repeat_count++)
     {
       printf("STRINGSEARCH: In main function : For %d time\n\n", app_repeat_count);
       for (i = 0; find_strings[i]; i++)
       {
-            CPU_PROFILE_COMP_START();
+            //CPU_PROFILE_COMP_START();
             init_search(find_strings[i]);
             here = strsearch(search_strings[i]);
-            CPU_PROFILE_COMP_END();
+            //CPU_PROFILE_COMP_END();
 
 #ifdef ENABLE_OUTPUT
-            CPU_PROFILE_IO_START();
+            //CPU_PROFILE_IO_START();
             printf("\"%s\" is%s in \"%s\"", find_strings[i],
                   here ? "" : " not", search_strings[i]);
             if (here)
                   printf(" [\"%s\"]", here);
             putchar('\n');
-            CPU_PROFILE_IO_END();
+            //CPU_PROFILE_IO_END();
 #endif
       }
 
       for (i = 0; find_strings[i]; i++)
       {
-            CPU_PROFILE_COMP_START();
+            //CPU_PROFILE_COMP_START();
             init_search(find_strings[i]);
             here = strsearch(search_strings[i]);
-            CPU_PROFILE_COMP_END();
+            //CPU_PROFILE_COMP_END();
 
 #ifdef ENABLE_OUTPUT
-            CPU_PROFILE_IO_START();
+            //CPU_PROFILE_IO_START();
             printf("\"%s\" is%s in \"%s\"", find_strings[i],
                   here ? "" : " not", search_strings[i]);
             if (here)
                   printf(" [\"%s\"]", here);
             putchar('\n');
-            CPU_PROFILE_IO_END();
+            //CPU_PROFILE_IO_END();
 #endif
       }
     }
-
+    CPU_PROFILE_CURRENT_TIME();
     CPU_PROFILE_FLUSH_DATA();
     return 0;
 }
