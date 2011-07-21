@@ -19,9 +19,9 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=bitcount
 #APPLICATION=cjpeg
 #APPLICATION=djpeg
-#APPLICATION=stringsearch
+APPLICATION=stringsearch
 #APPLICATION=kvmPi
-APPLICATION=selfProf
+#APPLICATION=selfProf
 #APPLICATION=printFloats
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")

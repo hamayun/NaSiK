@@ -17,7 +17,7 @@
 #include <limits.h>
 #include <Processor/Profile.h>
 
-//#define ENABLE_OUTPUT
+#define ENABLE_OUTPUT
 
 static size_t table[UCHAR_MAX + 1];
 static size_t len;
