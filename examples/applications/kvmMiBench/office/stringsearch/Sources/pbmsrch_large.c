@@ -2741,10 +2741,13 @@ NULL};
 "and recycling it for more than its",
 "worth But trust me on the sunscreen"
 };
+
     int i;
     int app_repeat_count;
+    char str_buff0[512] = {0};
+    char str_buff1[512] = {0};
     CPU_PROFILE_CURRENT_TIME();
-    for (app_repeat_count = 0; app_repeat_count < 500; app_repeat_count++)
+    for (app_repeat_count = 0; app_repeat_count < 250; app_repeat_count++)
     {
       printf("STRINGSEARCH: In main function : For %d time\n\n", app_repeat_count);
       for (i = 0; find_strings[i]; i++)
@@ -2752,14 +2755,18 @@ NULL};
             //CPU_PROFILE_COMP_START();
             init_search(find_strings[i]);
             here = strsearch(search_strings[i]);
+
+            sprintf(str_buff0, "\"%s\" is%s in \"%s\"", find_strings[i],
+                  here ? "" : " not", search_strings[i]);
+            if (here)
+                  sprintf(str_buff1," [\"%s\"]", here);
             //CPU_PROFILE_COMP_END();
 
 #ifdef ENABLE_OUTPUT
             //CPU_PROFILE_IO_START();
-            printf("\"%s\" is%s in \"%s\"", find_strings[i],
-                  here ? "" : " not", search_strings[i]);
+            fputs(str_buff0, stdout);
             if (here)
-                  printf(" [\"%s\"]", here);
+                fputs(str_buff1, stdout);
             putchar('\n');
             //CPU_PROFILE_IO_END();
 #endif
@@ -2770,14 +2777,18 @@ NULL};
             //CPU_PROFILE_COMP_START();
             init_search(find_strings[i]);
             here = strsearch(search_strings[i]);
+
+            sprintf(str_buff0, "\"%s\" is%s in \"%s\"", find_strings[i],
+                  here ? "" : " not", search_strings[i]);
+            if (here)
+                  sprintf(str_buff1, " [\"%s\"]", here);
             //CPU_PROFILE_COMP_END();
 
 #ifdef ENABLE_OUTPUT
             //CPU_PROFILE_IO_START();
-            printf("\"%s\" is%s in \"%s\"", find_strings[i],
-                  here ? "" : " not", search_strings[i]);
+            fputs(str_buff0, stdout);
             if (here)
-                  printf(" [\"%s\"]", here);
+                fputs(str_buff1, stdout);
             putchar('\n');
             //CPU_PROFILE_IO_END();
 #endif
