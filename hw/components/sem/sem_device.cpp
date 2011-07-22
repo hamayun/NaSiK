@@ -32,7 +32,7 @@
 #define DCOUT if (0) cout
 #endif
 
-sem_device::sem_device (const char *_name, unsigned int _size) : slave_device (_name)
+sem_device::sem_device (const char *_name, unsigned long _size) : slave_device (_name)
 {
     mem = NULL;
     size = _size + 8;
@@ -46,7 +46,7 @@ sem_device::~sem_device ()
         delete [] mem;
 }
 
-void sem_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sem_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int                 offset_dd = 0;
     int                 mod = 0;
@@ -95,12 +95,12 @@ void sem_device::write (unsigned int ofs, unsigned char be, unsigned char *data,
             else
                 if (mod == 4)
                 {
-                    unsigned int newval = *((unsigned int *) data + offset_dd);
+                    unsigned long newval = *((unsigned long*) data + offset_dd);
                     DPRINTF ("sem_write [%X]<-%lu (tm = %llu ns)\n", ofs + offset_dd * 4, newval, ns_tm);
 
                     if (newval == 1)
                     {
-                        unsigned int oldval = *((unsigned int *) (mem + ofs) + offset_dd);
+                        unsigned long oldval = *((unsigned long*) (mem + ofs) + offset_dd);
 
                         if (oldval == 1)
                             newval = 2;
@@ -111,7 +111,7 @@ void sem_device::write (unsigned int ofs, unsigned char be, unsigned char *data,
                                 exit (1);
                             }
                     }
-                    *((unsigned int *) (mem + ofs) + offset_dd) = newval;
+                    *((unsigned long*) (mem + ofs) + offset_dd) = newval;
                 }
                 else
                     err = 1;
@@ -121,12 +121,12 @@ void sem_device::write (unsigned int ofs, unsigned char be, unsigned char *data,
     {
         printf ("Bad %s:%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
                 name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int *)data + 1));
+                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
         exit (1);
     }
 }
 
-void sem_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sem_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int                 offset_dd = 0;
     int                 mod = 0;
@@ -137,8 +137,8 @@ void sem_device::read (unsigned int ofs, unsigned char be, unsigned char *data, 
 #endif
 
     bErr = false;
-    *((unsigned int *)data + 0) = 0;
-    *((unsigned int *)data + 1) = 0;
+    *((unsigned long *)data + 0) = 0;
+    *((unsigned long *)data + 1) = 0;
 
     if (ofs > size)
         err = 1;
@@ -179,11 +179,11 @@ void sem_device::read (unsigned int ofs, unsigned char be, unsigned char *data, 
             else
                 if (mod == 4)
                 {
-                    unsigned int val = *((unsigned int *) (mem + ofs) + offset_dd);
+                    unsigned long val = *((unsigned long*) (mem + ofs) + offset_dd);
                     DPRINTF ("sem_read [%X]->%lu (tm = %llu ns)\n", ofs + offset_dd * 4, val, ns_tm);
-                    *((unsigned int *) data + offset_dd) = (val == 2) ? 1 : val;
+                    *((unsigned long*) data + offset_dd) = (val == 2) ? 1 : val;
                     if (val == 0)
-                        *((unsigned int *) (mem + ofs) + offset_dd) = 1;
+                        *((unsigned long*) (mem + ofs) + offset_dd) = 1;
                 }
                 else
                     err = 1;
@@ -196,7 +196,7 @@ void sem_device::read (unsigned int ofs, unsigned char be, unsigned char *data, 
     }
 }
 
-void sem_device::rcv_rqst (unsigned int ofs, unsigned char be,
+void sem_device::rcv_rqst (unsigned long ofs, unsigned char be,
                            unsigned char *data, bool bWrite)
 {
     bool bErr = false;

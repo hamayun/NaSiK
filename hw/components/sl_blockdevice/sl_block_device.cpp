@@ -30,12 +30,11 @@
 #include <sl_block_device.h>
 #include <errno.h>
 
-
-/* #define DEBUG_DEVICE_BLOCK  */
+/*#define DEBUG_DEVICE_BLOCK*/
 
 #ifdef DEBUG_DEVICE_BLOCK
 #define DPRINTF(fmt, args...)                               \
-    do { printf("sl_block_device: " fmt , ##args); } while (0)
+    do { printf("sl_block_device: " fmt, ##args); } while (0)
 #define DCOUT if (1) cout
 #else
 #define DPRINTF(fmt, args...) do {} while(0)
@@ -475,7 +474,7 @@ sl_block_device_slave::~sl_block_device_slave(){
 
 }
 
-void sl_block_device_slave::write (unsigned int ofs, unsigned char be,
+void sl_block_device_slave::write (unsigned long ofs, unsigned char be,
                                     unsigned char *data, bool &bErr)
 {
     uint32_t  *val = (uint32_t *)data;
@@ -529,7 +528,7 @@ void sl_block_device_slave::write (unsigned int ofs, unsigned char be,
     return;
 }
 
-void sl_block_device_slave::read (unsigned int ofs, unsigned char be,
+void sl_block_device_slave::read (unsigned long ofs, unsigned char be,
                                   unsigned char *data, bool &bErr)
 {
 
@@ -597,7 +596,7 @@ void sl_block_device_slave::read (unsigned int ofs, unsigned char be,
     return;
 }
 
-void sl_block_device_slave::rcv_rqst (unsigned int ofs, unsigned char be,
+void sl_block_device_slave::rcv_rqst (unsigned long ofs, unsigned char be,
                                       unsigned char *data, bool bWrite)
 {
 

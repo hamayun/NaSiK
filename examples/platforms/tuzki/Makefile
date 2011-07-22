@@ -3,7 +3,6 @@ COMPONENTS   = hw/components
 PLATFORM     = examples/platforms/tuzki
 SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/mem                \
-               $(COMPONENTS)/ramdac             \
                $(COMPONENTS)/kvm_wrapper        \
                $(COMPONENTS)/analyzer           \
                $(COMPONENTS)/execution_spy      \

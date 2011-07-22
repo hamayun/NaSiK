@@ -44,7 +44,6 @@ namespace noc
     {
     public:
         uint32_t    address;
-        uint32_t    initial_address;
         uint8_t     be;
         uint8_t     cmd;
         bool        contig;
@@ -57,7 +56,10 @@ namespace noc
         bool        clen;
         uint16_t    srcid;
         uint8_t     trdid;
-        uint8_t     pktid;  
+        uint8_t     pktid;
+
+        uint32_t    initial_address;
+        int         slave_id;
     };
     enum {
         CMD_NOP,
@@ -75,9 +77,9 @@ namespace noc
         uint8_t   rdata[8];
         bool      reop;
         bool      rerror;
-        uint16_t  rsrcid;       // Response Source ID
-        uint8_t   rtrdid;       // Response Transaction ID
-        uint8_t   rpktid;       // Response Packet ID
+        uint16_t  rsrcid;
+        uint8_t   rtrdid;
+        uint8_t   rpktid;
 
         // **************
         // Extra field

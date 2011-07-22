@@ -29,8 +29,8 @@ public:
     virtual ~tty_device ();
 
 public:
-    virtual void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
-    virtual void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    virtual void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    virtual void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
 
 private:
     int                 nb_tty;

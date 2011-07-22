@@ -30,7 +30,6 @@
 
 #include <kvm_cpu_wrapper.h>
 #include <interconnect.h>
-#include <ramdac_device.h>
 #include <framebuffer_device.h>
 #include <tg_device.h>
 #include <sl_tg_device.h>
@@ -86,6 +85,15 @@ int sc_main (int argc, char ** argv)
 
     if(argc < 3) usage_and_exit(argv[0]);
     signal(SIGINT,simulation_stop);
+
+    fb_reset_t    fb_res_stat;
+    {
+      fb_res_stat.fb_start  = 1;
+      fb_res_stat.fb_w      = 256;
+      fb_res_stat.fb_h      = 144;
+      fb_res_stat.fb_mode   = YV16;
+      fb_res_stat.fb_display_on_wrap = 1;
+    }
 			
     /* Initialize the kvm. */
     retVal = soc_kvm_init(argv[1], argv[2]);
@@ -109,7 +117,7 @@ int sc_main (int argc, char ** argv)
     tty_serial_device   *tty0 = new tty_serial_device ("tty0");
     tty_serial_device   *tty1 = new tty_serial_device ("tty1");
     sl_tg_device	*tg   = new sl_tg_device ("tg", "fdaccess.0.0");
-    framebuffer_device	*ramdac = new framebuffer_device ("framebuffer");
+    fb_device         *fb   = new fb_device("framebuffer", 0, &fb_res_stat);
     sem_device		*sem    = new sem_device("sem", 0x100000);
 
     slaves[nslaves++] = ram;			// 0	0x00000000 - 0x08000000
@@ -117,7 +125,7 @@ int sc_main (int argc, char ** argv)
     slaves[nslaves++] = tty0;			// 2	0xC0000000 - 0xC0000040
     slaves[nslaves++] = tty1;			// 3	0xC0100000 - 0xC0100040
     slaves[nslaves++] = tg;				// 4	0xC3000000 - 0xC3000100
-    slaves[nslaves++] = ramdac;			// 5	0xC4000000 - 0xC4000200
+    slaves[nslaves++] = fb->get_slave();			// 5	0xC4000000 - 0xC4000200
     slaves[nslaves++] = sem;			// 6	0xC5000000 - 0xC5100000
     slaves[nslaves++] = bl->get_slave();// 7	0xC6000000 - 0xC6100000
     slaves[nslaves++] = bl2->get_slave();// 8	0xC6500000 - 0xC6600000
@@ -132,7 +140,7 @@ int sc_main (int argc, char ** argv)
       timers[i] = new timer_device (buf);
       slaves[nslaves++] = timers[i]; // 7 + i  from 0xC1000000
     }
-    int							no_irqs = ntimers + 5;
+    int							no_irqs = ntimers + 6;
     //int 						int_cpu_mask [] = {1, 1, 0, 0, 0, 0, 0};
 
     sc_signal<bool>             *wires_irq_qemu = new sc_signal<bool>[no_irqs];
@@ -140,14 +148,15 @@ int sc_main (int argc, char ** argv)
     for (i = 0; i < ntimers; i++)
         timers[i]->irq (wires_irq_qemu[i]);
 
-    tty0->irq_line (wires_irq_qemu[no_irqs - 5]);
-    tty1->irq_line (wires_irq_qemu[no_irqs - 4]);
-    bl->irq (wires_irq_qemu[no_irqs-3]);
-    bl2->irq (wires_irq_qemu[no_irqs-2]);
-    bl3->irq (wires_irq_qemu[no_irqs-1]);
+    tty0->irq_line (wires_irq_qemu[no_irqs - 6]);
+    tty1->irq_line (wires_irq_qemu[no_irqs - 5]);
+    bl->irq (wires_irq_qemu[no_irqs-4]);
+    bl2->irq (wires_irq_qemu[no_irqs-3]);
+    bl3->irq (wires_irq_qemu[no_irqs-2]);
+    fb->irq (wires_irq_qemu[no_irqs-1]);
 
     //interconnect
-    onoc = new interconnect ("interconnect", 4, nslaves);
+    onoc = new interconnect ("interconnect", 5, nslaves);
     for (i = 0; i < nslaves; i++)
         onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
 
@@ -163,6 +172,9 @@ int sc_main (int argc, char ** argv)
     onoc->connect_master_64(3,
                             bl3->get_master()->put_port,
                             bl3->get_master()->get_port);
+    onoc->connect_master_64(4,
+                            fb->get_master()->put_port,
+                            fb->get_master()->get_port);
 
     sc_start(-1);
     return (EXIT_SUCCESS);

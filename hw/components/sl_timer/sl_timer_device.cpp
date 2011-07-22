@@ -56,7 +56,7 @@ sl_timer_device::~sl_timer_device ()
 {
 }
 
-void sl_timer_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_timer_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     uint32_t                value;
 
@@ -91,7 +91,8 @@ void sl_timer_device::write (unsigned int ofs, unsigned char be, unsigned char *
     case TIMER_PERIOD:
         m_period      = value;
         m_next_period = (sc_time_stamp().value() - m_last_period) + 
-            ((uint64_t)1000000000000ULL /* 1s -> ps */ / (SYSTEM_CLOCK_FV / TIMER_DIV) * m_period);
+            ((uint64_t)1000000000000ULL /* 1s -> ps */ /
+            (SYSTEM_CLOCK_FV / TIMER_DIV) * m_period);
 
         DPRINTF("TIMER_PERIOD write : %d (curr_tick: %lld next: %lld)\n",
                value, (sc_time_stamp().value() - m_last_period)/1000,
@@ -108,15 +109,15 @@ void sl_timer_device::write (unsigned int ofs, unsigned char be, unsigned char *
     default:
         DPRINTF ("Bad %s::%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
                  name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                 (unsigned int) *((unsigned int *)data + 0),
-                 (unsigned int) *((unsigned int *)data + 1));
+                 (unsigned int) *((unsigned long*)data + 0),
+                 (unsigned int) *((unsigned long*)data + 1));
         exit (1);
         break;
     }
     bErr = false;
 }
 
-void sl_timer_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_timer_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int             i;
     uint32_t  *val = (uint32_t *)data;
@@ -163,7 +164,7 @@ void sl_timer_device::read (unsigned int ofs, unsigned char be, unsigned char *d
 
 void sl_timer_device::irq_update_thread ()
 {
-    unsigned int       flags;
+    unsigned long       flags;
 
     while(1) {
 
@@ -207,7 +208,7 @@ void sl_timer_device::sl_timer_thread (void)
     }
 }
 
-void sl_timer_device::rcv_rqst (unsigned int ofs, unsigned char be,
+void sl_timer_device::rcv_rqst (unsigned long ofs, unsigned char be,
                                 unsigned char *data, bool bWrite)
 {
 

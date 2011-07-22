@@ -86,13 +86,13 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned int ofs, unsigned char be,
+    void write (unsigned long ofs, unsigned char be,
                 unsigned char *data, bool &bErr);
-    void read (unsigned int ofs, unsigned char be,
+    void read (unsigned long ofs, unsigned char be,
                unsigned char *data, bool &bErr);
 
 private:
@@ -120,7 +120,7 @@ public:
 public:
     /*
      *   Obtained from father
-     *    void send_req(unsigned char tid, unsigned int addr, unsigned char *data, 
+     *    void send_req(unsigned char tid, unsigned long addr, unsigned char *data, 
      * 			  unsigned char bytes, bool bWrite);
      */
     virtual void rcv_rsp (unsigned char tid, unsigned char *data,

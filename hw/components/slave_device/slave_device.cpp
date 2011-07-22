@@ -19,7 +19,8 @@
 
 #include <slave_device.h>
 
-void invalidate_address (unsigned int addr, unsigned int node_id);
+void invalidate_address (unsigned long addr, int slave_id,
+        unsigned long offset_slave, int src_id);
 
 slave_device::slave_device (sc_module_name module_name) : sc_module (module_name)
 {
@@ -35,11 +36,21 @@ slave_device::~slave_device ()
 void slave_device::request_thread ()
 {
     unsigned char           be, cmd;
-    unsigned int            addr;
+    unsigned long           addr;
 
     while (1)
     {
         get_port->get (m_req);
+
+        #if 0
+        if (m_req.srcid == 6)
+        {
+            printf ("slave_device %s - addr = 0x%lx, src=%d, slave_id=%d,%s\n",
+                name (),
+                (unsigned long) m_req.initial_address, m_req.srcid,
+                m_req.slave_id, (m_req.cmd == CMD_WRITE) ? "WR" : "RD");
+        }
+        #endif
 
         if(m_bProcessing_rq)
         {
@@ -77,8 +88,8 @@ void
 slave_device::send_rsp (bool bErr)
 {
     if (m_write_invalidate && m_req.cmd == CMD_WRITE){
-        //invalidate_address (m_req.initial_address, m_req.srcid);
-        printf("Request of invalidate\n");
+        //invalidate_address (m_req.initial_address,
+            //m_req.slave_id, m_req.initial_address, m_req.srcid);
     }
 
     m_rsp.rerror = bErr;

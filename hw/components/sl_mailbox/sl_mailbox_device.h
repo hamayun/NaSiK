@@ -23,12 +23,15 @@
 #include <slave_device.h>
 
 enum sl_mailbox_registers {
-    MAILBOX_COMM_ADR	= 0,
-    MAILBOX_DATA_ADR	= 1,
-    // free addr	= 2
-    MAILBOX_RESET_ADR	= 3,
-    MAILBOX_SPAN    	= 4,
+    MAILBOX_COMM_ADR    = 0,
+    MAILBOX_DATA_ADR    = 1,
+    MAILBOX_RESERVED_ADR= 2,
+    MAILBOX_RESET_ADR   = 3,
+    MAILBOX_SPAN        = 4,
 };
+
+#define MAILBOX_GLOBAL_START_ADDR   0x1000
+#define MAILBOX_GLOBAL_NO_REGS      10
 
 enum sl_mailbox_status_register{
     MAILBOX_CLEAR       = 0,
@@ -47,12 +50,12 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
-    void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
 
 public:
     //ports
@@ -64,6 +67,8 @@ private:
     uint32_t            *m_command;
     uint32_t            *m_data;
     uint32_t            *m_status;
+    uint32_t            *m_reserved;
+    uint32_t            m_global_reg[MAILBOX_GLOBAL_NO_REGS];
 };
 
 #endif

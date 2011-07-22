@@ -26,12 +26,12 @@
 
 typedef struct
 {
-    unsigned int	int_enabled;
-    unsigned int	int_level;
-    unsigned int	read_buf[READ_BUF_SIZE];
-    unsigned int	read_pos;
-    unsigned int	read_count;
-    unsigned int	read_trigger;
+    unsigned long       int_enabled;
+    unsigned long       int_level;
+    unsigned long       read_buf[READ_BUF_SIZE];
+    unsigned long       read_pos;
+    unsigned long       read_count;
+    unsigned long       read_trigger;
 } tty_state;
 
 class tty_serial_device : public slave_device
@@ -46,12 +46,12 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
-    void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
 
     sc_event irq_update;
     //void irq_update ();

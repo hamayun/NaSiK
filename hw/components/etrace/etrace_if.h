@@ -1,3 +1,22 @@
+/*
+ *  Copyright (c) 2009 Thales Communication - AAL
+ *
+ *  This file is part of Rabbits.
+ *
+ *  Rabbits is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Rabbits is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Rabbits.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _ETRACE_IF_H_
 #define _ETRACE_IF_H_
 
@@ -80,11 +99,11 @@ public:
 public:
     unsigned long add_periph (const char *name, const periph_class_t *pclass, int &group_id,
         const char * group_name);
-    void change_energy_mode (unsigned int periph_id, unsigned int mode);
-    void energy_event (unsigned int periph_id, unsigned int event_id, unsigned int value);
+    void change_energy_mode (unsigned long periph_id, unsigned long mode);
+    void energy_event (unsigned long periph_id, unsigned long event_id, unsigned long value);
 
-	void start_measure (void);
-	unsigned int stop_measure (void);
+    void start_measure (void);
+    unsigned long stop_measure (void);
 
 private:
     void display_init (void);
@@ -106,6 +125,19 @@ private:
 
 extern etrace_if etrace;
 
-#endif
+#endif /* ENERGY_TRACE_ENABLED */
 
-#endif
+#endif /* _ETRACE_IF_H_ */
+
+/*
+ * Vim standard variables
+ * vim:set ts=4 expandtab tw=80 cindent syntax=c:
+ *
+ * Emacs standard variables
+ * Local Variables:
+ * mode: c
+ * tab-width: 4
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ */

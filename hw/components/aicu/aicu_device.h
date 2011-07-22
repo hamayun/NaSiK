@@ -71,8 +71,11 @@ class aicu_device : public slave_device
 {
 public:
     SC_HAS_PROCESS (aicu_device);
-    aicu_device (sc_module_name module_name, int nb_out, 
-                          int nb_global_in, int nb_local_in);
+    aicu_device (sc_module_name module_name,
+                 int nb_out,        /* Nb of CPUs */
+                 int nb_global_in,  /* Others like DMA, BLKDEV */
+                 int nb_local_in    /* Per CPU */
+                );
     virtual ~aicu_device ();
 
 public:
@@ -80,12 +83,12 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
-    void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
 
     void irq_update_thread (void);
     void reset_registers (void);

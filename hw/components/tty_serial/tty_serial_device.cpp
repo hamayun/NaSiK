@@ -159,7 +159,7 @@ tty_serial_device::~tty_serial_device ()
 //void tty_serial_device::irq_update ()
 void tty_serial_device::irq_update_thread ()
 {
-    unsigned int        flags;
+    unsigned long       flags;
 
     while(1) {
 
@@ -173,10 +173,10 @@ void tty_serial_device::irq_update_thread ()
     }
 }
 
-void tty_serial_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void tty_serial_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     unsigned char               ch;
-    unsigned int		value;
+    unsigned long               value;
 
     bErr = false;
 
@@ -184,10 +184,10 @@ void tty_serial_device::write (unsigned int ofs, unsigned char be, unsigned char
     if (be & 0xF0)
     {
         ofs++;
-        value = * ((unsigned int *) data + 1);
+        value = * ((unsigned long *) data + 1);
     }
     else
-        value = * ((unsigned int *) data + 0);
+        value = * ((unsigned long *) data + 0);
 
     if (ofs != 0)
         DPRINTF ("%s to 0x%lx - value 0x%lx\n", __FUNCTION__, ofs, value);
@@ -208,17 +208,17 @@ void tty_serial_device::write (unsigned int ofs, unsigned char be, unsigned char
     case_error_write:
         printf ("Bad %s::%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
                 name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int *)data + 1));
+                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
         exit (1);
     }
 }
 
-void tty_serial_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void tty_serial_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int                 i;
-    unsigned int	c, *pdata;
+    unsigned long       c, *pdata;
 
-    pdata = (unsigned int *) data;
+    pdata = (unsigned long *) data;
     pdata[0] = 0;
     pdata[1] = 0;
     bErr = false;
@@ -286,7 +286,7 @@ void tty_serial_device::read (unsigned int ofs, unsigned char be, unsigned char 
         DPRINTF ("%s from 0x%lx - value 0x%lx\n", __FUNCTION__, ofs, *pdata);
 }
 
-void tty_serial_device::rcv_rqst (unsigned int ofs, unsigned char be,
+void tty_serial_device::rcv_rqst (unsigned long ofs, unsigned char be,
                                   unsigned char *data, bool bWrite)
 {
 

@@ -47,7 +47,7 @@ void tg_device::reset_input ()
     fseek (tg_file, 0, SEEK_SET);
 }
 
-void tg_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void tg_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     switch (ofs)
     {
@@ -56,19 +56,19 @@ void tg_device::write (unsigned int ofs, unsigned char be, unsigned char *data, 
     default:
         printf ("Bad %s:%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n", name (),
                 __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int *)data + 1));
+                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
         exit (1);
         break;
     }
     bErr = false;
 }
 
-void tg_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void tg_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int             i;
 
-    *((unsigned int *)data + 0) = 0;
-    *((unsigned int *)data + 1) = 0;
+    *((unsigned long *)data + 0) = 0;
+    *((unsigned long *)data + 1) = 0;
 
     switch (ofs)
     {
@@ -84,7 +84,7 @@ void tg_device::read (unsigned int ofs, unsigned char be, unsigned char *data, b
     case 0x80:
         if (!tg_bytes_left)
             reset_input ();
-        *((unsigned int *)data + 0) = (tg_bytes_left + 3) / 4;
+        *((unsigned long *)data + 0) = (tg_bytes_left + 3) / 4;
         break;
     default:
         printf ("Bad %s:%s ofs=0x%X, be=0x%X!\n",  name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be);
@@ -93,7 +93,7 @@ void tg_device::read (unsigned int ofs, unsigned char be, unsigned char *data, b
     bErr = false;
 }
 
-void tg_device::rcv_rqst (unsigned int ofs, unsigned char be,
+void tg_device::rcv_rqst (unsigned long ofs, unsigned char be,
                           unsigned char *data, bool bWrite)
 {
 

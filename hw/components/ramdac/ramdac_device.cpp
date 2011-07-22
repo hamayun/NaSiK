@@ -28,7 +28,7 @@
 #include <sys/wait.h>
 #include <ramdac_device.h>
 
-extern unsigned int no_frames_to_simulate;
+extern unsigned long no_frames_to_simulate;
 
 static int          pids_ramdac[10];
 static int          nramdac = 0;
@@ -66,10 +66,10 @@ ramdac_device::~ramdac_device ()
 {
 }
 
-void ramdac_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void ramdac_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
-    unsigned int            val1 = ((unsigned int *)data)[0];
-    unsigned int            val2 = ((unsigned int *)data)[1];
+    unsigned long           val1 = ((unsigned long*)data)[0];
+    unsigned long           val2 = ((unsigned long*)data)[1];
 
     bErr = false;
 
@@ -106,13 +106,13 @@ void ramdac_device::write (unsigned int ofs, unsigned char be, unsigned char *da
     default:
         printf ("Bad %s::%s ofs=0x%X, be=0x%X, data=0x%X-%X\n",
                 name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
-                (unsigned int) *((unsigned int *)data + 0), (unsigned int) *((unsigned int *)data + 1));
+                (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
         exit (1);
         break;
     }
 }
 
-void ramdac_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void ramdac_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     bErr = false;
     return;
@@ -202,7 +202,7 @@ void ramdac_device::display ()
     kill (pid, SIGUSR1);
 }
 
-void ramdac_device::rcv_rqst (unsigned int ofs, unsigned char be,
+void ramdac_device::rcv_rqst (unsigned long ofs, unsigned char be,
                               unsigned char *data, bool bWrite)
 {
 

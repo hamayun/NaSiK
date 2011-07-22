@@ -25,8 +25,8 @@
 class mem_device : public slave_device
 {
 public:
-    mem_device (const char *_name, unsigned int _size);
-    mem_device (const char *_name, unsigned int _size, unsigned char* _mem);
+    mem_device (const char *_name, unsigned long _size);
+    mem_device (const char *_name, unsigned long _size, unsigned char* _mem);
     virtual ~mem_device ();
 
 public:
@@ -34,19 +34,19 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 
     virtual unsigned char *get_mem () {return mem;}
-    virtual unsigned int get_size () {return size;}
+    virtual unsigned long get_size () {return size;}
 
 private:
-    void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
-    void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
 
 private:
-    unsigned int       size;
+    unsigned long       size;
     unsigned char       *mem;
 };
 

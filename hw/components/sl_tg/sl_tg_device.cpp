@@ -45,7 +45,7 @@ void sl_tg_device::reset_input ()
     fseek (tg_file, 0, SEEK_SET);
 }
 
-void sl_tg_device::write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_tg_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     switch (ofs)
     {
@@ -61,7 +61,7 @@ void sl_tg_device::write (unsigned int ofs, unsigned char be, unsigned char *dat
     bErr = false;
 }
 
-void sl_tg_device::read (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr)
+void sl_tg_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int             i;
 	int				offset_dd = 0;
@@ -121,7 +121,7 @@ void sl_tg_device::read (unsigned int ofs, unsigned char be, unsigned char *data
     bErr = false;
 }
 
-void sl_tg_device::rcv_rqst (unsigned int ofs, unsigned char be,
+void sl_tg_device::rcv_rqst (unsigned long ofs, unsigned char be,
                           unsigned char *data, bool bWrite)
 {
 

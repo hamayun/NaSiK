@@ -31,8 +31,8 @@ enum sl_timer_registers {
 };
 
 enum sl_timer_mode {
-	TIMER_RUNNING = 1,
-	TIMER_IRQ_ENABLED = 2,
+    TIMER_RUNNING = 1,
+    TIMER_IRQ_ENABLED = 2,
 };
 
 
@@ -48,12 +48,12 @@ public:
      *   Obtained from father
      *   void send_rsp (bool bErr);
      */
-    virtual void rcv_rqst (unsigned int ofs, unsigned char be,
+    virtual void rcv_rqst (unsigned long ofs, unsigned char be,
                            unsigned char *data, bool bWrite);
 
 private:
-    void write (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
-    void read  (unsigned int ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
+    void read  (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr);
 
     void sl_timer_thread ();
     void irq_update_thread ();
