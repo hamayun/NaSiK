@@ -114,6 +114,13 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             break;
 
         case HOSTTIME_COMP_END:
+            if(pht->m_comp_start_count <= pht->m_comp_end_count)
+            {
+                fprintf(stderr, "Computation Profile Wrong Usage Order: m_comp_start_count = %d, m_comp_end_count = %d\n",
+                                pht->m_comp_start_count, pht->m_comp_end_count);
+                return (2);
+            }
+
             pht->m_comp_end_count++;
             clock_gettime(pht->m_clk_id, & pht->m_comp_end_ts);
             if(pht->m_comp_end_ts.tv_nsec < pht->m_comp_start_ts.tv_nsec)
@@ -144,6 +151,13 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             break;
 
         case HOSTTIME_IO_END:
+            if(pht->m_io_start_count <= pht->m_io_end_count)
+            {
+                fprintf(stderr, "I/O Profile Wrong Usage Order: m_io_start_count = %d, m_io_end_count = %d\n",
+                                pht->m_io_start_count, pht->m_io_end_count);
+                return (3);
+            }
+
             pht->m_io_end_count++;
             clock_gettime(pht->m_clk_id, & pht->m_io_end_ts);
             if(pht->m_io_end_ts.tv_nsec < pht->m_io_start_ts.tv_nsec)

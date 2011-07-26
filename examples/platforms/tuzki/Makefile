@@ -12,10 +12,11 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/master_device      \
                $(COMPONENTS)/tg                 \
                $(COMPONENTS)/sl_tg              \
+               $(COMPONENTS)/sl_tty             \
                $(COMPONENTS)/timer              \
-               $(COMPONENTS)/tty_serial         \
                $(COMPONENTS)/sl_blockdevice     \
                $(PLATFORM)
+
 
 CC           = g++
 OPT          = -O3

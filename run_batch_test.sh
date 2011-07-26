@@ -3,8 +3,8 @@
 TIMESTAMP=$(date +%Y-%m-%d-%Hh%M)
 RESULTSDIR=$PFORM_DIR/batchtest-results-${TIMESTAMP}
 RESULTFILE=hosttime_kvm.txt
-TTYLOGFILE=logCPUs
-ALL_TTYLOGS_FILE=logCPUs_all_tests.txt
+TTYLOGFILE=tty100
+ALL_TTYLOGS_FILE=tty100_all_tests.txt
 ALL_RESULTS_FILE=hosttime_kvm_results.txt
 
 APP_LIST="susan qsort dijkstra patricia blowfish rijndael sha CRC32 bitcount cjpeg djpeg stringsearch"

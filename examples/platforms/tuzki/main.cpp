@@ -30,15 +30,15 @@
 
 #include <kvm_cpu_wrapper.h>
 #include <interconnect.h>
-#include <framebuffer_device.h>
 #include <tg_device.h>
 #include <sl_tg_device.h>
 #include <timer_device.h>
-#include <tty_serial_device.h>
 #include <sem_device.h>
+#include <sl_tty_device.h>
+#include <framebuffer_device.h>
+#include <sl_block_device.h>
 #include <mem_device.h>
 
-#include <sl_block_device.h>
 
 using namespace std;
 
@@ -112,24 +112,22 @@ int sc_main (int argc, char ** argv)
     sl_block_device   *bl2  = new sl_block_device("block2", 2, "input_data", 1);
     sl_block_device   *bl3  = new sl_block_device("block3", 3, "output_data", 1);
 
-    mem_device		*ram  = new mem_device("ram", soc_kvm_init_data.memory_size, soc_kvm_init_data.vm_mem);
-    shared_ram                = new mem_device("shared_ram", 0x10000);
-    tty_serial_device   *tty0 = new tty_serial_device ("tty0");
-    tty_serial_device   *tty1 = new tty_serial_device ("tty1");
-    sl_tg_device	*tg   = new sl_tg_device ("tg", "fdaccess.0.0");
-    fb_device         *fb   = new fb_device("framebuffer", 0, &fb_res_stat);
-    sem_device		*sem    = new sem_device("sem", 0x100000);
+    mem_device		   *ram = new mem_device("ram", soc_kvm_init_data.memory_size, soc_kvm_init_data.vm_mem);
+    mem_device  *shared_ram = new mem_device("shared_ram", 0x10000);
+    sl_tty_device     *tty0 = new sl_tty_device ("tty1", 1);
+    sl_tg_device	    *tg = new sl_tg_device ("tg", "fdaccess.0.0");
+    fb_device           *fb = new fb_device("framebuffer", 0, &fb_res_stat);
+    sem_device		   *sem = new sem_device("sem", 0x100000);
 
     slaves[nslaves++] = ram;			// 0	0x00000000 - 0x08000000
     slaves[nslaves++] = shared_ram;		// 1	0xAF000000 - 0xAFF00000
     slaves[nslaves++] = tty0;			// 2	0xC0000000 - 0xC0000040
-    slaves[nslaves++] = tty1;			// 3	0xC0100000 - 0xC0100040
-    slaves[nslaves++] = tg;				// 4	0xC3000000 - 0xC3000100
-    slaves[nslaves++] = fb->get_slave();			// 5	0xC4000000 - 0xC4000200
-    slaves[nslaves++] = sem;			// 6	0xC5000000 - 0xC5100000
-    slaves[nslaves++] = bl->get_slave();// 7	0xC6000000 - 0xC6100000
-    slaves[nslaves++] = bl2->get_slave();// 8	0xC6500000 - 0xC6600000
-    slaves[nslaves++] = bl3->get_slave();// 9	0xC6A00000 - 0xC6B00000
+    slaves[nslaves++] = tg;				// 3	0xC3000000 - 0xC3000100
+    slaves[nslaves++] = fb->get_slave();// 4	0xC4000000 - 0xC4000200
+    slaves[nslaves++] = sem;			// 5	0xC5000000 - 0xC5100000
+    slaves[nslaves++] = bl->get_slave();// 6	0xC6000000 - 0xC6100000
+    slaves[nslaves++] = bl2->get_slave();// 7	0xC6500000 - 0xC6600000
+    slaves[nslaves++] = bl3->get_slave();// 8	0xC6A00000 - 0xC6B00000
 
     timer_device	*timers[4];
     int				ntimers = sizeof (timers) / sizeof (timer_device *);
@@ -140,7 +138,7 @@ int sc_main (int argc, char ** argv)
       timers[i] = new timer_device (buf);
       slaves[nslaves++] = timers[i]; // 7 + i  from 0xC1000000
     }
-    int							no_irqs = ntimers + 6;
+    int							no_irqs = ntimers + 4;
     //int 						int_cpu_mask [] = {1, 1, 0, 0, 0, 0, 0};
 
     sc_signal<bool>             *wires_irq_qemu = new sc_signal<bool>[no_irqs];
@@ -148,8 +146,6 @@ int sc_main (int argc, char ** argv)
     for (i = 0; i < ntimers; i++)
         timers[i]->irq (wires_irq_qemu[i]);
 
-    tty0->irq_line (wires_irq_qemu[no_irqs - 6]);
-    tty1->irq_line (wires_irq_qemu[no_irqs - 5]);
     bl->irq (wires_irq_qemu[no_irqs-4]);
     bl2->irq (wires_irq_qemu[no_irqs-3]);
     bl3->irq (wires_irq_qemu[no_irqs-2]);
