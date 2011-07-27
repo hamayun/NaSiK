@@ -23,7 +23,8 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=kvmPi
 #APPLICATION=selfProf
 #APPLICATION=printFloats
-APPLICATION=blockIOTest
+#APPLICATION=blockIOTest
+APPLICATION=printIOTest
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
