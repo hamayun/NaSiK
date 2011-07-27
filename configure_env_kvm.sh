@@ -27,12 +27,12 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=cjpeg
 #APPLICATION=djpeg
 #APPLICATION=stringsearch
-#APPLICATION=kvmPi
+APPLICATION=kvmPi
 #APPLICATION=selfProf
 #APPLICATION=dynMemTest
 #APPLICATION=printFloats
 #APPLICATION=blockIOTest
-APPLICATION=printIOTest
+#APPLICATION=printIOTest
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 

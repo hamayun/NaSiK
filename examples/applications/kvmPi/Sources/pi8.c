@@ -220,78 +220,70 @@ void arctan(int multiplier, int denom, int sign)
       }
 }
 
+#define NUM_SIZES 10
 int main(void)
 {
-      INDEXER x;
-      time_t T1, T2;
+    INDEXER x;
+    time_t T1, T2;
+    int     pi_sizes[NUM_SIZES] = {1000, 2000, 5000, 10000, 20000, 30000, 40000, 50000, 75000, 100000};
+    int     index;
 
-      int argc = 2; 
-      char *argv[2] = {"PI", "50000"};
+    for (index = 0; index < NUM_SIZES; index++)
+    {
+        size = pi_sizes[index];
+        printf("PI Accuracy = %d\n", size); 
+        size = ((size + BASEDIGITS - 1) / BASEDIGITS) + 1;
 
-      if (argc != 2)
-      {
-            printf("I need to know how many digits to compute.\n");
-            exit(EXIT_FAILURE);
-      }
+        pi = malloc(sizeof(SHORT) * size);
+        powers = malloc(sizeof(SHORT) * size);
+        term = malloc(sizeof(SHORT) * size);
 
-      size = atol(argv[1]);
-      if (size <= 0L)
-      {
-            printf("Invalid argument.\n");
-            exit(EXIT_FAILURE);
-      }
-
-      printf("PI Accuracy = %d\n", size); 
-      size = ((size + BASEDIGITS - 1) / BASEDIGITS) + 1;
-
-      pi = malloc(sizeof(SHORT) * size);
-      powers = malloc(sizeof(SHORT) * size);
-      term = malloc(sizeof(SHORT) * size);
-
-      if ((pi == NULL) || (powers == NULL) || (term == NULL))
-      {
+        if ((pi == NULL) || (powers == NULL) || (term == NULL))
+        {
             printf("Unable to allocate enough memory.\n");
             exit(EXIT_FAILURE);
-      }
+        }
 
-      for (x = 0; x < size; x++)
+        for (x = 0; x < size; x++)
             pi[x] = 0;
 
-      T1 = time(NULL);
-      CPU_PROFILE_COMP_START();
+        T1 = time(NULL);
+        CPU_PROFILE_TIME_DELTA();
 
 #if defined ARC3
-      arctan(8, 3, 1);
-      arctan(4, 7, 1);
+        arctan(8, 3, 1);
+        arctan(4, 7, 1);
 #elif defined ARC5
-      arctan(16, 5, 1);
-      arctan(4, 70, -1);
-      arctan(4, 99, 1);
+        arctan(16, 5, 1);
+        arctan(4, 70, -1);
+        arctan(4, 99, 1);
 #elif defined  ARC4
-      arctan(12, 4, 1);
-      arctan(4, 20, 1);
-      arctan(4, 1985, 1);
+        arctan(12, 4, 1);
+        arctan(4, 20, 1);
+        arctan(4, 1985, 1);
 #elif defined  ARC10
-      arctan(32, 10, 1);
-      arctan(4, 239, -1);
-      arctan(16, 515, -1);
+        arctan(32, 10, 1);
+        arctan(4, 239, -1);
+        arctan(16, 515, -1);
 #else
-      /* Machin formula */
-      arctan(16, 5, 1);
-      arctan(4, 239, -1);
+        /* Machin formula */
+        arctan(16, 5, 1);
+        arctan(4, 239, -1);
 #endif
 
-      CPU_PROFILE_COMP_END();
-      T2 = time(NULL);
+        CPU_PROFILE_TIME_DELTA();
+        T2 = time(NULL);
 
-      CPU_PROFILE_IO_START();
-      Print(pi);
-      CPU_PROFILE_IO_END();
-
+        //Print(pi);
 #ifdef SHOWTIME
-      printf("\nCalculation time %0.0lf\n", difftime(T2, T1));
+        printf("\nCalculation time %0.0lf\n", difftime(T2, T1));
 #endif
 
-      CPU_PROFILE_FLUSH_DATA();
-      return EXIT_SUCCESS;
+        free(pi);       pi = NULL;
+        free(powers);   powers = NULL;
+        free(term);     term = NULL;
+    }
+
+    CPU_PROFILE_FLUSH_DATA();
+    return EXIT_SUCCESS;
 }
