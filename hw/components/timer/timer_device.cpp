@@ -52,7 +52,7 @@ timer_device::~timer_device ()
 void timer_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     unsigned long           val1 = ((unsigned long*)data)[0];
-    unsigned long           val2 = ((unsigned long*)data)[1];
+    //unsigned long           val2 = ((unsigned long*)data)[1];
 
     switch (ofs)
     {
@@ -87,8 +87,6 @@ void timer_device::write (unsigned long ofs, unsigned char be, unsigned char *da
 
 void timer_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
-    int             i;
-
     *((unsigned long *)data + 0) = 0;
     *((unsigned long *)data + 1) = 0;
 

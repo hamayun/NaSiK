@@ -111,7 +111,7 @@ sl_tty_device::~sl_tty_device ()
 
 void sl_tty_device::write (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
-    unsigned char           val, tty, be_ok = true;
+    unsigned char           tty;
     unsigned long           value;
 
     ofs >>= 2;
@@ -153,10 +153,6 @@ void sl_tty_device::write (unsigned long ofs, unsigned char be, unsigned char *d
 
 void sl_tty_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
-    int             i;
-    unsigned long               value;
-
-
     *((unsigned long *)data + 0) = 0;
     *((unsigned long *)data + 1) = 0;
 

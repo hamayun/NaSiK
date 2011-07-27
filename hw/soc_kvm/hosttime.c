@@ -69,6 +69,10 @@ int32_t init_hosttime(hosttime_t* pht, const char *filename)
     pht->m_first_ts.tv_nsec = 0;
     pht->m_last_ts.tv_sec = 0;
     pht->m_last_ts.tv_nsec = 0;
+
+    pht->m_prev_ts.tv_sec = 0;
+    pht->m_prev_ts.tv_nsec = 0;
+    pht->m_delta_count = -1;
     return 0;
 }
 
@@ -286,6 +290,43 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
                 clock_gettime(pht->m_clk_id, & curr_time);
                 pht->m_first_ts.tv_sec = curr_time.tv_sec;
                 pht->m_first_ts.tv_nsec = curr_time.tv_nsec;
+            }
+            break;
+
+        case HOSTTIME_PROFILE_TIME_DELTA:
+            {
+                struct timespec        curr_time;
+                struct timespec        curr_time_pristine;
+                struct timespec        delta_time;
+
+                clock_gettime(pht->m_clk_id, & curr_time);
+
+                // Save current time for later copy to previous time stamp.
+                curr_time_pristine.tv_sec = curr_time.tv_sec;
+                curr_time_pristine.tv_nsec = curr_time.tv_nsec;
+
+                if((curr_time.tv_nsec - pht->m_prev_ts.tv_nsec) < 0)
+                {
+                    curr_time.tv_nsec += 1e9;
+                    curr_time.tv_sec--;
+                }
+
+                delta_time.tv_sec  = curr_time.tv_sec - pht->m_prev_ts.tv_sec;
+                delta_time.tv_nsec = curr_time.tv_nsec - pht->m_prev_ts.tv_nsec;
+
+                fprintf(stderr,
+                        "Current Time                 : %ld.%09ld    Delta[%2d] : %ld.%09ld\n",
+                        curr_time_pristine.tv_sec,  curr_time_pristine.tv_nsec,
+                        pht->m_delta_count, delta_time.tv_sec, delta_time.tv_nsec);
+                fprintf(pht->m_host_file,
+                        "Current Time                 : %ld.%09ld    Delta[%2d] : %ld.%09ld\n",
+                        curr_time_pristine.tv_sec,  curr_time_pristine.tv_nsec,
+                        pht->m_delta_count, delta_time.tv_sec, delta_time.tv_nsec);
+
+                // Save for Next Delta Time
+                pht->m_prev_ts.tv_sec = curr_time_pristine.tv_sec;
+                pht->m_prev_ts.tv_nsec = curr_time_pristine.tv_nsec;
+                pht->m_delta_count++;
             }
             break;
 

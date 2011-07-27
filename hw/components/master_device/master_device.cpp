@@ -39,7 +39,7 @@ void master_device::response_thread ()
 {
     vci_response                    resp;
     unsigned char                   be, ofs;
-    int                             i, nbytes;
+    int                             nbytes;
 
     for (;;)
     {

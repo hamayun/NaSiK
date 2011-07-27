@@ -429,8 +429,6 @@ void
 sl_block_device_master::rcv_rsp(uint8_t tid, uint8_t *data,
                                 bool bErr, bool bWrite)
 {
-    int i = 0;
-
     if(tid != m_crt_tid){
         EPRINTF("Bad tid (%d / %d)\n", tid, m_crt_tid);
     }

@@ -38,7 +38,8 @@ typedef enum hosttime_port_value
     HOSTTIME_IO_START = 3,
     HOSTTIME_IO_END = 4,
     HOSTTIME_FLUSH_DATA = 5,
-    HOSTTIME_PROFILE_COST_FACTOR = 6
+    HOSTTIME_PROFILE_COST_FACTOR = 6,
+    HOSTTIME_PROFILE_TIME_DELTA = 7
 } hosttime_port_value_t;
 
 typedef struct hosttime {
@@ -63,6 +64,9 @@ typedef struct hosttime {
     uint8_t              m_estimate_cost_factor;
     struct timespec      m_first_ts;
     struct timespec      m_last_ts;
+
+    struct timespec      m_prev_ts;                   // For calculating delta time
+    int32_t              m_delta_count;
 } hosttime_t;
 
 int32_t init_hosttime(hosttime_t* pht, const char *filename);

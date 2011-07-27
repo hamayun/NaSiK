@@ -14,7 +14,8 @@ typedef enum hosttime_port_value
     HOSTTIME_IO_START = 3,
     HOSTTIME_IO_END = 4,
     HOSTTIME_FLUSH_DATA = 5,
-    HOSTTIME_PROFILE_COST_FACTOR = 6
+    HOSTTIME_PROFILE_COST_FACTOR = 6,
+    HOSTTIME_PROFILE_TIME_DELTA = 7
 } hosttime_port_value_t;
 
 #ifdef ENABLE_PROFILING
@@ -29,8 +30,21 @@ typedef enum hosttime_port_value
             :"%dx","%eax"                                                      \
         );                                                                     \
     } while (0)
+
+#define CPU_PROFILE_TIME_DELTA()                                               \
+    do{                                                                        \
+        __asm__ volatile(                                                      \
+            "   mov  $0x5000,%%dx\n\t"                                         \
+            "   mov  %1,%%eax\n\t"                                             \
+            "   out  %%eax,(%%dx)\n\t"                                         \
+            ::"r"((short int) HOSTTIME_BASEPORT),                              \
+              "r"((hosttime_port_value_t) HOSTTIME_PROFILE_TIME_DELTA)         \
+            :"%dx","%eax"                                                      \
+        );                                                                     \
+    } while (0)
 #else
 #define CPU_PROFILE_CURRENT_TIME()
+#define CPU_PROFILE_TIME_DELTA()
 #endif
 
 #ifdef ENABLE_PROFILING
@@ -102,11 +116,10 @@ typedef enum hosttime_port_value
             "   mov  %1,%%eax\n\t"                                             \
             "   out  %%eax,(%%dx)\n\t"                                         \
             ::"r"((short int) HOSTTIME_BASEPORT),                              \
-              "r"((hosttime_port_value_t)HOSTTIME_PROFILE_COST_FACTOR)         \
+              "r"((hosttime_port_value_t) HOSTTIME_PROFILE_COST_FACTOR)        \
             :"%dx","%eax"                                                      \
         );                                                                     \
     } while (0)
-
 #else
 #define CPU_PROFILE_COMP_START()
 #define CPU_PROFILE_COMP_END()
