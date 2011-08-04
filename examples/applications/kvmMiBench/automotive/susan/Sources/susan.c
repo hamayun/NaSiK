@@ -481,6 +481,7 @@ void setup_brightness_lut(bp,thresh,form)
 {
 int   k;
 float temp;
+int temp2;
 
   *bp=(unsigned char *)malloc(516);
   *bp=*bp+258;
@@ -492,7 +493,9 @@ float temp;
     if (form==6)
       temp=temp*temp*temp;
     temp=100.0*exp(-temp);
-    *(*bp+k)= (uchar)temp;
+    //*(*bp+k)= (uchar)temp;
+    temp2 = (int)temp;
+    *(*bp+k) = (uchar)temp2;
   }
 }
 

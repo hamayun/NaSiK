@@ -327,6 +327,8 @@ static int annotation_handler(void *opaque, int size, int is_write,
 
     // opaque is the virtual memory addr allocated to kvm.
     // value contains a pointer to the annotation buffer descriptor offset in the allocated virtual memory.
+    //printf("annotation_handler: Annotations are Present in S/W\n");
+
     if(*value){
         systemc_annotate_function(p_kvm_cpu_adaptor, opaque, (opaque + *value));
     }

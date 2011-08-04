@@ -161,9 +161,7 @@ extern "C"
         int nbytes, unsigned int *ns, int bIO)
     {
         uint64_t						ret;
-
         ret = _this->read (addr, nbytes, bIO);
-
         return ret;
     }
 
