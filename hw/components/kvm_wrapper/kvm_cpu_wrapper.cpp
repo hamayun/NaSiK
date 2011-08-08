@@ -190,17 +190,18 @@ extern "C"
     }
     */
 
+#ifdef USE_ANNOTATION_BUFFERS
 #ifdef USE_EXECUTION_SPY
     void
-    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *pdesc)
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
     {
-        _this->annotate((void *)vm_addr, (db_buffer_desc_t *) pdesc);
+        _this->annotate((void *)vm_addr, (db_buffer_desc_t *) ptr);
     }
 #else
     void
-    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *pdesc)
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
     {
-        db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) pdesc;
+        db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) ptr;
         annotation_db_t *pdb = NULL;
         uint32_t buffer_cycles = 0;
 
@@ -216,6 +217,14 @@ extern "C"
         wait(buffer_cycles, SC_NS);
     }
 #endif
+#else
+    void
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
+    {
+        annotation_db_t *pdb = (annotation_db_t *) ptr;
+        wait(pdb->CycleCount, SC_NS);
+    }
+#endif /* USE_ANNOTATION_BUFFERS */
 }
 
 /*

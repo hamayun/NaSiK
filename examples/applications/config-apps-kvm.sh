@@ -9,8 +9,8 @@ export APES_SPLIT_CC=""
 export APES_CC1="llvm-gcc"
 export APES_CC2="llc"
 export APES_CC1_FLAGS="-Wall -Wno-format -std=c99 -U__linux__ --emit-llvm -nostdinc $CUSTOM_INCLUDES"
-#export APES_CC2_FLAGS="-soft-float -annotate=arm"
-export APES_CC2_FLAGS="-soft-float"
+export APES_CC2_FLAGS="-soft-float -annotate=arm"
+#export APES_CC2_FLAGS="-soft-float"
 # "-march=arm --print-dual-cfg --print-annotated-cfg"
 
 # On Failure Use the default APES_COMPILER

@@ -19,6 +19,8 @@
 #ifndef ANNOTATION_MANAGER_PUBLIC_H
 #define ANNOTATION_MANAGER_PUBLIC_H
 
+#define USE_ANNOTATION_BUFFERS
+
 typedef struct {
     uint32_t          Type;
     uint32_t          InstructionCount;

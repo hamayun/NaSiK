@@ -24,6 +24,7 @@
     <id name="DnaCore" version="1.0"/>
     <id name="DnaMM_WorstFit" version="1.0"/>
     <id name="PosixThreadsLibrary" version="1.0"/>
+    <id name="AnnotationManager" version="1.0"/>
   </restrict>
 
   <provide>
@@ -70,7 +71,10 @@
       <argument name="args" type="access" direction="In"/>
     </method>
 
+    <method name="mbb_annotation" result="">
+        <argument name="pdb" type="annotation_db_t" direction="In"/>
+    </method>
+
   </require>
 
 </APES:Interface>
-

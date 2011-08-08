@@ -20,6 +20,7 @@
 #ifndef __KVM_CPU_WRAPPER_H__
 #define __KVM_CPU_WRAPPER_H__
 
+#define USE_ANNOTATION_BUFFERS
 //#define USE_EXECUTION_SPY
 
 #include <qemu_wrapper_request.h>

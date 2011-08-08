@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <Private/AnnotationManager.h>
 
+#ifdef USE_ANNOTATION_BUFFERS
 static db_buffer_desc_t buff_desc[ANNOTATION_BUFFER_COUNT] = {{0, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}},
                                                               {1, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}},
                                                               {2, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}}};  //Empty Descriptors;
@@ -94,3 +95,25 @@ void mbb_annotation(annotation_db_t *pdb)
         }
     }
 }
+
+#else
+
+void mbb_annotation(annotation_db_t *pdb)
+{
+    // Get the Return Address of Current Function;
+    // Its the address of next instruction that will be executed after mbb_annotation call.
+    if(!pdb->FuncAddr){
+        pdb->FuncAddr = (uint32_t) __builtin_return_address (0);
+    }
+
+    // We send the annotation data to H/W.
+    __asm__ volatile(
+        "   mov   $0x4000,%%dx\n\t"
+        "   mov   %0,%%eax\n\t"
+        "   out   %%eax,(%%dx)\n\t"
+        ::"r" ((annotation_db_t *) pdb):"%dx"
+    );
+}
+
+#endif /* USE_ANNOTATION_BUFFERS */
+

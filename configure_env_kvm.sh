@@ -7,9 +7,10 @@ export LIBKVM_PREFIX=/opt/libs/libkvm
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
-export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386
-#export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-libc-llvm
-#export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-annotated
+#export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386
+#export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat
+#export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat-llvm-newlib
+export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat-annotated
 export APES_ROOT=/opt/Apes
 export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh

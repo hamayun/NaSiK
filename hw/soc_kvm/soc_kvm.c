@@ -333,7 +333,7 @@ static int annotation_handler(void *opaque, int size, int is_write,
         systemc_annotate_function(p_kvm_cpu_adaptor, opaque, (opaque + *value));
     }
     else{
-        printf("%s: Overflow in S/W: *value = 0x%08x\n", __func__, (uint32_t)(*value));
+        printf("%s: Overflow in S/W (All Annotation Buffers Full): *value = 0x%08x\n", __func__, (uint32_t)(*value));
         exit(1);
     }
     return 0;

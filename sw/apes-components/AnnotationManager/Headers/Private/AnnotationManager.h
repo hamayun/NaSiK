@@ -21,8 +21,10 @@
 
 #include <Public/AnnotationManager.h>
 
+#ifdef USE_ANNOTATION_BUFFERS
+
 #define ANNOTATION_BUFFER_COUNT 3
-#define ANNOTATION_BUFFER_SIZE  2048
+#define ANNOTATION_BUFFER_SIZE  1024+1
 
 typedef struct {
     uint32_t            BufferID;
@@ -33,5 +35,5 @@ typedef struct {
 } db_buffer_desc_t;
 
 int  buffer_add_db(db_buffer_desc_t *pbuff_desc, annotation_db_t *pdb);
-
+#endif /* USE_ANNOTATION_BUFFERS */
 #endif
