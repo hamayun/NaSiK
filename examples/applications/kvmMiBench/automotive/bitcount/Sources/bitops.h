@@ -18,9 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>                             /* For size_t           */
-#include <limits.h>                             /* For CHAR_BIT         */
 #include "sniptype.h"                           /* For TOBOOL()         */
-#include "extkword.h"                           /* For CDECL            */
 
 /*
 **  Macros to manipulate bits in any integral data type.
@@ -36,6 +34,7 @@
 **  These macros assume CHAR_BIT is one of either 8, 16, or 32.
 */
 
+#define CHAR_BIT 8
 #define MASK  CHAR_BIT-1
 #define SHIFT ((CHAR_BIT==8)?3:(CHAR_BIT==16)?4:8)
 
@@ -86,27 +85,27 @@ unsigned int bstr_i(char *cptr);
 **  BITCNT_1.C
 */
 
-int CDECL bit_count(long x);
+int bit_count(long x);
 
 /*
 **  BITCNT_2.C
 */
 
-int CDECL bitcount(long i);
+int bitcount(long i);
 
 /*
 **  BITCNT_3.C
 */
 
-int CDECL ntbl_bitcount(long int x);
-int CDECL BW_btbl_bitcount(long int x);
-int CDECL AR_btbl_bitcount(long int x);
+int ntbl_bitcount(long int x);
+int BW_btbl_bitcount(long int x);
+int AR_btbl_bitcount(long int x);
 
 /*
 **  BITCNT_4.C
 */
 
-int CDECL ntbl_bitcnt(long x);
-int CDECL btbl_bitcnt(long x);
+int ntbl_bitcnt(long x);
+int btbl_bitcnt(long x);
 
 #endif /*  BITOPS__H */

@@ -6,8 +6,6 @@
 **  public domain by Auke Reitsma and Bruce Wedding
 */
 
-#include "bitops.h"   /* from Snippets */
-
 /*
 **  Bits table
 */
@@ -39,7 +37,7 @@ static char bits[256] =
 **        omitted.
 */
 
-int CDECL ntbl_bitcount(long int x)
+int ntbl_bitcount(long int x)
 {
       return
             bits[ (int) (x & 0x0000000FUL)       ] +
@@ -58,7 +56,7 @@ int CDECL ntbl_bitcount(long int x)
 **  by Bruce Wedding, works best on Watcom & Borland
 */
 
-int CDECL BW_btbl_bitcount(long int x)
+int BW_btbl_bitcount(long int x)
 {
       union 
       { 
@@ -78,7 +76,7 @@ int CDECL BW_btbl_bitcount(long int x)
 **  by Auke Reitsma, works best on Microsoft, Symantec, and others
 */
 
-int CDECL AR_btbl_bitcount(long int x)
+int AR_btbl_bitcount(long int x)
 {
       unsigned char * Ptr = (unsigned char *) &x ;
       int Accu ;

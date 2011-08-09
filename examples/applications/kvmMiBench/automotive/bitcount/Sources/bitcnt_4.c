@@ -6,8 +6,6 @@
 **  public domain by Bob Stout
 */
 
-#include "bitops.h"   /* from Snippets */
-
 static char bits[256] =
 {
       0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,  /* 0   - 15  */
@@ -35,7 +33,7 @@ static char bits[256] =
 **        omitted.
 */
 
-int CDECL ntbl_bitcnt(long x)
+int ntbl_bitcnt(long x)
 {
       int cnt = bits[(int)(x & 0x0000000FL)];
 
@@ -49,7 +47,7 @@ int CDECL ntbl_bitcnt(long x)
 **  Count bits in each byte
 */
 
-int CDECL btbl_bitcnt(long x)
+int btbl_bitcnt(long x)
 {
       int cnt = bits[ ((char *)&x)[0] & 0xFF ];
 

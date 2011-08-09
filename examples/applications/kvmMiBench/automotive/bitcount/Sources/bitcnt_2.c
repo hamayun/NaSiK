@@ -4,9 +4,7 @@
 **  Bit counter by Ratko Tomic
 */
 
-#include "bitops.h"
-
-int CDECL bitcount(long i)
+int bitcount(long i)
 {
       i = ((i & 0xAAAAAAAAL) >>  1) + (i & 0x55555555L);
       i = ((i & 0xCCCCCCCCL) >>  2) + (i & 0x33333333L);

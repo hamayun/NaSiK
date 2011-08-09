@@ -10,7 +10,7 @@
 **
 **  10/21/93 rdg  Fixed bug found by Jeff Dunlop
 */
-#include <limits.h>                                         /* rdg 10/93 */
+#include "limits.h"                                         /* rdg 10/93 */
 #include <stddef.h>
 #include <string.h>
 typedef unsigned char uchar;

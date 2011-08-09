@@ -14,7 +14,7 @@
 
 #include <stddef.h>
 #include <string.h>
-#include <limits.h>
+#include "limits.h"
 #include <Processor/Profile.h>
 
 #define ENABLE_OUTPUT

@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "conio.h"
-#include <limits.h>
 #include <time.h>
 #include <float.h>
 #include "bitops.h"
@@ -19,7 +18,7 @@
 #define FUNCS  7
 #define IO_ON
 
-static int CDECL bit_shifter(long int x);
+static int bit_shifter(long int x);
 
 int main(int argc, char *argv[])
 {
@@ -33,7 +32,7 @@ int main(int argc, char *argv[])
   int cmaxix = 0;
   long j, n, seed;
   int iterations;
-  static int (* CDECL pBitCntFunc[FUNCS])(long) = {
+  static int (* pBitCntFunc[FUNCS])(long) = {
     bit_count,
     bitcount,
     ntbl_bitcnt,
@@ -104,7 +103,7 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-static int CDECL bit_shifter(long int x)
+static int bit_shifter(long int x)
 {
   int i, n;
 
