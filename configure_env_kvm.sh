@@ -17,9 +17,9 @@ source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
 #APPLICATION=kvmParallelMjpeg
-APPLICATION=susan
-#APPLICATION=qsort
-#APPLICATION=dijkstra
+#APPLICATION=susan
+APPLICATION=qsort
+APPLICATION=dijkstra
 #APPLICATION=patricia
 #APPLICATION=blowfish
 #APPLICATION=rijndael

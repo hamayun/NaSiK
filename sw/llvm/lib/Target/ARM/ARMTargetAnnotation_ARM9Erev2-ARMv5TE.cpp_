@@ -67,13 +67,12 @@ enum ARM_InstrClasses {
     ARM_LDM_PC,
     ARM_MCR,
     ARM_MCRR,
-    ARM_MLA,
     ARM_MRC_NPC,
     ARM_MRC_PC,
     ARM_MRRC,
     ARM_MRS,
     ARM_MSR,
-    ARM_MUL,
+    ARM_MUL_MLA,
     ARM_MULS_MLAS,
     ARM_XMULL_XMLAL,
     ARM_XMULLS_XMLALS,
@@ -166,7 +165,7 @@ void initInstrClassAssignment()
             case UXTABrr_rot:           case UXTAHrr:               case UXTAHrr_rot:           case UXTB16r:
             case UXTB16r_rot:           case UXTBr:                 case UXTBr_rot:             case UXTHr:
             case UXTHr_rot:           
-                // We do *NOT* support these instructions for Performance Estimation as we Annotate for ARM7TDMI (ARMv4T)
+                // We do *NOT* support these instructions for Performance Estimation as we Annotate for ARM9Erev2 (ARMv5TE)
                 // Most of the above instructions are either for ARMv6 or SIMD instructions for Cortex Series Processors.
                 // Refer to the following files.
                 // AETC2010-21_ARM_Cortex-M4_IanJohnson.pdf, QRC0001_UAL.pdf, ARM9E-S Core Technical Reference Manual
@@ -264,12 +263,8 @@ void initInstrClassAssignment()
                 ARM_AssignedInstrClass[instrIndex] = ARM_MCRR;
                 break;
 
-            case MLA:
-                ARM_AssignedInstrClass[instrIndex] = ARM_MLA;
-                break;
-
-            case MUL:
-                ARM_AssignedInstrClass[instrIndex] = ARM_MUL;
+            case MLA:                   case MUL:
+                ARM_AssignedInstrClass[instrIndex] = ARM_MUL_MLA;
                 break;
 
             case MOVi2pieces:
@@ -388,18 +383,37 @@ void initInstrClassCycles()
     ARM_Cycles [ARM_GENERIC]        = 1;
     ARM_Cycles [ARM_ALU]            = 1;    // +2 if Rd is pc
     ARM_Cycles [ARM_ALU_RSL]        = 2;    // 2 because ALU = 1 and Register Shift/Logical Operation = 1. +2 more if Rd is pc
-    ARM_Cycles [ARM_BRANCH]         = 3;    // +2 as Branch Penalty; If the Branch is Taken; At Inter MBB Level
+    ARM_Cycles [ARM_BRANCH]         = 1;    // +2 as Branch Penalty; If the Branch is Taken; At Inter MBB Level
     ARM_Cycles [ARM_BRANCH_LINK]    = 3;    // Branch Link Instrcutions are Always Considered as Taken, so 3 Cycles
-    ARM_Cycles [ARM_LDRB]           = 3;    // +2 if Rd is pc
-    ARM_Cycles [ARM_LDR_NPC]        = 3;    // +2 if Rd is pc
-    ARM_Cycles [ARM_LDR_PC]         = 5;
-    ARM_Cycles [ARM_LDM_NPC]        = 2;    // +N Later on, +2 if pc is in the register list.
+    ARM_Cycles [ARM_CDP]            = 1 +   ARM_Cycles [ARM_BRANCH];     // 1 + B
+    ARM_Cycles [ARM_LDC]            =       ARM_Cycles [ARM_BRANCH];     // +N Later on
+    ARM_Cycles [ARM_LDRB]           = 1;    // Rd is not available for two cycles. +1 if the load offset is shifted.
+    ARM_Cycles [ARM_LDR_NPC]        = 1;    // Rd is not available for two cycles. +1 if the load offset is shifted.
+    ARM_Cycles [ARM_LDR_PC]         = 5;    // +1 if the load offset is shifted.
+    ARM_Cycles [ARM_LDRD]           = 2;    // R(d+1) is not available for one cycle.
+    ARM_Cycles [ARM_LDM_NPC]        = 0;    // +N Later on, +1 if N = 1 or the last loaded register used in the next cycle
     ARM_Cycles [ARM_LDM_PC]         = 4;    // +N Later on
-    ARM_Cycles [ARM_MLA]            = 6;    // 2 + M where M is assumed to be worst case of early termination; so M = 4
-    ARM_Cycles [ARM_MUL]            = 5;    // 1 + M where M is assumed to be worst case of early termination; so M = 4
-    ARM_Cycles [ARM_STR_BH]         = 2;
+    ARM_Cycles [ARM_MCR]            = 1 +   ARM_Cycles [ARM_BRANCH];
+    ARM_Cycles [ARM_MCRR]           = 2 +   ARM_Cycles [ARM_BRANCH];
+    ARM_Cycles [ARM_MRC_NPC]        = 1 +   ARM_Cycles [ARM_BRANCH];     // Rd is not available for one cycle.
+    ARM_Cycles [ARM_MRC_PC]         = 4 +   ARM_Cycles [ARM_BRANCH];
+    ARM_Cycles [ARM_MRRC]           = 2 +   ARM_Cycles [ARM_BRANCH];     // Rn is not available for one cycle.
+    ARM_Cycles [ARM_MRS]            = 2;
+    ARM_Cycles [ARM_MSR]            = 1;    // +2 if any of the csx fields are updated.
+    ARM_Cycles [ARM_MUL_MLA]        = 2;    // Rd is not available for one cycle, except as an accumulator input for a multiply accumulate.
+    ARM_Cycles [ARM_MULS_MLAS]      = 4;
+    ARM_Cycles [ARM_XMULL_XMLAL]    = 3;    // RdHi is not available for one cycle, except as an accumulator input for a multiply accumulate.
+    ARM_Cycles [ARM_XMULLS_XMLALS]  = 5;
+    ARM_Cycles [ARM_PLD]            = 1;
+    ARM_Cycles [ARM_QX_ADDSUB]      = 1;    // Rd is not available for one cycle.
+    ARM_Cycles [ARM_SMUL_SMLA_XY]   = 1;    // Rd is not available for one cycle except as an accumulator input for a multiply accumulate.
+    ARM_Cycles [ARM_SMLAL_XY]       = 1;    // RdHi is not available for one cycle except as an accumulator input for a multiply accumulate.
+    ARM_Cycles [ARM_STC]            =       ARM_Cycles [ARM_BRANCH];      // +N Later on
+    ARM_Cycles [ARM_STR_BH]         = 1;    // +1 if a shifted offset is used.
     ARM_Cycles [ARM_STRD]           = 2;
-    ARM_Cycles [ARM_STM]            = 1;    // +N Later on
+    ARM_Cycles [ARM_STM]            = 0;    // +N Later on, +1 if N = 1.
+    ARM_Cycles [ARM_SWI]            = 3;
+    ARM_Cycles [ARM_SWP_B]          = 2;    // Rd is not available for one cycle.
     ARM_Cycles [ARM_MOV2PIECES]     = 2;
     ARM_Cycles [ARM_THUMB]          = 0;
     ARM_Cycles [ARM_INVALID]        = 0;
@@ -534,7 +548,6 @@ unsigned int calculateExtraCycles(const MachineInstr &MachInstr, ARM_InstrClasse
 
         case ARM_CDP:
         case ARM_LDC:              // +N Later on
-        case ARM_LDRD:
         case ARM_MCR:
         case ARM_MCRR:
         case ARM_MRC_NPC:          // Rd is not available for one cycle.
@@ -542,64 +555,52 @@ unsigned int calculateExtraCycles(const MachineInstr &MachInstr, ARM_InstrClasse
         case ARM_MRRC:
         case ARM_MRS:
         case ARM_MSR:              // +2 if any of the csx fields are updated
-        case ARM_MULS_MLAS:
-        case ARM_PLD:
-        case ARM_QX_ADDSUB:
-        case ARM_SMUL_SMLA_XY:
-        case ARM_SMLAL_XY:
         case ARM_STC:              // +N Later on
         case ARM_SWI:
         case ARM_SWP_B:            // Rd is not available for one cycle.
-        case ARM_XMULL_XMLAL:
-        case ARM_XMULLS_XMLALS:
-            //DERR(PRINT_WARNINGS) << "ARM7 Un-used Instruction Classes: " << MachInstr.getDesc().Name << std::endl;
-            std::cerr << "ARM7 Un-used Instruction Classes: " << MachInstr.getDesc().Name << std::endl;
+            DERR(PRINT_WARNINGS) << "ARM 9 Un-used Instruction Classes: " << MachInstr.getDesc().Name << std::endl;
         break;
 
-        case ARM_LDRB:             // +2 if Rd is pc.
-            if(ARMRegisterInfo::getRegisterNumbering(MachInstr.getOperand(0).getReg()) == 15)
+        case ARM_LDRB:             // Rd is not available for two cycles. +1 if the load offset is shifted.
+            if(getInstrAddressingMode(MachInstr) == 2)
             {
-                extraCycles = 2;
+                 if(isShiftedOffset(MachInstr))
+                {
+                    extraCycles++;
+                }
             }
         break;
 
-        case ARM_LDR_NPC:          // +2 if Rd is pc
+        case ARM_LDRD:
+        case ARM_STRD:
+        break;
+            
+        case ARM_LDR_NPC:          // Rd is not available for two cycles. +1 if the load offset is shifted.
             if(ARMRegisterInfo::getRegisterNumbering(MachInstr.getOperand(0).getReg()) == 15)
             {
-                instructionClass = ARM_LDR_PC;
-                extraCycles = 2;
+                instructionClass = ARM_LDR_PC;     // +1 if the load offset is shifted.
+                extraCycles = 4;
+            }
+
+            if(getInstrAddressingMode(MachInstr) == 2)
+            {
+                if(isShiftedOffset(MachInstr))
+                {
+                    extraCycles++;
+                }
             }
         break;
 
         case ARM_LDR_PC:           // This is empty because this class has not been assigned to any Instructions.
         break; 
             
-        case ARM_LDM_NPC:          // +N Later on, +2 if pc is in the register list.
+        case ARM_LDM_NPC:          // +N Later on, +1 if N = 1 or the last loaded register used in the next cycle
         {
-            unsigned int index;
-            extraCycles = getRegOperandsCount(MachInstr);
+            int  N = getRegOperandsCount(MachInstr);
+            if(N == 1) 
+                N++;
 
-            //MachInstr.dump();
-            //std::cerr << "Total Operands: " << MachInstr.getNumOperands() << std::endl;
-
-            for(index = 0; index < MachInstr.getNumOperands(); index++)
-            {
-                if(MachInstr.getOperand(index).isReg())
-                {
-                    unsigned reg = MachInstr.getOperand(index).getReg();
-                    //std::cerr << "Operand # " << index << " is Register # " << reg << std::endl;
-
-                    if (reg == 0)   // We Ignore LLVM %reg0 here.
-                        continue;
-
-                    if(ARMRegisterInfo::getRegisterNumbering(MachInstr.getOperand(index).getReg()) == 15)
-                    {
-                        instructionClass = ARM_LDM_PC;
-                        extraCycles += 2;
-                        break;
-                    }
-                }
-            }
+            extraCycles = N;
         }
         break;
             
@@ -610,16 +611,43 @@ unsigned int calculateExtraCycles(const MachineInstr &MachInstr, ARM_InstrClasse
         }
         break;
 
-        case ARM_MLA:
-        case ARM_MUL:
+        case ARM_MUL_MLA:          // Rd is not available for one cycle, except as an accumulator input for a multiply accumulate.
+                                    // No Early Termination, but Check for Rd Availability. 
         break;
 
-        case ARM_STR_BH:
+        case ARM_MULS_MLAS:
         break;
 
-        case ARM_STM:              // +N Later on
+        case ARM_PLD:
+        break;
+
+        case ARM_QX_ADDSUB:
+        break;
+
+        case ARM_SMUL_SMLA_XY:
+        case ARM_SMLAL_XY:
+        break;
+            
+        case ARM_XMULL_XMLAL:
+        case ARM_XMULLS_XMLALS:
+        break;
+            
+        case ARM_STR_BH:           // +1 if a shifted offset is used.
+            if(getInstrAddressingMode(MachInstr) == 2)
+            {
+                 if(isShiftedOffset(MachInstr))
+                {
+                    extraCycles++;
+                }
+            }
+        break;
+
+        case ARM_STM:              // +N Later on, +1 if N = 1.
         {
             int  N = getRegOperandsCount(MachInstr);
+            if(N == 1)
+                N++;
+
             extraCycles = N;
         }
         break;
@@ -774,7 +802,7 @@ const TargetAnnotationDB * ARMTargetMachine::MachineBasicBlockAnnotation(Machine
     cout <<"==============================================================" << std::endl << std::endl;
 #endif
 
-    if(mbbInstructionCycleCount > 0 )
+    if( mbbInstructionCycleCount > 0 )
     {
         annotationDB = new TargetAnnotationDB();
         assert( annotationDB && "NULL pointer!\n" );
@@ -788,6 +816,14 @@ const TargetAnnotationDB * ARMTargetMachine::MachineBasicBlockAnnotation(Machine
         annotationDB->setCycleCount(mbbTotalCycles);
         annotationDB->setLoadCount(mbbLoadCount);
         annotationDB->setStoreCount(mbbStoreCount);        
+
+        /*
+        annotationDB->setInstructionCount(0x1C1C1C1C);
+        annotationDB->setCycleCount(0xCCCCCCCC);
+        annotationDB->setLoadCount(0xDDDDDDDD);
+        annotationDB->setStoreCount(0xEEEEEEEE);
+        annotationDB->setFuncAddr(0xFADDFADD);
+        */
     }
 
     return(annotationDB);
@@ -840,6 +876,28 @@ unsigned int estimateDependencyCycles(const MachineInstr &PrevInstr, const Machi
         }
         break;
 
+        case ARM_LDRD:     // R(d+1) is not available for one cycle.
+        {
+            int prevInstrRd = PrevInstr.getOperand(1).getReg();  // Check this line
+            int currInstrOperandCount = CurrInstr.getNumOperands();
+
+            cout << "LDRD Instruction Found: Verify Dependency Analysis Code " << endl;
+            
+            for(int i = 0; i < currInstrOperandCount; i++)
+            {
+                if(CurrInstr.getOperand(i).isReg())
+                {
+                    int currInstrReg = CurrInstr.getOperand(i).getReg();
+                    if(currInstrReg == prevInstrRd)
+                    {
+                        instrDependencyCycles = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        break;
+            
         case ARM_LDM_NPC:  // +N Later on, +1 if N = 1 or the last loaded register used in the next cycle
         {
             int prevInstrOperandCount = PrevInstr.getNumOperands();
@@ -861,8 +919,8 @@ unsigned int estimateDependencyCycles(const MachineInstr &PrevInstr, const Machi
         }
         break;
 
-        case ARM_MLA: // Rd is not available for one cycle, except as an accumulator input for a multiply accumulate.
-        case ARM_MUL: // Rd is not available for one cycle, except as an accumulator input for a multiply accumulate.
+        case ARM_MUL_MLA: // Rd is not available for one cycle, except as an accumulator input for a multiply accumulate.
+        case ARM_SMUL_SMLA_XY: // Rd is not available for one cycle except as an accumulator input for a multiply accumulate.
         {
             int prevInstrRd = PrevInstr.getOperand(0).getReg();
             int currInstrOperandCount = CurrInstr.getNumOperands();
@@ -882,6 +940,35 @@ unsigned int estimateDependencyCycles(const MachineInstr &PrevInstr, const Machi
             }
         }
         break;
+
+        case ARM_SMLAL_XY:  // RdHi is not available for one cycle except as an accumulator input for a multiply accumulate.
+        {
+            int prevInstrRd = PrevInstr.getOperand(1).getReg();
+            int currInstrOperandCount = CurrInstr.getNumOperands();
+
+            // TODO: Handle the except as an accumulator input for multiply accumulate case. 
+            for(int i = 0; i < currInstrOperandCount; i++)
+            {
+                if(CurrInstr.getOperand(i).isReg())
+                {
+                    int currInstrReg = CurrInstr.getOperand(i).getReg();
+                    if(currInstrReg == prevInstrRd)
+                    {
+                        instrDependencyCycles = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        break;
+
+            
+        case ARM_MRC_NPC: // Rd is not available for one cycle.
+        case ARM_MRRC:   // Rn is not available for one cycle.
+        case ARM_XMULL_XMLAL: // RdHi is not available for one cycle, except as an accumulator input for a multiply accumulate.
+        case ARM_QX_ADDSUB: // Rd is not available for one cycle.
+        case ARM_SWP_B: // Rd is not available for one cycle.
+            break;
 
         default:
             break;
@@ -912,6 +999,11 @@ unsigned int getDataLoadCount(MachineBasicBlock &MBB)
             case ARM_LDR_PC:
             currInstrLoadCount++;  
             mbbLoadCount += currInstrLoadCount;
+            break;
+
+            case ARM_LDRD:
+            currInstrLoadCount+=2;  
+            mbbLoadCount += currInstrLoadCount;                
             break;
 
             // The following load multiple data memory locations    
