@@ -22,6 +22,7 @@
 
 #define USE_ANNOTATION_BUFFERS
 //#define USE_EXECUTION_SPY
+#define ENABLE_CPU_STATS
 
 #include <qemu_wrapper_request.h>
 #include <execution_spy.h>
@@ -29,6 +30,11 @@
 
 using namespace noc;
 class cpu_logs;
+
+#define KVM_ADDR_BASE                               0xE0000000
+#define KVM_ADDR_END                                0xEFFFFFFF
+#define LOG_KVM_STATS                               0x0050
+#define LOG_KVM_STATS_DELTA                         0x0058
 
 class kvm_cpu_wrapper : public master_device, public ExecutionSpy
 {
@@ -48,10 +54,18 @@ public:
     uint64_t read (uint64_t address, int nbytes, int bIO);
     void write (uint64_t address, unsigned char *data,
                 int nbytes, int bIO);
-
+    void update_cpu_stats(annotation_db_t *pdb);
+    void log_cpu_stats();
+    void log_cpu_stats_delta(unsigned char *data);
 private:
     qemu_wrapper_requests          *m_rqs;
     bool                            m_unblocking_write;
+
+    // Statistics extracted from Annotations
+    uint64_t                        m_cpu_instrs_count;
+    uint64_t                        m_cpu_cycles_count;
+    uint64_t                        m_cpu_loads_count;
+    uint64_t                        m_cpu_stores_count;
 };
 
 typedef kvm_cpu_wrapper kvm_cpu_wrapper_t;

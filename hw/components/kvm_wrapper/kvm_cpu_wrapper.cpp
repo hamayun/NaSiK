@@ -1,5 +1,6 @@
 #include <kvm_cpu_wrapper.h>
 #include <streambuf>
+#include <iomanip>
 
 #define DEBUG_KVM_WRAPPER false
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
@@ -19,6 +20,11 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, char *elf_file, uintptr_t
     m_unblocking_write = 0;
     m_node_id = node_id;
 
+    m_cpu_instrs_count = 0;
+    m_cpu_cycles_count = 0;
+    m_cpu_loads_count  = 0;
+    m_cpu_stores_count = 0;
+
     SC_THREAD (cpuThread);
 }
 
@@ -37,6 +43,7 @@ void kvm_cpu_wrapper::cpuThread ()
 }
 
 // Here we get the Annotation Trace (A buffer containing pointers to Annotation DBs)
+// This function is used when Analyzer is Enabled.
 void kvm_cpu_wrapper::compute(annotation_t *trace, uint32_t count)
 {
     uint32_t  index;
@@ -56,6 +63,44 @@ void kvm_cpu_wrapper::compute(annotation_t *trace, uint32_t count)
 
     DOUT_NAME << __func__ << " wait " << std::dec << cycles << " cycles" << std::endl;
     wait(cycles, SC_NS);
+}
+
+void kvm_cpu_wrapper::update_cpu_stats(annotation_db_t *pdb)
+{
+    m_cpu_instrs_count += pdb->InstructionCount;
+    m_cpu_cycles_count += pdb->CycleCount;
+    m_cpu_loads_count  += pdb->LoadCount;
+    m_cpu_stores_count += pdb->StoreCount;
+}
+
+void kvm_cpu_wrapper::log_cpu_stats()
+{
+    std::cout << "KVM STATS: cpu_instrs_count = " << m_cpu_instrs_count
+              << " cpu_cycles_count = " << m_cpu_cycles_count
+              << " cpu_loads_count = " << m_cpu_loads_count
+              << " cpu_stores_count = " << m_cpu_stores_count << std::endl;
+}
+
+void kvm_cpu_wrapper::log_cpu_stats_delta(unsigned char *data)
+{
+    static uint64_t cpu_instrs_count_prev = 0, cpu_cycles_count_prev = 0, cpu_loads_count_prev = 0, cpu_stores_count_prev = 0;
+    uint32_t value = (uint32_t) *data;
+
+    std::cout << "KVM STATS Delta[" << value << "]:"
+              << " cpu_instrs_count = " << std::setw(12) << (m_cpu_instrs_count - cpu_instrs_count_prev)
+              << " cpu_cycles_count = " << std::setw(10) << (m_cpu_cycles_count - cpu_cycles_count_prev)
+              << " cpu_loads_count = "  << std::setw(10) << (m_cpu_loads_count  - cpu_loads_count_prev )
+              << " cpu_stores_count = " << std::setw(10) << (m_cpu_stores_count - cpu_stores_count_prev) << std::endl;
+
+    cpu_instrs_count_prev = m_cpu_instrs_count;
+    cpu_cycles_count_prev = m_cpu_cycles_count;
+    cpu_loads_count_prev  = m_cpu_loads_count;
+    cpu_stores_count_prev = m_cpu_stores_count;
+
+    if(value == 0){
+        std::cout << "Exiting on Application Request ..." << std::endl;
+        exit(0);
+    }
 }
 
 void kvm_cpu_wrapper::rcv_rsp(unsigned char tid, unsigned char *data,
@@ -128,6 +173,23 @@ void kvm_cpu_wrapper::write (uint64_t addr,
 {
     unsigned char                   tid;
     qemu_wrapper_request            *localrq;
+
+    /* See if this request is for KVM Wrapper? */
+    if(addr >= KVM_ADDR_BASE && addr <= KVM_ADDR_END)
+    {
+        addr = addr - KVM_ADDR_BASE;
+        switch(addr)
+        {
+            case LOG_KVM_STATS:
+                log_cpu_stats();
+                break;
+
+            case LOG_KVM_STATS_DELTA:
+                log_cpu_stats_delta(data);
+                break;
+        }
+        return;
+    }
 
     if (m_unblocking_write)
         localrq = m_rqs->GetNewRequest (bIO);
@@ -210,7 +272,9 @@ extern "C"
             // Get pointer to the annotation db;
             pdb = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb);
             buffer_cycles += pdb->CycleCount;
-
+#ifdef ENABLE_CPU_STATS
+            _this->update_cpu_stats(pdb);
+#endif
             pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
         }
 
@@ -223,6 +287,9 @@ extern "C"
     {
         annotation_db_t *pdb = (annotation_db_t *) ptr;
         wait(pdb->CycleCount, SC_NS);
+#ifdef ENABLE_CPU_STATS
+        update_cpu_stats(pdb);
+#endif
     }
 #endif /* USE_ANNOTATION_BUFFERS */
 }

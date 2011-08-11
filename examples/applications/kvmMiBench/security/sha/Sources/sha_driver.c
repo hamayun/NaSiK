@@ -7,20 +7,26 @@
 #include "sha.h"
 #include <Processor/Profile.h>
 
-#ifdef  MEASURE_QEMU_ACCURACY
-    /* Copied the following definitions from qemu_wrapper_cts.h */
+#ifdef  MEASURE_ACCURACY
+    /* Copied the following definitions from qemu_wrapper_cts.h & kvm_cpu_wrapper.h */
     #define QEMU_ADDR_BASE                              0x82000000
+    #define KVM_ADDR_BASE                               0xE0000000
     #define LOG_DELTA_STATS                             0x0058
+#ifdef PLATFORM_QEMU
+    #define ADDR_BASE                                   QEMU_ADDR_BASE
+#else
+    #define ADDR_BASE                                   KVM_ADDR_BASE
+#endif
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
-#ifdef MEASURE_QEMU_ACCURACY
-    volatile int *QEMU_LOG_ADDR = QEMU_ADDR_BASE + LOG_DELTA_STATS;
-    *QEMU_LOG_ADDR = 1;
+#ifdef MEASURE_ACCURACY
+    volatile int *LOG_ADDR = ADDR_BASE + LOG_DELTA_STATS;
+    *LOG_ADDR = 1;
     real_main(argc, argv, 0);
-    *QEMU_LOG_ADDR = 0;     /* Writing Zero to this Address will cause QEMU to exit */
-#elif DISABLE_APP_REPEAT
+    *LOG_ADDR = 0;     /* Writing Zero to this Address will cause QEMU/KVM to exit */
+#elif DISABLE_APP_REPEAT /* This option is useful in case we want to execute once or We want to use Analyzer */
     real_main(argc, argv, 0);
 #else
     int app_repeat_count;

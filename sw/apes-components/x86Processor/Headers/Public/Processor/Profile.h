@@ -2,8 +2,7 @@
 #ifndef PROCESSOR_PROFILE_H
 #define PROCESSOR_PROFILE_H
 
-#define ENABLE_PROFILING
-#define ENABLE_FULL_PROFILING
+//#define ENABLE_PROFILING
 extern short HOSTTIME_BASEPORT;
 
 typedef enum hosttime_port_value
@@ -42,13 +41,7 @@ typedef enum hosttime_port_value
             :"%dx","%eax"                                                      \
         );                                                                     \
     } while (0)
-#else
-#define CPU_PROFILE_CURRENT_TIME()
-#define CPU_PROFILE_TIME_DELTA()
-#endif
 
-#ifdef ENABLE_PROFILING
-#ifdef ENABLE_FULL_PROFILING
 #define CPU_PROFILE_COMP_START()                                               \
     do{                                                                        \
         __asm__ volatile(                                                      \
@@ -120,14 +113,16 @@ typedef enum hosttime_port_value
             :"%dx","%eax"                                                      \
         );                                                                     \
     } while (0)
+
 #else
+#define CPU_PROFILE_CURRENT_TIME()
+#define CPU_PROFILE_TIME_DELTA()
 #define CPU_PROFILE_COMP_START()
 #define CPU_PROFILE_COMP_END()
 #define CPU_PROFILE_IO_START()
 #define CPU_PROFILE_IO_END()
 #define CPU_PROFILE_FLUSH_DATA()
 #define CPU_PROFILE_COST_FACTOR()
-#endif /* ENABLE_FULL_PROFILING */
 #endif /* ENABLE_PROFILING */
 
 #endif	/* PROCESSOR_PROFILE_H */

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export APES_COMPILER="arm-sls-dnaos-gcc"
-export APES_CC_FLAGS="-Wall -Wno-format -std=c99 -DMEASURE_QEMU_ACCURACY"
+export APES_CC_FLAGS="-Wall -Wno-format -std=c99 -DMEASURE_ACCURACY -DPLATFORM_QEMU"
 
 export APES_ASSEMBLER="arm-sls-dnaos-as"
 
