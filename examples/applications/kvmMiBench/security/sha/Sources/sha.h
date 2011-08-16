@@ -19,6 +19,7 @@ typedef struct {
 } SHA_INFO;
 
 void sha_init(SHA_INFO *);
+void sha_transform(SHA_INFO *);
 void sha_update(SHA_INFO *, BYTE *, int);
 void sha_final(SHA_INFO *);
 

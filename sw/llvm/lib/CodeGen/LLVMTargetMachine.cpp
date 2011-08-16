@@ -521,8 +521,8 @@ bool LLVMTargetMachine::addCommonCodeGenPasses(PassManagerBase &PM,
 }
 
 int LLVMTargetMachine::compileModuleForTarget(Module *mod,
-                                               CodeGenOpt::Level OptLevel,
-                                               bool DisableVerify)
+                                              CodeGenOpt::Level OptLevel,
+                                              bool DisableVerify)
 {
     std::string Err;
     CompileModuleForTargetFlag = true;
@@ -549,7 +549,15 @@ int LLVMTargetMachine::compileModuleForTarget(Module *mod,
     // module/host triple.
     Triple::ArchType Type = Triple::getArchTypeForLLVMName(AnnotationArch);
     if (Type != Triple::UnknownArch)
+    {
         TheTriple.setArch(Type);
+    }
+    else
+    {
+        errs() << __func__ << ": error getting arch type for annotation arch: "
+             << AnnotationArch << "\n";
+            return 1;
+    }
 
     // Package up features to be passed to target/subtarget
     std::string FeaturesStr;
@@ -562,15 +570,22 @@ int LLVMTargetMachine::compileModuleForTarget(Module *mod,
 
     // Add the target data from the target machine, if it exists, or the module.
     if (const TargetData *TD = Target.getTargetData())
+    {
         PM.add(new TargetData(*TD));
+    }
     else
+    {
         PM.add(new TargetData(mod));
+    }
+
+    // Override default to generate verbose assembly.
+    Target.setAsmVerbosityDefault(true);
 
     {
         formatted_raw_ostream FOS;      // Just for Calling the Function. Not Used for output.
 
         // Ask the target to add backend passes as necessary.
-        if (Target.addPassesToEmitFile(PM, FOS, TargetMachine::CGFT_Null, OptLevel, DisableVerify)) {
+        if (Target.addPassesToEmitFile(PM, FOS, TargetMachine::CGFT_Null, OptLevel, DisableVerify, mod)) {
             errs() << __func__ << ": target does not support generation of this" << " file type!\n";
             return 1;
         }

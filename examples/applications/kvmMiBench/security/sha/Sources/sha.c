@@ -36,7 +36,7 @@
 
 /* do SHA transformation */
 
-static void sha_transform(SHA_INFO *sha_info)
+void sha_transform(SHA_INFO *sha_info)
 {
     int i;
     LONG temp, A, B, C, D, E, W[80];
@@ -135,6 +135,7 @@ void sha_init(SHA_INFO *sha_info)
     sha_info->count_hi = 0L;
 }
 
+#if 0
 /* update the SHA digest */
 
 void sha_update(SHA_INFO *sha_info, BYTE *buffer, int count)
@@ -155,6 +156,7 @@ void sha_update(SHA_INFO *sha_info, BYTE *buffer, int count)
     }
     memcpy(sha_info->data, buffer, count);
 }
+#endif
 
 /* finish computing the SHA digest */
 

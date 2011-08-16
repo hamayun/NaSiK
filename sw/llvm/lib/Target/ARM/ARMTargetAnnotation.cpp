@@ -40,6 +40,7 @@ using namespace std;
 using namespace ARM; 
 
 bool PRINT_WARNINGS;
+//#define ENABLE_DATA_DEPENDANCY
 
 static cl::opt<bool, true> PrintAnnotationWarnings("print-annotation-warnings",
        cl::desc("Print warnings during annoatation pass."),
@@ -724,6 +725,7 @@ const TargetAnnotationDB * ARMTargetMachine::MachineBasicBlockAnnotation(Machine
         mbbInstructionCount++;
     }
 
+#ifdef ENABLE_DATA_DEPENDANCY
     if(mbbInstructionCount >= 2)   // Atleast Two Instructions are needed to perform any kindof of Dependency Analysis in each MBB
     {
         currInstrNo = 0;
@@ -756,6 +758,7 @@ const TargetAnnotationDB * ARMTargetMachine::MachineBasicBlockAnnotation(Machine
         cout << "[" << prevInstrNo << "]: " << *PrevInstr;
 #endif
     }    
+#endif
 
     mbbTotalCycles = mbbInstructionCycleCount + mbbDependencyCycleCount;
 

@@ -296,9 +296,13 @@ int main(int argc, char **argv) {
 
   // Add the target data from the target machine, if it exists, or the module.
   if (const TargetData *TD = Target.getTargetData())
+  {
     PM.add(new TargetData(*TD));
+  }
   else
+  {
     PM.add(new TargetData(&mod));
+  }
 
   // Override default to generate verbose assembly.
   Target.setAsmVerbosityDefault(true);

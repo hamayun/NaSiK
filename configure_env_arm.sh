@@ -1,7 +1,7 @@
 export NASIK_HOME=$PWD
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
-export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
+export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8-debug
 export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-arm
 export APES_ROOT=/opt/Apes
 export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
@@ -10,9 +10,9 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
 #APPLICATION=kvmParallelMjpeg
 #APPLICATION=susan
-#APPLICATION=qsort
+APPLICATION=qsort
 #APPLICATION=dijkstra
-APPLICATION=patricia
+#APPLICATION=patricia
 #APPLICATION=blowfish
 #APPLICATION=rijndael
 #APPLICATION=sha

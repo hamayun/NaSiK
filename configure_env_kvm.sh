@@ -6,7 +6,7 @@ export LIBSOCKVM_HOME=${NASIK_HOME}/hw/soc_kvm
 export LIBKVM_PREFIX=/opt/libs/libkvm
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
-export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
+export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8-debug
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat-llvm-newlib
@@ -19,7 +19,7 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=kvmParallelMjpeg
 #APPLICATION=susan
 APPLICATION=qsort
-APPLICATION=dijkstra
+#APPLICATION=dijkstra
 #APPLICATION=patricia
 #APPLICATION=blowfish
 #APPLICATION=rijndael

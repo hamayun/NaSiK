@@ -476,7 +476,7 @@ get_dac (j_decompress_ptr cinfo)
   return TRUE;
 }
 
-
+#if 0
 LOCAL(boolean)
 get_dht (j_decompress_ptr cinfo)
 /* Process a DHT marker */
@@ -540,7 +540,7 @@ get_dht (j_decompress_ptr cinfo)
   INPUT_SYNC(cinfo);
   return TRUE;
 }
-
+#endif
 
 LOCAL(boolean)
 get_dqt (j_decompress_ptr cinfo)
