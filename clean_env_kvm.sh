@@ -37,6 +37,7 @@ print_substep "Removing Software Application Symlinks ..."
 rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "interface.xmi")
 rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "elf.lds")
 rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "APPLICATION.X.bin")
+rm -f $(find $NASIK_HOME/examples/applications/kvmMiBench/ -name "compose.log")
 rm -f $NASIK_HOME/examples/applications/kvmMiBench/automotive/bitcount/BITCOUNT
 rm -f $NASIK_HOME/examples/applications/kvmMiBench/automotive/qsort/QSORT
 rm -f $NASIK_HOME/examples/applications/kvmMiBench/automotive/susan/SUSAN

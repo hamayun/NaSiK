@@ -777,7 +777,7 @@ const TargetAnnotationDB * ARMTargetMachine::MachineBasicBlockAnnotation(Machine
     cout <<"==============================================================" << std::endl << std::endl;
 #endif
 
-    if(mbbInstructionCycleCount > 0 )
+    if(mbbInstructionCount > 0 || mbbInstructionCycleCount > 0 )
     {
         annotationDB = new TargetAnnotationDB();
         assert( annotationDB && "NULL pointer!\n" );
