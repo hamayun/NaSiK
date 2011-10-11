@@ -942,7 +942,7 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 		return 1;
 	}
 
-	vm_mem = kvm_create_phys_mem(kvm, 0, memory_size, 0, 1);
+	vm_mem = kvm_create_phys_mem(kvm, /* phys_start */ 0x0, memory_size /* len */, 0 /* log */, 1 /* writable */);
         if(vm_mem == NULL)
         {
 		kvm_finalize(kvm);
