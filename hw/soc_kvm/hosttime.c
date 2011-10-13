@@ -330,6 +330,11 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             }
             break;
 
+        case HOSTTIME_ERASE_MEMORY:
+            fprintf(stderr, "Inside HOSTTIME_ERASE_MEMORY\n");
+            soc_erase_memory();
+            break;
+
         default:
             printf ("%s: Bad Port Value = %d\n", __func__, port_value);
             exit (1);

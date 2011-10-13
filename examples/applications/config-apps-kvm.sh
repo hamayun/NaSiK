@@ -5,7 +5,7 @@ export CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SEC
 export DNASTART="${LIBKVM_HOME}/user/test/x86/dnastart.o"
 
 # Try and Do the Split Compilation using the Primary Compiler. 
-export APES_SPLIT_CC=""
+#export APES_SPLIT_CC=""
 export APES_CC1="llvm-gcc"
 export APES_CC2="llc"
 export APES_CC1_FLAGS="-Wall -Wno-format -std=c99 -U__linux__ --emit-llvm -nostdinc -DMEASURE_ACCURACY $CUSTOM_INCLUDES"

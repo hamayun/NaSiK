@@ -593,6 +593,7 @@ static void load_file(void *mem, const char *fname)
 {
 	int r;
 	int fd;
+        int bytes = 0;
 
 	fd = open(fname, O_RDONLY);
 	if (fd == -1) {
@@ -600,11 +601,15 @@ static void load_file(void *mem, const char *fname)
 		exit(1);
 	}
 	while ((r = read(fd, mem, 4096)) != -1 && r != 0)
-		mem += r;
+        {
+            mem += r;
+            bytes += r;
+        }
 	if (r == -1) {
 		perror("read");
 		exit(1);
 	}
+        printf("%s: Loaded %d bytes (%d KB) in total for %s file\n", __func__, bytes, bytes/1024, fname);
 }
 
 static void enter_32(kvm_context_t kvm)
@@ -830,14 +835,16 @@ int load_elf(void *vm_addr, int vm_size, char *file)
                     memcpy(vm_addr + shdr.sh_addr + n, edata->d_buf, edata->d_size);
                     n += edata->d_size;
                 }
-                printf("Loaded %d bytes at 0x%x", n, (unsigned int)(vm_addr + shdr.sh_addr));
+                printf("Loaded %d bytes at 0x%x (KVM VIR: 0x%x)", n,
+                       (unsigned int)(vm_addr + shdr.sh_addr), (unsigned int) shdr.sh_addr);
             }
         }
 
         if(strcmp(section_bss, elf_strptr(elf, elf_header->e_shstrndx, shdr.sh_name)) == 0)
         {
             memset(vm_addr + shdr.sh_addr, 0, shdr.sh_size);
-            printf("Initialized %d bytes (Nulls) at 0x%x", (int)shdr.sh_size, (unsigned int)(vm_addr + shdr.sh_addr));
+            printf("Initialized %d bytes (Nulls) at 0x%x (KVM VIR: 0x%x)", (int)shdr.sh_size,
+                   (unsigned int)(vm_addr + shdr.sh_addr), (unsigned int)(shdr.sh_addr));
         }
 
         printf("\n");
@@ -851,6 +858,8 @@ int load_elf(void *vm_addr, int vm_size, char *file)
 int soc_kvm_init(char *bootstrap, char *elf_file)
 {
 	unsigned char *vm_mem;
+        //unsigned int phys_start = 0x1000;
+        unsigned int phys_start = 0x0;
 	int i;
 	/*
         const char *sopts = "s:phm:";
@@ -942,7 +951,9 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 		return 1;
 	}
 
-	vm_mem = kvm_create_phys_mem(kvm, /* phys_start */ 0x0, memory_size /* len */, 0 /* log */, 1 /* writable */);
+        printf("%s: Creating KVM Physical Memory ... From: 0x%x \tTo: 0x%x\n", __func__,
+               (unsigned int) phys_start, (unsigned int) (phys_start + memory_size));
+	vm_mem = kvm_create_phys_mem(kvm, phys_start, memory_size /* len */, 0 /* log */, 1 /* writable */);
         if(vm_mem == NULL)
         {
 		kvm_finalize(kvm);
@@ -954,7 +965,7 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 	if (enter_protected_mode){
 		enter_32(kvm);
         }else{
-                printf("%s: Loading %s ... at 0x%x\n", __func__, bootstrap, (unsigned int) vm_mem + 0xf0000);
+                printf("%s: Loading %s ... at 0x%x (KVM VIR: 0x%x)\n", __func__, bootstrap, (unsigned int) vm_mem + 0xf0000, 0xf0000);
 		load_file(vm_mem + 0xf0000, bootstrap);
         }
         /*
@@ -968,11 +979,11 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 
 	io_table_register(&pio_table, IRQCHIP_IO_BASE, 0x20, irqchip_io, NULL);
 
-        // Register the Annotation Handler; Also pass the Virtual Memory Address allocated to KVM
-        io_table_register(&pio_table, ANNOTATION_BASEPORT, 0x04, annotation_handler, vm_mem);
+    // Register the Annotation Handler; Also pass the Virtual Memory Address allocated to KVM
+    io_table_register(&pio_table, ANNOTATION_BASEPORT, 0x04, annotation_handler, vm_mem);
 
-        // Register the HostTime Handler
-        io_table_register(&pio_table, HOSTTIME_BASEPORT, 0x4, hosttime_handler, &hosttime_instance);
+    // Register the HostTime Handler
+    io_table_register(&pio_table, HOSTTIME_BASEPORT, 0x4, hosttime_handler, &hosttime_instance);
 
 	sem_init(&init_sem, 0, 0);
 	for (i = 0; i < ncpus; ++i)
@@ -984,6 +995,39 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 	soc_kvm_init_data.memory_size = memory_size;
 	soc_kvm_init_data.vm_mem = vm_mem;
 	return 0;
+}
+
+int soc_erase_memory()
+{
+    // unsigned char * address = soc_kvm_init_data.vm_mem + 0xf0000;
+    // int size = 64 * 1024;
+    unsigned char * address  = soc_kvm_init_data.vm_mem;
+    unsigned char * curr_ptr = address;
+    int size = 1024 * 1024;
+
+    memset((void *) address, 0x0, size);
+    printf("%s: Erased Memory from 0x%08x to 0x%08x (KVM VIR:0x%08x - 0x%08x)\n",
+            __func__, (unsigned int) address, (unsigned int) (address + size - 1),
+                      (unsigned int) (address - soc_kvm_init_data.vm_mem),
+                      (unsigned int) ((address + size - 1) - soc_kvm_init_data.vm_mem));
+
+    // Verify that all memory contents are actually zero?
+    while(curr_ptr < (address + size))
+    {
+        if(*curr_ptr != 0x0)
+        {
+            printf("%s: Non Zero Memory Contents Found: 0x%08x = 0x%08x (KVM VIR:0x%08x = 0x%08x)\n",
+                    __func__, (unsigned int) curr_ptr, (unsigned int) (*curr_ptr),
+                              (unsigned int) (curr_ptr - address), (unsigned int) (*curr_ptr));
+            return (-1);
+        }
+
+        curr_ptr++;
+    }
+
+    printf("%s: Memory Contents Verified to be Zero: Last Address 0x%08x (KVM VIR:0x%08x)\n",
+           __func__, (unsigned int) curr_ptr - 1, (unsigned int) (curr_ptr - address - 1));
+    return (0);
 }
 
 void soc_kvm_run()

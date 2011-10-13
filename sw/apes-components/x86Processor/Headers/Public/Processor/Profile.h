@@ -2,7 +2,7 @@
 #ifndef PROCESSOR_PROFILE_H
 #define PROCESSOR_PROFILE_H
 
-//#define ENABLE_PROFILING
+#define ENABLE_PROFILING
 extern short HOSTTIME_BASEPORT;
 
 typedef enum hosttime_port_value
@@ -14,7 +14,8 @@ typedef enum hosttime_port_value
     HOSTTIME_IO_END = 4,
     HOSTTIME_FLUSH_DATA = 5,
     HOSTTIME_PROFILE_COST_FACTOR = 6,
-    HOSTTIME_PROFILE_TIME_DELTA = 7
+    HOSTTIME_PROFILE_TIME_DELTA = 7,
+    HOSTTIME_ERASE_MEMORY = 8
 } hosttime_port_value_t;
 
 #ifdef ENABLE_PROFILING
@@ -114,6 +115,18 @@ typedef enum hosttime_port_value
         );                                                                     \
     } while (0)
 
+#define CPU_PROFILE_ERASE_MEMORY()                                             \
+    do{                                                                        \
+        __asm__ volatile(                                                      \
+            "   mov  $0x5000,%%dx\n\t"                                         \
+            "   mov  %1,%%eax\n\t"                                             \
+            "   out  %%eax,(%%dx)\n\t"                                         \
+            ::"r"((short int) HOSTTIME_BASEPORT),                              \
+              "r"((hosttime_port_value_t) HOSTTIME_ERASE_MEMORY)               \
+            :"%dx","%eax"                                                      \
+        );                                                                     \
+    } while (0)
+
 #else
 #define CPU_PROFILE_CURRENT_TIME()
 #define CPU_PROFILE_TIME_DELTA()
@@ -123,6 +136,7 @@ typedef enum hosttime_port_value
 #define CPU_PROFILE_IO_END()
 #define CPU_PROFILE_FLUSH_DATA()
 #define CPU_PROFILE_COST_FACTOR()
+#define CPU_PROFILE_ERASE_MEMORY()
 #endif /* ENABLE_PROFILING */
 
 #endif	/* PROCESSOR_PROFILE_H */

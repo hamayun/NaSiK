@@ -7,6 +7,7 @@
 
 int main(void)
 {
+    CPU_PROFILE_ERASE_MEMORY();
     uint32_t * curr_addr = TEST_START_ADDR;
     uint32_t   value_read = 0x0;
 

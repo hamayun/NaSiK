@@ -9,11 +9,10 @@
   unique="true"
   wrapper="false">
 
-  <id name="QSORT" version="1.0"/>
+  <id name="MJPEGKVM" version="1.0"/>
 
   <inject>
     <id name="SoclibPlatformDriver" version="1.0"/>
-    <id name="SoclibBlockDeviceDriver" version="1.0"/>
     <id name="SoclibFramebufferDriver" version="1.0"/>
     <id name="SoclibHostAccessDriver" version="1.0"/>
     <id name="SoclibTgDriver" version="1.0"/>

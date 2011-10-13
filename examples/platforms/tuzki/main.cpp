@@ -119,13 +119,13 @@ int sc_main (int argc, char ** argv)
     fb_device           *fb = new fb_device("framebuffer", 0, &fb_res_stat);
     sem_device		   *sem = new sem_device("sem", 0x100000);
 
-    slaves[nslaves++] = ram;			// 0	0x00000000 - 0x08000000
-    slaves[nslaves++] = shared_ram;		// 1	0xAF000000 - 0xAFF00000
-    slaves[nslaves++] = tty0;			// 2	0xC0000000 - 0xC0000040
-    slaves[nslaves++] = tg;				// 3	0xC3000000 - 0xC3000100
-    slaves[nslaves++] = fb->get_slave();// 4	0xC4000000 - 0xC4000200
-    slaves[nslaves++] = sem;			// 5	0xC5000000 - 0xC5100000
-    slaves[nslaves++] = bl->get_slave();// 6	0xC6000000 - 0xC6100000
+    slaves[nslaves++] = ram;			 // 0	0x00000000 - 0x08000000
+    slaves[nslaves++] = shared_ram;		 // 1	0xAF000000 - 0xAFF00000
+    slaves[nslaves++] = tty0;			 // 2	0xC0000000 - 0xC0000040
+    slaves[nslaves++] = tg;				 // 3	0xC3000000 - 0xC3001000
+    slaves[nslaves++] = fb->get_slave(); // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
+    slaves[nslaves++] = sem;			 // 5	0xC5000000 - 0xC5100000
+    slaves[nslaves++] = bl->get_slave(); // 6	0xC6000000 - 0xC6100000
     slaves[nslaves++] = bl2->get_slave();// 7	0xC6500000 - 0xC6600000
     slaves[nslaves++] = bl3->get_slave();// 8	0xC6A00000 - 0xC6B00000
 
