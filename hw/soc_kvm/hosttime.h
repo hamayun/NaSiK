@@ -40,7 +40,8 @@ typedef enum hosttime_port_value
     HOSTTIME_FLUSH_DATA = 5,
     HOSTTIME_PROFILE_COST_FACTOR = 6,
     HOSTTIME_PROFILE_TIME_DELTA = 7,
-    HOSTTIME_ERASE_MEMORY = 8
+    HOSTTIME_ERASE_MEMORY = 8,
+    HOSTTIME_VERIFY_MEMORY = 9
 } hosttime_port_value_t;
 
 typedef struct hosttime {

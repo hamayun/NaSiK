@@ -999,46 +999,64 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 
 int soc_erase_memory()
 {
-    // unsigned char * address = soc_kvm_init_data.vm_mem + 0xf0000;
-    // int size = 64 * 1024;
-    unsigned char * address  = soc_kvm_init_data.vm_mem;
-    unsigned char * curr_ptr = address;
+    unsigned int *  address = (unsigned int *) soc_kvm_init_data.vm_mem;
     int size = 64 * 1024 * 1024;
 
-    while (curr_ptr < (address + size))
+    unsigned int * curr_ptr = address;
+    unsigned int * end_ptr  = address + ( size / sizeof(unsigned int) );
+
+    while (curr_ptr < end_ptr)
     {
-    memset((void *) curr_ptr, 0x0, 1024*1024);
-            curr_ptr += 1024*1024;
-            printf("*");
-            fflush(stdout);
+        *curr_ptr = 0x0; curr_ptr++;
     }
 
-    printf("\n%s: Erased Memory from 0x%08x to 0x%08x (KVM VIR:0x%08x - 0x%08x)\n",
-            __func__, (unsigned int) address, (unsigned int) (address + size - 1),
-                      (unsigned int) (address - soc_kvm_init_data.vm_mem),
-                      (unsigned int) ((address + size - 1) - soc_kvm_init_data.vm_mem));
+    printf("%s: Erased Memory from 0x%08x to 0x%08x (KVM VIR:0x%08x - 0x%08x)\n",
+            __func__, (unsigned int) address,
+            (unsigned int) ((unsigned char *) end_ptr - 1),
+            (unsigned int) ((unsigned char *) address - soc_kvm_init_data.vm_mem),
+            (unsigned int) ((unsigned char *) end_ptr - soc_kvm_init_data.vm_mem - 1));
 
     // Verify that all memory contents are actually zero?
     curr_ptr = address;
-    while(curr_ptr < (address + size))
+    while(curr_ptr < end_ptr)
     {
         if(*curr_ptr != 0x0)
         {
             printf("%s: Non Zero Memory Contents Found: 0x%08x = 0x%08x (KVM VIR:0x%08x = 0x%08x)\n",
-                    __func__, (unsigned int) curr_ptr, (unsigned int) (*curr_ptr),
-                              (unsigned int) (curr_ptr - address), (unsigned int) (*curr_ptr));
+                    __func__, (unsigned int) curr_ptr,
+                              (unsigned int) (*curr_ptr),
+                              (unsigned int) ((unsigned char *) curr_ptr - (unsigned char *) address),
+                              (unsigned int) (*curr_ptr));
             return (-1);
         }
-
         curr_ptr++;
-        if(((unsigned int) curr_ptr) % (1024*1024) == 0)
-        {
-                printf("#"); fflush(stdout);
-        }
     }
 
-    printf("\n%s: Memory Contents Verified to be Zero: Last Address 0x%08x (KVM VIR:0x%08x)\n",
-           __func__, (unsigned int) curr_ptr - 1, (unsigned int) (curr_ptr - address - 1));
+    return (0);
+}
+
+int soc_verify_memory()
+{
+    unsigned int * address  = (unsigned int *) soc_kvm_init_data.vm_mem;
+    int size = 64 * 1024 * 1024;
+    static int test_count = 0;
+
+    unsigned int * curr_ptr = address;
+    unsigned int * end_ptr  = address + ( size / sizeof(unsigned int) );
+
+    while (curr_ptr < end_ptr)
+    {
+        if(*curr_ptr != 0x0)
+        {
+            printf("[%08X] = 0x%08X\n", (unsigned char *) curr_ptr - (unsigned char *) address, *curr_ptr);
+            printf("%s: Memory Test Failed\n", __func__);
+            return (-1);
+        }
+        curr_ptr++;
+    }
+
+    printf("%s: Memory Test Passed: %05d\r", __func__, test_count++);
+    fflush(stdout);
     return (0);
 }
 

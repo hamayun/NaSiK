@@ -331,8 +331,11 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             break;
 
         case HOSTTIME_ERASE_MEMORY:
-            fprintf(stderr, "Inside HOSTTIME_ERASE_MEMORY\n");
             soc_erase_memory();
+            break;
+
+        case HOSTTIME_VERIFY_MEMORY:
+            soc_verify_memory();
             break;
 
         default:

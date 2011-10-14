@@ -2,42 +2,28 @@
 #include <Processor/Profile.h>
 
 #define TEST_START_ADDR 0x0
-#define TEST_END_ADDR   0x8000000
+#define TEST_END_ADDR   0x04000000
 #define VALUE           0xDEADBEEF
 
 int main(void)
 {
-    CPU_PROFILE_ERASE_MEMORY();
     uint32_t * curr_addr = TEST_START_ADDR;
-    uint32_t   value_read = 0x0;
-
-//    printf("Before:\n");
+    CPU_PROFILE_ERASE_MEMORY();
     while (curr_addr < TEST_END_ADDR)
     {
-        value_read = *curr_addr;
-//        printf("0x%X : 0x%X\n", curr_addr, value_read);
-
-//        *curr_addr = VALUE;
-        curr_addr++;
-    }
-
-#if 0
-//    printf("After:\n");
-    curr_addr = TEST_START_ADDR;
-    while (curr_addr < TEST_END_ADDR)
-    {
-        value_read = *curr_addr;
-        if(value_read != VALUE)
+        if(*curr_addr != 0x0)
         {
-            printf("Test Failed: Value Written 0x%x, Value Read 0x%x\n", VALUE, value_read);
-            return -1;
+            printf("[%08X] = 0x%08X\n", curr_addr, *curr_addr);
+            //printf("Test Failed: Value Not Zero! 0x%08X = 0x%08X\n", curr_addr, value_read);
+            //return -1;
         }
 
-//        printf("0x%X : 0x%X\n", curr_addr, value_read);
+        //*curr_addr = VALUE;
         curr_addr++;
     }
-#endif
-    printf("Test Passed !!!\n");
+
+    //printf("Read Test Passed, Contents from 0x%X to 0x%X set to 0x%X\n", TEST_START_ADDR, TEST_END_ADDR - 4, VALUE);
+    CPU_PROFILE_VERIFY_MEMORY();
     return 0;
 }
 

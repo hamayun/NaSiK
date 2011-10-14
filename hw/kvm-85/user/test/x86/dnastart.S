@@ -4,10 +4,14 @@
 .bss
 
 .section .init
-    mov  $0x5000,%dx        /* Write the I/O Port to dx register, on which we
-                               will send the command (Erase Memory or Load Target Binary) */
-    mov  $0x8,%eax          /* Write the Command ID to eax register */
-    out  %eax,%dx           /* Actually Write the Command to I/O Port */
+    //mov  $0x5000,%dx        /* Write the I/O Port to dx register, on which we
+    //                           will send the command (Erase Memory or Load Target Binary) */
+    //mov  $0x8,%eax          /* Write the Command ID to eax register */
+    //out  %eax,%dx           /* Actually Write the Command to I/O Port */
+    /* Observation; This seems to be a bad place for loading target vliw binary;
+       because some of the code in 0x00000010 - 0x0001FFFC gets overwritten during
+       the DNAOS boot process; Thats why the above code has been commented; A better 
+       place to load target vliw binary is in the application main function. */
 	call system_kickstart   /* Call the OS Start Function */
 	out %eax, $0xf4
 
