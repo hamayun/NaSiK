@@ -111,7 +111,7 @@ pmode:
 	mov %ax, %gs
 	mov %ax, %ss
 	mov $pmode_stack_start + pmode_stack_size, %esp
-	ljmp $8, $0x100000
+	ljmp $8, $0x04000000
 
 .align 16
 	

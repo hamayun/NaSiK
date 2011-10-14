@@ -1003,15 +1003,23 @@ int soc_erase_memory()
     // int size = 64 * 1024;
     unsigned char * address  = soc_kvm_init_data.vm_mem;
     unsigned char * curr_ptr = address;
-    int size = 1024 * 1024;
+    int size = 64 * 1024 * 1024;
 
-    memset((void *) address, 0x0, size);
-    printf("%s: Erased Memory from 0x%08x to 0x%08x (KVM VIR:0x%08x - 0x%08x)\n",
+    while (curr_ptr < (address + size))
+    {
+    memset((void *) curr_ptr, 0x0, 1024*1024);
+            curr_ptr += 1024*1024;
+            printf("*");
+            fflush(stdout);
+    }
+
+    printf("\n%s: Erased Memory from 0x%08x to 0x%08x (KVM VIR:0x%08x - 0x%08x)\n",
             __func__, (unsigned int) address, (unsigned int) (address + size - 1),
                       (unsigned int) (address - soc_kvm_init_data.vm_mem),
                       (unsigned int) ((address + size - 1) - soc_kvm_init_data.vm_mem));
 
     // Verify that all memory contents are actually zero?
+    curr_ptr = address;
     while(curr_ptr < (address + size))
     {
         if(*curr_ptr != 0x0)
@@ -1023,9 +1031,13 @@ int soc_erase_memory()
         }
 
         curr_ptr++;
+        if(((unsigned int) curr_ptr) % (1024*1024) == 0)
+        {
+                printf("#"); fflush(stdout);
+        }
     }
 
-    printf("%s: Memory Contents Verified to be Zero: Last Address 0x%08x (KVM VIR:0x%08x)\n",
+    printf("\n%s: Memory Contents Verified to be Zero: Last Address 0x%08x (KVM VIR:0x%08x)\n",
            __func__, (unsigned int) curr_ptr - 1, (unsigned int) (curr_ptr - address - 1));
     return (0);
 }

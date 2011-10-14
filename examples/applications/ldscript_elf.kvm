@@ -1,6 +1,6 @@
 MEMORY
 {
-	mem :    ORIGIN = 1M,    LENGTH = 30M
+	mem :    ORIGIN = 64M,    LENGTH = 30M
 }
 
 PHDRS
@@ -17,7 +17,7 @@ PHDRS
 
 SECTIONS
 {
-	.init 0x00100000: { stext = .; *(.init) } > mem :text
+	.init 0x04000000: { stext = .; *(.init) } > mem :text
     .text ALIGN(8): { *(.text) *(.text.*) } > mem :text
 	.fini ALIGN(8): { *(.fini*) } > mem :text
     
@@ -95,7 +95,6 @@ SECTIONS
 
     edata = .;
 
-    . = 10M;
     .note : { *(.note) *(.note.gnu.build-id) *(.comment) }
 }
 
