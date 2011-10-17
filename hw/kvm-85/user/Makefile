@@ -3,57 +3,31 @@ include config.mak
 
 DESTDIR :=
 
-.PHONY: arch_clean clean
+.PHONY: clean
 
 #make sure env CFLAGS variable is not used
 CFLAGS =
+CFLAGS += -D__i386__ -m32 -O1
+CFLAGS += $(autodepend-flags) -g -fomit-frame-pointer -Wall -fno-stack-protector
+CFLAGS += -I $(KERNELDIR)/include -I ../libkvm 
 
-libgcc := $(shell $(CC) --print-libgcc-file-name)
-
-libcflat := test/lib/libcflat.a
-cflatobjs := \
-	test/lib/panic.o \
-	test/lib/printf.o \
-	test/lib/string.o
-
-#include architecure specific make rules
-include config-$(ARCH).mak
-
-# cc-option
-# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
-
-cc-option = $(shell if $(CC) $(1) -S -o /dev/null -xc /dev/null \
-              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
-
-CFLAGS += -O1
-CFLAGS += $(autodepend-flags) -g -fomit-frame-pointer -Wall
-CFLAGS += $(call cc-option, -fno-stack-protector, "")
-CFLAGS += $(call cc-option, -fno-stack-protector-all, "")
-CFLAGS += -I ../libkvm
+TEST_DIR=test/x86
 
 LDFLAGS += $(CFLAGS) -L ../libkvm
 
-CXXFLAGS = $(autodepend-flags)
-
 autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d
 
-LDFLAGS += -pthread -lrt
+all: $(TEST_DIR)/dnastart.o $(TEST_DIR)/bootstrap $(TEST_DIR)/kvm_kickstart.o
 
-kvmtrace_objs= kvmtrace.o
+$(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I test/lib -I test/lib/x86
 
-kvmctl: $(kvmctl_objs)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-kvmtrace: $(kvmtrace_objs)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-$(libcflat): $(cflatobjs)
-	$(AR) rcs $@ $^
+$(TEST_DIR)/bootstrap: $(TEST_DIR)/bootstrap.o
+	$(CC) -nostdlib -o $@ -Wl,-T,bootstrap.lds $^
 
 %.o: %.S
 	$(CC) $(CFLAGS) -c -nostdlib -o $@ $^
 
 -include .*.d
 
-clean: arch_clean
-	$(RM) kvmctl kvmtrace *.o *.a .*.d $(libcflat) $(cflatobjs)
+clean:
+	$(RM) $(TEST_DIR)/dnastart.o $(TEST_DIR)/bootstrap.o $(TEST_DIR)/bootstrap $(TEST_DIR)/kvm_kickstart.o
