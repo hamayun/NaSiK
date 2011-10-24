@@ -24,6 +24,7 @@ int main(void)
 
     //printf("Read Test Passed, Contents from 0x%X to 0x%X set to 0x%X\n", TEST_START_ADDR, TEST_END_ADDR - 4, VALUE);
     CPU_PROFILE_VERIFY_MEMORY();
+	printf("Test Finished !!!\n");
     return 0;
 }
 

@@ -37,7 +37,7 @@ void cpu_context_save (cpu_context_t * ctx, uint32_t *entry);
             "push 0x8(%%ebp) \n"     /* address at which we should return*/ \
             "push %%ebp \n"          /* current position of the ebp*/ \
             "pushf \n"\
-            "cli\n"\
+/*            "cli\n"\ */
             "pusha \n"\
             "mov 0x4(%%ebp), %%eax \n"\
             "mov %%esp, (%%eax) \n"   /* Update to first entry of context (the push/pop location)*/\

@@ -35,7 +35,7 @@ APPLICATION=kvmParallelMjpeg
 #APPLICATION=printFloats
 #APPLICATION=blockIOTest
 #APPLICATION=printIOTest
-#APPLICATION=kvmPhyMemTest
+APPLICATION=kvmPhyMemTest
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
