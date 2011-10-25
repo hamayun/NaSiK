@@ -4,8 +4,12 @@ OBJS 	  = $(SRCS:.c=.o)
 DEPS 	  = $(SRCS:.c=.dep)
 
 CC        = llvm-gcc
-CFLAGS    =-g -O3 -Wall -Wno-format -std=c99 -U__linux__ --emit-llvm
+#CFLAGS    =-g -O3 -Wall -Wno-format -std=c99 -U__linux__ --emit-llvm
+#INCDIR    =-I. -I../../include/
+CFLAGS    =-g -O3 -Wall -Wno-format -std=c99 --emit-llvm
 INCDIR    =-I. -I../../include/
+INCDIR   +=-I/opt/toolchains/i386-pc-baremetal/i386-pc-baremetal/include
+INCDIR   +=-I/opt/toolchains/i386-pc-baremetal/lib/gcc/i386-pc-baremetal/4.5.0/include
 
 CFILES    = C62xISABehavior.c
 TARGET    = C62xISABehavior.bc
@@ -17,7 +21,7 @@ all : $(TARGET)
 .PHONY  : clean
 
 %.bc : %.c
-	$(CC) $(CFLAGS) $(INCDIR) -c $< -o $@
+	$(CC) $(CFLAGS) -nostdinc $(INCDIR) -c $< -o $@
 
 #$(call quiet-command, $(CC) $(CFLAGS) $(INCDIR) -c $<, "  Compile Behavior Model ... $<")
 

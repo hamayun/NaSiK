@@ -20,6 +20,7 @@
  *************************************************************************************/
 
 #include "C62xISABehavior.h"
+#include "stdio.h"
 
 // TODO: Externalize this Definition of Processor State Instance.
 //extern C62x_Proc_State_t proc_state;
@@ -46,17 +47,26 @@ void Dump(char * rn, uint16_t sz)
     printf("\n");
 }
 
+
 char * REG(uint16_t idx)
 {
+    /* In order to support multiple calls to this function
+     * And to return a different char pointer for each call we use last_idx
+     */
     static char name[MAX_REG_PER_INSTR][MAX_REG_NAME_LEN + 1];
     static uint16_t last_idx = 0;
-    char * str = &name[last_idx][0];
+    char * str = & name[last_idx][0];
 
     memset(str, 0x0, MAX_REG_NAME_LEN + 1);
+
     if(BANKINDEX(idx) == REG_BANK_C)
+    {
         sprintf(str, "%s", BANKC_REGS[RNUM(idx)]);
+    }
     else
+    {
         sprintf(str, "%c%d", BANKNAME(idx), RNUM(idx));
+    }
 
     last_idx = (last_idx + 1) % MAX_REG_PER_INSTR;
     return (str);
@@ -160,10 +170,8 @@ int32_t InitProcessorState(C62x_Proc_State_t * proc_state)
         }
     }
 
-#ifdef ENABLE_TRACE
     for(index = 0; index < C62X_REG_BANKS; index++)
         BANKS[index] = 'A' + index;
-#endif
 
     return (0);
 }
@@ -251,6 +259,7 @@ int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
         }
         printf("}\n");
     }
+
     printf("\n");
     return (0);
 }

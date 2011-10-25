@@ -1,1 +1,0 @@
-/home/hamayun/workspace/temp/NaSiK/examples/applications/ldscript_elf.kvm

@@ -150,6 +150,7 @@ namespace native
             //CreateCallByName("ShowProcessorState");
         }
 
+        CreateCallByName("ShowProcessorState");
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
         GetIRBuilder().CreateCall2(p_increment_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
@@ -162,7 +163,7 @@ namespace native
     {
         llvm::FunctionType * func_type = llvm::FunctionType::get(Type::getInt32Ty(GetContext()), /*not vararg*/false);
         //llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "GenFunc" + input_bb->GetName(), p_out_module);
-        llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "main", p_out_module);
+        llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "simulated_bb", p_out_module);
         llvm::BasicBlock * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
 
         SetCurrentFunction(function);
@@ -187,7 +188,7 @@ namespace native
                 switch(exec_packet->GetSpecialFlags())
                 {
                     case BRANCH_TAKEN:
-                        //CreateCallByName("ShowProcessorState");
+                        CreateCallByName("ShowProcessorState");
                         GetIRBuilder().CreateRet(Geti32Value(0));
                         break;
                     case POSSIBLE_BRANCH:

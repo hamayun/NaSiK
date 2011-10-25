@@ -51,8 +51,8 @@
 
 using namespace llvm;
 
-//#define FUNC_CALL_ERROR_CHECK
-#define INLINE_FUNCTIONS
+#define FUNC_CALL_ERROR_CHECK
+//#define INLINE_FUNCTIONS
 #define OPTIMIZE_MODULE
 
 namespace native

@@ -23,6 +23,7 @@
 #define	C62X_PROCESSOR_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "C62xCommon.h"
