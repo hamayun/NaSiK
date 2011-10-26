@@ -25,6 +25,7 @@ using namespace native;
 
 //#define COFF_INPUT_FILE
 #define GENERATE_CODE
+//#define BASIC_BLOCK_LEVEL_CODE
 
 void print_usage(char **argv)
 {
@@ -69,6 +70,12 @@ int main (int argc, char ** argv)
         instr_address += 4;
     }
 
+    // Dump the different sections of input binary to files for loading to KVM Memory
+    COUT << "Dumping .text section ..." << endl;
+    reader->DumpSection(argv[1], argv[1], ".text");
+    COUT << "Dumping .data section ..." << endl;
+    reader->DumpSection(argv[1], argv[1], ".data");
+
     FetchPacketList fetch_packet_list(&instruction_list);
     ExecutePacketList execute_packet_list(&instruction_list);
 
@@ -97,18 +104,37 @@ int main (int argc, char ** argv)
 
 #ifdef GENERATE_CODE
     LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "GeneratedModule.bc");
+
+#ifdef BASIC_BLOCK_LEVEL_CODE
     const BasicBlockList_t * bb_list = basic_block_list.GetBasicBlockList();
 
-    COUT << "Generating LLVM Instructions ..." << endl;
+    COUT << "Generating LLVM Instructions (Basic Block Level) ..." << endl;
     for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end();
         BBLCI != BBLCE; ++BBLCI)
     {
-        if(llvm_gen->GenerateLLVM(*BBLCI))
+        if(llvm_gen->GenerateLLVMBBLevel(*BBLCI))
         {
             DOUT << "Error: Generating LLVM Code" << endl;
             return (-1);
         }
     }
+#else
+    ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
+
+    COUT << "Generating LLVM Instructions (Execute Packet Level) ..." << endl;
+    for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
+        EPLI != EPLE; ++EPLI)
+    {
+        if((*EPLI)->GetPacketType() == NORMAL_EXEC_PACKET)
+        {
+            if(llvm_gen->GenerateLLVMEPLevel(*EPLI))
+            {
+                DOUT << "Error: Generating LLVM Code" << endl;
+                return (-1);
+            }
+        }
+    }
+#endif
 
     COUT << "Optimizing LLVM Instructions ..." << endl;
     llvm_gen->OptimizeModule();

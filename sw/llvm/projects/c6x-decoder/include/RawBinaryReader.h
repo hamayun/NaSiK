@@ -22,6 +22,7 @@
 #ifndef RAW_BINARY_READER_H
 #define RAW_BINARY_READER_H
 
+#include <string.h>
 #include <fstream>
 #include <map>
 
@@ -50,6 +51,8 @@ namespace native
 
         // Every subclass must implement its own Read function.
         virtual Instruction * Read(uint32_t * section_handle, uint32_t address);
+
+        virtual int32_t DumpSection(string infile, string outfile, string section_name);
 
         virtual ~RawBinaryReader() {}
     };

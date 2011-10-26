@@ -11,5 +11,6 @@ TOOLNAME = HowToUseJIT
 EXAMPLE_TOOL = 1
 
 LINK_COMPONENTS := jit interpreter nativecodegen
+#LDFLAGS += -static
 
 include $(LEVEL)/Makefile.common

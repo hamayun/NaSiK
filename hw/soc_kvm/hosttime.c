@@ -332,6 +332,7 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
 
         case HOSTTIME_ERASE_MEMORY:
             soc_erase_memory();
+            soc_load_target_binary();
             break;
 
         case HOSTTIME_VERIFY_MEMORY:

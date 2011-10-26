@@ -87,6 +87,19 @@ namespace native
 
         virtual uint32_t GetSize() const { return (m_instr_list.size()); }
 
+        virtual string GetName() const
+        {
+            std::string ep_name = "EP";
+            std::stringstream addr_string;
+
+            if(GetSize())
+            {
+                addr_string << setw(8) << setfill('0') << hex << GetInstrByIndex(0)->GetAddress();
+                ep_name += addr_string.str();
+            }
+            return (ep_name);
+        }
+
         virtual uint32_t GetBranchTargetInstructionAddress() const
         {
             DecodedInstruction * dec_instr = NULL;

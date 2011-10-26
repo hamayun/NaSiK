@@ -107,9 +107,12 @@ namespace native
         virtual llvm::Value * Geti32Value(int32_t value) { return(llvm::ConstantInt::get(i32, value)); }
 
         virtual llvm::Value * CreateCallByName(string func_name);
+        virtual llvm::Value * CreateCallByNameGlobalProcStat(string func_name);
 
-        virtual int32_t GenerateLLVM(ExecutePacket * exec_packet);
-        virtual int32_t GenerateLLVM(native::BasicBlock * input_bb);
+        virtual int32_t GenerateLLVMEPLevel(ExecutePacket * exec_packet);       // Using Execute Packet Level Granularity
+
+        virtual int32_t GenerateLLVMBBLevel(native::BasicBlock * input_bb);     // Using Basic Block Level Granularity
+        virtual int32_t GenerateLLVMBBLevel(ExecutePacket * exec_packet);
 
         virtual void AddOptimizationPasses(unsigned OptLevel);
         virtual int32_t OptimizeModule();

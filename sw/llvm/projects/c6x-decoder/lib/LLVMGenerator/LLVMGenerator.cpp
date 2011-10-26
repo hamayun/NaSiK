@@ -66,7 +66,7 @@ namespace native
             Function *F = cast<Function>(I);
             if (!I->isDeclaration())
             {
-                F->setLinkage(GlobalValue::InternalLinkage);
+                //F->setLinkage(GlobalValue::InternalLinkage);
                 F->addFnAttr(llvm::Attribute::AlwaysInline);
             }
         }
@@ -84,7 +84,7 @@ namespace native
         AddOptimizationPasses(3);
 
         // Get the Pointer to Processor State First !!!
-        p_proc_state = p_out_module->getGlobalVariable("proc_state");
+        p_proc_state = p_out_module->getGlobalVariable("g_proc_state");
         ASSERT(p_proc_state, "Could Not Get Processor State from Module");
 
         // Some common Processor State Manipulation Functions
@@ -128,13 +128,29 @@ namespace native
         return (func_value);
     }
 
-    int32_t LLVMGenerator :: GenerateLLVM(ExecutePacket * exec_packet)
+    llvm::Value * LLVMGenerator :: CreateCallByNameGlobalProcStat(string func_name)
+    {
+        llvm::Function    * func_ptr     = NULL;
+        llvm::Value       * func_value   = NULL;
+        std::string         func_rname   = (func_name.size() > 4 ? func_name.substr(0, 4) : func_name);
+
+        func_ptr = p_out_module->getFunction(StringRef(func_name));
+        if(!func_ptr)
+        {
+          COUT << "Could not Get Function Call for: "  << func_name << endl;
+          return NULL;
+        }
+        func_value = GetIRBuilder().CreateCall(func_ptr, func_rname);
+        return (func_value);
+    }
+
+    int32_t LLVMGenerator :: GenerateLLVMBBLevel(ExecutePacket * exec_packet)
     {
         Instruction        * instr      = NULL;
         DecodedInstruction * dec_instr  = NULL;
         llvm::Value        * pc_updated = NULL;
 
-        // Add a instruction that returns if the PC update is indicated by the above function call;
+        // Add an instruction that returns if the PC update is indicated by the above function call;
         //GetIRBuilder().CreateICmpEQ(pc_updated, Geti1Value(1), "");
         //CreateCallByName("ShowProcessorState");
         exec_packet->ResetInstrIterator();
@@ -159,7 +175,7 @@ namespace native
         return (0);
     }
 
-    int32_t LLVMGenerator :: GenerateLLVM(native::BasicBlock * input_bb)
+    int32_t LLVMGenerator :: GenerateLLVMBBLevel(native::BasicBlock * input_bb)
     {
         llvm::FunctionType * func_type = llvm::FunctionType::get(Type::getInt32Ty(GetContext()), /*not vararg*/false);
         //llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "GenFunc" + input_bb->GetName(), p_out_module);
@@ -177,7 +193,7 @@ namespace native
             if(exec_packet->GetPacketType() == NORMAL_EXEC_PACKET)
             {
                 exec_packet->ResetInstrIterator();
-                if(GenerateLLVM(exec_packet))
+                if(GenerateLLVMBBLevel(exec_packet))
                 {
                     COUT << "Error: In Generating LLVM" << endl;
                     return (-1);
@@ -203,6 +219,48 @@ namespace native
         llvm::verifyModule(*p_out_module, PrintMessageAction);
         return (0);
     }
+
+    int32_t LLVMGenerator :: GenerateLLVMEPLevel(ExecutePacket * exec_packet)
+    {
+        Instruction        * instr         = NULL;
+        DecodedInstruction * dec_instr     = NULL;
+        llvm::Value        * pc_updated    = NULL;
+        string               function_name = "Simulate_" + exec_packet->GetName();
+
+        llvm::FunctionType * func_type = llvm::FunctionType::get(Type::getInt32Ty(GetContext()), /*not vararg*/false);
+        llvm::Function     * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_out_module);
+        llvm::BasicBlock   * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
+
+        cout << "Generating Function ... " << function_name << "()" << endl;
+
+        SetCurrentFunction(function);
+        GetIRBuilder().SetInsertPoint(gen_block);
+
+        exec_packet->ResetInstrIterator();
+        while((instr = exec_packet->GetNextInstruction()))
+        {
+            dec_instr = instr->GetDecodedInstruction();
+            ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
+
+            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_out_module);
+#ifdef FUNC_CALL_ERROR_CHECK
+            ASSERT(func_value, "Error: In Creating Function Call");
+#endif
+        }
+
+        CreateCallByNameGlobalProcStat("ShowProcessorState");
+        // TODO: Verify the Program Counter Update Method;
+        // This is the immediate update; Branch Updates will be done through delay buffer method.
+        GetIRBuilder().CreateCall2(p_increment_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
+        GetIRBuilder().CreateCall(p_inc_cycles, p_proc_state);
+        pc_updated = CreateCallByName("UpdateRegisters");
+
+        GetIRBuilder().CreateRet(Geti32Value(0));
+        llvm::verifyModule(*p_out_module, PrintMessageAction);
+        return (0);
+    }
+
+
 
     /// AddOptimizationPasses - This routine adds optimization passes
     /// based on selected optimization level, OptLevel. This routine

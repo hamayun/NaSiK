@@ -58,6 +58,11 @@ namespace native
 
         // Every subclass must implement its own Read function.
         virtual Instruction * Read(uint32_t * section_handle, uint32_t address) = 0;
+
+        // Dump A Given Section to file.
+        virtual int32_t DumpSection(string infile, string outfile, string section_name)
+                { cout << "Not Implemented" << endl; return (0); }
+
         virtual ~BinaryReader();
     };
 }

@@ -31,8 +31,8 @@
 soc_kvm_data soc_kvm_init_data;
 
 extern void * p_kvm_cpu_adaptor;
-uint64_t systemc_kvm_read_memory (void *_this, uint64_t addr, int nbytes, unsigned int *ns, int bIO);
-void systemc_kvm_write_memory (void *_this, uint64_t addr, unsigned char *data, int nbytes, unsigned int *ns, int bIO);
+uint64_t systemc_kvm_read_memory (void *_this, uint64_t addr, int nbytes, uint32_t *ns, int bIO);
+void systemc_kvm_write_memory (void *_this, uint64_t addr, unsigned char *data, int nbytes, uint32_t *ns, int bIO);
 void systemc_annotate_function(void *_this, void *vm_addr, void *pdesc);
 
 static char *section_copy[] = {".init", ".text", ".data", ".rodata", ".rodata.str1.1", ".os_config", ".hal", ".note", ""};
@@ -500,9 +500,9 @@ static int test_mmio_read(void *opaque, uint64_t addr, uint8_t *data, int len)
     if (addr < IORAM_BASE_PHYS || addr + len > IORAM_BASE_PHYS + IORAM_LEN)
     {
         fprintf(stderr, "%s: IORAM_BASE_PHYS: 0x%x, IORAM_BASE_PHYS + IORAM_LEN: 0x%x\n",
-                __func__, (unsigned int) IORAM_BASE_PHYS, (unsigned int) (IORAM_BASE_PHYS + IORAM_LEN - 1));
+                __func__, (uint32_t) IORAM_BASE_PHYS, (uint32_t) (IORAM_BASE_PHYS + IORAM_LEN - 1));
         fprintf(stderr, "%s: Address: 0x%x, Address End: 0x%x (len = %d)\n",
-                __func__, (unsigned int) addr, (unsigned int) addr+len-1, len);
+                __func__, (uint32_t) addr, (uint32_t) addr+len-1, len);
 
         dump_trace_files("mmio_read_error_trace.dump", "pmio_read_error_trace.dump");
         kvm_show_regs(kvm, 0);
@@ -510,13 +510,13 @@ static int test_mmio_read(void *opaque, uint64_t addr, uint8_t *data, int len)
     }
 
     //memcpy(data, ioram + addr - IORAM_BASE_PHYS, len);
-    //printf("%s: address: 0x%x, len: %d\n", __func__, (unsigned int) addr, len);
+    //printf("%s: address: 0x%x, len: %d\n", __func__, (uint32_t) addr, len);
     value = systemc_kvm_read_memory(p_kvm_cpu_adaptor, addr, len, NULL, 1);
     for (i = 0; i < len; i++)
         data[i] = *((unsigned char *) &value + i);
 
 #ifdef DEBUG
-    printf("ioram read with address:0x%lx and value %x\n", (long unsigned int)addr, *data);
+    printf("ioram read with address:0x%lx and value %x\n", (long uint32_t)addr, *data);
 #endif
     return 0;
 }
@@ -541,9 +541,9 @@ static int test_mmio_write(void *opaque, uint64_t addr, uint8_t *data, int len)
     if (addr < IORAM_BASE_PHYS || addr + len > IORAM_BASE_PHYS + IORAM_LEN)
     {
         fprintf(stderr, "%s: IORAM_BASE_PHYS: 0x%x, IORAM_BASE_PHYS + IORAM_LEN: 0x%x\n",
-                __func__, (unsigned int) IORAM_BASE_PHYS, (unsigned int) (IORAM_BASE_PHYS + IORAM_LEN - 1));
+                __func__, (uint32_t) IORAM_BASE_PHYS, (uint32_t) (IORAM_BASE_PHYS + IORAM_LEN - 1));
         fprintf(stderr, "%s: Address: 0x%x, Address End: 0x%x (len = %d)\n",
-		__func__, (unsigned int) addr, (unsigned int) addr+len-1, len);
+		__func__, (uint32_t) addr, (uint32_t) addr+len-1, len);
 
         dump_trace_files("mmio_write_error_trace.dump", "pmio_write_error_trace.dump");
         kvm_show_regs(kvm, 0);
@@ -551,7 +551,7 @@ static int test_mmio_write(void *opaque, uint64_t addr, uint8_t *data, int len)
     }
 
     //memcpy(ioram + addr - IORAM_BASE_PHYS, data, len);
-    //printf("%s: address: 0x%x, len: 0x%x\n", __func__, (unsigned int) addr, len);
+    //printf("%s: address: 0x%x, len: 0x%x\n", __func__, (uint32_t) addr, len);
 
     systemc_kvm_write_memory(p_kvm_cpu_adaptor, addr, data, len, NULL, 1);
     return 0;
@@ -758,7 +758,7 @@ int load_elf(void *vm_addr, int vm_size, char *file)
     elf_header = (Elf32_Ehdr *) base_ptr;    // point elf_header at our object in memory
     elf = elf_begin(fd, ELF_C_READ, NULL);    // Initialize 'elf' pointer to our file descriptor
 
-    printf("%s: Loading ELF Binary at vm_addr: 0x%x, Size = %d\n", __func__, (unsigned int)vm_addr, (int)elf_stats.st_size);
+    printf("%s: Loading ELF Binary at vm_addr: 0x%x, Size = %d\n", __func__, (uint32_t)vm_addr, (int)elf_stats.st_size);
     printf("Section Type        Flags\tVirt Addr\tSize (bytes)\tOffset\t\tName\n");
     /* Iterate through section headers */
     while((scn = elf_nextscn(elf, scn)) != 0)
@@ -813,11 +813,11 @@ int load_elf(void *vm_addr, int vm_size, char *file)
         printf("\t\t");
 
         // Virt Addr
-        printf("0x%lx\t\t", (long unsigned int)shdr.sh_addr);
+        printf("0x%llx\t\t", (uint64_t)shdr.sh_addr);
         // Size (bytes)
-        printf("%ld\t\t", (long unsigned int)shdr.sh_size);
+        printf("%lld\t\t", (uint64_t)shdr.sh_size);
         // Offset
-        printf("0x%lx\t\t", (long unsigned int)shdr.sh_offset);
+        printf("0x%llx\t\t", (uint64_t)shdr.sh_offset);
 
         // the shdr Name is in a string table, libelf uses elf_strptr() to find it
         // using the e_shstrndx value from the elf_header
@@ -836,7 +836,7 @@ int load_elf(void *vm_addr, int vm_size, char *file)
                     n += edata->d_size;
                 }
                 printf("Loaded %d bytes at 0x%x (KVM VIR: 0x%x)", n,
-                       (unsigned int)(vm_addr + shdr.sh_addr), (unsigned int) shdr.sh_addr);
+                       (uint32_t)(vm_addr + shdr.sh_addr), (uint32_t) shdr.sh_addr);
             }
         }
 
@@ -844,7 +844,7 @@ int load_elf(void *vm_addr, int vm_size, char *file)
         {
             memset(vm_addr + shdr.sh_addr, 0, shdr.sh_size);
             printf("Initialized %d bytes (Nulls) at 0x%x (KVM VIR: 0x%x)", (int)shdr.sh_size,
-                   (unsigned int)(vm_addr + shdr.sh_addr), (unsigned int)(shdr.sh_addr));
+                   (uint32_t)(vm_addr + shdr.sh_addr), (uint32_t)(shdr.sh_addr));
         }
 
         printf("\n");
@@ -858,8 +858,8 @@ int load_elf(void *vm_addr, int vm_size, char *file)
 int soc_kvm_init(char *bootstrap, char *elf_file)
 {
 	unsigned char *vm_mem;
-        //unsigned int phys_start = 0x1000;
-        unsigned int phys_start = 0x0;
+        //uint32_t phys_start = 0x1000;
+        uint32_t phys_start = 0x0;
 	int i;
 	/*
         const char *sopts = "s:phm:";
@@ -952,7 +952,7 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 	}
 
         printf("%s: Creating KVM Physical Memory ... From: 0x%x \tTo: 0x%x\n", __func__,
-               (unsigned int) phys_start, (unsigned int) (phys_start + memory_size));
+               (uint32_t) phys_start, (uint32_t) (phys_start + memory_size));
 	vm_mem = kvm_create_phys_mem(kvm, phys_start, memory_size /* len */, 0 /* log */, 1 /* writable */);
         if(vm_mem == NULL)
         {
@@ -965,7 +965,7 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 	if (enter_protected_mode){
 		enter_32(kvm);
         }else{
-                printf("%s: Loading %s ... at 0x%x (KVM VIR: 0x%x)\n", __func__, bootstrap, (unsigned int) vm_mem + 0xf0000, 0xf0000);
+                printf("%s: Loading %s ... at 0x%x (KVM VIR: 0x%x)\n", __func__, bootstrap, (uint32_t) vm_mem + 0xf0000, 0xf0000);
 		load_file(vm_mem + 0xf0000, bootstrap);
         }
         /*
@@ -997,13 +997,83 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 	return 0;
 }
 
+int soc_load_target_section(char * section_file, char * section_name)
+{
+    uint32_t * kvm_mem_base_addr = (uint32_t *) soc_kvm_init_data.vm_mem;
+    uint32_t   binary_load_addr  = 0x0;         // Where this section should be loaded ?
+    uint32_t   binary_size       = 0;
+    uint32_t   binary_value      = 0;
+    uint32_t   bytes_loaded      = 0;
+
+    FILE * target_sect_file = fopen(section_file, "r");
+    if(! target_sect_file)
+    {
+        fprintf(stderr, "Error Opening the Target Section File: %s\n", section_file);
+        return (-1);
+    }
+
+    if(fread((void *) & binary_load_addr, sizeof(uint32_t), 1, target_sect_file) != 1)
+    {
+        fprintf(stderr, "Error Reading from target section file\n");
+        return (-1);
+    }
+
+    if(fread((void *) & binary_size, sizeof(uint32_t), 1, target_sect_file) != 1)
+    {
+        fprintf(stderr, "Error Reading from target section file\n");
+        return (-1);
+    }
+
+    fprintf(stdout, "Loading Target Binary (%s) at 0x%x, Size %d bytes\n", section_name, binary_load_addr, binary_size);
+
+    while(bytes_loaded < binary_size)
+    {
+        if(fread((void *) & binary_value, sizeof(uint32_t), 1, target_sect_file) != 1)
+        {
+            fprintf(stderr, "Error Reading from target section file\n");
+            return (-1);
+        }
+
+        // Write to KVM Memory
+        *((uint32_t *)(kvm_mem_base_addr + binary_load_addr)) = binary_value;
+
+        binary_load_addr ++;
+        bytes_loaded += sizeof(uint32_t);
+    }
+
+    if(target_sect_file)
+    {
+        fclose(target_sect_file);
+        target_sect_file = NULL;
+    }
+
+    return (0);
+}
+
+int soc_load_target_binary()
+{
+    if(soc_load_target_section("target_binary_text", ".text"))
+    {
+        fprintf(stderr, "Error Loading Target .text Section\n");
+        return (-1);
+    }
+
+    if(soc_load_target_section("target_binary_data", ".data"))
+    {
+        fprintf(stderr, "Error Loading Target .data Section\n");
+        return (-1);
+    }
+
+    return (0);
+}
+
 int soc_erase_memory()
 {
-    unsigned int *  address = (unsigned int *) soc_kvm_init_data.vm_mem;
+    uint32_t *  address = (uint32_t *) soc_kvm_init_data.vm_mem;
     int size = 64 * 1024 * 1024;
 
-    unsigned int * curr_ptr = address;
-    unsigned int * end_ptr  = address + ( size / sizeof(unsigned int) );
+    uint32_t * curr_ptr = address;
+    uint32_t * end_ptr  = address + ( size / sizeof(uint32_t) );
 
     while (curr_ptr < end_ptr)
     {
@@ -1011,10 +1081,10 @@ int soc_erase_memory()
     }
 
     printf("%s: Erased Memory from 0x%08x to 0x%08x (KVM VIR:0x%08x - 0x%08x)\n",
-            __func__, (unsigned int) address,
-            (unsigned int) ((unsigned char *) end_ptr - 1),
-            (unsigned int) ((unsigned char *) address - soc_kvm_init_data.vm_mem),
-            (unsigned int) ((unsigned char *) end_ptr - soc_kvm_init_data.vm_mem - 1));
+            __func__, (uint32_t) address,
+            (uint32_t) ((unsigned char *) end_ptr - 1),
+            (uint32_t) ((unsigned char *) address - soc_kvm_init_data.vm_mem),
+            (uint32_t) ((unsigned char *) end_ptr - soc_kvm_init_data.vm_mem - 1));
 
     // Verify that all memory contents are actually zero?
     curr_ptr = address;
@@ -1023,10 +1093,10 @@ int soc_erase_memory()
         if(*curr_ptr != 0x0)
         {
             printf("%s: Non Zero Memory Contents Found: 0x%08x = 0x%08x (KVM VIR:0x%08x = 0x%08x)\n",
-                    __func__, (unsigned int) curr_ptr,
-                              (unsigned int) (*curr_ptr),
-                              (unsigned int) ((unsigned char *) curr_ptr - (unsigned char *) address),
-                              (unsigned int) (*curr_ptr));
+                    __func__, (uint32_t) curr_ptr,
+                              (uint32_t) (*curr_ptr),
+                              (uint32_t) ((unsigned char *) curr_ptr - (unsigned char *) address),
+                              (uint32_t) (*curr_ptr));
             return (-1);
         }
         curr_ptr++;
@@ -1038,12 +1108,12 @@ int soc_erase_memory()
 
 int soc_verify_memory()
 {
-    unsigned int * address  = (unsigned int *) soc_kvm_init_data.vm_mem;
+    uint32_t * address  = (uint32_t *) soc_kvm_init_data.vm_mem;
     int size = 64 * 1024 * 1024;
-    static int test_count = 0;
+    //static int test_count = 0;
 
-    unsigned int * curr_ptr = address;
-    unsigned int * end_ptr  = address + ( size / sizeof(unsigned int) );
+    uint32_t * curr_ptr = address;
+    uint32_t * end_ptr  = address + ( size / sizeof(uint32_t) );
 
     //kvm_show_regs(kvm, 0);
     printf("%s: Verifying Memory\n", __func__);
