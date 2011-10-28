@@ -56,22 +56,45 @@ int main(int argc, char **argv, char **environ)
 extern int InitProcessorState(C62x_Proc_State_t * proc_state);
 extern int ShowProcessorState(C62x_Proc_State_t * proc_state);
 
+extern int Simulate_EP00000000 (C62x_Proc_State_t * proc_state);
+extern int Simulate_EP00000004 (C62x_Proc_State_t * proc_state);
+extern int Simulate_EP0000000c (C62x_Proc_State_t * proc_state);
+extern int Simulate_EP00000010 (C62x_Proc_State_t * proc_state);
+extern int Simulate_EP00000014 (C62x_Proc_State_t * proc_state);
+extern int Simulate_EP00000018 (C62x_Proc_State_t * proc_state);
+extern int Simulate_EP0000001c (C62x_Proc_State_t * proc_state);
+
+typedef struct func_table_entry
+{
+    uint32_t m_address;
+    int (*func_address)(C62x_Proc_State_t * proc_state);
+} func_table_entry_t;
+
+func_table_entry_t func_table [7] =
+{
+    { 0x00000000, Simulate_EP00000000 },
+    { 0x00000004, Simulate_EP00000004 },
+    { 0x0000000c, Simulate_EP0000000c },
+    { 0x00000010, Simulate_EP00000010 },
+    { 0x00000014, Simulate_EP00000014 },
+    { 0x00000018, Simulate_EP00000018 },
+    { 0x0000001c, Simulate_EP0000001c },
+};
 
 int main(int argc, char **argv, char **environ)
 {
-    C62x_Proc_State_t proc_state;
-
     CPU_PROFILE_VERIFY_MEMORY();
+    int (*curr_func)(C62x_Proc_State_t * proc_state) = NULL;
 
+    C62x_Proc_State_t proc_state;
     InitProcessorState(& proc_state);
 
-    Simulate_EP00000000(& proc_state);
-    Simulate_EP00000004(& proc_state);
-    Simulate_EP0000000c(& proc_state);
-    Simulate_EP00000010(& proc_state);
-    Simulate_EP00000014(& proc_state);
-    Simulate_EP00000018(& proc_state);
-    Simulate_EP0000001c(& proc_state);
+    for(int index = 0; index < 7; index++)
+    {
+       curr_func = func_table[index].func_address;
+
+       curr_func(& proc_state); 
+    }
 
     ShowProcessorState(& proc_state);
 
