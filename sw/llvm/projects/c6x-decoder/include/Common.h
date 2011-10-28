@@ -39,11 +39,13 @@ using namespace std;
 //#define PRINT_INSTR_OPCODE
 #define PRINT_DELAY_SLOTS
 #define PRINT_BRANCH_TARGET_HINTS
+#define ENABLE_FUNC_BUILD_INFO 1
 
 //#define DOUT            cerr << __PRETTY_FUNCTION__ << " "
 #define DOUT            cout << "<" << __func__ << ">: "
 #define COUT            cout << "<" << __func__ << ">: "
 #define WARN            cerr << __func__ << "():" << __LINE__ << " :: WARNING !!! "
+#define INFO            if(ENABLE_FUNC_BUILD_INFO) cout
 
 #define FMT_CHAR        "0x" << hex << setfill('0') << setw(2)
 #define FMT_SHORT       "0x" << hex << setfill('0') << setw(4)

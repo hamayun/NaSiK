@@ -36,6 +36,7 @@ typedef struct C62x_DelayTable_Node
     uint32_t                      m_value;
     struct C62x_DelayTable_Node * m_next_node;
 } C62x_DelayTable_Node_t;
+/* LLVM Type ... { i16, i32, \2 } */
 
 typedef struct C62x_DelayTable_Queue
 {
@@ -44,6 +45,7 @@ typedef struct C62x_DelayTable_Queue
     uint32_t                      m_num_busy_nodes;
     uint32_t                      m_max_busy_nodes;
 } C62x_DelayTable_Queue_t;
+/* LLVM Type ... { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 } */
 
 typedef struct C62x_Processor_State
 {
@@ -52,6 +54,7 @@ typedef struct C62x_Processor_State
     uint32_t                      m_register[C62X_REG_BANKS * C62X_REGS_PER_BANK];
     C62x_DelayTable_Queue_t       m_delay_table[C62X_MAX_DELAY_SLOTS + 1];
 } C62x_Proc_State_t;
+/* LLVM Type ... { i64, i32*, [48 x i32], [6 x { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 }] } */
 
 typedef enum ReturnStatus
 {

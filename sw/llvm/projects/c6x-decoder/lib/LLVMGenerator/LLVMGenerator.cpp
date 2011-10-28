@@ -83,9 +83,12 @@ namespace native
         /* The Set of Passes that we Run on Each Module / Function */
         AddOptimizationPasses(3);
 
-        // Get the Pointer to Processor State First !!!
-        p_proc_state = p_out_module->getGlobalVariable("g_proc_state");
-        ASSERT(p_proc_state, "Could Not Get Processor State from Module");
+        // TODO: Remove the following Hard-Coded Processor State Type
+        const Type * proc_state_type = p_out_module->getTypeByName("struct.C62x_Proc_State_t");
+        ASSERT(proc_state_type, "Could Not Get Processor State Type from Module");
+
+        p_proc_state_type = llvm::PointerType::getUnqual(proc_state_type);
+        ASSERT(proc_state_type, "Could Not Get Processor State Type Pointer");
 
         // Some common Processor State Manipulation Functions
         p_increment_pc = p_out_module->getFunction("IncrementPC"); ASSERT(p_increment_pc, "Could Not Get IncrementPC");
@@ -118,29 +121,17 @@ namespace native
         std::vector<llvm::Value*> args;
 
         args.push_back(p_proc_state);
+
         func_ptr = p_out_module->getFunction(StringRef(func_name));
         if(!func_ptr)
         {
           COUT << "Could not Get Function Call for: "  << func_name << endl;
           return NULL;
         }
+
+        INFO << "\tFunction Call: " << func_name << endl;
         func_value = GetIRBuilder().CreateCall(func_ptr, args.begin(), args.end(), func_rname);
-        return (func_value);
-    }
 
-    llvm::Value * LLVMGenerator :: CreateCallByNameGlobalProcStat(string func_name)
-    {
-        llvm::Function    * func_ptr     = NULL;
-        llvm::Value       * func_value   = NULL;
-        std::string         func_rname   = (func_name.size() > 4 ? func_name.substr(0, 4) : func_name);
-
-        func_ptr = p_out_module->getFunction(StringRef(func_name));
-        if(!func_ptr)
-        {
-          COUT << "Could not Get Function Call for: "  << func_name << endl;
-          return NULL;
-        }
-        func_value = GetIRBuilder().CreateCall(func_ptr, func_rname);
         return (func_value);
     }
 
@@ -227,13 +218,22 @@ namespace native
         llvm::Value        * pc_updated    = NULL;
         string               function_name = "Simulate_" + exec_packet->GetName();
 
-        llvm::FunctionType * func_type = llvm::FunctionType::get(Type::getInt32Ty(GetContext()), /*not vararg*/false);
+        const Type * return_type = Type::getInt32Ty(GetContext());
+        std::vector<const Type*> params;
+        params.push_back(p_proc_state_type);
+        llvm::FunctionType * func_type = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
         llvm::Function     * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_out_module);
         llvm::BasicBlock   * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
 
-        cout << "Generating Function ... " << function_name << "()" << endl;
+        INFO << "Generating Function ... " << function_name << "(proc_state_t *)" << endl;
 
         SetCurrentFunction(function);
+        // Here we get the Processor State Pointer from the Currently Generating Function.
+        // The Processor State is passed to the Generated Function as a pointer.
+        Function::arg_iterator curr_gen_func_args = function->arg_begin();
+        p_proc_state = curr_gen_func_args++;          // We know that its the only single parameter; but increment anyways
+        p_proc_state->setName("proc_state");
+
         GetIRBuilder().SetInsertPoint(gen_block);
 
         exec_packet->ResetInstrIterator();
@@ -248,15 +248,23 @@ namespace native
 #endif
         }
 
-        CreateCallByNameGlobalProcStat("ShowProcessorState");
+        CreateCallByName("ShowProcessorState");
+
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
+        INFO << "\tFunction Call: " << "IncrementPC" << endl;
         GetIRBuilder().CreateCall2(p_increment_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
+
+        INFO << "\tFunction Call: " << "IncrementCycles" << endl;
         GetIRBuilder().CreateCall(p_inc_cycles, p_proc_state);
+
         pc_updated = CreateCallByName("UpdateRegisters");
+        INFO << endl;
 
         GetIRBuilder().CreateRet(Geti32Value(0));
+
         llvm::verifyModule(*p_out_module, PrintMessageAction);
+
         return (0);
     }
 

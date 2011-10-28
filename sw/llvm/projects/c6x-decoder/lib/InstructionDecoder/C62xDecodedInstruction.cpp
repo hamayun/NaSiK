@@ -326,7 +326,7 @@ namespace native
 #endif
         if(func_ptr)
         {
-            //COUT << "Adding Call to Function: " << func_name << endl;
+            INFO << "\tFunction Call: " << func_name << endl;
             func_value = irbuilder.CreateCall(func_ptr, args.begin(), args.end(), GetMnemonic());
         }
         else

@@ -85,7 +85,8 @@ namespace native
          */
         llvm::tool_output_file  * p_output_stream;      // The output bitcode file.
 
-        llvm::GlobalVariable    * p_proc_state;         // Pointer to Processor State in LLVM IR Module
+        llvm::PointerType       * p_proc_state_type;    // Pointer type to the Processor State. i.e. "Proc_State_t *"
+        llvm::Value             * p_proc_state;         // Pointer to Processor State argument that is passed to the current function
         llvm::Function          * p_increment_pc;
         llvm::Function          * p_get_pc;
         llvm::Function          * p_set_pc;
@@ -107,7 +108,6 @@ namespace native
         virtual llvm::Value * Geti32Value(int32_t value) { return(llvm::ConstantInt::get(i32, value)); }
 
         virtual llvm::Value * CreateCallByName(string func_name);
-        virtual llvm::Value * CreateCallByNameGlobalProcStat(string func_name);
 
         virtual int32_t GenerateLLVMEPLevel(ExecutePacket * exec_packet);       // Using Execute Packet Level Granularity
 

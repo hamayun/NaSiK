@@ -22,10 +22,6 @@
 #include "C62xISABehavior.h"
 #include "stdio.h"
 
-// TODO: Externalize this Definition of Processor State Instance.
-//extern C62x_Proc_State_t proc_state;
-C62x_Proc_State_t g_proc_state;
-
 char BANKS[C62X_REG_BANKS];
 
 #define BANKINDEX(idx) idx / C62X_REGS_PER_BANK
@@ -152,7 +148,6 @@ C62x_DelayTable_Node_t * ConsumeDelayRegister(C62x_DelayTable_Queue_t * delay_qu
     return (NULL);
 }
 
-/*
 int32_t InitProcessorState(C62x_Proc_State_t * proc_state)
 {
     uint32_t index;
@@ -174,34 +169,7 @@ int32_t InitProcessorState(C62x_Proc_State_t * proc_state)
     for(index = 0; index < C62X_REG_BANKS; index++)
         BANKS[index] = 'A' + index;
 
-    printf("Processor State Initialized\n");
-    return (0);
-}
-*/
-
-int32_t InitProcessorState()
-{
-    C62x_Proc_State_t * proc_state = & g_proc_state;
-    uint32_t index;
-
-    proc_state->m_curr_cpu_cycle = 0;
-    proc_state->p_pc = & proc_state->m_register[REG_PC_INDEX];
-
-    memset((void *) & proc_state->m_register[0], 0x0, sizeof(proc_state->m_register));
-
-    for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
-    {
-        if(InitDelayTableQueue(& proc_state->m_delay_table[index]))
-        {
-            printf("Error: Initializing Delay Table Queue [%d]\n", index);
-            return (-1);
-        }
-    }
-
-    for(index = 0; index < C62X_REG_BANKS; index++)
-        BANKS[index] = 'A' + index;
-
-    printf("(Global) Processor State Initialized\n");
+    printf("(Parameterized) Processor State Initialized\n");
     return (0);
 }
 
@@ -259,46 +227,9 @@ int32_t AddDelayedRegister(C62x_Proc_State_t * proc_state, uint16_t reg_id, uint
     return (0);
 }
 
-/*
 int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
 {
     uint32_t reg_id, index;
-
-    printf("Cycle: %016lld, PC = %08x, Registers:\n", proc_state->m_curr_cpu_cycle, *proc_state->p_pc);
-    for(reg_id = 0; reg_id < (C62X_REG_BANKS * C62X_REGS_PER_BANK); reg_id++)
-    {
-        printf("%4s=%08x ", REG(reg_id), proc_state->m_register[reg_id]);
-        if((reg_id + 1) % (C62X_REGS_PER_BANK/2) == 0) printf("\n");
-    }
-
-    for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
-    {
-        C62x_DelayTable_Queue_t * delay_queue = & proc_state->m_delay_table[index];
-        C62x_DelayTable_Node_t  * curr_node = delay_queue->m_head_node;
-
-        if(proc_state->m_curr_cpu_cycle % (C62X_MAX_DELAY_SLOTS + 1) == index)
-            printf("->");
-        else
-            printf("  ");
-
-        printf("Queue[%d(Max=%02d)]: { ", index, delay_queue->m_max_busy_nodes);
-        while(curr_node != delay_queue->m_tail_node)
-        {
-            printf("%4s=%08x ", REG(curr_node->m_reg_id), curr_node->m_value);
-            curr_node = curr_node->m_next_node;
-        }
-        printf("}\n");
-    }
-
-    printf("\n");
-    return (0);
-}
-*/
-
-int32_t ShowProcessorState()
-{
-    uint32_t reg_id, index;
-    C62x_Proc_State_t * proc_state = & g_proc_state;
 
     printf("Cycle: %016lld, PC = %08x, Registers:\n", proc_state->m_curr_cpu_cycle, *proc_state->p_pc);
     for(reg_id = 0; reg_id < (C62X_REG_BANKS * C62X_REGS_PER_BANK); reg_id++)
@@ -626,8 +557,8 @@ C62xADDU_UR32_UR40_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         uint32_t rdl = rd & 0xFFFFFFFF;
 
 #ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADDU      %s,%s,%s:%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
+        fprintf(stdout, "%08x\tADDU      %s,%s:%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
 #endif
         AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
