@@ -2,7 +2,7 @@
 #ifndef PROCESSOR_PROFILE_H
 #define PROCESSOR_PROFILE_H
 
-#define ENABLE_PROFILING
+//#define ENABLE_PROFILING
 extern short HOSTTIME_BASEPORT;
 
 typedef enum hosttime_port_value

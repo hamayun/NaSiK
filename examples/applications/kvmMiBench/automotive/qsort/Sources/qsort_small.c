@@ -58,7 +58,7 @@ real_main(int argc, char *argv[], int app_repeat_count) {
     FILE *fp2;
     int i,count=0;
 
-    printf("QSORT: In main function : For %d time\n\n", app_repeat_count);
+    printf("QSORT: In main function : For %d time\n", app_repeat_count);
 #if 0
   if (argc<2) {
     fprintf(stderr,"Usage: qsort_small <file>\n");
@@ -68,18 +68,35 @@ real_main(int argc, char *argv[], int app_repeat_count) {
     fp = fopen(argv[1],"r");
 #endif
     fp  = fopen("/devices/disk/simulator/0", "r");
-    fp1 = fopen("/devices/disk/simulator/1", "r");
-    fp2 = fopen("/devices/disk/simulator/2", "w");
+    if(!fp)
+    {
+	    printf("\nError Opening /devices/disk/simulator/0\n");
+	    return (-1);
+    }
 
+    fp1 = fopen("/devices/disk/simulator/1", "r");
+    if(!fp1)
+    {
+	    printf("\nError Opening /devices/disk/simulator/1\n");
+	    return (-1);
+    }
+ 
+    fp2 = fopen("/devices/disk/simulator/2", "w");
+    if(!fp2)
+    {
+        printf("\nError Opening /devices/disk/simulator/2\n");
+        return (-1);
+    }
+ 
     CPU_PROFILE_IO_START();
     while((fscanf(fp, "%s", &array[count].qstring) == 1) && (count < MAXARRAY)) {
-	 count++;
+        count++;
     }
     CPU_PROFILE_IO_END();
 #if 0
   }
 #endif
-  printf("\nSorting %d elements.\n\n",count);
+  printf("\nSorting %d elements.\n",count);
 
   CPU_PROFILE_COMP_START();
   qsort(array,count,sizeof(struct myStringStruct),compare);
@@ -96,6 +113,6 @@ real_main(int argc, char *argv[], int app_repeat_count) {
   fclose(fp1);
   fclose(fp2);
 
-  printf("\nDone\n");
+  printf("Done\n");
   return 0;
 }

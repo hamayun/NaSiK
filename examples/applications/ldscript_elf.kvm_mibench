@@ -1,6 +1,6 @@
 MEMORY
 {
-	mem :    ORIGIN = 64M,    LENGTH = 30M
+	mem :    ORIGIN = 64M,    LENGTH = 64M
 }
 
 PHDRS
@@ -24,9 +24,9 @@ SECTIONS
     .data ALIGN(4K) : { *(.data) *(.glue_7*) *(.eh_frame*) } > mem :data
 
 	.os_config ALIGN(0x8): {
-		OS_N_DRIVERS = .; LONG(0x5)
-		OS_DRIVERS_LIST = .; LONG(soclib_platform_module) LONG(rdv_module)
-                     LONG(fdaccess_module) LONG(soclib_fb_module) LONG(tg_module)
+		OS_N_DRIVERS = .; LONG(0x4)
+		OS_DRIVERS_LIST = .; LONG(soclib_platform_module) LONG(rdv_module) LONG(soclib_block_device_module)
+							 LONG(soclib_fb_module)
 	
 		OS_N_FILESYSTEMS = .; LONG(0x2)
 		OS_FILESYSTEMS_LIST = .; LONG(devfs_module) LONG(rootfs_module)

@@ -18,7 +18,7 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
 APPLICATION=kvmParallelMjpeg
 #APPLICATION=susan
-#APPLICATION=qsort
+APPLICATION=qsort
 #APPLICATION=dijkstra
 #APPLICATION=patricia
 #APPLICATION=blowfish
@@ -35,7 +35,7 @@ APPLICATION=kvmParallelMjpeg
 #APPLICATION=printFloats
 #APPLICATION=blockIOTest
 #APPLICATION=printIOTest
-APPLICATION=kvmPhyMemTest
+#APPLICATION=kvmPhyMemTest
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
@@ -55,7 +55,13 @@ fi
 #Update Links in Application.
 echo "Updating Application Specific Symlinks ..."
 cd ${APP_DIR}
-ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm elf.lds
+
+if [ ${APPLICATION} = "kvmParallelMjpeg" ]; then
+	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mjpeg elf.lds
+else
+	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mibench elf.lds
+fi
+
 ln -sf interface.xmi.kvm interface.xmi
 
 # for tty_terms
