@@ -64,8 +64,8 @@ static sigset_t kernel_sigmask;
 static sigset_t ipi_sigmask;
 static uint64_t memory_size = 128 * 1024 * 1024;
 
+static hosttime_t *hosttime_instance = NULL;
 static struct io_table pio_table;
-static hosttime_t hosttime_instance = {0};
 
 struct vcpu_info {
 	int id;
@@ -101,7 +101,7 @@ static int apic_io(void *opaque, int size, int is_write,
 	switch (addr - APIC_BASE) {
 	case APIC_REG_NCPU:
 		if (!is_write)
-			*value = ncpus;
+                    *value = ncpus;
 		break;
 	case APIC_REG_ID:
 		if (!is_write)
@@ -939,6 +939,12 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 		return 1;
 	}
 
+        hosttime_instance = calloc(ncpus, sizeof(hosttime_t));
+        if (!hosttime_instance) {
+            fprintf(stderr, "calloc failed for hosttime_instances\n");
+            return 1;
+	}
+
 	kvm = kvm_init(&test_callbacks, 0);
 	if (!kvm) {
 		fprintf(stderr, "kvm_init failed\n");
@@ -979,11 +985,11 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 
 	io_table_register(&pio_table, IRQCHIP_IO_BASE, 0x20, irqchip_io, NULL);
 
-    // Register the Annotation Handler; Also pass the Virtual Memory Address allocated to KVM
-    io_table_register(&pio_table, ANNOTATION_BASEPORT, 0x04, annotation_handler, vm_mem);
+        // Register the Annotation Handler; Also pass the Virtual Memory Address allocated to KVM
+        io_table_register(&pio_table, ANNOTATION_BASEPORT, 0x04, annotation_handler, vm_mem);
 
-    // Register the HostTime Handler
-    io_table_register(&pio_table, HOSTTIME_BASEPORT, 0x4, hosttime_handler, &hosttime_instance);
+        // Register the HostTime Handler
+        io_table_register(&pio_table, HOSTTIME_BASEPORT, 0x4, hosttime_handler, &hosttime_instance[0]);
 
 	sem_init(&init_sem, 0, 0);
 	for (i = 0; i < ncpus; ++i)
@@ -994,6 +1000,7 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 	soc_kvm_init_data.ncpus = ncpus;
 	soc_kvm_init_data.memory_size = memory_size;
 	soc_kvm_init_data.vm_mem = vm_mem;
+
 	return 0;
 }
 
@@ -1134,7 +1141,7 @@ int soc_verify_memory()
     return (0);
 }
 
-void soc_kvm_run()
+void soc_kvm_run(int cpuid)
 {
     int ret = 0;
 
@@ -1144,7 +1151,7 @@ void soc_kvm_run()
         return;
     }
 
-    if(init_hosttime(& hosttime_instance, "hosttime_kvm.txt"))
+    if(init_hosttime(& hosttime_instance[cpuid], "hosttime_kvm.txt"))
     {
         printf("%s: Error Initializing Hosttime Instance\n", __func__);
         return;
@@ -1153,7 +1160,7 @@ void soc_kvm_run()
     io_table_print(&pio_table);
 
     printf("%s: Calling kvm_run ...\n", __func__);
-    ret = kvm_run(kvm, 0, &vcpus[0]);
+    ret = kvm_run(kvm, 0, &vcpus[cpuid]);
     printf("%s Exited; Return Value = %d\n", __func__, ret);
 
     dump_trace_files("mmio_kvm_run_exit.dump", "pmio_kvm_run_exit.dump");
