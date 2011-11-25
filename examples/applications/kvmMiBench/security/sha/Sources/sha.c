@@ -100,7 +100,7 @@ void sha_transform(SHA_INFO *sha_info)
 
 /* change endianness of data */
 
-static void byte_reverse(LONG *buffer, int count)
+void byte_reverse(LONG *buffer, int count)
 {
     int i;
     BYTE ct[4], *cp;
@@ -221,7 +221,7 @@ void sha_stream(SHA_INFO *sha_info, FILE *fin)
         if(i <= 0) break;
 
         CPU_PROFILE_COMP_START();
-	sha_update(sha_info, data, i);
+    	sha_update(sha_info, data, i);
         CPU_PROFILE_COMP_END();
     }
     CPU_PROFILE_COMP_START();

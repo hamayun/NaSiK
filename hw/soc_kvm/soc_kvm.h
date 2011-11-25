@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define MAX_VCPUS 4
+
 typedef struct _soc_kvm_data
 {
 	int				ncpus;

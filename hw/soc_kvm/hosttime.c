@@ -21,6 +21,10 @@
 #include <stdlib.h>
 #include "hosttime.h"
 
+int soc_load_target_binary();
+int soc_erase_memory();
+int soc_verify_memory();
+
 #if 0
 double get_clock(void) {
   /* Unix or Linux: use resource usage */

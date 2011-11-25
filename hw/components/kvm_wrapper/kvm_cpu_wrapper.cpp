@@ -6,7 +6,7 @@
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
-    void soc_kvm_run(int cpuid);
+    void soc_kvm_run(unsigned int cpuid);
 }
 
 //#define QEMU_STNOC_ADDRESS_DIFFERENCE 0x00000000
@@ -36,10 +36,8 @@ kvm_cpu_wrapper::~kvm_cpu_wrapper ()
 // A thread used to simulate the kvm
 void kvm_cpu_wrapper::cpuThread ()
 {
-    //while (1)
-    {
-        soc_kvm_run(0);
-    }
+    cout << "cpuThread: Calling KVM Run ... [" << m_node_id << "]" << endl;
+    soc_kvm_run(m_node_id);
 }
 
 // Here we get the Annotation Trace (A buffer containing pointers to Annotation DBs)

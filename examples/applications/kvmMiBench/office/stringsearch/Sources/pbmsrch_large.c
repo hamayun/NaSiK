@@ -12,6 +12,7 @@
 **  10/21/93 rdg  Fixed bug found by Jeff Dunlop
 */
 
+#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include "limits.h"
@@ -45,7 +46,7 @@ void init_search(const char *string)
 
 char *strsearch(const char *string)
 {
-      register size_t shift;
+      register size_t shift = 0;
       register size_t pos = len - 1;
       char *here;
       size_t limit=strlen(string);
@@ -69,8 +70,6 @@ char *strsearch(const char *string)
       }
       return NULL;
 }
-
-#include <stdio.h>
 
 #ifdef  MEASURE_ACCURACY
     /* Copied the following definitions from qemu_wrapper_cts.h & kvm_cpu_wrapper.h */

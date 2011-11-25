@@ -24,6 +24,7 @@ void sha_update(SHA_INFO *, BYTE *, int);
 void sha_final(SHA_INFO *);
 
 void sha_stream(SHA_INFO *, FILE *);
+void byte_reverse(LONG *buffer, int count);
 void sha_print(SHA_INFO *);
 
 #endif /* SHA_H */

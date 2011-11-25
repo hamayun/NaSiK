@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <sstream>
 
 #include <systemc.h>
 #include <abstract_noc.h>
@@ -47,9 +48,10 @@ extern "C" {
 #include <soc_kvm.h>
     extern soc_kvm_data soc_kvm_init_data;
     int soc_kvm_init(char *bootstrap, char *elf_file);
+
+    void *p_kvm_cpu_adaptor[MAX_VCPUS] = {NULL};
 }
 
-void *p_kvm_cpu_adaptor;
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -61,7 +63,7 @@ void simulation_stop(int signo)
 {
 	cout << "************************************************************" << endl;
 	cout << "              USER REQUEST END OF SIMULATION                " << endl;
-	cout << " Simulation time : " << sc_time_stamp() << endl;	
+	cout << " Simulation time : " << sc_time_stamp() << endl;
 	cout << "************************************************************" << endl;
 	sc_stop();
 	exit(0);
@@ -80,8 +82,8 @@ int                 nslaves = 0;
 
 int sc_main (int argc, char ** argv)
 {
-    int             i, retVal;
-    unsigned int    kvm_nb_cpu;
+    int         i, retVal;
+    int         kvm_nb_cpu;
 
     if(argc < 3) usage_and_exit(argv[0]);
     signal(SIGINT,simulation_stop);
@@ -94,7 +96,7 @@ int sc_main (int argc, char ** argv)
       fb_res_stat.fb_mode   = YV16;
       fb_res_stat.fb_display_on_wrap = 1;
     }
-			
+
     /* Initialize the kvm. */
     retVal = soc_kvm_init(argv[1], argv[2]);
     if(retVal)
@@ -102,46 +104,53 @@ int sc_main (int argc, char ** argv)
         std::cout << "soc_kvm_init failed, retVal = " << retVal << std::endl;
         return(EXIT_FAILURE);
     }
+
     kvm_nb_cpu = soc_kvm_init_data.ncpus;
 
     /* Initialize the adaptor, also pass the application name to execute*/
-    kvm_cpu_wrapper_t	kvm_cpu_adaptor("kvm_cpu", argv[2], (uintptr_t)soc_kvm_init_data.vm_mem);
-    p_kvm_cpu_adaptor = &kvm_cpu_adaptor;
+    kvm_cpu_wrapper_t * kvm_cpu_adaptor[MAX_VCPUS] = {NULL};
+    for (i = 0; i < kvm_nb_cpu; i++)
+    {
+        std::stringstream cpu_id; cpu_id << i;
+        string kvm_cpu_name = "kvm_cpu_" + cpu_id.str();
+        kvm_cpu_adaptor[i] = new kvm_cpu_wrapper_t(kvm_cpu_name.c_str(), argv[2], (uintptr_t)soc_kvm_init_data.vm_mem, i);
+        p_kvm_cpu_adaptor[i] = (void *) kvm_cpu_adaptor[i];
+
+        std::cout << "p_kvm_cpu_adaptor[" << i << "] = " << p_kvm_cpu_adaptor[i] << std::endl;
+    }
 
     sl_block_device   *bl   = new sl_block_device("block", 1, "input_data", 1);
     sl_block_device   *bl2  = new sl_block_device("block2", 2, "input_data", 1);
     sl_block_device   *bl3  = new sl_block_device("block3", 3, "output_data", 1);
 
-    mem_device		   *ram = new mem_device("ram", soc_kvm_init_data.memory_size, soc_kvm_init_data.vm_mem);
+    mem_device         *ram = new mem_device("ram", soc_kvm_init_data.memory_size, soc_kvm_init_data.vm_mem);
     mem_device  *shared_ram = new mem_device("shared_ram", 0x10000);
     sl_tty_device     *tty0 = new sl_tty_device ("tty1", 1);
-    sl_tg_device	    *tg = new sl_tg_device ("tg", "fdaccess.0.0");
+    sl_tg_device        *tg = new sl_tg_device ("tg", "fdaccess.0.0");
     fb_device           *fb = new fb_device("framebuffer", 0, &fb_res_stat);
-    sem_device		   *sem = new sem_device("sem", 0x100000);
+    sem_device         *sem = new sem_device("sem", 0x100000);
 
     slaves[nslaves++] = ram;			 // 0	0x00000000 - 0x08000000
     slaves[nslaves++] = shared_ram;		 // 1	0xAF000000 - 0xAFF00000
     slaves[nslaves++] = tty0;			 // 2	0xC0000000 - 0xC0000040
-    slaves[nslaves++] = tg;				 // 3	0xC3000000 - 0xC3001000
-    slaves[nslaves++] = fb->get_slave(); // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
+    slaves[nslaves++] = tg;			 // 3	0xC3000000 - 0xC3001000
+    slaves[nslaves++] = fb->get_slave();         // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
     slaves[nslaves++] = sem;			 // 5	0xC5000000 - 0xC5100000
-    slaves[nslaves++] = bl->get_slave(); // 6	0xC6000000 - 0xC6100000
-    slaves[nslaves++] = bl2->get_slave();// 7	0xC6500000 - 0xC6600000
-    slaves[nslaves++] = bl3->get_slave();// 8	0xC6A00000 - 0xC6B00000
+    slaves[nslaves++] = bl->get_slave();         // 6	0xC6000000 - 0xC6100000
+    slaves[nslaves++] = bl2->get_slave();        // 7	0xC6500000 - 0xC6600000
+    slaves[nslaves++] = bl3->get_slave();        // 8	0xC6A00000 - 0xC6B00000
 
-    timer_device	*timers[4];
-    int				ntimers = sizeof (timers) / sizeof (timer_device *);
+    timer_device	*timers[3 + kvm_nb_cpu];
+    int       ntimers = sizeof (timers) / sizeof (timer_device *);   // Why we divide by pointer size here ???
     for (i = 0; i < ntimers; i ++)
     {
-	    char		buf[20];
-      sprintf(buf, "timer_%d", i);
-      timers[i] = new timer_device (buf);
-      slaves[nslaves++] = timers[i]; // 7 + i  from 0xC1000000
+        char		buf[20];
+        sprintf(buf, "timer_%d", i);
+        timers[i] = new timer_device (buf);
+        slaves[nslaves++] = timers[i]; // 7 + i  from 0xC1000000
     }
-    int							no_irqs = ntimers + 4;
-    //int 						int_cpu_mask [] = {1, 1, 0, 0, 0, 0, 0};
-
-    sc_signal<bool>             *wires_irq_qemu = new sc_signal<bool>[no_irqs];
+    int                     no_irqs = ntimers + 4;
+    sc_signal<bool> *wires_irq_qemu = new sc_signal<bool>[no_irqs];
 
     for (i = 0; i < ntimers; i++)
         timers[i]->irq (wires_irq_qemu[i]);
@@ -152,27 +161,28 @@ int sc_main (int argc, char ** argv)
     fb->irq (wires_irq_qemu[no_irqs-1]);
 
     //interconnect
-    onoc = new interconnect ("interconnect", 5, nslaves);
+    onoc = new interconnect ("interconnect", (kvm_nb_cpu + 4), nslaves);
     for (i = 0; i < nslaves; i++)
         onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
 
-    onoc->connect_master_64 (0, kvm_cpu_adaptor.put_port, kvm_cpu_adaptor.get_port);
+    for (i = 0; i < kvm_nb_cpu; i++)
+        onoc->connect_master_64 (i, kvm_cpu_adaptor[i]->put_port, kvm_cpu_adaptor[i]->get_port);
 
     // connect block device
-    onoc->connect_master_64(1,
+    onoc->connect_master_64(i,
                             bl->get_master()->put_port,
                             bl->get_master()->get_port);
-    onoc->connect_master_64(2,
+    onoc->connect_master_64(i+1,
                             bl2->get_master()->put_port,
                             bl2->get_master()->get_port);
-    onoc->connect_master_64(3,
+    onoc->connect_master_64(i+2,
                             bl3->get_master()->put_port,
                             bl3->get_master()->get_port);
-    onoc->connect_master_64(4,
+    onoc->connect_master_64(i+3,
                             fb->get_master()->put_port,
                             fb->get_master()->get_port);
 
-    sc_start(-1);
+    sc_start();
     return (EXIT_SUCCESS);
 }
 
@@ -230,7 +240,7 @@ void memory_mark_exclusive (int cpu, unsigned long addr)
     for (i = 0; i < no_mem_exclusive; i++)
         if (addr == mem_exclusive[i].addr)
             break;
-    
+
     if (i >= no_mem_exclusive)
     {
         mem_exclusive[no_mem_exclusive].addr = addr;
@@ -262,7 +272,7 @@ int memory_test_exclusive (int cpu, unsigned long addr)
     for (i = 0; i < no_mem_exclusive; i++)
         if (addr == mem_exclusive[i].addr)
             return (cpu != mem_exclusive[i].cpu);
-    
+
     return 1;
 }
 
@@ -280,7 +290,7 @@ void memory_clear_exclusive (int cpu, unsigned long addr)
                 mem_exclusive[i].addr = mem_exclusive[i + 1].addr;
                 mem_exclusive[i].cpu = mem_exclusive[i + 1].cpu;
             }
-            
+
             no_mem_exclusive--;
             return;
         }

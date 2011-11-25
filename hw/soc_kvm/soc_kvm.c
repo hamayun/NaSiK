@@ -30,7 +30,7 @@
 
 soc_kvm_data soc_kvm_init_data;
 
-extern void * p_kvm_cpu_adaptor;
+extern void * p_kvm_cpu_adaptor[];
 uint64_t systemc_kvm_read_memory (void *_this, uint64_t addr, int nbytes, uint32_t *ns, int bIO);
 void systemc_kvm_write_memory (void *_this, uint64_t addr, unsigned char *data, int nbytes, uint32_t *ns, int bIO);
 void systemc_annotate_function(void *_this, void *vm_addr, void *pdesc);
@@ -51,8 +51,6 @@ static int tkill(int pid, int sig)
 }
 
 kvm_context_t kvm;
-
-#define MAX_VCPUS 4
 
 #define IPI_SIGNAL (SIGRTMIN + 4)
 
@@ -105,7 +103,7 @@ static int apic_io(void *opaque, int size, int is_write,
 		break;
 	case APIC_REG_ID:
 		if (!is_write)
-			*value = vcpu;
+                    *value = vcpu;
 		break;
 	case APIC_REG_SIPI_ADDR:
 		if (!is_write)
@@ -330,7 +328,7 @@ static int annotation_handler(void *opaque, int size, int is_write,
     //printf("annotation_handler: Annotations are Present in S/W\n");
 
     if(*value){
-        systemc_annotate_function(p_kvm_cpu_adaptor, opaque, (opaque + *value));
+        systemc_annotate_function(p_kvm_cpu_adaptor[0], opaque, (opaque + *value));
     }
     else{
         printf("%s: Overflow in S/W (All Annotation Buffers Full): *value = 0x%08x\n", __func__, (uint32_t)(*value));
@@ -506,12 +504,16 @@ static int test_mmio_read(void *opaque, uint64_t addr, uint8_t *data, int len)
 
         dump_trace_files("mmio_read_error_trace.dump", "pmio_read_error_trace.dump");
         kvm_show_regs(kvm, 0);
+        //kvm_dump_vcpu(kvm, 0);
         return 1;
     }
 
     //memcpy(data, ioram + addr - IORAM_BASE_PHYS, len);
     //printf("%s: address: 0x%x, len: %d\n", __func__, (uint32_t) addr, len);
-    value = systemc_kvm_read_memory(p_kvm_cpu_adaptor, addr, len, NULL, 1);
+
+    //printf ("%s: p_kvm_cpu_adaptor[%d] = 0x%x\n", __func__, 0, (unsigned int)p_kvm_cpu_adaptor[0]);
+
+    value = systemc_kvm_read_memory(p_kvm_cpu_adaptor[0], addr, len, NULL, 1);
     for (i = 0; i < len; i++)
         data[i] = *((unsigned char *) &value + i);
 
@@ -547,13 +549,16 @@ static int test_mmio_write(void *opaque, uint64_t addr, uint8_t *data, int len)
 
         dump_trace_files("mmio_write_error_trace.dump", "pmio_write_error_trace.dump");
         kvm_show_regs(kvm, 0);
+        //kvm_dump_vcpu(kvm, 0);
         return 1;
     }
 
     //memcpy(ioram + addr - IORAM_BASE_PHYS, data, len);
     //printf("%s: address: 0x%x, len: 0x%x\n", __func__, (uint32_t) addr, len);
 
-    systemc_kvm_write_memory(p_kvm_cpu_adaptor, addr, data, len, NULL, 1);
+    //printf ("%s: p_kvm_cpu_adaptor[%d] = 0x%x\n", __func__, 0, (unsigned int) p_kvm_cpu_adaptor[0]);
+
+    systemc_kvm_write_memory(p_kvm_cpu_adaptor[0], addr, data, len, NULL, 1);
     return 0;
 }
 
@@ -562,6 +567,7 @@ static int test_shutdown(void *opaque, void *env)
 	printf("shutdown\n");
         dump_trace_files("mmio_shutdown_trace.dump", "pmio_shutdown_trace.dump");
         kvm_show_regs(kvm, 0);
+        //kvm_dump_vcpu(kvm, 0);
 	exit(1);
 	return 1;
 }
@@ -661,20 +667,25 @@ static void *do_create_vcpu(void *_n)
 	int n = (long)_n;
 	struct kvm_regs regs;
 
+        printf("%s: Creating VCPU ... [%d]\n", __func__, n);
 	kvm_create_vcpu(kvm, n);
+        printf("%s: Init VCPU ... [%d]\n", __func__, n);
 	init_vcpu(n);
+        printf("%s: Waiting on sipi_sem ... [%d]\n", __func__, n);
 	sem_wait(&vcpus[n].sipi_sem);
 	kvm_get_regs(kvm, n, &regs);
 	regs.rip = apic_sipi_addr;
 	kvm_set_regs(kvm, n, &regs);
+
 	kvm_run(kvm, n, &vcpus[n]);
-	return NULL;
+        return NULL;
 }
 
 static void start_vcpu(int n)
 {
 	pthread_t thread;
 
+        printf("%s: Creating CPU Thread ... [%d]\n", __func__, n);
 	sem_init(&vcpus[n].sipi_sem, 0, 0);
 	pthread_create(&thread, NULL, do_create_vcpu, (void *)(long)n);
 }
@@ -759,7 +770,7 @@ int load_elf(void *vm_addr, int vm_size, char *file)
     elf = elf_begin(fd, ELF_C_READ, NULL);    // Initialize 'elf' pointer to our file descriptor
 
     printf("%s: Loading ELF Binary at vm_addr: 0x%x, Size = %d\n", __func__, (uint32_t)vm_addr, (int)elf_stats.st_size);
-    printf("Section Type        Flags\tVirt Addr\tSize (bytes)\tOffset\t\tName\n");
+    printf("Section Type        Flags\tVirt Addr\tSize (bytes)\tOffset\t           Name\n");
     /* Iterate through section headers */
     while((scn = elf_nextscn(elf, scn)) != 0)
     {
@@ -813,15 +824,15 @@ int load_elf(void *vm_addr, int vm_size, char *file)
         printf("\t\t");
 
         // Virt Addr
-        printf("0x%llx\t\t", (uint64_t)shdr.sh_addr);
+        printf("0x%08llx\t", (uint64_t)shdr.sh_addr);
         // Size (bytes)
         printf("%lld\t\t", (uint64_t)shdr.sh_size);
         // Offset
-        printf("0x%llx\t\t", (uint64_t)shdr.sh_offset);
+        printf("0x%llx\t", (uint64_t)shdr.sh_offset);
 
         // the shdr Name is in a string table, libelf uses elf_strptr() to find it
         // using the e_shstrndx value from the elf_header
-        printf("%s\t\t", elf_strptr(elf, elf_header->e_shstrndx, shdr.sh_name));
+        printf("%15s\t", elf_strptr(elf, elf_header->e_shstrndx, shdr.sh_name));
 
         // Load binary to memory address.
         for(i = 0; strcmp(section_copy[i], "") != 0; i++)
@@ -835,7 +846,7 @@ int load_elf(void *vm_addr, int vm_size, char *file)
                     memcpy(vm_addr + shdr.sh_addr + n, edata->d_buf, edata->d_size);
                     n += edata->d_size;
                 }
-                printf("Loaded %d bytes at 0x%x (KVM VIR: 0x%x)", n,
+                printf("Loaded ...  %7d Bytes @ 0x%x (KVM: 0x%x)", n,
                        (uint32_t)(vm_addr + shdr.sh_addr), (uint32_t) shdr.sh_addr);
             }
         }
@@ -843,7 +854,7 @@ int load_elf(void *vm_addr, int vm_size, char *file)
         if(strcmp(section_bss, elf_strptr(elf, elf_header->e_shstrndx, shdr.sh_name)) == 0)
         {
             memset(vm_addr + shdr.sh_addr, 0, shdr.sh_size);
-            printf("Initialized %d bytes (Nulls) at 0x%x (KVM VIR: 0x%x)", (int)shdr.sh_size,
+            printf("Initialized %7d Bytes @ 0x%x (KVM: 0x%x)", (int)shdr.sh_size,
                    (uint32_t)(vm_addr + shdr.sh_addr), (uint32_t)(shdr.sh_addr));
         }
 
@@ -989,19 +1000,49 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
         io_table_register(&pio_table, ANNOTATION_BASEPORT, 0x04, annotation_handler, vm_mem);
 
         // Register the HostTime Handler
-        io_table_register(&pio_table, HOSTTIME_BASEPORT, 0x4, hosttime_handler, &hosttime_instance[0]);
+	for (i = 0; i < ncpus; ++i)
+            io_table_register(&pio_table, HOSTTIME_BASEPORT, 0x4, hosttime_handler, &hosttime_instance[i]);
 
 	sem_init(&init_sem, 0, 0);
+
 	for (i = 0; i < ncpus; ++i)
-		start_vcpu(i);
-	for (i = 0; i < ncpus; ++i)
-		sem_wait(&init_sem);
+            start_vcpu(i);
+
+        for (i = 0; i < ncpus; ++i)
+            sem_wait(&init_sem);
 
 	soc_kvm_init_data.ncpus = ncpus;
 	soc_kvm_init_data.memory_size = memory_size;
 	soc_kvm_init_data.vm_mem = vm_mem;
 
 	return 0;
+}
+
+void soc_kvm_run(unsigned int cpuid)
+{
+    int ret = 0;
+
+    //printf ("%s: p_kvm_cpu_adaptor[%d] = 0x%x\n", __func__, cpuid, (unsigned int) p_kvm_cpu_adaptor[cpuid]);
+
+    if(allocate_trace_buffers())
+    {
+        printf("%s: Error Allocating Trace Buffers\n", __func__);
+        return;
+    }
+
+    if(init_hosttime(&hosttime_instance[cpuid], "hosttime_kvm.txt"))
+    {
+        printf("%s: Error Initializing Hosttime Instance\n", __func__);
+        return;
+    }
+
+    //io_table_print(&pio_table);
+
+    printf("%s: Calling kvm_run ... CPU[%d]\n", __func__, cpuid);
+    ret = kvm_run(kvm, 0, &vcpus[cpuid]);
+
+    printf("%s Exited; Return Value = %d\n", __func__, ret);
+    dump_trace_files("mmio_kvm_run_exit.dump", "pmio_kvm_run_exit.dump");
 }
 
 int soc_load_target_section(char * section_file, char * section_name)
@@ -1109,7 +1150,8 @@ int soc_erase_memory()
         curr_ptr++;
     }
 
-    //kvm_show_regs(kvm, 0);
+    kvm_show_regs(kvm, 0);
+    //kvm_dump_vcpu(kvm, 0);
     return (0);
 }
 
@@ -1122,7 +1164,8 @@ int soc_verify_memory()
     uint32_t * curr_ptr = address;
     uint32_t * end_ptr  = address + ( size / sizeof(uint32_t) );
 
-    //kvm_show_regs(kvm, 0);
+    kvm_show_regs(kvm, 0);
+    //kvm_dump_vcpu(kvm, 0);
     printf("%s: Verifying Memory\n", __func__);
 
     while (curr_ptr < end_ptr)
@@ -1139,29 +1182,4 @@ int soc_verify_memory()
     //printf("%s: Memory Test Passed: %05d\r", __func__, test_count++);
     fflush(stdout);
     return (0);
-}
-
-void soc_kvm_run(int cpuid)
-{
-    int ret = 0;
-
-    if(allocate_trace_buffers())
-    {
-        printf("%s: Error Allocating Trace Buffers\n", __func__);
-        return;
-    }
-
-    if(init_hosttime(& hosttime_instance[cpuid], "hosttime_kvm.txt"))
-    {
-        printf("%s: Error Initializing Hosttime Instance\n", __func__);
-        return;
-    }
-
-    io_table_print(&pio_table);
-
-    printf("%s: Calling kvm_run ...\n", __func__);
-    ret = kvm_run(kvm, 0, &vcpus[cpuid]);
-    printf("%s Exited; Return Value = %d\n", __func__, ret);
-
-    dump_trace_files("mmio_kvm_run_exit.dump", "pmio_kvm_run_exit.dump");
 }

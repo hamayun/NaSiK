@@ -16,6 +16,7 @@ all: $(LIBSOCKVM)
 $(LIBSOCKVM): iotable.o soc_kvm.o hosttime.o
 	@echo "    | Building  ... ${LIBSOCKVM}"
 	@$(CC) $(LDFLAGS) -o $@ $^
+	@rm -f *.o *.a *.d
 
 #	$(AR) rcs $@ $^
 

@@ -43,11 +43,12 @@ int real_main(int argc, char **argv, int app_repeat_count)
     FILE *fin;
     SHA_INFO sha_info;
 
-    int myargc = 2;
-    char **myargv = {"sha", "/devices/disk/simulator/0"};
+    char *myargv[2];
+    myargv[0] = "sha";
+    myargv[1] = "/devices/disk/simulator/0";
 
     printf("SHA: In main function : For %d time\n\n", app_repeat_count);
-    fin = fopen("/devices/disk/simulator/0", "rb");
+    fin = fopen(myargv[1], "rb");
     if (fin == NULL)
     {
         printf("error opening %s for reading\n", *myargv);
