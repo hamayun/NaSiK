@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sl_tty_device.h>
-#include <cfg.h>
+//#include <cfg.h>
 
 //#define DEBUG_DEVICE_TTY
 

@@ -39,7 +39,8 @@ APPLICATION=qsort
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
-export PLATFORM=tuzki
+#export PLATFORM=tuzki
+export PLATFORM=kroger
 export PFORM_DIR=$NASIK_HOME/examples/platforms/$PLATFORM
 
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
@@ -68,7 +69,7 @@ ln -sf interface.xmi.kvm interface.xmi
 export PATH=$NASIK_HOME:$PATH
 export PATH=${SECONDARY_TOOLCHAIN}/bin:$PATH
 export PATH=${PRIMARY_TOOLCHAIN}/bin:$PATH
-export LD_LIBRARY_PATH=${LIBKVM_PREFIX}/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/hamayun/sandbox/linux-kvm/tools/kvm:${LIBKVM_PREFIX}/lib
 
 cd $NASIK_HOME
 

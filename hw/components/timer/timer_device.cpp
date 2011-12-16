@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <timer_device.h>
-#include <cfg.h>
+//#include <cfg.h>
 
 //#define DEBUG_DEVICE_TIMER
 
