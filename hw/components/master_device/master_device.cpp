@@ -116,6 +116,10 @@ void master_device::send_req (unsigned char tid, unsigned long addr,
             req.wdata[i + ofs] = data[i];
     }
 
+    /*
+    printf("send_req: cmd = %d, addr = 0x%08x, trdid = %d, srcid = %d, plen = %d, eop = %d\n", 
+            req.cmd, req.address, req.trdid, req.srcid, req.plen, req.eop);
+    */
     put_port->put (req);
 }
 

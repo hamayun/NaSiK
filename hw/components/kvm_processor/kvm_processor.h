@@ -39,7 +39,7 @@ class kvm_processor : public master_device
 {
 public:
     SC_HAS_PROCESS (kvm_processor);
-    kvm_processor (sc_module_name name, uint32_t num_cores);
+    kvm_processor (sc_module_name name, uint32_t num_cores, int node_id=0);
     ~kvm_processor ();
 
 private:

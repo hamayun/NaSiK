@@ -70,15 +70,16 @@ interconnect        *onoc = NULL;
 slave_device        *slaves[50];
 int                 nslaves = 0;
 
-extern uint64_t kvm_ram_size;
-extern void *   kvm_userspace_mem_addr;
+extern "C" {
+        extern uint64_t kvm_ram_size;
+        extern void *   kvm_userspace_mem_addr;
+}
+
+void * p_kvm_cpu_adaptor = NULL;
 
 int sc_main (int argc, char ** argv)
 {
     int         i;
-    int         kvm_num_procs = 1;
-    int         kvm_num_cores = 2;
-
     //if(argc < 3) usage_and_exit(argv[0]);
     signal(SIGINT,simulation_stop);
 
@@ -91,16 +92,12 @@ int sc_main (int argc, char ** argv)
       fb_res_stat.fb_display_on_wrap = 1;
     }
 
-    /* Initialize the KVM Processor, and specify the number of cores here.*/
-    kvm_processor_t * kvm_processor[1] = {NULL};
-    for(i = 0; i < kvm_num_procs; i++)
-    {
-        std::stringstream proc_id; proc_id << i;
-        string kvm_proc_name = "kvm_proc_" + proc_id.str();
-        kvm_processor[i] = new kvm_processor_t(kvm_proc_name.c_str(), kvm_num_cores);
-    }
+    /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
+    int         kvm_num_procs = 1;
+    kvm_processor_t kvm_processor("kvm_proc", kvm_num_procs);
+    p_kvm_cpu_adaptor = & kvm_processor;
 
-    sl_block_device   *bl   = new sl_block_device("block", 1, "input_data", 1);
+    sl_block_device   *bl1  = new sl_block_device("block1", 1, "input_data", 1);
     sl_block_device   *bl2  = new sl_block_device("block2", 2, "input_data", 1);
     sl_block_device   *bl3  = new sl_block_device("block3", 3, "output_data", 1);
 
@@ -117,11 +114,11 @@ int sc_main (int argc, char ** argv)
     slaves[nslaves++] = tg;			 // 3	0xC3000000 - 0xC3001000
     slaves[nslaves++] = fb->get_slave();         // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
     slaves[nslaves++] = sem;			 // 5	0xC5000000 - 0xC5100000
-    slaves[nslaves++] = bl->get_slave();         // 6	0xC6000000 - 0xC6100000
+    slaves[nslaves++] = bl1->get_slave();        // 6	0xC6000000 - 0xC6100000
     slaves[nslaves++] = bl2->get_slave();        // 7	0xC6500000 - 0xC6600000
     slaves[nslaves++] = bl3->get_slave();        // 8	0xC6A00000 - 0xC6B00000
 
-    timer_device	*timers[3 + kvm_num_procs];
+    timer_device	*timers[3 + 1 /* kvm_processor_t */];
     int       ntimers = sizeof (timers) / sizeof (timer_device *);   // Why we divide by pointer size here ???
     for (i = 0; i < ntimers; i ++)
     {
@@ -136,33 +133,33 @@ int sc_main (int argc, char ** argv)
     for (i = 0; i < ntimers; i++)
         timers[i]->irq (wires_irq_qemu[i]);
 
-    bl->irq (wires_irq_qemu[no_irqs-4]);
+    bl1->irq (wires_irq_qemu[no_irqs-4]);
     bl2->irq (wires_irq_qemu[no_irqs-3]);
     bl3->irq (wires_irq_qemu[no_irqs-2]);
     fb->irq (wires_irq_qemu[no_irqs-1]);
 
     //interconnect
-    onoc = new interconnect ("interconnect", (kvm_num_procs + 4), nslaves);
+    onoc = new interconnect ("interconnect", (1 /* kvm_processor_t */ + 4), nslaves);
     for (i = 0; i < nslaves; i++)
         onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
 
-    for(i = 0; i < kvm_num_procs; i++)
-        onoc->connect_master_64 (i, kvm_processor[i]->put_port, kvm_processor[i]->get_port);
+    onoc->connect_master_64 (0, kvm_processor.put_port, kvm_processor.get_port);
 
     // connect block device
-    onoc->connect_master_64(i+0,
-                            bl->get_master()->put_port,
-                            bl->get_master()->get_port);
-    onoc->connect_master_64(i+1,
+    onoc->connect_master_64(1,
+                            bl1->get_master()->put_port,
+                            bl1->get_master()->get_port);
+    onoc->connect_master_64(2,
                             bl2->get_master()->put_port,
                             bl2->get_master()->get_port);
-    onoc->connect_master_64(i+2,
+    onoc->connect_master_64(3,
                             bl3->get_master()->put_port,
                             bl3->get_master()->get_port);
-    onoc->connect_master_64(i+3,
+    onoc->connect_master_64(4,
                             fb->get_master()->put_port,
                             fb->get_master()->get_port);
 
+    cout << "Starting SystemC Hardware ... " << endl;
     sc_start();
     return (EXIT_SUCCESS);
 }

@@ -1,7 +1,9 @@
 #! /bin/bash
 
 export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
-./arch.x bootstrap APPLICATION.X
+./arch.x
+
+#./arch.x bootstrap APPLICATION.X
 
 #./arch.x bootstrap ../../applications/pi/PIKVM_GCC_5K
 #./arch.x bootstrap ../../applications/pi/PIKVM_GCC_10K

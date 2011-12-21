@@ -30,7 +30,7 @@
 #include <sl_block_device.h>
 #include <errno.h>
 
-/*#define DEBUG_DEVICE_BLOCK*/
+#define DEBUG_DEVICE_BLOCK
 
 #ifdef DEBUG_DEVICE_BLOCK
 #define DPRINTF(fmt, args...)                               \
@@ -577,7 +577,7 @@ void sl_block_device_slave::read (unsigned long ofs, unsigned char be,
         break;
     case BLOCK_DEVICE_SIZE       :
         *val = m_cs_regs->m_size;
-        DPRINTF("BLOCK_DEVICE_SIZE read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_SIZE read: %d\n", *val);
         break;
     case BLOCK_DEVICE_BLOCK_SIZE :
         *val = m_cs_regs->m_block_size;

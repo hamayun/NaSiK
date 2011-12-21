@@ -40,15 +40,16 @@ mem_device::mem_device (const char *_name, unsigned long _size) : slave_device (
     mem = new unsigned char [size];
     memset (mem, 0, size);
 
-    DPRINTF ("mem_device: Memory area location: 0x%08x\n", mem);
-
+    DPRINTF ("mem_device: Allocated Memory Address: 0x%08x, Size: 0x%x\n", (uint32_t) mem, (uint32_t) size);
 }
 
 mem_device::mem_device (const char *_name, unsigned long _size, unsigned char* _mem) : slave_device (_name)
 {
     m_write_invalidate = false;
     size = _size;
-	mem = _mem;
+    mem = _mem;
+
+    DPRINTF ("mem_device: Pre-Assigned Memory Address: 0x%08x, Size: 0x%x\n", (uint32_t) mem, (uint32_t) size);
 }
 
 mem_device::~mem_device ()
@@ -143,10 +144,10 @@ void mem_device::write (unsigned long ofs, unsigned char be, unsigned char *data
 
     if (err == 1)
     {
-        printf ("Bad %s:%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
+        printf ("Bad %s:%s ofs=0x%08X, be=0x%X, data=0x%X-%X!\n",
                 name (), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
                 (unsigned int) *((unsigned long*)data + 0), (unsigned int) *((unsigned long*)data + 1));
-        //exit (1);
+        exit (1);
     }
 }
 
@@ -223,7 +224,7 @@ void mem_device::read (unsigned long ofs, unsigned char be, unsigned char *data,
 
         if(err == 1)
         {
-            printf("Bad %s:%s ofs=0x%X, be=0x%X, data=0x%X-%X!\n",
+            printf("Bad %s:%s ofs=0x%08X, be=0x%X, data=0x%X-%X!\n",
                     name(), __FUNCTION__, (unsigned int) ofs, (unsigned int) be,
                     *((uint32_t *)data + 0), *((uint32_t *)data + 1));
             bErr = true;

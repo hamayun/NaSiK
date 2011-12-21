@@ -96,16 +96,21 @@ real_main(int argc, char *argv[], int app_repeat_count) {
 #if 0
   }
 #endif
-  printf("\nSorting %d elements.\n",count);
+  printf("\nSorting %d Elements.\n",count);
+  
+  while(1);
 
   CPU_PROFILE_COMP_START();
   qsort(array,count,sizeof(struct myStringStruct),compare);
   CPU_PROFILE_COMP_END();
 
+  printf("Sorted ... Writing to File\n");
   CPU_PROFILE_IO_START();
   for(i=0;i<count;i++)
   {
     fprintf(fp2, "%s\n", array[i].qstring);
+    printf("%3d ", i);
+    fflush(stdout);
   }
   CPU_PROFILE_IO_END();
 

@@ -70,6 +70,7 @@ void interconnect_slave::dispatch_responses_thread ()
         {
             printf ("Error (slaveid=%d): Cannot find the masterid %d!\n",
                     m_srcid, rsp.rsrcid);
+            cout << rsp;
             exit (1);
         }
 

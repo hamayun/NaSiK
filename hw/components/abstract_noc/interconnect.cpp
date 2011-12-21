@@ -22,6 +22,8 @@
 #include <interconnect_slave.h>
 #include <string.h>
 
+//#define DEBUG_INTERCONNECT
+
 interconnect::interconnect (sc_module_name name, int nmasters, int nslaves)
 : sc_module (name)
 {
@@ -68,7 +70,7 @@ void interconnect::internal_init ()
     }
 }
 
-void interconnect::connect_master_64 (int devid, sc_port<VCI_PUT_REQ_IF> &putp, 
+void interconnect::connect_master_64 (int devid, sc_port<VCI_PUT_REQ_IF> &putp,
                                       sc_port<VCI_GET_RSP_IF> &getp)
 {
     if (devid < 0 || devid >= m_nMasters)
@@ -76,6 +78,10 @@ void interconnect::connect_master_64 (int devid, sc_port<VCI_PUT_REQ_IF> &putp,
         printf ("Wrong devid %d for %s!\n", devid, __FUNCTION__);
         exit (1);
     }
+
+#ifdef DEBUG_INTERCONNECT
+    printf("connect_master_64: Connecting Master ID %d\n", devid);
+#endif
 
     putp (*m_masters[devid]);
     getp (*m_masters[devid]);
@@ -89,6 +95,10 @@ void interconnect::connect_slave_64 (int devid, sc_port<VCI_GET_REQ_IF> &getp,
         printf ("Wrong devid %d for %s!\n", devid, __FUNCTION__);
         exit (1);
     }
+
+#ifdef DEBUG_INTERCONNECT
+    printf("connect_slave_64: Connecting Slave ID %d\n", devid);
+#endif
 
     getp (*m_slaves[devid]);
     putp (*m_slaves[devid]);

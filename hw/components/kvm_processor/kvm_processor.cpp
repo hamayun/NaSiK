@@ -6,20 +6,55 @@
 #define DOUT_NAME if(DEBUG_KVM_PROCESSOR) std::cout << this->name() << ": "
 
 extern "C" {
-    int kvm_cmd_run(int argc, const char **argv, const char *prefix);
+    int kvm_internel_init(int argc, const char **argv, const char *prefix);
+    int kvm_cmd_run();
 }
 
-kvm_processor::kvm_processor (sc_module_name name, uint32_t num_cores)
+kvm_processor::kvm_processor (sc_module_name name, uint32_t num_cores, int node_id)
 	: master_device (name)
 {
     m_nr_cores = num_cores;
     m_rqs = new kvm_processor_requests (100);
     m_unblocking_write = 0;
+    m_node_id = node_id;
 
     m_cpu_instrs_count = 0;
     m_cpu_cycles_count = 0;
     m_cpu_loads_count  = 0;
     m_cpu_stores_count = 0;
+
+    #define ARGC 4
+    int argc = ARGC;
+    char *argv[ARGC] = {
+        #if 1
+            (char *) "--cpus",
+            (char *) "1",
+            (char *) "-k",
+            //                      (char *) "/home/hamayun/sandbox/bootloader_marius/test_i386_dna_th/boot/16/bin/setup.elf",
+            //                      (char *) "/home/hamayun/sandbox/bootloader_marius/test_i386_dna_th/kernel_dnaos.bin",
+            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmMiBench/automotive/qsort/QSORT",
+            //                      (char *) "--debug-ioport",
+            //                      (char *) "--debug-single-step",
+            #if 0
+            (char *) "-p",
+            (char *) "kgdboc=ttyS1 kgdbwait",
+            (char *) "--tty",
+            (char *) "1"
+            //                    'kvm run -k [vmlinuz] -p "kgdboc=ttyS1 kgdbwait" --tty 1'
+
+            #endif
+        #else
+            (char *) "--cpus",
+            (char *) "1",
+            (char *) "--disk",
+            (char *) "/home/hamayun/sandbox/linux-kvm/tools/kvm/raw_image/linux-0.2.img",
+            (char *) "--kernel",
+            (char *) "/home/hamayun/sandbox/linux-kvm/arch/i386/boot/bzImage",
+        #endif
+    };
+
+
+    kvm_internel_init(argc, (const char **) &argv[0], NULL);
 
     SC_THREAD (kvm_cpu_thread);
 }
@@ -29,42 +64,11 @@ kvm_processor::~kvm_processor () {}
 // A thread used to simulate the kvm processor(s)
 void kvm_processor::kvm_cpu_thread ()
 {
-    // Construct a commandline for kvm run
-    // ./kvm run --cpus 2 --disk raw_image/linux-0.2.img --kernel ../../arch/i386/boot/bzImage
+    int rval = 0;
 
-#define ARGC 7
-    int argc = ARGC;
-    char *argv[ARGC] = { 
-#if 0
-                      (char *) "--cpus",
-                      (char *) "1",
-                      (char *) "-k",
-                      (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmMiBench/automotive/qsort/QSORT",
-                      (char *) "--debug-single-step",
-#if 0
-                      (char *) "-p",
-                      (char *) "kgdboc=ttyS1 kgdbwait",
-                      (char *) "--tty",
-                      (char *) "1" 
-#endif
-#else
-                      (char *) "--cpus",
-                      (char *) "1",
-                      (char *) "--disk",
-                      (char *) "/home/hamayun/sandbox/linux-kvm/tools/kvm/raw_image/linux-0.2.img",
-                      (char *) "--kernel",
-                      (char *) "/home/hamayun/sandbox/linux-kvm/arch/i386/boot/bzImage",
-                      (char *) "--debug",
-#endif
-                    };
-/*
-    //argv[6] = (char *) "--debug";
-    //argv[6] = (char *) "--debug-single-step";
-*/
-            
     cout << "kvm_cpu_thread: Calling KVM Run ... " << endl;
-    
-    kvm_cmd_run(argc, (const char **) &argv[0], NULL);
+    rval = kvm_cmd_run();
+    cout << "kvm_cpu_thread: KVM Run Exited ... Return Value = " << rval << endl;
 }
 
 /*
@@ -155,6 +159,7 @@ uint64_t kvm_processor::read (uint64_t addr,
     localrq->bWrite = 0;
     tid = localrq->tid;
 
+    //printf("kvm_processor: Read tid = %x, addr = 0x%08x, nbytes = %d\n", tid, (uint32_t) addr, nbytes);
     send_req(tid, addr, adata, nbytes, 0);
 
     if (!localrq->bDone)
@@ -226,7 +231,7 @@ extern "C"
     systemc_kvm_read_memory (kvm_processor_t *_this, uint64_t addr,
         int nbytes, unsigned int *ns, int bIO)
     {
-        uint64_t						ret;
+        uint64_t ret;
         ret = _this->read (addr, nbytes, bIO);
         return ret;
     }
@@ -267,7 +272,7 @@ extern "C"
     void
     systemc_annotate_function(kvm_processor_t *_this, void *vm_addr, void *ptr)
     {
-/*        
+/*
         db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) ptr;
         annotation_db_t *pdb = NULL;
         uint32_t buffer_cycles = 0;
@@ -291,7 +296,7 @@ extern "C"
     void
     systemc_annotate_function(kvm_processor_t *_this, void *vm_addr, void *ptr)
     {
-/*        
+/*
         annotation_db_t *pdb = (annotation_db_t *) ptr;
         wait(pdb->CycleCount, SC_NS);
 #ifdef ENABLE_CPU_STATS

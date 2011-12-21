@@ -1,3 +1,3 @@
 #!/bin/sh
 
-./clone_maps.sh base.map node 0 19 
+./clone_maps.sh base.map node 0 4 

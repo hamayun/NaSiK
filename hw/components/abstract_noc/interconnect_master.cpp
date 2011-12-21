@@ -21,6 +21,8 @@
 #include <interconnect_slave.h>
 #include <mwsr_ta_fifo.h>
 
+//#define DEBUG_INTERCONNECT
+
 interconnect_master::interconnect_master (sc_module_name name, interconnect *parent, int srcid)
 : sc_module (name)
 {
@@ -42,7 +44,7 @@ interconnect_master::interconnect_master (sc_module_name name, interconnect *par
     i = 0;
     while (1)
     {
-        k = fscanf (file, "0x%lX 0x%lX 0x%lX %d\n", 
+        k = fscanf (file, "0x%lX 0x%lX 0x%lX %d\n",
                     &m_map[i].begin_address, &m_map[i].end_address, &m_map[i].intern_offset, &m_map[i].slave_id);
         if (k <= 0)
             break;
@@ -58,6 +60,17 @@ interconnect_master::interconnect_master (sc_module_name name, interconnect *par
 
     m_queue_responses = new mwsr_ta_fifo<vci_response> (8);
     m_queue_requests = new mwsr_ta_fifo<vci_request> (8);
+
+#ifdef DEBUG_INTERCONNECT
+    printf("Node Map for Master %d\n", m_srcid);
+    printf("Slave ID: Begin Addr - End Addr   [+Offset    ]\n");
+    for(i = 0; i < m_nmap; i++)
+    {
+        printf("%8d: 0x%08x - 0x%08x [+0x%08x]\n",
+               m_map[i].slave_id, (uint32_t) m_map[i].begin_address,
+               (uint32_t) m_map[i].end_address, (uint32_t) m_map[i].intern_offset);
+    }
+#endif
 
     SC_THREAD (dispatch_requests_thread);
 }
