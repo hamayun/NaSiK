@@ -22,8 +22,8 @@ DEBUG        = -Wall -g
 #PROFILE      = -pg
 OTHER        = -Wno-deprecated
 CFLAGS       = $(DEBUG) $(OTHER) $(OPT) $(PROFILE)
-LIBDIR       = -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L/home/hamayun/sandbox/linux-kvm/tools/kvm 
-LIBS         = -lsystemc -lSDL -lelf -lkvm -lz -lrt -lpthread -lutil
+LIBDIR       = -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(LIBKVMTOOL_PREFIX)
+LIBS         = -lsystemc -lSDL -lelf -lkvm-tool -lz -lrt -lpthread -lutil
 TARGET_ARCH  = linux
 
 INCDIR += -I$(SYSTEMC)/include
@@ -48,12 +48,16 @@ $(shell mkdir -p $(addprefix $(BUILD_DIR)/, $(SUB_DIRS)))
 .SUFFIXES: .cc .cpp .o .x
 .PHONY: clean all graphs verif
 
-all: $(EXE)
+all: $(SYMLINKS) $(EXE)
 
 $(EXE): $(OBJS)
 	@echo "    | Building $@ ..."
 	@$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) $(RLIBDIR) -o $@ $(OBJS) $(LIBS) 2>&1 | c++filt
-	@export LD_LIBRARY_PATH=/home/hamayun/sandbox/linux-kvm/tools/kvm
+
+$(SYMLINKS): ${APP_DIR}/APPLICATION.X
+	@echo "    | Updating Application and Input File Symbolic Links ..."
+	@ln -sf ${APP_DIR}/APPLICATION.X APPLICATION.X
+	@ln -sf ${APP_DIR}/input_data input_data
 
 $(BUILD_DIR)/%.o:$(SRC_BASE_DIR)/%.cpp
 	@echo "    | Compiling $(notdir $<) ..."

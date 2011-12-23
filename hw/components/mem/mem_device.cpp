@@ -22,6 +22,7 @@
 #include <mem_device.h>
 
 //#define DEBUG_MEM
+//#define DEBUG_MEM_RDWR
 
 #ifdef DEBUG_MEM
 #define DPRINTF(fmt, args...)                   \
@@ -32,6 +33,14 @@
 #define DCOUT if (0) cout
 #endif
 
+#ifdef DEBUG_MEM_RDWR
+#define DRWPRINTF(fmt, args...)                   \
+    do { printf(fmt , ##args); } while (0)
+#else
+#define DRWPRINTF(fmt, args...) do {} while(0)
+#endif
+
+
 mem_device::mem_device (const char *_name, unsigned long _size) : slave_device (_name)
 {
     m_write_invalidate = true;
@@ -40,7 +49,7 @@ mem_device::mem_device (const char *_name, unsigned long _size) : slave_device (
     mem = new unsigned char [size];
     memset (mem, 0, size);
 
-    DPRINTF ("mem_device: Allocated Memory Address: 0x%08x, Size: 0x%x\n", (uint32_t) mem, (uint32_t) size);
+    DPRINTF ("mem_device: Allocated Memory Address: 0x%08X, Size: 0x%X\n", (uint32_t) mem, (uint32_t) size);
 }
 
 mem_device::mem_device (const char *_name, unsigned long _size, unsigned char* _mem) : slave_device (_name)
@@ -49,7 +58,7 @@ mem_device::mem_device (const char *_name, unsigned long _size, unsigned char* _
     size = _size;
     mem = _mem;
 
-    DPRINTF ("mem_device: Pre-Assigned Memory Address: 0x%08x, Size: 0x%x\n", (uint32_t) mem, (uint32_t) size);
+    DPRINTF ("mem_device: Pre-Assigned Memory Address: 0x%08X, Size: 0x%X\n", (uint32_t) mem, (uint32_t) size);
 }
 
 mem_device::~mem_device ()
@@ -66,6 +75,9 @@ void mem_device::write (unsigned long ofs, unsigned char be, unsigned char *data
 
     bErr = false;
     wait (1, SC_NS);
+
+    DRWPRINTF ("mem_device[Base:0x%08X]: Write offset: 0x%08X, be = 0x%02X\n",
+               (uint32_t) mem, (uint32_t) ofs, (uint32_t) be);
 
     if (ofs > size || be == 0)
         err = 1;
@@ -154,6 +166,9 @@ void mem_device::write (unsigned long ofs, unsigned char be, unsigned char *data
 void mem_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     bErr = false;
+
+    DRWPRINTF ("mem_device[Base:0x%08X]: Read offset: 0x%08X, be = 0x%02X\n",
+               (uint32_t) mem, (uint32_t) ofs, (uint32_t) be);
 
     if (this->m_req.plen > 1)
     {

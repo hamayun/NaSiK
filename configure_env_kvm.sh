@@ -4,6 +4,7 @@ export SYSTEMC=/opt/libs/systemc-2.2.0
 export LIBKVM_HOME=${NASIK_HOME}/hw/kvm-85
 export LIBSOCKVM_HOME=${NASIK_HOME}/hw/soc_kvm
 export LIBKVM_PREFIX=/opt/libs/libkvm
+export LIBKVMTOOL_PREFIX=/home/hamayun/sandbox/linux-kvm/tools/kvm
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8-debug
@@ -69,7 +70,7 @@ ln -sf interface.xmi.kvm interface.xmi
 export PATH=$NASIK_HOME:$PATH
 export PATH=${SECONDARY_TOOLCHAIN}/bin:$PATH
 export PATH=${PRIMARY_TOOLCHAIN}/bin:$PATH
-export LD_LIBRARY_PATH=/home/hamayun/sandbox/linux-kvm/tools/kvm:${LIBKVM_PREFIX}/lib
+export LD_LIBRARY_PATH=${LIBKVMTOOL_PREFIX}:${LIBKVM_PREFIX}/lib
 
 cd $NASIK_HOME
 

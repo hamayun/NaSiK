@@ -30,11 +30,11 @@
 #include <sl_block_device.h>
 #include <errno.h>
 
-#define DEBUG_DEVICE_BLOCK
+//#define DEBUG_DEVICE_BLOCK
 
 #ifdef DEBUG_DEVICE_BLOCK
 #define DPRINTF(fmt, args...)                               \
-    do { printf("sl_block_device: " fmt, ##args); } while (0)
+    do { printf("%s: " fmt, get_name(), ##args); } while (0)
 #define DCOUT if (1) cout
 #else
 #define DPRINTF(fmt, args...) do {} while(0)
@@ -48,6 +48,7 @@ sl_block_device::sl_block_device (sc_module_name _name, uint32_t master_id, cons
 :sc_module(_name)
 {
     char *buf = new char[strlen(_name) + 3];
+    uint32_t slave_id = master_id;
 
     m_cs_regs = new sl_block_device_CSregs_t;
 
@@ -61,6 +62,9 @@ sl_block_device::sl_block_device (sc_module_name _name, uint32_t master_id, cons
     m_cs_regs->m_irqen = 0;
     m_cs_regs->m_irq   = 0;
 
+    p_name = new char[strlen(_name)];
+    strcpy(p_name, _name);
+
     strcpy(buf, _name);
     buf[strlen(_name)] = '_';
     buf[strlen(_name)+1] = 'm';
@@ -68,21 +72,19 @@ sl_block_device::sl_block_device (sc_module_name _name, uint32_t master_id, cons
     master = new sl_block_device_master(buf, master_id);
 
     buf[strlen(_name)+1] = 's';
-    slave = new sl_block_device_slave(buf, m_cs_regs, &ev_op_start, &ev_irq_update);
+    slave = new sl_block_device_slave(buf, m_cs_regs, &ev_op_start, &ev_irq_update, slave_id);
 
     m_fd = -1;
     open_host_file (fname);
 
     SC_THREAD (irq_update_thread);
     SC_THREAD (control_thread);
- 
+
 }
 
 sl_block_device::~sl_block_device ()
 {
-
-    DPRINTF("destructor called\n");
-
+    DPRINTF("Destructor Called\n");
 }
 
 void sl_block_device::open_host_file (const char *fname)
@@ -124,7 +126,7 @@ sl_block_device::control_thread ()
     int func_ret = 0;
     uint32_t offset = 0;
     uint32_t addr = 0;
-	off_t seek_result = 0;
+    off_t seek_result = 0;
     uint32_t transfer_size_words = 0;
 
     while(1)
@@ -142,34 +144,36 @@ sl_block_device::control_thread ()
             m_transfer_size = m_cs_regs->m_count * m_cs_regs->m_block_size;
 
             m_data = new uint8_t[m_transfer_size];
-			
-            DPRINTF("Got a BLOCK_DEVICE_READ of size 0x%x\n", m_transfer_size);
+
+            DPRINTF("Got a BLOCK_DEVICE_READ of size %d bytes\n", m_transfer_size);
 
             /* Read in device */
-			DPRINTF("lseek with address 0x%x.\n", m_cs_regs->m_lba*m_cs_regs->m_block_size);
+            DPRINTF("LSEEK (SEEK_SET) with File Offset: %d.\n", m_cs_regs->m_lba*m_cs_regs->m_block_size);
             seek_result = lseek(m_fd, m_cs_regs->m_lba*m_cs_regs->m_block_size, SEEK_SET);
-			if (seek_result == -1) // need to check the errorno
-			{
-				switch (errno)
-				{
-					case EBADF:
-						printf("fd is not an open file descriptor.\n");
-						break;
-					case EINVAL:
-						printf("whence is not one of SEEK_SET, SEEK_CUR, SEEK_END; or the resulting file offset would be negative, or beyond the end of a seekable device.\n");
-						break;
-					case EOVERFLOW:
-						printf("The resulting file offset cannot be represented in an off_t.\n");
-						break;
-					case ESPIPE: 
-						printf("fd is associated with a pipe, socket, or FIFO.\n");
-						break;
-					default:
-						printf("errno is unknown.\n");
-						break;
-				}
-				break;
-			}
+            if (seek_result == -1) // need to check the errorno
+            {
+                switch (errno)
+                {
+                    case EBADF:
+                            printf("fd is not an open file descriptor.\n");
+                            break;
+                    case EINVAL:
+                            printf("whence is not one of SEEK_SET, SEEK_CUR, SEEK_END; "
+                                   "or the resulting file offset would be negative, or beyond the end of a seekable device.\n");
+                            break;
+                    case EOVERFLOW:
+                            printf("The resulting file offset cannot be represented in an off_t.\n");
+                            break;
+                    case ESPIPE:
+                            printf("fd is associated with a pipe, socket, or FIFO.\n");
+                            break;
+                    default:
+                            printf("errno is unknown.\n");
+                            break;
+                }
+                break;
+            }
+
             func_ret = ::read(m_fd, m_data, m_transfer_size);
             addr = m_cs_regs->m_buffer;
             if (func_ret < 0)
@@ -182,38 +186,25 @@ sl_block_device::control_thread ()
                 break;
             }
 #if 0
-			if (func_ret == 0)
-			{
-				EPRINTF("Reach the EOF of source file.\n");
-				printf("Reach the EOF of source file.\n");
+            if (func_ret == 0)
+            {
+                EPRINTF("Reach the EOF of source file.\n");
+                printf("Reach the EOF of source file.\n");
                 m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
-				m_cs_regs->m_status = BLOCK_DEVICE_READ_EOF;
-				m_cs_regs->m_count = 0;
+                m_cs_regs->m_status = BLOCK_DEVICE_READ_EOF;
+                m_cs_regs->m_count = 0;
                 m_cs_regs->m_finished_block_count = 0;
-				break;
-			}
+                break;
+            }
 #endif
             m_cs_regs->m_finished_block_count = func_ret / m_cs_regs->m_block_size;
             m_cs_regs->m_count = func_ret / m_cs_regs->m_block_size;
 
-#if 0
-            /* Send data in memory */
-            for(offset = 0; offset < m_transfer_size; ++ offset){
-                func_ret = master->cmd_write(addr + offset, m_data + offset, 1);
-                if(!func_ret){
-                    break;
-                }
-            }
-            if(!func_ret){
-                EPRINTF("Error in Read\n");
-                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
-                m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
-            }
-#else
             /* Send data to memory */
             transfer_size_words = m_transfer_size / 4;
 
             /* Write Words */
+            DPRINTF("Transferring %d Bytes _TO_ Memory Address 0x%08X\n", m_transfer_size, addr);
             for(offset = 0; offset < (transfer_size_words * 4); offset += 4){
                 func_ret = master->cmd_write(addr + offset, m_data + offset, 4);
                 if(!func_ret){
@@ -240,7 +231,6 @@ sl_block_device::control_thread ()
                 m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
                 break;
             }
-#endif
 
             /* Update everything */
             if(m_cs_regs->m_irqen){
@@ -262,26 +252,11 @@ sl_block_device::control_thread ()
             m_data = new uint8_t[m_transfer_size];
             addr = m_cs_regs->m_buffer;
 
-#if 0
-            /* Read data from memory */
-//            for(offset = 0; offset < m_transfer_size; offset += 4){
-//                func_ret = master->cmd_read(addr + offset, m_data + offset, 4);
-            for(offset = 0; offset < m_transfer_size; ++offset){
-                func_ret = master->cmd_read(addr + offset, m_data + offset, 1);
-                if(!func_ret){
-                    break;
-                }
-            }
-            if(!func_ret){
-                m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
-                m_cs_regs->m_status = BLOCK_DEVICE_WRITE_ERROR;
-                break;
-            }
-#else
             /* Read data from memory */
             transfer_size_words = m_transfer_size / 4;
 
             /* Read Words */
+            DPRINTF("Transferring %d Bytes _FROM_ Memory Address 0x%08X\n", m_transfer_size, addr);
             for(offset = 0; offset < (transfer_size_words * 4); offset += 4){
                 func_ret = master->cmd_read(addr + offset, m_data + offset, 4);
                 if(!func_ret){
@@ -308,7 +283,6 @@ sl_block_device::control_thread ()
                 m_cs_regs->m_status = BLOCK_DEVICE_READ_ERROR;
                 break;
             }
-#endif
 
             /* Write in the device */
             lseek(m_fd, m_cs_regs->m_lba*m_cs_regs->m_block_size, SEEK_SET);
@@ -319,18 +293,17 @@ sl_block_device::control_thread ()
                 m_cs_regs->m_irq = 1;
                 ev_irq_update.notify();
             }
-            
+
             m_cs_regs->m_op     = BLOCK_DEVICE_NOOP;
-            m_cs_regs->m_status = BLOCK_DEVICE_WRITE_SUCCESS; 
+            m_cs_regs->m_status = BLOCK_DEVICE_WRITE_SUCCESS;
             delete m_data;
 
             break;
+
         default:
             EPRINTF("Error in command\n");
         }
-
     }
-
 }
 
 void sl_block_device::irq_update_thread ()
@@ -361,11 +334,12 @@ sl_block_device_master::sl_block_device_master (const char *_name, uint32_t node
     m_status  = MASTER_READY;
     m_node_id = node_id;
 
+    p_name = new char[strlen(_name)];
+    strcpy(p_name, _name);
 }
 
 sl_block_device_master::~sl_block_device_master()
 {
-
 }
 
 int
@@ -425,7 +399,7 @@ sl_block_device_master::cmd_read (uint32_t addr, uint8_t *data, uint8_t nbytes)
     }
 }
 
-void 
+void
 sl_block_device_master::rcv_rsp(uint8_t tid, uint8_t *data,
                                 bool bErr, bool bWrite)
 {
@@ -441,8 +415,8 @@ sl_block_device_master::rcv_rsp(uint8_t tid, uint8_t *data,
     }
 
     if(!bWrite){
-        //DPRINTF("Got data: 0x%08x - 0x%08x\n",  
-        //         *((uint32_t *)data + 0), *((uint32_t *)data + 1)); 
+        //DPRINTF("Got data: 0x%08x - 0x%08x\n",
+        //         *((uint32_t *)data + 0), *((uint32_t *)data + 1));
         //m_tr_rdata = *((uint8_t **)data);
         m_tr_rdata = (uint8_t *)data;
     }
@@ -458,14 +432,18 @@ sl_block_device_master::rcv_rsp(uint8_t tid, uint8_t *data,
  */
 sl_block_device_slave::sl_block_device_slave (const char *_name,
                                               sl_block_device_CSregs_t *cs_regs,
-                                              sc_event *op_start, sc_event *irq_update)
+                                              sc_event *op_start, sc_event *irq_update,
+                                              uint32_t slave_id)
 : slave_device (_name)
 {
 
     m_cs_regs     = cs_regs;
     ev_op_start   = op_start;
     ev_irq_update = irq_update;
+    m_slave_id    = slave_id;
 
+    p_name = new char[strlen(_name)];
+    strcpy(p_name, _name);
 }
 
 sl_block_device_slave::~sl_block_device_slave(){
@@ -492,19 +470,19 @@ void sl_block_device_slave::write (unsigned long ofs, unsigned char be,
     switch(lofs){
 
     case BLOCK_DEVICE_BUFFER     :
-        DPRINTF("BLOCK_DEVICE_BUFFER write: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_BUFFER write: 0x%08X\n", *val);
         m_cs_regs->m_buffer = *val;
         break;
     case BLOCK_DEVICE_LBA        :
-        DPRINTF("BLOCK_DEVICE_LBA write: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_LBA write: %d\n", *val);
         m_cs_regs->m_lba = *val;
         break;
     case BLOCK_DEVICE_COUNT      :
-        DPRINTF("BLOCK_DEVICE_COUNT write: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_COUNT write: %d\n", *val);
         m_cs_regs->m_count = *val;
         break;
     case BLOCK_DEVICE_OP         :
-        DPRINTF("BLOCK_DEVICE_OP write: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_OP write: %d [NOP, READ, WRITE, FILE]\n", *val);
         if(m_cs_regs->m_status != BLOCK_DEVICE_IDLE){
             EPRINTF("Got a command while executing another one\n");
         }
@@ -512,7 +490,7 @@ void sl_block_device_slave::write (unsigned long ofs, unsigned char be,
         ev_op_start->notify();
         break;
     case BLOCK_DEVICE_IRQ_ENABLE :
-        DPRINTF("BLOCK_DEVICE_IRQ_ENABLE write: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_IRQ_ENABLE write: %d\n", *val);
         m_cs_regs->m_irqen = *val;
         ev_irq_update->notify();
         break;
@@ -548,23 +526,23 @@ void sl_block_device_slave::read (unsigned long ofs, unsigned char be,
 
     case BLOCK_DEVICE_BUFFER     :
         *val = m_cs_regs->m_buffer;
-        DPRINTF("BLOCK_DEVICE_BUFFER read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_BUFFER read: 0x%08X\n", *val);
         break;
     case BLOCK_DEVICE_LBA        :
         *val = m_cs_regs->m_lba;
-        DPRINTF("BLOCK_DEVICE_LBA read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_LBA read: %d\n", *val);
         break;
     case BLOCK_DEVICE_COUNT      :
         *val = m_cs_regs->m_count;
-        DPRINTF("BLOCK_DEVICE_COUNT read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_COUNT read: %d\n", *val);
         break;
     case BLOCK_DEVICE_OP         :
         *val = m_cs_regs->m_op;
-        DPRINTF("BLOCK_DEVICE_OP read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_OP read: %d [NOP, READ, WRITE, FILE]\n", *val);
         break;
     case BLOCK_DEVICE_STATUS     :
         *val = m_cs_regs->m_status;
-        DPRINTF("BLOCK_DEVICE_STATUS read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_STATUS read: %d [IDLE, BUSY, RDOK, WROK, RDER, WRER, DVER, REOF]\n", *val);
         if(m_cs_regs->m_status != BLOCK_DEVICE_BUSY){
             m_cs_regs->m_status = BLOCK_DEVICE_IDLE;
             m_cs_regs->m_irq = 0;
@@ -573,19 +551,19 @@ void sl_block_device_slave::read (unsigned long ofs, unsigned char be,
         break;
     case BLOCK_DEVICE_IRQ_ENABLE :
         *val = m_cs_regs->m_irqen;
-        DPRINTF("BLOCK_DEVICE_IRQ_ENABLE read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_IRQ_ENABLE read: %d\n", *val);
         break;
     case BLOCK_DEVICE_SIZE       :
         *val = m_cs_regs->m_size;
-        DPRINTF("BLOCK_DEVICE_SIZE read: %d\n", *val);
+        DPRINTF("BLOCK_DEVICE_SIZE read: %d blocks\n", *val);
         break;
     case BLOCK_DEVICE_BLOCK_SIZE :
         *val = m_cs_regs->m_block_size;
-        DPRINTF("BLOCK_DEVICE_BLOCK_SIZE read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_BLOCK_SIZE read: %d bytes\n", *val);
         break;
     case BLOCK_DEVICE_FINISHED_BLOCK_COUNT :
         *val = m_cs_regs->m_finished_block_count;
-        DPRINTF("BLOCK_DEVICE_FINISHED_BLOCK_COUNT read: %x\n", *val);
+        DPRINTF("BLOCK_DEVICE_FINISHED_BLOCK_COUNT read: %d\n", *val);
         break;
     default:
         EPRINTF("Bad %s::%s ofs=0x%X, be=0x%X\n", name (), __FUNCTION__,

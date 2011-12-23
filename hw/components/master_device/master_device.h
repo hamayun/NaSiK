@@ -51,7 +51,6 @@ public:
 public:
     unsigned int                                        m_node_id;
 
-
 };
 
 #endif

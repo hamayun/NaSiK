@@ -108,18 +108,11 @@ int sc_main (int argc, char ** argv)
     kvm_nb_cpu = soc_kvm_init_data.ncpus;
 
     /* Initialize the adaptor, also pass the application name to execute*/
-    kvm_cpu_wrapper_t * kvm_cpu_adaptor[MAX_VCPUS] = {NULL};
-    for (i = 0; i < kvm_nb_cpu; i++)
-    {
-        std::stringstream cpu_id; cpu_id << i;
-        string kvm_cpu_name = "kvm_cpu_" + cpu_id.str();
-        kvm_cpu_adaptor[i] = new kvm_cpu_wrapper_t(kvm_cpu_name.c_str(), argv[2], (uintptr_t)soc_kvm_init_data.vm_mem, i);
-        p_kvm_cpu_adaptor[i] = (void *) kvm_cpu_adaptor[i];
+    kvm_cpu_wrapper_t * kvm_cpu_adaptor = NULL;
+    kvm_cpu_adaptor = new kvm_cpu_wrapper_t("kvm_cpu_wrapper", argv[2], (uintptr_t)soc_kvm_init_data.vm_mem, 0);
+    p_kvm_cpu_adaptor[i] = (void *) kvm_cpu_adaptor;
 
-        std::cout << "p_kvm_cpu_adaptor[" << i << "] = " << p_kvm_cpu_adaptor[i] << std::endl;
-    }
-
-    sl_block_device   *bl   = new sl_block_device("block", 1, "input_data", 1);
+    sl_block_device   *bl1  = new sl_block_device("block1", 1, "input_data", 1);
     sl_block_device   *bl2  = new sl_block_device("block2", 2, "input_data", 1);
     sl_block_device   *bl3  = new sl_block_device("block3", 3, "output_data", 1);
 
@@ -136,11 +129,11 @@ int sc_main (int argc, char ** argv)
     slaves[nslaves++] = tg;			 // 3	0xC3000000 - 0xC3001000
     slaves[nslaves++] = fb->get_slave();         // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
     slaves[nslaves++] = sem;			 // 5	0xC5000000 - 0xC5100000
-    slaves[nslaves++] = bl->get_slave();         // 6	0xC6000000 - 0xC6100000
+    slaves[nslaves++] = bl1->get_slave();        // 6	0xC6000000 - 0xC6100000
     slaves[nslaves++] = bl2->get_slave();        // 7	0xC6500000 - 0xC6600000
     slaves[nslaves++] = bl3->get_slave();        // 8	0xC6A00000 - 0xC6B00000
 
-    timer_device	*timers[3 + kvm_nb_cpu];
+    timer_device	*timers[3 + /*kvm_nb_cpu*/ 1];
     int       ntimers = sizeof (timers) / sizeof (timer_device *);   // Why we divide by pointer size here ???
     for (i = 0; i < ntimers; i ++)
     {
@@ -155,30 +148,29 @@ int sc_main (int argc, char ** argv)
     for (i = 0; i < ntimers; i++)
         timers[i]->irq (wires_irq_qemu[i]);
 
-    bl->irq (wires_irq_qemu[no_irqs-4]);
+    bl1->irq (wires_irq_qemu[no_irqs-4]);
     bl2->irq (wires_irq_qemu[no_irqs-3]);
     bl3->irq (wires_irq_qemu[no_irqs-2]);
     fb->irq (wires_irq_qemu[no_irqs-1]);
 
     //interconnect
-    onoc = new interconnect ("interconnect", (kvm_nb_cpu + 4), nslaves);
+    onoc = new interconnect ("interconnect", (/*kvm_nb_cpu*/ 1 + 4), nslaves);
     for (i = 0; i < nslaves; i++)
         onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
 
-    for (i = 0; i < kvm_nb_cpu; i++)
-        onoc->connect_master_64 (i, kvm_cpu_adaptor[i]->put_port, kvm_cpu_adaptor[i]->get_port);
+    onoc->connect_master_64 (0, kvm_cpu_adaptor->put_port, kvm_cpu_adaptor->get_port);
 
     // connect block device
-    onoc->connect_master_64(i,
-                            bl->get_master()->put_port,
-                            bl->get_master()->get_port);
-    onoc->connect_master_64(i+1,
+    onoc->connect_master_64(1,
+                            bl1->get_master()->put_port,
+                            bl1->get_master()->get_port);
+    onoc->connect_master_64(2,
                             bl2->get_master()->put_port,
                             bl2->get_master()->get_port);
-    onoc->connect_master_64(i+2,
+    onoc->connect_master_64(3,
                             bl3->get_master()->put_port,
                             bl3->get_master()->get_port);
-    onoc->connect_master_64(i+3,
+    onoc->connect_master_64(4,
                             fb->get_master()->put_port,
                             fb->get_master()->get_port);
 

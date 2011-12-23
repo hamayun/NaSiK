@@ -32,7 +32,7 @@ enum sl_block_registers {
     BLOCK_DEVICE_IRQ_ENABLE           = 5,
     BLOCK_DEVICE_SIZE                 = 6,
     BLOCK_DEVICE_BLOCK_SIZE           = 7,
-    BLOCK_DEVICE_FINISHED_BLOCK_COUNT = 8,
+    BLOCK_DEVICE_FINISHED_BLOCK_COUNT = 8,      /* The number of blocks actually read/written during the last operation */
 };
 
 enum sl_block_op {
@@ -66,7 +66,7 @@ struct sl_block_device_CSregs {
     uint32_t m_block_size;
     uint32_t m_irqen;
     uint32_t m_irq;
-	uint32_t m_finished_block_count;
+    uint32_t m_finished_block_count;
 };
 
 /*
@@ -78,7 +78,8 @@ class sl_block_device_slave : public slave_device
 public:
     sl_block_device_slave (const char *_name,
                            sl_block_device_CSregs_t *cs_regs,
-                           sc_event *op_start, sc_event *irq_update);
+                           sc_event *op_start, sc_event *irq_update,
+                           uint32_t slave_id);
     ~sl_block_device_slave();
 
 public:
@@ -100,6 +101,11 @@ private:
     sc_event                 *ev_irq_update;
     sl_block_device_CSregs_t *m_cs_regs;
 
+public:
+    uint32_t                  m_slave_id;
+    char                     *p_name;
+
+    char * get_name() { return (p_name); }
 };
 
 /*
@@ -120,7 +126,7 @@ public:
 public:
     /*
      *   Obtained from father
-     *    void send_req(unsigned char tid, unsigned long addr, unsigned char *data, 
+     *    void send_req(unsigned char tid, unsigned long addr, unsigned char *data,
      * 			  unsigned char bytes, bool bWrite);
      */
     virtual void rcv_rsp (unsigned char tid, unsigned char *data,
@@ -139,6 +145,8 @@ private:
     uint32_t   m_tr_addr;
     uint8_t    m_tr_nbytes;
 
+    char      *p_name;
+    char * get_name() { return (p_name); }
 };
 
 /*
@@ -179,6 +187,10 @@ private:
 
     /* Control and status register bank */
     sl_block_device_CSregs_t *m_cs_regs;
+
+public:
+    char      *p_name;
+    char * get_name() { return (p_name); }
 };
 
 #endif
