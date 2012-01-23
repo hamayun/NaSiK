@@ -32,7 +32,8 @@ kvm_processor::kvm_processor (sc_module_name name, uint32_t num_cores, int node_
             (char *) "-k",
             //                      (char *) "/home/hamayun/sandbox/bootloader_marius/test_i386_dna_th/boot/16/bin/setup.elf",
             //                      (char *) "/home/hamayun/sandbox/bootloader_marius/test_i386_dna_th/kernel_dnaos.bin",
-            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmMiBench/automotive/qsort/QSORT",
+//            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmMiBench/automotive/qsort/QSORT",
+            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmParallelMjpeg/MJPEGKVM",
             //                      (char *) "--debug-ioport",
             //                      (char *) "--debug-single-step",
             #if 0
