@@ -23,35 +23,32 @@ kvm_processor::kvm_processor (sc_module_name name, uint32_t num_cores, int node_
     m_cpu_loads_count  = 0;
     m_cpu_stores_count = 0;
 
-    #define ARGC 4
+    #define ARGC 6
     int argc = ARGC;
     char *argv[ARGC] = {
-        #if 1
+#if 1
             (char *) "--cpus",
-            (char *) "1",
+            (char *) "2",
             (char *) "-k",
-            //                      (char *) "/home/hamayun/sandbox/bootloader_marius/test_i386_dna_th/boot/16/bin/setup.elf",
-            //                      (char *) "/home/hamayun/sandbox/bootloader_marius/test_i386_dna_th/kernel_dnaos.bin",
-//            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmMiBench/automotive/qsort/QSORT",
             (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmParallelMjpeg/MJPEGKVM",
-            //                      (char *) "--debug-ioport",
-            //                      (char *) "--debug-single-step",
-            #if 0
+            (char *) "--debug-ioport",
+            (char *) "--debug-single-step",
+#if 0
             (char *) "-p",
             (char *) "kgdboc=ttyS1 kgdbwait",
             (char *) "--tty",
             (char *) "1"
             //                    'kvm run -k [vmlinuz] -p "kgdboc=ttyS1 kgdbwait" --tty 1'
 
-            #endif
-        #else
+#endif
+#else
             (char *) "--cpus",
             (char *) "1",
             (char *) "--disk",
             (char *) "/home/hamayun/sandbox/linux-kvm/tools/kvm/raw_image/linux-0.2.img",
             (char *) "--kernel",
             (char *) "/home/hamayun/sandbox/linux-kvm/arch/i386/boot/bzImage",
-        #endif
+#endif
     };
 
 

@@ -1,9 +1,9 @@
 /*
- * minimal bootstrap to set up flat 32-bit protected mode
+ * minimal smp bootstrap to set up flat 32-bit protected mode
  */
 
-#define APIC_BASE 0x1000
-//#define APIC_BASE 0xFEE00000
+#define APIC_BASE 0xFEE00000
+
 #define APIC_REG_NCPU        0x00
 #define APIC_REG_ID          0x04
 #define APIC_REG_SIPI_ADDR   0x08
@@ -11,150 +11,266 @@
 #define APIC_REG_IPI_VECTOR  0x10
 #define APIC_REG_SEND_IPI    0x14
 
-#.equ APIC_BASE, 0xFEE00000
-
-/* bstart = 0xf0000 */
-boot_sect_start = 0x7C00
+realCS = 0x1000
+stack_top = 0x8000          /* Match stack_top in kvm.c (BOOT_LOADER_SP) */
 
 .code16
-
-/* Match stack_top in kvm.c (BOOT_LOADER_SP) */
-stack_top = 0x8000
-/* Dummy Value for cpu_up */
-cpu_up = 0x1000
-/* Dummy Value for cpu_up_pmode */
-cpu_up_pmode = 0x1004
-
-pmode_stack_start = 0x10000
-pmode_stack_shift = 16
-pmode_stack_size = (1 << pmode_stack_shift)
-
-ipi_vec = 0xf0
-
-.code16gcc
-.section ".entrytext", "ax"
 .global _start
 
 _start:
-        ljmp $0x07C0, $start
+    ljmp $realCS, $start
 
 start:
-    call smp_init
+    call    allow_4GB_addressing
+    call    broadcast_AP_startup
+    call	delay_until_APs_halt
 
-	cs lidtl idt_desc
-	cs lgdtl gdt_desc
+//    call smp_init
 
-        /* Enable Protected Mode */
-	mov %cr0, %eax
+    /* Enable Protected Mode */
+/*	mov %cr0, %eax
 	or $1, %eax
-	mov %eax, %cr0
+	mov %eax, %cr0 */
 
-        ljmpl $8, $pmode + boot_sect_start
+#    ljmpl $8, $pmode + realCS
 
-smp_init:
-	mov $ipi_vec, %eax
-	mov $(APIC_BASE + APIC_REG_IPI_VECTOR), %dx
-	out %eax, %dx
-	movw $ap_switch_to_pmode, ipi_vec*4
-	movw %cs, %ax
-	mov %ax, ipi_vec*4+2
-	mov $sipi, %eax
-	mov $(APIC_BASE + APIC_REG_SIPI_ADDR), %dx
-	outl %eax, %dx
-	mov $(APIC_BASE + APIC_REG_NCPU), %dx
-	inl %dx, %eax
-	mov %eax, %ecx
-	mov $1, %esi
-smp_loop:
-	cmp %esi, %ecx
-	jbe smp_done
-        mov $0xDEADABCD, %eax
-	mov %esi, %eax
-	mov $(APIC_BASE + APIC_REG_SEND_SIPI), %dx
-	outl %eax, %dx
-wait_for_cpu:
-	cmp cpu_up, %esi
-	jne wait_for_cpu
-	mov %esi, %eax
-	mov $(APIC_BASE + APIC_REG_SEND_IPI), %dx
-	out %eax, %dx
-wait_for_cpu_pmode:
-	cmp cpu_up_pmode, %esi
-	jne wait_for_cpu_pmode
+#------------------------------------------------------------------
+# We must briefly enter protected-mode to arrange for APIC access
+#
+theGDT:
+    .quad 0x0000000000000000 // NULL Descriptor
+    .quad 0x00CF9B000000FFFF // flat 32-bit code segment
+    .quad 0x00CF93000000FFFF // flat 32-bit data segment
+	.equ	limGDT, (.-theGDT)-1	# our GDT's segment-limit
+#------------------------------------------------------------------
+regGDT:	.word	limGDT, theGDT, 0x0001	# register-image for GDTR
+#------------------------------------------------------------------
+#------------------------------------------------------------------
+allow_4GB_addressing:
+#
+# Here we setup register FS, so it can access the APIC registers.
+#
+	pushf				# preserve current flags
+	cli				    # and disable interrupts
 
-	inc %esi
-	jmp smp_loop
-smp_done:
+	mov	%cr0, %eax		# get CPU's register CR0
+	bts	$0, %eax		# turn on PE-bit's image
+	mov	%eax, %cr0		# enter 'protected-mode'
+
+	lgdt %cs:regGDT		# setup GDT for this CPU
+
+	mov	$0x10, %ax		# flat-segment's selector
+	mov	%ax, %fs		# raises FS segment-limit
+
+	mov	%cr0, %eax		# get CPU's register CR0
+	btr	$0, %eax		# reset image for PE-bit
+	mov	%eax, %cr0		# go back to 'real-mode'
+
+	xor	%ax, %ax		# load base-address zero
+	mov	%ax, %fs		# for our 'flat' segment
+
+	popf				# restore previous flags
+	ret
+#------------------------------------------------------------------
+n_APs:	.word	0               # count of awakened APs
+n_fin:	.word	0               # count of finished APs
+newSS:	.word	0x2000			# stack segment-address
+#------------------------------------------------------------------
+delay_EAX_microseconds:
+#
+# This helper-function will implement the timed delays which are
+# specified in Intel's 'Multiprocessor Initialization Protocol',
+# where the delay-duration (in microseconds) is in register EAX.
+#
+	pushal
+
+	mov	%eax, %ecx              # copy microseconds count
+
+	# enable the 8254 Channel-2 counter
+	in	$0x61, %al              # get PORT_B settings
+	and	$0x0D, %al              # turn PC speaker off
+	or	$0x01, %al              # turn on Gate2 input
+	out	%al, $0x61              # output new settings
+
+	# program channel-2 for one-shot countdown
+	mov	$0xB0, %al              # chan2,LSB/MSB,one-shot
+	out	%al, $0x43              # output command to PIT
+
+	# compute value for channel-2 latch-register
+	mov	$1193182, %eax          # input-pulses-per-second
+	mul	%ecx                    # * number of microseconds
+	mov	$1000000, %ecx          # microseconds-per-second
+	div	%ecx                    # division by doubleword
+
+	# write latch-resister value to channel-2
+	out	%al, $0x42
+	mov	%ah, %al
+	out	%al, $0x42
+
+	# wait for channel-2 countdown to conclude
+nxpoll:	
+    in      $0x61, %al
+	test	$0x20, %al
+	jz	nxpoll
+
+	# disable the 8254 Channel-2 counter
+	in	$0x61, %al		# get PORT_B settings
+	and	$0x0C, %al		# turn off channel-2
+	out	%al, $0x61		# output new settings
+
+	popal
+	ret
+#------------------------------------------------------------------
+delay_EAX_us:
+# An adhoc delay loop ...
+	pushal
+	mov	%eax, %ecx              # copy microseconds count
+
+outer_loop:
+    mov $1000, %eax
+
+inner_loop:
+    sub $1, %eax
+    jnz inner_loop
+
+    sub $1, %ecx
+    jnz outer_loop
+
+	popal
 	ret
 
-sipi:
-	mov $(APIC_BASE + APIC_REG_ID), %dx
-	inl %dx, %eax
-	mov %eax, cpu_up
-	shl $12, %eax
-	addl $stack_top, %eax
-	movl %eax, %esp
-	sti
-	nop
-1:	hlt
-	jmp 1b
+#------------------------------------------------------------------
+delay_until_APs_halt:
+#
+# Here the BootStrap Processor waits for all the APs to finish.
+#
+    mov $0xAAAAAAAA, %eax
+mysleep:
+    cli                             # do not awaken this CPU
+	hlt                             # 'fetch-execute' ceases
+	jmp	mysleep                     # just-in-case of an NMI
 
-ap_switch_to_pmode:
-	cs lidtl idt_desc
-	cs lgdtl gdt_desc
-	mov %cr0, %eax
-	or $1, %eax
-	mov %eax, %cr0
-	ljmpl $8, $ap_pmode + boot_sect_start
 
-.code32
-/* Application Processor (AP) Protected Mode */
-ap_pmode:
-	mov $0x10, %ax
-	mov %ax, %ds
-	mov %ax, %es
-	mov %ax, %fs
-	mov %ax, %gs
-	mov %ax, %ss
-	mov $(APIC_BASE + APIC_REG_ID), %dx
-	in %dx, %eax
-	mov %eax, cpu_up_pmode
-	shl $pmode_stack_shift, %eax
-	lea pmode_stack_start + pmode_stack_size(%eax), %esp
-	sti
-	nop
-ap_pmode_wait:
-	hlt
-	jmp ap_pmode_wait
+	sti                 # allow timer interrupts
+check:	hlt				# halt until interrupted
+	mov	n_APs, %ax		# number of awakened APs
+	sub	n_fin, %ax		# equals number finished?
+	jnz	check			# no, check again later
+	ret
+#------------------------------------------------------------------
+broadcast_AP_startup:
+#
+# This procedure is executed only by the BootStrap Processor, to
+# awaken the Auxilliary Processors so that they each can display
+# their Local-APIC ID-number (and their CR0 register's value, so
+# we can verify that the cache-related bits are setup properly).
+# We use code here which follows the MP Initialization Protocol.
+#
+	# point FS:EBX to the Local-APIC's memory-mapped page
+	xor	%ax, %ax                    # address segment zero
+	mov	%ax, %fs                    #   with FS register
+	mov	$APIC_BASE, %ebx            # APIC address in EBX
 
-/* Boot Strap Processsor (BSP) Protected Mode; Starts Here */
-pmode:
-	mov $0x10, %ax
-	mov %ax, %ds
-	mov %ax, %es
-	mov %ax, %fs
-	mov %ax, %gs
-	mov %ax, %ss
-	mov $pmode_stack_start + pmode_stack_size, %esp
-	ljmp $8, $0x00100000
+	# compute the page-number (where each AP should start)
+	mov	$realCS, %edx               # arena segment-address
+	shl	$4, %edx                    # multiplied by sixteen
+	add	$tos, %edx                  #  plus entry's offset
+	shr	$12, %edx                   # divided by page-size
+	and	$0xFF, %edx                 # must be in bottom 1MB
 
-.align 16
+	# issue an 'INIT' Inter-Processor Interrupt command
+	mov	$0x000C4500, %eax           # broadcast INIT-IPI
+	mov	%eax, %fs:0x300(%ebx)       # to all-except-self; (MMH: OK in KVM-Module)
 
-idt_desc:
-	.word 8*256-1
-	.long 0
+	# do ten-millisecond delay, enough time for APs to awaken
+	#mov	$10000, %eax                # ten-thousand microseconds
+	#call	delay_EAX_microseconds	# execute programmed delay
+    mov  $10000, %eax
+    call delay_EAX_us
 
-gdt_desc:
-	.word gdt_end - gdt - 1
-	.long gdt + boot_sect_start
+	# wait for indication of the command's completion
+spin1:	bt	$12, %fs:0x300(%ebx)	# command-in-progress?
+	jc	spin1                       # yes, spin until done
 
-.align 16
+	#--------------------------------------------------------
+	# now we complete the Intel 'MP Initialization Protocol'
+	#--------------------------------------------------------
+	mov	$2, %ecx                    # protocol's repetitions
+nxIPI:
+	# issue a 'Startup' Inter-Processor Interrupt command
+	mov	$0x000C4600, %eax           # issue 'Startup-IPI'
+	mov	%dl, %al                    # page is the vector
+	mov	%eax, %fs:0x300(%ebx)       # to all-except-self
 
-gdt:
-	.quad 0
-	.quad 0x00cf9b000000ffff // flat 32-bit code segment
-	.quad 0x00cf93000000ffff // flat 32-bit data segment
-gdt_end:
+	# delay for 200 microseconds
+	#mov	$200, %eax                  # number of microseconds
+	#call	delay_EAX_microseconds	# for a programmed delay
+    mov  $200, %eax
+    call delay_EAX_us
 
-.align 65536
+	# wait for indication of the command's completion
+spin2:	bt	$12, %fs:0x300(%ebx)	# command-in-progress?
+	jc	spin2                       # yes, spin until done
 
+	# repeat this 'Statup-IPI' step twice (per the protocol)
+	loop	nxIPI                   # again for MP protocol
+
+	ret
+
+#------------------------------------------------------------------
+initAP:
+#
+# This procedure will be executed by each Application Processor as
+# it is awakened by the BootStrap Processor sending Startup-IPI's.
+# In order that each processor can call subroutines, it requires a
+# private stack-area, which we setup sequentially using the 'xadd'
+# instruction (to guarantee that stack-areas are non-overlapping).
+# But until its stack is ready, this CPU cannot handle interrupts.
+#
+	cli                             # disable interrupts
+
+    mov $0xBBBBBBBB, %eax
+apsleep:
+    cli                             # do not awaken this CPU
+	hlt                             # 'fetch-execute' ceases
+	jmp	apsleep                     # just-in-case of an NMI
+
+
+
+	mov	%cs, %ax                    # address program arena
+	mov	%ax, %ds                    #   using DS register
+	mov	%ax, %es                    #    and ES register
+
+	# increment the count of processors that have awakened
+	lock                            # insure 'atomic' update
+	incw	n_APs                   # increment the AP count
+
+	# setup an exclusive stack-region for this processor
+
+	mov	$0x1000, %ax                # paragraphs in segment
+	xadd %ax, newSS                 # 'atomic' xchg-and-add
+	mov	%ax, %ss                    # segment-address to SS
+	xor	%esp, %esp                  # top-of-stack into ESP
+
+	# increment the count of processors that have finished
+	lock                            # insure 'atomic' update
+	incw	n_fin                   # when modifying counter
+
+	# now put this processor to sleep
+sleep:	
+    cli                             # do not awaken this CPU
+	hlt                             # 'fetch-execute' ceases
+	jmp	sleep                       # just-in-case of an NMI
+
+#------------------------------------------------------------------
+	.org	4096                    # insures page-alignment
+tos:	ljmp	$realCS, $initAP	# initialize awakened AP
+#------------------------------------------------------------------
+	.end				# nothing else to assemble
+
+
+/*
+	mov	$0xDEB00000, %ebx           # Debug MMIO Address
+	mov	%eax, %fs:0x0(%ebx)
+    mov $0xBBBBBBBB, %eax
+*/
