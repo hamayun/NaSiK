@@ -11,6 +11,9 @@
 #define APIC_REG_IPI_VECTOR  0x10
 #define APIC_REG_SEND_IPI    0x14
 
+#define	APIC_ICR            0x300
+#define	APIC_ICR_BUSY		0x01000
+
 realCS = 0x1000
 stack_top = 0x8000          /* Match stack_top in kvm.c (BOOT_LOADER_SP) */
 
@@ -18,9 +21,13 @@ stack_top = 0x8000          /* Match stack_top in kvm.c (BOOT_LOADER_SP) */
 .global _start
 
 _start:
-    ljmp $realCS, $start
+    ljmp $realCS, $start        # This does not change the Linear Address but Normalizes it;
 
 start:
+	mov	%cs, %ax		# address program arena
+	mov	%ax, %ss		# using SS register
+	mov	$stack_top, %sp		# establish local stack
+
     call    allow_4GB_addressing
     call    broadcast_AP_startup
     call	delay_until_APs_halt
@@ -122,40 +129,35 @@ nxpoll:
 	ret
 #------------------------------------------------------------------
 delay_EAX_us:
-# An adhoc delay loop ...
-	pushal
+# A function trying to implement udelay ...
+
+    pushal
 	mov	%eax, %ecx              # copy microseconds count
 
-outer_loop:
-    mov $1000, %eax
-
-inner_loop:
-    sub $1, %eax
-    jnz inner_loop
-
+delay_loop:
+    mul %edx
     sub $1, %ecx
-    jnz outer_loop
+    jnz delay_loop
 
-	popal
-	ret
-
+    popal
+    ret
 #------------------------------------------------------------------
 delay_until_APs_halt:
 #
 # Here the BootStrap Processor waits for all the APs to finish.
 #
+	sti                 # allow timer interrupts
+check:	hlt				# halt until interrupted
+	mov	n_APs, %ax		# number of awakened APs
+	sub	n_fin, %ax		# equals number finished?
+	jnz	check			# no, check again later
+
     mov $0xAAAAAAAA, %eax
 mysleep:
     cli                             # do not awaken this CPU
 	hlt                             # 'fetch-execute' ceases
 	jmp	mysleep                     # just-in-case of an NMI
 
-
-	sti                 # allow timer interrupts
-check:	hlt				# halt until interrupted
-	mov	n_APs, %ax		# number of awakened APs
-	sub	n_fin, %ax		# equals number finished?
-	jnz	check			# no, check again later
 	ret
 #------------------------------------------------------------------
 broadcast_AP_startup:
@@ -180,36 +182,38 @@ broadcast_AP_startup:
 
 	# issue an 'INIT' Inter-Processor Interrupt command
 	mov	$0x000C4500, %eax           # broadcast INIT-IPI
-	mov	%eax, %fs:0x300(%ebx)       # to all-except-self; (MMH: OK in KVM-Module)
+	mov	%eax, %fs:APIC_ICR(%ebx)       # to all-except-self; (MMH: OK in KVM-Module)
 
 	# do ten-millisecond delay, enough time for APs to awaken
 	#mov	$10000, %eax                # ten-thousand microseconds
 	#call	delay_EAX_microseconds	# execute programmed delay
-    mov  $10000, %eax
-    call delay_EAX_us
+	mov	 $10000, %eax               # number of microseconds
+	call delay_EAX_us               # for a programmed delay
 
 	# wait for indication of the command's completion
-spin1:	bt	$12, %fs:0x300(%ebx)	# command-in-progress?
+spin1:
+    bt	$12, %fs:APIC_ICR(%ebx)     # command-in-progress?
 	jc	spin1                       # yes, spin until done
 
 	#--------------------------------------------------------
 	# now we complete the Intel 'MP Initialization Protocol'
 	#--------------------------------------------------------
 	mov	$2, %ecx                    # protocol's repetitions
+	
 nxIPI:
 	# issue a 'Startup' Inter-Processor Interrupt command
 	mov	$0x000C4600, %eax           # issue 'Startup-IPI'
 	mov	%dl, %al                    # page is the vector
-	mov	%eax, %fs:0x300(%ebx)       # to all-except-self
+	mov	%eax, %fs:APIC_ICR(%ebx)    # to all-except-self
 
 	# delay for 200 microseconds
-	#mov	$200, %eax                  # number of microseconds
+	#mov	$200, %eax              # number of microseconds
 	#call	delay_EAX_microseconds	# for a programmed delay
-    mov  $200, %eax
-    call delay_EAX_us
+	mov	 $200, %eax                 # number of microseconds
+	call delay_EAX_us               # for a programmed delay
 
 	# wait for indication of the command's completion
-spin2:	bt	$12, %fs:0x300(%ebx)	# command-in-progress?
+spin2:	bt	$12, %fs:APIC_ICR(%ebx)	# command-in-progress?
 	jc	spin2                       # yes, spin until done
 
 	# repeat this 'Statup-IPI' step twice (per the protocol)
@@ -229,14 +233,6 @@ initAP:
 #
 	cli                             # disable interrupts
 
-    mov $0xBBBBBBBB, %eax
-apsleep:
-    cli                             # do not awaken this CPU
-	hlt                             # 'fetch-execute' ceases
-	jmp	apsleep                     # just-in-case of an NMI
-
-
-
 	mov	%cs, %ax                    # address program arena
 	mov	%ax, %ds                    #   using DS register
 	mov	%ax, %es                    #    and ES register
@@ -252,6 +248,8 @@ apsleep:
 	mov	%ax, %ss                    # segment-address to SS
 	xor	%esp, %esp                  # top-of-stack into ESP
 
+    call allow_4GB_addressing
+
 	# increment the count of processors that have finished
 	lock                            # insure 'atomic' update
 	incw	n_fin                   # when modifying counter
@@ -264,7 +262,9 @@ sleep:
 
 #------------------------------------------------------------------
 	.org	4096                    # insures page-alignment
-tos:	ljmp	$realCS, $initAP	# initialize awakened AP
+tos:
+    mov $0xBBBBBBBB, %eax
+    ljmp $realCS, $initAP           # initialize awakened AP
 #------------------------------------------------------------------
 	.end				# nothing else to assemble
 
