@@ -16,13 +16,14 @@ PHDRS
 	bss PT_LOAD ;
 }
 
+
 SECTIONS
 {
 	.init 0x00100000: { stext = .; *(.init) } > mem :text
-    .text ALIGN(8): { *(.text) *(.text.*) } > mem :text
+	.text ALIGN(8): { *(.text) *(.text.*) } > mem :text
 	.fini ALIGN(8): { *(.fini*) } > mem :text
     
-    .data ALIGN(4K) : { *(.data) *(.glue_7*) *(.eh_frame*) } > mem :data
+	.data ALIGN(4K) : { *(.data) *(.glue_7*) *(.eh_frame*) } > mem :data
 	.os_config ALIGN(0x8): {
 		OS_N_DRIVERS = .; LONG(0x5)
 		OS_DRIVERS_LIST = .; LONG(soclib_platform_module) LONG(rdv_module)
@@ -44,8 +45,8 @@ SECTIONS
 		OS_N_EXTENSIONS = .; LONG(0x0)
 	} > mem :data
 	.hal ALIGN(0x8): {
-		PLATFORM_DEBUG_CHARPORT = .; LONG(0xC0100000)
-		APP_ENTRY_POINT = .; LONG(_main);
+		PLATFORM_DEBUG_CHARPORT = .; LONG(0xC0000000)
+		APP_ENTRY_POINT = .; LONG(main);
 
 		CPU_MIPS32_COUNT = .; LONG(0x2)
 		CPU_SVC_STACK_ADDR  = ABSOLUTE(ADDR(.sysstack));
@@ -63,6 +64,7 @@ SECTIONS
 		SOCLIB_TTY_DEVICES = .; LONG(3) LONG(0XC0000000)
 
 		SOCLIB_FB_NDEV = .; LONG(0x1)
+        /* Important: If in SystemC Framebuffer Component, the base address is 0XC4000000; we have to add an offset of 0x1000 here */
 		SOCLIB_FB_DEVICES = .; LONG(256) LONG(144) LONG(0XC4001000)
 
 		SOCLIB_FDACCESS_NDEV = .; LONG(0x1)
@@ -73,13 +75,15 @@ SECTIONS
 		PLATFORM_AICU_BASE = .; LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0)
 		EXTFIFO_CHANNEL_NDEV = .; LONG(0x0)
 		EXTFIFO_CHANNELS_PTR = .; LONG(0x0)
+
+		HOSTTIME_BASEPORT    = .; SHORT(0x5000)
 	} > mem :data
 
-  .rodata ALIGN(16) : { *(.rodata) *(.rodata.str1.*) } > mem :data
+    .rodata ALIGN(16) : { *(.rodata) *(.rodata.str1.*) *(.rodata.cst*) *(.rodata.str2.*) } > mem :data
 
 	.sysstack ALIGN(0x8) + 0x10000 : { } > mem :stack
 
-  .bss ALIGN(16): {
+    .bss ALIGN(16): {
 		*(.bss)  *(.rel*) *(COMMON) __hal_bss_end = .; 
 	} > mem :bss
 
@@ -87,10 +91,8 @@ SECTIONS
 
 	.uheap ALIGN(0x8) + 0x100000: {_end = .;}  > mem :heap
 
+	edata = .;
 
-  edata = .;
-
-	. = 10M;
 	.note : { *(.note) *(.note.gnu.build-id) *(.comment) }
 }
 
