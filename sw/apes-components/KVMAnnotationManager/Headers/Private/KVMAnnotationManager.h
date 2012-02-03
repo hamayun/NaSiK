@@ -19,7 +19,7 @@
 #ifndef ANNOTATION_MANAGER_PRIVATE_H
 #define ANNOTATION_MANAGER_PRIVATE_H
 
-#include <Public/AnnotationManager.h>
+#include <Public/KVMAnnotationManager.h>
 
 #ifdef USE_ANNOTATION_BUFFERS
 

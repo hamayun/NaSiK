@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <Private/AnnotationManager.h>
+#include <Private/KVMAnnotationManager.h>
 
 #ifdef USE_ANNOTATION_BUFFERS
 static db_buffer_desc_t buff_desc[ANNOTATION_BUFFER_COUNT] = {{0, 0, 0, ANNOTATION_BUFFER_SIZE, {{0, NULL}}},

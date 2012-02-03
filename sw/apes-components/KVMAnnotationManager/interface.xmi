@@ -9,7 +9,7 @@
   unique="true"
   wrapper="false">
 
-  <id name="AnnotationManager" version="1.0"/>
+  <id name="KVMAnnotationManager" version="1.0"/>
 
   <provide>
     <context name="Annotation">
