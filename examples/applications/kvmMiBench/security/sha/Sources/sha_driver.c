@@ -45,7 +45,7 @@ int real_main(int argc, char **argv, int app_repeat_count)
 
     char *myargv[2];
     myargv[0] = "sha";
-    myargv[1] = "/devices/disk/simulator/0";
+    myargv[1] = "/devices/disk/simulator/1";
 
     printf("SHA: In main function : For %d time\n\n", app_repeat_count);
     fin = fopen(myargv[1], "rb");

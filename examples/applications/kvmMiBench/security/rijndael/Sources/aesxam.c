@@ -291,7 +291,7 @@ int real_main(int argc, char **argv, int app_repeat_count)
     // ./rijndael input_large.asc output_large.enc e 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321
     myargc = 5;
     myargv[0] = "./rijndael";
-    myargv[1] = "/devices/disk/simulator/0";
+    myargv[1] = "/devices/disk/simulator/1";
     myargv[2] = "/devices/disk/simulator/2";
     myargv[3] = "e";
     myargv[4] = "1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321";

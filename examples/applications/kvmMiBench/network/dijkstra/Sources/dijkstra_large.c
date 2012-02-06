@@ -202,7 +202,7 @@ int real_main(int argc, char *argv[], int app_repeat_count)
 //  fp = fopen (argv[1],"r");
     printf("DIJKSTRA: In main function : For %d time\n\n", app_repeat_count);
 
-  fp = fopen ("/devices/disk/simulator/0","r");
+  fp = fopen ("/devices/disk/simulator/1","r");
   fout = fopen ("/devices/disk/simulator/2","w");
 
   CPU_PROFILE_IO_START();

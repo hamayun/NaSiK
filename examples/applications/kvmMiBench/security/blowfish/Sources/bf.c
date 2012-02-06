@@ -51,7 +51,7 @@ int real_main(int argc, char **argv, int app_repeat_count)
     myargc = 5;
     myargv[0] = "./bf";
     myargv[1] = "e";
-    myargv[2] = "/devices/disk/simulator/0";
+    myargv[2] = "/devices/disk/simulator/1";
     myargv[3] = "/devices/disk/simulator/2";
     myargv[4] = "1234567890abcdeffedcba0987654321";
 

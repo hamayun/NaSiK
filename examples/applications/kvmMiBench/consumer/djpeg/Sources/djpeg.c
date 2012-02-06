@@ -474,7 +474,7 @@ int real_main(int argc, char **argv, int app_repeat_count)
   //myargv[5] = "output_large_decode.ppm";
   myargv[5] = "/devices/disk/simulator/2";
   //myargv[6] = "input_large.jpg";
-  myargv[6] = "/devices/disk/simulator/0";
+  myargv[6] = "/devices/disk/simulator/1";
 
   /* On Mac, fetch a command line. */
 #ifdef USE_CCOMMAND

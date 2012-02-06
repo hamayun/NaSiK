@@ -2027,13 +2027,12 @@ CORNER_LIST corner_list;
 int myargc;
 char *myargv[4];
 
-FILE *fd0;
 FILE *fd1;
 FILE *fd2;
 
   myargc = 4;
   myargv[0] = "susan";
-  myargv[1] = "/devices/disk/simulator/0";
+  myargv[1] = "/devices/disk/simulator/1";
   myargv[2] = "/devices/disk/simulator/2";
   myargv[3] = "-s";
 
@@ -2043,13 +2042,12 @@ FILE *fd2;
   if (myargc<3)
     usage();
 
-  fd0 = fopen("/devices/disk/simulator/0", "r");
-  fd1 = fopen("/devices/disk/simulator/1", "r");
-  fd2 = fopen("/devices/disk/simulator/2", "w");
+  fd1 = fopen(myargv[1], "r");
+  fd2 = fopen(myargv[2], "w");
   
   CPU_PROFILE_IO_START();
   //get_image(myargv[1],&in,&x_size,&y_size);
-  get_image(fd0,&in,&x_size,&y_size);
+  get_image(fd1,&in,&x_size,&y_size);
   CPU_PROFILE_IO_END();
 
   printf("After get_image.\n");
@@ -2188,7 +2186,6 @@ FILE *fd2;
     put_image(fd2,in,x_size,y_size);
     CPU_PROFILE_IO_END();
 
-    fclose(fd0);
     fclose(fd1);
     fclose(fd2);
     printf("\nDone\n");

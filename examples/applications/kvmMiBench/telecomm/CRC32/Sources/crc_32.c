@@ -238,7 +238,7 @@ int real_main(int argc, char **argv, int app_repeat_count)
 //      while(--argc > 0)
 //      {
 //            errors |= crc32file(*++argv, &crc, &charcnt);
-            errors |= crc32file("/devices/disk/simulator/0", &crc, &charcnt);
+            errors |= crc32file("/devices/disk/simulator/1", &crc, &charcnt);
 
             CPU_PROFILE_IO_START();
             printf("%08lX %7ld %s\n", crc, charcnt, *argv);

@@ -125,7 +125,7 @@ int real_main(int argc, char **argv, int app_repeat_count)
 
     myargc = 2;
     myargv[0] = "./patricia";
-    myargv[1] = "/devices/disk/simulator/0";
+    myargv[1] = "/devices/disk/simulator/1";
 
 	if (myargc<2) {
 		printf("Usage: %s <TCP stream>\n", argv[0]);

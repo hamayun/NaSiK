@@ -3,7 +3,7 @@
 export CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/arm-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/arm-sls-dnaos/4.4.2/include/"
 
 # Try and Do the Split Compilation using the Primary Compiler. 
-export APES_SPLIT_CC=""
+#export APES_SPLIT_CC=""
 export APES_CC1="llvm-gcc"
 export APES_CC2="llc"
 export APES_CC1_FLAGS="-Wall -Wno-format -std=c99 -U__linux__ --emit-llvm -nostdinc -DMEASURE_ACCURACY -DPLATFORM_QEMU $CUSTOM_INCLUDES"
@@ -12,7 +12,7 @@ export APES_CC2_FLAGS="-march=arm"
 
 # On Failure Use the default APES_COMPILER
 export APES_COMPILER="arm-sls-dnaos-gcc"
-export APES_CC_FLAGS="-Wall -Wno-format -std=c99 -mlittle-endian -03 -mfpu=fpa -march=armv6 $CUSTOM_INCLUDES"
+export APES_CC_FLAGS="-Wall -Wno-format -std=c99 -mlittle-endian -O3 -mfpu=fpa -march=armv6 $CUSTOM_INCLUDES"
 
 export APES_ASSEMBLER="arm-sls-dnaos-as"
 #export APES_ASSEMBLER_FLAGS="-mfloat-abi=soft"

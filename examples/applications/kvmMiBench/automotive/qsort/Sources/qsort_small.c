@@ -59,10 +59,10 @@ real_main(int argc, char *argv[], int app_repeat_count) {
     int ret = 0;
 
     printf("QSORT: In main function : For %d time\n", app_repeat_count);
-    fp  = fopen("/devices/disk/simulator/0", "r");
+    fp  = fopen("/devices/disk/simulator/1", "r");
     if(!fp)
     {
-	    printf("\nError Opening /devices/disk/simulator/0\n");
+	    printf("\nError Opening /devices/disk/simulator/1\n");
 	    return (-1);
     }
 
