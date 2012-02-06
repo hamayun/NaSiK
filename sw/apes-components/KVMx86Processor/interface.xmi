@@ -9,7 +9,7 @@
   unique="true"
   wrapper="false">
 
-  <id name="x86Processor" version="1.0"/>
+  <id name="KVMx86Processor" version="1.0"/>
 
   <restrict>
     <id name="SoclibPlatform" version="1.0"/>

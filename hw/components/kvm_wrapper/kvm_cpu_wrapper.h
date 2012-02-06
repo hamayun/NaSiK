@@ -22,7 +22,7 @@
 
 #define USE_ANNOTATION_BUFFERS
 //#define USE_EXECUTION_SPY
-#define ENABLE_CPU_STATS
+//#define ENABLE_CPU_STATS
 
 #include <qemu_wrapper_request.h>
 #include <execution_spy.h>

@@ -6,12 +6,8 @@
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
-    void soc_kvm_run(unsigned int cpuid);
+    void soc_kvm_run();
 }
-
-//#define QEMU_STNOC_ADDRESS_DIFFERENCE 0x00000000
-//static unsigned char s_st_operation_codes[] = {0xDE, 0x00, 0x10, 0xDE, 0x20, 0xDE, 0xDE, 0xDE, 0x30};
-//static unsigned char s_st_operation_mask_be[] = {0xDE, 0x01, 0x03, 0xDE, 0x0F, 0xDE, 0xDE, 0xDE, 0xFF};
 
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, char *elf_file, uintptr_t app_base_addr, int node_id)
 	: master_device (name), ExecutionSpy(ANALYZE_OPTION, ONLINE_OPTION, NO_THREAD_OPTION, elf_file, app_base_addr)
@@ -36,8 +32,8 @@ kvm_cpu_wrapper::~kvm_cpu_wrapper ()
 // A thread used to simulate the kvm
 void kvm_cpu_wrapper::cpuThread ()
 {
-    cout << "cpuThread: Calling KVM Run ... [" << m_node_id << "]" << endl;
-    soc_kvm_run(m_node_id);
+    cout << "cpuThread: Calling KVM Run ..." << endl;
+    soc_kvm_run();
 }
 
 // Here we get the Annotation Trace (A buffer containing pointers to Annotation DBs)
@@ -292,25 +288,3 @@ extern "C"
 #endif /* USE_ANNOTATION_BUFFERS */
 }
 
-/*
-printf("BufferID = %d, StartIndex = %d,  EndIndex = %d, Capacity = %d\n",
-    pbuff_desc->BufferID, pbuff_desc->StartIndex,
-    pbuff_desc->EndIndex, pbuff_desc->Capacity);
-
-printf("@db: 0x%08x, Type: %d, CC = %d, FuncAddr: 0x%08x\n",
-       (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex], pdb->Type, pdb->CycleCount, pdb->FuncAddr);
-*/
-
-/*
-db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) pdesc;
-uint32_t db_count = 0;
-
-if(pbuff_desc->EndIndex > pbuff_desc->StartIndex)
-    db_count = pbuff_desc->EndIndex - pbuff_desc->StartIndex;
-else
-    db_count = pbuff_desc->Capacity - (pbuff_desc->StartIndex - pbuff_desc->EndIndex);
-
-printf("BufferID [%d] %5d --> %5d (Count = %d)\n",
-        pbuff_desc->BufferID, pbuff_desc->StartIndex,
-        pbuff_desc->EndIndex, db_count);
- */
