@@ -1,0 +1,3 @@
+[submodule "hw/kvm-kmod-2.6.32.27"]
+	path = hw/kvm-kmod-2.6.32.27
+	url = /home/hamayun/workspace/Common/kvm-kmod-2.6.32.27/
