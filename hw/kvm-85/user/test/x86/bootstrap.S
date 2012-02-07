@@ -182,7 +182,7 @@ broadcast_AP_startup:
 
 	# issue an 'INIT' Inter-Processor Interrupt command
 	mov	$0x000C4500, %eax           # broadcast INIT-IPI
-	mov	%eax, %fs:APIC_ICR(%ebx)       # to all-except-self; (MMH: OK in KVM-Module)
+	mov	%eax, %fs:APIC_ICR(%ebx)    # to all-except-self; (MMH: OK in KVM-Module)
 
 	# do ten-millisecond delay, enough time for APs to awaken
 	#mov	$10000, %eax                # ten-thousand microseconds
@@ -263,8 +263,9 @@ sleep:
 #------------------------------------------------------------------
 	.org	4096                    # insures page-alignment
 tos:
-    mov $0xBBBBBBBB, %eax
+    mov $0xDEADBEEF, %eax
     ljmp $realCS, $initAP           # initialize awakened AP
+
 #------------------------------------------------------------------
 	.end				# nothing else to assemble
 

@@ -28,7 +28,7 @@ kvm_processor::kvm_processor (sc_module_name name, uint32_t num_cores, int node_
     char *argv[ARGC] = {
 #if 1
             (char *) "--cpus",
-            (char *) "2",
+            (char *) "4",
             (char *) "-k",
             (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmParallelMjpeg/MJPEGKVM",
             (char *) "--debug-ioport",

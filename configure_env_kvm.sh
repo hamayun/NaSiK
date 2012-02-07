@@ -58,13 +58,10 @@ fi
 echo "Updating Application Specific Symlinks ..."
 cd ${APP_DIR}
 
-if [ ${APPLICATION} = "kvmParallelMjpeg" ]; then
-	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mjpeg elf.lds
-else
+if [ ${APPLICATION} != "kvmParallelMjpeg" ]; then
 	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mibench elf.lds
+	ln -sf interface.xmi.kvm interface.xmi
 fi
-
-ln -sf interface.xmi.kvm interface.xmi
 
 # for tty_terms
 export PATH=$NASIK_HOME:$PATH
