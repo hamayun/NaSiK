@@ -2,3 +2,10 @@ sw/apes-components/KVMx86Processor/
 sw/apes-components/KVMAnnotationManager/
 examples/applications/kvmParallelMjpeg/
 sw/llvm/projects/c6x-decoder/run-time/for_docs/
+examples/platforms/kroger/arch.x
+examples/platforms/kroger/objs/
+examples/platforms/kroger/output_data
+examples/platforms/kroger/tty100
+sw/apes-components/KVMx86BootLoader/bin/
+sw/apes-components/KVMx86BootLoader/obj/
+
