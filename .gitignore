@@ -1,1 +1,9 @@
-
+examples/applications/printFloats/
+examples/platforms/kroger/arch.x
+examples/platforms/kroger/objs/
+examples/platforms/kroger/output_data
+examples/platforms/kroger/tty100
+hw/soc_kvm/libsoc_kvm.so
+sw/llvm/projects/c6x-decoder/run-time/for_docs/
+examples/applications/kvmParallelMjpeg/MJPEGKVM
+examples/applications/kvmParallelMjpeg/input_data
