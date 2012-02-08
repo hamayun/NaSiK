@@ -1,0 +1,3 @@
+[submodule "sw/apes-components/KVMx86Processor"]
+	path = sw/apes-components/KVMx86Processor
+	url = ssh://sls_gitserver/srv/git/KVMx86Processor
