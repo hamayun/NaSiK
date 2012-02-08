@@ -4,7 +4,7 @@ export SYSTEMC=/opt/libs/systemc-2.2.0
 export LIBKVM_HOME=${NASIK_HOME}/hw/kvm-85
 export LIBSOCKVM_HOME=${NASIK_HOME}/hw/soc_kvm
 export LIBKVM_PREFIX=/opt/libs/libkvm
-export LIBKVMTOOL_PREFIX=/home/hamayun/sandbox/linux-kvm/tools/kvm
+export LIBKVMTOOL_PREFIX=/home/hamayun/workspace/linux-kvm/tools/kvm
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8-debug

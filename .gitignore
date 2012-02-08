@@ -8,4 +8,5 @@ examples/platforms/kroger/output_data
 examples/platforms/kroger/tty100
 sw/apes-components/KVMx86BootLoader/bin/
 sw/apes-components/KVMx86BootLoader/obj/
+hw/soc_kvm/libsoc_kvm.so
 
