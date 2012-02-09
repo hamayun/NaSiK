@@ -43,7 +43,9 @@ using namespace std;
 
 ExecutionSpy::ExecutionSpy(bool analyze, bool online_analyze, bool no_thread,
                            char *elf_file, uintptr_t app_base_addr)
-  : m_analyze(analyze), m_online_analyze(online_analyze), m_no_thread(no_thread)
+   :m_no_thread(no_thread),
+    m_analyze(analyze),
+    m_online_analyze(online_analyze)
 {
     //std::cout << "Registering to the execution_spy" << std::endl;
     ASSERT(elf_file != NULL);

@@ -66,6 +66,7 @@ void tg_device::write (unsigned long ofs, unsigned char be, unsigned char *data,
 void tg_device::read (unsigned long ofs, unsigned char be, unsigned char *data, bool &bErr)
 {
     int             i;
+	int          rval;
 
     *((unsigned long *)data + 0) = 0;
     *((unsigned long *)data + 1) = 0;
@@ -77,7 +78,7 @@ void tg_device::read (unsigned long ofs, unsigned char be, unsigned char *data, 
         {
             if (!tg_bytes_left)
                 reset_input ();
-            fread (data + i, sizeof (unsigned char), 1, tg_file);
+            rval = fread (data + i, sizeof (unsigned char), 1, tg_file);
             tg_bytes_left --;
         }
         break;

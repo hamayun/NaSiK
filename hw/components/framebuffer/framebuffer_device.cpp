@@ -104,8 +104,9 @@ fb_device::init_viewer ()
     int             ppout[2];
     key_t           key[2];
     int             i, k;
+    int             ret;
 
-    pipe(ppout);
+    ret = pipe(ppout);
     if (!(m_pid = fork()))
     {
         setpgrp();
@@ -155,11 +156,11 @@ fb_device::init_viewer ()
 
     nb_fb++;
    
-    ::write (m_pout, key, sizeof (key));
-    ::write (m_pout, &m_width, sizeof (uint32_t));
-    ::write (m_pout, &m_height, sizeof (uint32_t));
-    ::write (m_pout, &m_mode, sizeof (uint32_t));
-    ::write (m_pout, xname, sizeof (xname));
+    ret = ::write (m_pout, key, sizeof (key));
+    ret = ::write (m_pout, &m_width, sizeof (uint32_t));
+    ret = ::write (m_pout, &m_height, sizeof (uint32_t));
+    ret = ::write (m_pout, &m_mode, sizeof (uint32_t));
+    ret = ::write (m_pout, xname, sizeof (xname));
 
     sleep(1);
 }

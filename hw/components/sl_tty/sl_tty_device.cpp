@@ -113,6 +113,7 @@ void sl_tty_device::write (unsigned long ofs, unsigned char be, unsigned char *d
 {
     unsigned char           tty;
     unsigned long           value;
+	unsigned int            rval;
 
     ofs >>= 2;
     if (be & 0xF0)
@@ -138,7 +139,7 @@ void sl_tty_device::write (unsigned long ofs, unsigned char be, unsigned char *d
     {
     case 0: //TTY_WRITE
         DPRINTF("TTY_WRITE[%d]: 0x%x (%c)\n", tty, (char)value, (char) value);
-        ::write (pout[tty], &value, 1);
+        rval = ::write (pout[tty], &value, 1);
         break;
         
 

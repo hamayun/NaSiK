@@ -72,7 +72,7 @@ fi
 
 print_step "Building the Simulation Platform ... "
 cd ${PFORM_DIR}
-make -s
+make -sj3
 if [ $? != 0 ]; then
     print_error "Error! Building the Simulation Platform ... "
     exit 1

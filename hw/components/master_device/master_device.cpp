@@ -89,7 +89,7 @@ void master_device::response_thread ()
 void master_device::send_req (unsigned char tid, unsigned long addr,
     unsigned char *data, unsigned long nbytes, bool bWrite)
 {
-    int                     i;
+    unsigned int            i;
     unsigned char           ofs, mask_be, plen;
     vci_request             req;
 

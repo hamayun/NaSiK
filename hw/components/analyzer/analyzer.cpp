@@ -50,8 +50,8 @@ Analyzer::Analyzer(char * elf_file, uintptr_t app_base_addr, annotation_buffer_t
     _appli_base_addr(app_base_addr),
     _ending(false),
     _no_thread(no_thread),
-    _analyze(analyze),
-    _online_analyze(online_analyze)
+    _online_analyze(online_analyze),
+    _analyze(analyze)
     {
       std::string filename;
       time_t rawtime;
