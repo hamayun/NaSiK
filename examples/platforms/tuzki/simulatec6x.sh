@@ -47,7 +47,6 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-
 print_step "Generating ISA Behavior ... "
 cd ${C6XISA_BEHAVIOR}
 make clean
@@ -57,7 +56,15 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-ln -sf ${C6XDEC_BUILD}/Debug+Asserts/bin/c6x-decoder ${GENERATED_APP}/c6x-decoder
+if [ -f "${C6XDEC_BUILD}/Debug+Asserts/bin/c6x-decoder" ]
+then
+    echo "  Debug Build of c6x-decoder Found ... "
+    ln -sf ${C6XDEC_BUILD}/Debug+Asserts/bin/c6x-decoder ${GENERATED_APP}/c6x-decoder
+else
+    echo "  Creating Link for Release Build of c6x-decoder ... "
+    ln -sf ${C6XDEC_BUILD}/Release+Asserts/bin/c6x-decoder ${GENERATED_APP}/c6x-decoder
+fi
+
 ln -sf ${TARGET_BIN_WRITER}/instructions.bin ${GENERATED_APP}/instructions.bin
 
 print_step "Generating Application ... "
@@ -67,6 +74,14 @@ make clean
 make -s
 if [ $? != 0 ]; then
     print_error "Error! Generating Simulator ... "
+    exit 1
+fi
+
+print_step "Building Bootstrap(s) ... "
+cd ${NASIK_HOME}/hw/kvm-85/user
+make 
+if [ $? != 0 ]; then
+    print_error "Error! Building the Bootstrap ... "
     exit 1
 fi
 

@@ -7,7 +7,7 @@ export LIBKVM_PREFIX=/opt/libs/libkvm
 export LIBKVMTOOL_PREFIX=/home/hamayun/workspace/linux-kvm/tools/kvm
 
 echo "[Setting-up Software Platform Environment (Toolchains)]"
-export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8-debug
+export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
 export BAREMETAL_TOOLCHAIN=/opt/toolchains/i386-pc-baremetal
 
 export TARGET_BIN_WRITER=/home/hamayun/examples/binary-file-writer
