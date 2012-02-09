@@ -22,8 +22,10 @@
 #include "hosttime.h"
 
 int soc_load_target_binary();
-int soc_erase_memory();
-int soc_verify_memory();
+int soc_fill_memory_pattern(uint32_t size, uint32_t pattern);
+int soc_memory_dump(uint32_t from, uint32_t to);
+int soc_erase_memory(int size);
+int soc_verify_memory(int size);
 
 #if 0
 double get_clock(void) {
@@ -335,12 +337,16 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             break;
 
         case HOSTTIME_ERASE_MEMORY:
-            soc_erase_memory();
+            soc_erase_memory(64 * 1024 * 1024);
+            //soc_fill_memory_pattern(1 * 1024 * 1024, 0x0A8B0C8D);
+            soc_fill_memory_pattern(1 * 1024 * 1024, 0x0);
+            //soc_memory_dump(0x0, 0x100);
+
             //soc_load_target_binary();
             break;
 
         case HOSTTIME_VERIFY_MEMORY:
-            soc_verify_memory();
+            soc_verify_memory(64 * 1024 * 1024);
             break;
 
         default:

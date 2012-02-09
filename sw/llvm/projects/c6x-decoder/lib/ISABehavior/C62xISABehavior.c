@@ -221,7 +221,7 @@ int32_t AddDelayedRegister(C62x_Proc_State_t * proc_state, uint16_t reg_id, uint
     uint32_t                  delay_queue_id = (proc_state->m_curr_cpu_cycle + delay_slots + 1) % (C62X_MAX_DELAY_SLOTS + 1);
     C62x_DelayTable_Queue_t * delay_queue    = & proc_state->m_delay_table[delay_queue_id];
 
-    //printf("Add Register: [%02d]=%04x, +%d\n", reg_id, value, delay_slots);
+    //printf("Add Register: [%4s]=%08x, +%d\n\n", REG(reg_id), value, delay_slots);
     ProduceDelayRegister(delay_queue, reg_id, value);
 
     return (0);
@@ -1238,25 +1238,71 @@ C62xIDLE(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint1
 /// LDB - Load Byte from Memory.
 /// We will use the same target addresses here as this code will execute in KVM.
 ReturnStatus_t
-C62xLDB_UC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+C62xLDB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
         uint8_t ucst5 = constant & 0x1F;
-        int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+        int8_t *  ptr = NULL;
 
-        // Working Here
-        uint32_t rd    = 0x0;
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
+        switch(mode)
+        {
+            case CST_NEGATIVE_OFFSET:        // *-R[ucst5]
+                ptr = (int8_t *) rb - ucst5;
+                break;
+
+            case CST_POSITIVE_OFFSET:        // *+R[ucst5]
+                ptr = (int8_t *) rb + ucst5;
+                break;
+
+            case CST_OFFSET_PRE_DECR:        // *--R[ucst5]
+                ptr = (int8_t *) --rb + ucst5;
+                AddDelayedRegister(proc_state, idx_rb, (uint32_t) rb, 0);
+                break;
+
+            case CST_OFFSET_PRE_INCR:        // *++R[ucst5]
+                ptr = (int8_t *) ++rb + ucst5;
+                AddDelayedRegister(proc_state, idx_rb, (uint32_t) rb, 0);
+                break;
+
+            case CST_OFFSET_POST_DECR:       // *R--[ucst5]
+                ptr = (int8_t *) rb-- + ucst5;
+                AddDelayedRegister(proc_state, idx_rb, (uint32_t) rb, 0);
+                break;
+
+            case CST_OFFSET_POST_INCR:       // *R++[ucst5]
+                ptr = (int8_t *) rb++ + ucst5;
+                AddDelayedRegister(proc_state, idx_rb, (uint32_t) rb, 0);
+                break;
+
+            default:
+                ASSERT(0, "Unknown Addressing Mode");
+        }
+
+        // Now we should have a valid address (mode-wise).
+        rd = *ptr;
+
+        if(0x80 & rd) // Need Sign Extension ?
+            rd = rd | 0xFFFFFF00;
+        else
+            rd = rd & 0x000000FF;
+        
 #ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tLDB       0x%x,%s,%s\n",
-                GetPC(proc_state), ucst5, REG(idx_rb), REG(idx_rd));
+        fprintf(stdout, "%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+                GetPC(proc_state), ucst5, REG(idx_rb), REG(idx_rd), ptr, *ptr);
 #endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
     }
     return OK;
 }
+
+// Working Here
 
 
 ReturnStatus_t

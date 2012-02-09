@@ -129,7 +129,7 @@ namespace native
           return NULL;
         }
 
-        INFO << "\tFunction Call: " << func_name << endl;
+        INFO << "    Call to: " << func_name << "(...)" << endl;
         func_value = GetIRBuilder().CreateCall(func_ptr, args.begin(), args.end(), func_rname);
 
         return (func_value);
@@ -225,7 +225,7 @@ namespace native
         llvm::Function     * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_out_module);
         llvm::BasicBlock   * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
 
-        INFO << "Generating Function ... " << function_name << "(proc_state_t *)" << endl;
+        INFO << "Function ... " << function_name << "(proc_state_t *)" << endl;
 
         SetCurrentFunction(function);
         // Here we get the Processor State Pointer from the Currently Generating Function.
@@ -248,14 +248,14 @@ namespace native
 #endif
         }
 
-        CreateCallByName("ShowProcessorState");
+        //CreateCallByName("ShowProcessorState");
 
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
-        INFO << "\tFunction Call: " << "IncrementPC" << endl;
+        INFO << "    Call to: " << "IncrementPC" << "(...)" << endl;
         GetIRBuilder().CreateCall2(p_increment_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
 
-        INFO << "\tFunction Call: " << "IncrementCycles" << endl;
+        INFO << "    Call to: " << "IncrementCycles" << "(...)" << endl;
         GetIRBuilder().CreateCall(p_inc_cycles, p_proc_state);
 
         pc_updated = CreateCallByName("UpdateRegisters");

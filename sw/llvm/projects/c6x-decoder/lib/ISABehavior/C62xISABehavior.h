@@ -28,7 +28,7 @@
 
 #include "C62xCommon.h"
 
-//#define ENABLE_TRACE
+#define ENABLE_TRACE
 
 typedef struct C62x_DelayTable_Node
 {

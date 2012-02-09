@@ -58,6 +58,7 @@ extern int ShowProcessorState(C62x_Proc_State_t * proc_state);
 
 extern int Simulate_EP00000000 (C62x_Proc_State_t * proc_state);
 extern int Simulate_EP00000004 (C62x_Proc_State_t * proc_state);
+extern int Simulate_EP00000008 (C62x_Proc_State_t * proc_state);
 extern int Simulate_EP0000000c (C62x_Proc_State_t * proc_state);
 extern int Simulate_EP00000010 (C62x_Proc_State_t * proc_state);
 extern int Simulate_EP00000014 (C62x_Proc_State_t * proc_state);
@@ -70,10 +71,11 @@ typedef struct func_table_entry
     int (*func_address)(C62x_Proc_State_t * proc_state);
 } func_table_entry_t;
 
-func_table_entry_t func_table [7] =
+func_table_entry_t func_table [8] =
 {
     { 0x00000000, Simulate_EP00000000 },
     { 0x00000004, Simulate_EP00000004 },
+    { 0x00000008, Simulate_EP00000008 },
     { 0x0000000c, Simulate_EP0000000c },
     { 0x00000010, Simulate_EP00000010 },
     { 0x00000014, Simulate_EP00000014 },
@@ -89,7 +91,7 @@ int main(int argc, char **argv, char **environ)
     C62x_Proc_State_t proc_state;
     InitProcessorState(& proc_state);
 
-    for(int index = 0; index < 7; index++)
+    for(int index = 0; index < 8; index++)
     {
        curr_func = func_table[index].func_address;
        curr_func(& proc_state); 

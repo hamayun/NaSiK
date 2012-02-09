@@ -740,7 +740,7 @@ int soc_kvm_init(char *bootstrap, char *elf_file)
 	if (enter_protected_mode){
 		enter_32(kvm);
     }else{
-        printf("%s: Loading %s ... at 0x%x (KVM VIR: 0x%x)\n", __func__, bootstrap, (uint32_t) vm_mem + 0xf0000, 0xf0000);
+        printf("%s: Loading %s ... at 0x%x (KVM PHY: 0x%x)\n", __func__, bootstrap, (uint32_t) vm_mem + 0xf0000, 0xf0000);
         load_file(vm_mem + 0xf0000, bootstrap);
     }
 
@@ -860,20 +860,70 @@ int soc_load_target_binary()
     return (0);
 }
 
-int soc_erase_memory()
+int soc_fill_memory_pattern(uint32_t size, uint32_t pattern)
 {
     uint32_t *  address = (uint32_t *) soc_kvm_init_data.vm_mem;
-    int size = 64 * 1024 * 1024;
+    uint32_t *  kvm_phy_addr = 0x0;
 
     uint32_t * curr_ptr = address;
     uint32_t * end_ptr  = address + ( size / sizeof(uint32_t) );
 
     while (curr_ptr < end_ptr)
     {
-        *curr_ptr = 0x0; curr_ptr++;
+        if(pattern)
+            *curr_ptr = pattern;
+        else
+            *curr_ptr = (uint32_t) kvm_phy_addr + 0x65432100;
+        
+        curr_ptr++;
+        kvm_phy_addr++;
     }
 
-    printf("%s: Erased Memory from 0x%08x to 0x%08x (KVM VIR:0x%08x - 0x%08x)\n",
+    printf("%s: Filled Memory from 0x%08x to 0x%08x (KVM PHY:0x%08x - 0x%08x)\n",
+            __func__, (uint32_t) address,
+            (uint32_t) ((unsigned char *) end_ptr - 1),
+            (uint32_t) ((unsigned char *) address - soc_kvm_init_data.vm_mem),
+            (uint32_t) ((unsigned char *) end_ptr - soc_kvm_init_data.vm_mem - 1));
+
+    return (0);
+}
+
+int soc_memory_dump(uint32_t from, uint32_t to)
+{
+    uint32_t *  address = (uint32_t *) soc_kvm_init_data.vm_mem;
+
+    uint32_t *  curr_ptr = (uint32_t *) address + ( from / sizeof(uint32_t) );
+    uint32_t *   end_ptr = (uint32_t *) address + ( to / sizeof(uint32_t) );
+
+    printf("%s: Dumping Memory from 0x%08x to 0x%08x (KVM PHY:0x%08x - 0x%08x)\n",
+            __func__, (uint32_t) address,
+            (uint32_t) ((unsigned char *) end_ptr - 1),
+            (uint32_t) ((unsigned char *) address - soc_kvm_init_data.vm_mem),
+            (uint32_t) ((unsigned char *) end_ptr - soc_kvm_init_data.vm_mem - 1));
+
+    while (curr_ptr < end_ptr)
+    {
+        printf("[%08X] = 0x%08X\n", (unsigned char *) curr_ptr - (unsigned char *) address, *curr_ptr);
+        curr_ptr++;
+    }
+
+    return 0;
+}
+
+int soc_erase_memory(int size)
+{
+    uint32_t *  address = (uint32_t *) soc_kvm_init_data.vm_mem;
+
+    uint32_t * curr_ptr = address;
+    uint32_t * end_ptr  = address + ( size / sizeof(uint32_t) );
+
+    while (curr_ptr < end_ptr)
+    {
+        *curr_ptr = 0x0;
+        curr_ptr++;
+    }
+
+    printf("%s: Erased Memory from 0x%08x to 0x%08x (KVM PHY:0x%08x - 0x%08x)\n",
             __func__, (uint32_t) address,
             (uint32_t) ((unsigned char *) end_ptr - 1),
             (uint32_t) ((unsigned char *) address - soc_kvm_init_data.vm_mem),
@@ -885,7 +935,7 @@ int soc_erase_memory()
     {
         if(*curr_ptr != 0x0)
         {
-            printf("%s: Non Zero Memory Contents Found: 0x%08x = 0x%08x (KVM VIR:0x%08x = 0x%08x)\n",
+            printf("%s: Non Zero Memory Contents Found: 0x%08x = 0x%08x (KVM PHY:0x%08x = 0x%08x)\n",
                     __func__, (uint32_t) curr_ptr,
                               (uint32_t) (*curr_ptr),
                               (uint32_t) ((unsigned char *) curr_ptr - (unsigned char *) address),
@@ -900,11 +950,9 @@ int soc_erase_memory()
     return (0);
 }
 
-int soc_verify_memory()
+int soc_verify_memory(int size)
 {
     uint32_t * address  = (uint32_t *) soc_kvm_init_data.vm_mem;
-    int size = 64 * 1024 * 1024;
-    //static int test_count = 0;
 
     uint32_t * curr_ptr = address;
     uint32_t * end_ptr  = address + ( size / sizeof(uint32_t) );

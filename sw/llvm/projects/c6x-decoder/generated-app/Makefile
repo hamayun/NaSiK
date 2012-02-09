@@ -7,9 +7,11 @@ OBJS      = $(SRCS:.c=.o)
 DEPS 	  = $(SRCS:.c=.dep)
 GEN_SRCS  = $(wildcard *.bc)
 GEN_OBJS  = $(GEN_SRCS:.bc=.o)
+GEN_ASMS  = $(GEN_SRCS:.bc=.ll)
 
 CC        = i386-pc-baremetal-gcc
 LLC       = llc
+LLVMDIS   = llvm-dis
 LD        = i386-pc-baremetal-gcc
 AS        = i386-pc-baremetal-as
 
@@ -23,26 +25,30 @@ LDFLAGS   =${CRT0} ${KVMSTART} -Wl,-T,ldscript.kvm -nostdlib -L${TOOLCHAIN}/i386
 
 TARGET    = APPLICATION.X
 
-all : $(TARGET)
+all :  $(GEN_ASMS) $(TARGET)
 
 .PHONY  : clean
 
 %.s : %.bc
-	@echo "Compiling  ... " $<
+	@echo "Compiling   ... " $<
 	@$(LLC) $< -o $@
 
+%.ll : %.bc
+	@echo "Disassembly ... " $<
+	@$(LLVMDIS) $< -o $@
+
 %.o : %.s
-	@echo "Assembling ... " $<
+	@echo "Assembling  ... " $<
 	@$(AS) $< -o $@
 
 %.o : %.c
-	@echo "Compiling  ... " $<
+	@echo "Compiling   ... " $<
 	@$(CC) $(CFLAGS) $(INCDIR) -c $<
 
 $(TARGET) : $(OBJS) $(GEN_OBJS)
-	@echo "Linking    ... " $@
+	@echo "Linking     ... " $@
 	@$(LD) $^ -o $@ $(LDFLAGS)
 
 clean:
-	@echo "Cleaning   ... "
-	@rm -f $(OBJS) $(GEN_OBJS) $(TARGET) *~
+	@echo "Cleaning    ... "
+	@rm -f $(OBJS) $(GEN_OBJS) $(GEN_ASMS) $(TARGET) *~

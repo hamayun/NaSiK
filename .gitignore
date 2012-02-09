@@ -4,7 +4,7 @@ examples/platforms/kroger/objs/
 examples/platforms/kroger/output_data
 examples/platforms/kroger/tty100
 hw/soc_kvm/libsoc_kvm.so
-sw/llvm/projects/c6x-decoder/run-time/for_docs/
+sw/llvm/projects/c6x-decoder/generated-app/for_docs/
 examples/applications/kvmParallelMjpeg/MJPEGKVM
 examples/applications/kvmParallelMjpeg/input_data
 examples/platforms/tuzki/arch.x
@@ -12,6 +12,7 @@ examples/platforms/tuzki/hosttime_kvm.txt
 examples/platforms/tuzki/objs/
 examples/platforms/tuzki/output_data
 examples/platforms/tuzki/tty100
-sw/llvm/projects/c6x-decoder/run-time/input_data
-sw/llvm/projects/c6x-decoder/run-time/*.asm
-sw/llvm/projects/c6x-decoder/run-time/*.text
+sw/llvm/projects/c6x-decoder/generated-app/input_data
+sw/llvm/projects/c6x-decoder/generated-app/*.asm
+sw/llvm/projects/c6x-decoder/generated-app/*.text
+hw/kvm-85/user/test/x86/kvm_c6x_bootstrap

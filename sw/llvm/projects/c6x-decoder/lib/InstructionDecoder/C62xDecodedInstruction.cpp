@@ -305,16 +305,16 @@ namespace native
             }
         }
 
-        /* For Delay Slots */
-        argument = llvm_gen->Geti8Value(GetDelaySlots());
-        args.push_back(argument);
-
         /* For Load/Store Mode */
         if(IsLoadStoreInstruction())
         {
             argument = llvm_gen->Geti8Value(((const C62xLDSTInstr *) this)->GetLoadStoreMode());
             args.push_back(argument);
         }
+
+        /* For Delay Slots */
+        argument = llvm_gen->Geti8Value(GetDelaySlots());
+        args.push_back(argument);
 
         func_ptr = out_mod->getFunction(StringRef(func_name));
 #ifdef FUNC_CALL_ERROR_CHECK
@@ -326,7 +326,7 @@ namespace native
 #endif
         if(func_ptr)
         {
-            INFO << "\tFunction Call: " << func_name << endl;
+            INFO << "    Call to: " << func_name << "(...)" << endl;
             func_value = irbuilder.CreateCall(func_ptr, args.begin(), args.end(), GetMnemonic());
         }
         else

@@ -1852,6 +1852,7 @@ namespace native
             case 0x02 :
             {
                 /*LDB Load Byte ucst15, m_dst; {+baseR[offset], dst} */// No Left Shift on ucst15/offset required
+                COUT << "Type B" << endl;
                 dec_instr_eu = new C62xLDBInstr(dec_instr, dest_reg, src1_opr, src2_opr, CST_POSITIVE_OFFSET);
             }
             break;
@@ -1915,8 +1916,8 @@ namespace native
         DecodedInstruction * dec_instr_eu = NULL;
         dec_instr->GetExecutionUnit()->SetUnitId(dh->GetDUnitId() + 1);
         C62xOperand * src1_opr = NULL;       // Can be a Register or Constant Offset; Depends on Addressing Mode
-        C62xOperand * src2_opr = new C62xRegister(true, 32, (C62xRegisterBank_t) dh->GetDUnitId(), dh->GetSrc2());
-        C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
+        C62xOperand * src2_opr = new C62xRegister(false, 32, (C62xRegisterBank_t) dh->GetDUnitId(), dh->GetSrc2());
+        C62xOperand * dest_reg = new C62xRegister(false, 32, dh->GetDestBankId(), dh->GetDest());
 
         switch(dh->GetAddressingMode())
         {
