@@ -67,6 +67,14 @@ fi
 
 ln -sf ${TARGET_BIN_WRITER}/instructions.bin ${GENERATED_APP}/instructions.bin
 
+print_step "Building Bootstrap(s) ... "
+cd ${LIBKVM_HOME}/user
+make 
+if [ $? != 0 ]; then
+    print_error "Error! Building the Bootstrap ... "
+    exit 1
+fi
+
 print_step "Generating Application ... "
 cd ${GENERATED_APP}
 ./c6x-decoder instructions.bin instructions.asm
@@ -77,12 +85,22 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-print_step "Building Bootstrap(s) ... "
-cd ${NASIK_HOME}/hw/kvm-85/user
-make 
+print_step "Compiling the LIBKVM"
+cd ${LIBKVM_HOME}
+./configure --arch=i386 --prefix=${LIBKVM_PREFIX}
+cd ${LIBKVM_HOME}/libkvm 
+make && make install-libkvm
 if [ $? != 0 ]; then
-    print_error "Error! Building the Bootstrap ... "
-    exit 1
+    print_error "Error: Compiling the LIBKVM"
+    exit 1 
+fi
+
+print_step "Compiling the LIBSOCKVM"
+cd ${LIBSOCKVM_HOME}
+make && make install 
+if [ $? != 0 ]; then
+    print_error "Error! Compiling the LIBSOCKVM"
+    exit 1 
 fi
 
 print_step "Building the Simulation Platform ... "

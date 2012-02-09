@@ -30,25 +30,25 @@ all :  $(GEN_ASMS) $(TARGET)
 .PHONY  : clean
 
 %.s : %.bc
-	@echo "Compiling   ... " $<
+	@echo "  Compiling   ... " $<
 	@$(LLC) $< -o $@
 
 %.ll : %.bc
-	@echo "Disassembly ... " $<
+	@echo "  Disassembly ... " $<
 	@$(LLVMDIS) $< -o $@
 
 %.o : %.s
-	@echo "Assembling  ... " $<
+	@echo "  Assembling  ... " $<
 	@$(AS) $< -o $@
 
 %.o : %.c
-	@echo "Compiling   ... " $<
+	@echo "  Compiling   ... " $<
 	@$(CC) $(CFLAGS) $(INCDIR) -c $<
 
 $(TARGET) : $(OBJS) $(GEN_OBJS)
-	@echo "Linking     ... " $@
+	@echo "  Linking     ... " $@
 	@$(LD) $^ -o $@ $(LDFLAGS)
 
 clean:
-	@echo "Cleaning    ... "
+	@echo "  Clean ... "
 	@rm -f $(OBJS) $(GEN_OBJS) $(GEN_ASMS) $(TARGET) *~

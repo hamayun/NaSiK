@@ -39,4 +39,5 @@ install-kernel-headers:
 -include .*.d
 
 clean:
-	$(RM) *.o *.a .*.d
+	@echo "  Clean ..."
+	@$(RM) *.o *.a .*.d

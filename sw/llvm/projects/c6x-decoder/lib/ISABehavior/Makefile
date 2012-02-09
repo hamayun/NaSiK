@@ -25,6 +25,6 @@ all : $(TARGET) $(ASM)
 	@$(LLVMDIS) $< -o $@
 
 clean:
-	@echo "  Clean   ..."
+	@echo "  Clean ..."
 	@rm -f $(TARGET) $(ASM) *~ *.o *.bin
 

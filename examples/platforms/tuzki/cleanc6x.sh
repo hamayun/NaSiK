@@ -35,9 +35,21 @@ print_step "Cleaning ISA Behavior ... "
 cd ${C6XISA_BEHAVIOR}
 make clean
 
+print_step "Cleaning Bootstrap(s) ... "
+cd ${LIBKVM_HOME}/user
+make clean
+
 print_step "Cleaning Generated Application ... "
 cd ${GENERATED_APP}
 make clean 
+
+print_step "Cleaning the LIBKVM"
+cd ${LIBKVM_HOME}/libkvm 
+make clean
+
+print_step "Cleaning the LIBSOCKVM"
+cd ${LIBSOCKVM_HOME}
+make clean
 
 print_step "Cleaning the Simulation Platform ... "
 cd ${PFORM_DIR}

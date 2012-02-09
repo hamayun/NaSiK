@@ -28,6 +28,7 @@ $(LIBSOCKVM): iotable.o soc_kvm.o hosttime.o
 	@$(CC) $(CFLAGS) $(CINCDIR) -M $< >> $(addsuffix .d, $(basename $@))
 
 clean:
+	@echo "  Clean ..."
 	@$(RM) *.o *.a *.d ${LIBSOCKVM}
 
 install: 

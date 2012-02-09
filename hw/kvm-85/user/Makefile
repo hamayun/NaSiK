@@ -22,17 +22,21 @@ all: $(TEST_DIR)/dnastart.o $(TEST_DIR)/bootstrap $(TEST_DIR)/kvm_kickstart.o $(
 $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I test/lib -I test/lib/x86
 
 $(TEST_DIR)/bootstrap: $(TEST_DIR)/bootstrap.o
-	$(CC) -nostdlib -o $@ -Wl,-T,bootstrap.lds $^
+	@echo "  Linking    ... "$<
+	@$(CC) -nostdlib -o $@ -Wl,-T,bootstrap.lds $^
 
 $(TEST_DIR)/kvm_c6x_bootstrap: $(TEST_DIR)/kvm_c6x_bootstrap.o
-	$(CC) -nostdlib -o $@ -Wl,-T,bootstrap.lds $^
+	@echo "  Linking    ... "$<
+	@$(CC) -nostdlib -o $@ -Wl,-T,bootstrap.lds $^
 
 %.o: %.S
-	$(CC) $(CFLAGS) -c -nostdlib -o $@ $^
+	@echo "  Assembling ... "$<
+	@$(CC) $(CFLAGS) -c -nostdlib -o $@ $^
 
 -include .*.d
 
 clean:
-	$(RM) $(TEST_DIR)/dnastart.o $(TEST_DIR)/kvm_kickstart.o
-	$(RM) $(TEST_DIR)/bootstrap.o $(TEST_DIR)/bootstrap
-	$(RM) $(TEST_DIR)/kvm_c6x_bootstrap.o $(TEST_DIR)/kvm_c6x_bootstrap
+	@echo "  Clean ..."
+	@$(RM) $(TEST_DIR)/dnastart.o $(TEST_DIR)/kvm_kickstart.o
+	@$(RM) $(TEST_DIR)/bootstrap.o $(TEST_DIR)/bootstrap
+	@$(RM) $(TEST_DIR)/kvm_c6x_bootstrap.o $(TEST_DIR)/kvm_c6x_bootstrap

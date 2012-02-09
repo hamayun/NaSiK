@@ -71,7 +71,7 @@ $(BUILD_DIR)/%.o:$(SRC_BASE_DIR)/%.cpp
 #	@$(CC) $(CFLAGS) $(INCDIR) -o $@ -c $< -fvisibility=hidden
 
 clean:
-	@echo Cleaning ...
+	@echo '  Clean ...'
 	@rm -f $(EXE)
 	@rm -f logCPU* tty100
 	@rm -f tty*.log hosttime_kvm.txt output_data
