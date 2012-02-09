@@ -13,7 +13,7 @@ LLC       = llc
 LD        = i386-pc-baremetal-gcc
 AS        = i386-pc-baremetal-as
 
-INCDIR    =-I/home/hamayun/workspace/NaSiK/sw/apes-components/x86Processor/Headers/Public/
+INCDIR    =-I/home/hamayun/workspace/NaSiK/sw/apes-components/KVMx86Processor/Headers/Public/
 INCDIR   +=-I/home/hamayun/workspace/NaSiK/sw/llvm/projects/c6x-decoder/lib/ISABehavior
 INCDIR   +=-I${TOOLCHAIN}/i386-pc-baremetal/include
 INCDIR   +=-I${TOOLCHAIN}/lib/gcc/i386-pc-baremetal/4.5.0/include

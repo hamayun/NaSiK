@@ -12,4 +12,6 @@ examples/platforms/tuzki/hosttime_kvm.txt
 examples/platforms/tuzki/objs/
 examples/platforms/tuzki/output_data
 examples/platforms/tuzki/tty100
-
+sw/llvm/projects/c6x-decoder/run-time/input_data
+sw/llvm/projects/c6x-decoder/run-time/*.asm
+sw/llvm/projects/c6x-decoder/run-time/*.text

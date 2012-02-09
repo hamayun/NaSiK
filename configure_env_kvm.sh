@@ -4,7 +4,7 @@ export SYSTEMC=/opt/libs/systemc-2.2.0
 export LIBKVM_HOME=${NASIK_HOME}/hw/kvm-85
 export LIBSOCKVM_HOME=${NASIK_HOME}/hw/soc_kvm
 export LIBKVM_PREFIX=/opt/libs/libkvm
-export LIBKVMTOOL_PREFIX=/home/hamayun/sandbox/linux-kvm/tools/kvm
+export LIBKVMTOOL_PREFIX=/home/hamayun/workspace/linux-kvm/tools/kvm
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8-debug
@@ -12,6 +12,8 @@ export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat-llvm-newlib
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat-annotated
+export BAREMETAL_TOOLCHAIN=/opt/toolchains/i386-pc-baremetal
+
 export APES_ROOT=/opt/Apes
 export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
@@ -66,6 +68,7 @@ fi
 
 # for tty_terms
 export PATH=$NASIK_HOME:$PATH
+export PATH=${BAREMETAL_TOOLCHAIN}/bin:$PATH
 export PATH=${SECONDARY_TOOLCHAIN}/bin:$PATH
 export PATH=${PRIMARY_TOOLCHAIN}/bin:$PATH
 export LD_LIBRARY_PATH=${LIBKVMTOOL_PREFIX}:${LIBKVM_PREFIX}/lib

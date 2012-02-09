@@ -83,7 +83,7 @@ func_table_entry_t func_table [7] =
 
 int main(int argc, char **argv, char **environ)
 {
-    CPU_PROFILE_VERIFY_MEMORY();
+//    CPU_PROFILE_VERIFY_MEMORY();
     int (*curr_func)(C62x_Proc_State_t * proc_state) = NULL;
 
     C62x_Proc_State_t proc_state;
@@ -92,7 +92,6 @@ int main(int argc, char **argv, char **environ)
     for(int index = 0; index < 7; index++)
     {
        curr_func = func_table[index].func_address;
-
        curr_func(& proc_state); 
     }
 

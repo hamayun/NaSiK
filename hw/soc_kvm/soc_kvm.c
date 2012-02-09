@@ -895,7 +895,7 @@ int soc_erase_memory()
         curr_ptr++;
     }
 
-    kvm_show_regs(kvm, 0);
+    //kvm_show_regs(kvm, 0);
     //kvm_dump_vcpu(kvm, 0);
     return (0);
 }
