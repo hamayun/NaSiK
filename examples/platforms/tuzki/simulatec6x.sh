@@ -67,6 +67,7 @@ fi
 
 ln -sf ${TARGET_BIN_WRITER}/instructions.bin ${GENERATED_APP}/instructions.bin
 
+if [ $1 = "kvm" ]; then
 print_step "Building Bootstrap(s) ... "
 cd ${LIBKVM_HOME}/user
 make 
@@ -74,10 +75,17 @@ if [ $? != 0 ]; then
     print_error "Error! Building the Bootstrap ... "
     exit 1
 fi
+fi
 
-print_step "Generating Application ... "
+print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
 ./c6x-decoder instructions.bin instructions.asm
+if [ $? != 0 ]; then
+    print_error "Error! Decoding Target Binary ... "
+    exit 1
+fi
+
+print_step "Generating Simulator ... "
 make clean 
 make -s
 if [ $? != 0 ]; then
@@ -85,6 +93,7 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
+if [ $1 = "kvm" ]; then
 print_step "Compiling the LIBKVM"
 cd ${LIBKVM_HOME}
 ./configure --arch=i386 --prefix=${LIBKVM_PREFIX}
@@ -102,6 +111,7 @@ if [ $? != 0 ]; then
     print_error "Error! Compiling the LIBSOCKVM"
     exit 1 
 fi
+fi
 
 print_step "Building the Simulation Platform ... "
 cd ${PFORM_DIR}
@@ -116,7 +126,8 @@ ln -sf ${NASIK_HOME}/hw/kvm-85/user/test/x86/kvm_c6x_bootstrap ${PFORM_DIR}/kvm_
 ln -sf ${GENERATED_APP}/instructions.bin.text ${PFORM_DIR}/target_binary_text
 
 print_step "Running the Simulation ... "
+rm -f tty100
 export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
 ./arch.x kvm_c6x_bootstrap APPLICATION.X
-
+cat tty100 | less
 

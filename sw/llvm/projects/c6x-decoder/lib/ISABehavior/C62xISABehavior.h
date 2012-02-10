@@ -30,6 +30,13 @@
 
 #define ENABLE_TRACE
 
+#ifdef ENABLE_TRACE
+#define TRACE_PRINT(fmt, args...)                               \
+    do { fprintf(stderr, fmt, ##args); } while (0)
+#else
+#define TRACE_PRINT(fmt, args...) do {} while(0)
+#endif
+
 typedef struct C62x_DelayTable_Node
 {
     uint16_t                      m_reg_id;

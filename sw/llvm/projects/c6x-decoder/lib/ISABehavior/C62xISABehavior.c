@@ -31,6 +31,10 @@ char BANKS[C62X_REG_BANKS];
 #define MAX_REG_PER_INSTR     10
 #define MAX_REG_NAME_LEN      3
 
+#define LDSTB_REG_INC_SIZE 4   /* For Use In Pre/Post Inc/Dec of Base Register */
+#define LDSTH_REG_INC_SIZE 4   /* For Use In Pre/Post Inc/Dec of Base Register */
+#define LDSTW_REG_INC_SIZE 4   /* For Use In Pre/Post Inc/Dec of Base Register */
+
 char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
                        "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
 
@@ -293,11 +297,10 @@ C62xABS_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_ze
         else
             rd = 0x80000000;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tABS       %s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tABS       %s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rd));
     }
     return OK;
 }
@@ -324,12 +327,11 @@ C62xABS_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_ze
         int32_t rdh = rd >> 32 & 0xFF;
         int32_t rdl = rd & 0xFFFFFFFF;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%010x\tABS       %s:%s,%s:%s\n",
-                GetPC(proc_state), REG(idx_rah), REG(idx_ral), REG(idx_rdh), REG(idx_rdl));
-#endif
         AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%010x\tABS       %s:%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -344,11 +346,11 @@ C62xADD_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         int32_t ra = (int32_t) proc_state->m_register[idx_ra];
         int32_t rb = (int32_t) proc_state->m_register[idx_rb];
         int32_t rd = ra + rb;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADD       %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADD       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -366,12 +368,11 @@ C62xADD_SR32_SR32_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         int32_t rdh = rd >> 32 & 0xFF;
         int32_t rdl = rd & 0xFFFFFFFF;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADD       %s,%s,%s:%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
-#endif
         AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tADD       %s,%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -392,12 +393,11 @@ C62xADD_SR32_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         int32_t rdh = rd >> 32 & 0xFF;
         int32_t rdl = rd & 0xFFFFFFFF;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADD       %s,%s:%s,%s:%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
-#endif
         AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tADD       %s,%s:%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -411,11 +411,11 @@ C62xADD_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         int8_t cst5 = constant & 0x1F;
         int32_t rb  = (int32_t) proc_state->m_register[idx_rb];
         int32_t rd  = cst5 + rb;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADD       0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
-#endif
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADD       0x%x,%s,%s\n",
+                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -436,12 +436,11 @@ C62xADD_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         int32_t rdh = rd >> 32 & 0xFF;
         int32_t rdl = rd & 0xFFFFFFFF;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADD       0x%x,%s:%s,%s:%s\n",
-                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
-#endif
         AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tADD       0x%x,%s:%s,%s:%s\n",
+                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -451,7 +450,7 @@ ReturnStatus_t
 C62xADDAB_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    fprintf(stdout, "%s: Not Implemented !!!\n", __func__);
+    TRACE_PRINT("%s: Not Implemented !!!\n", __func__);
     return OK;
 }
 
@@ -459,7 +458,7 @@ ReturnStatus_t
 C62xADDAB_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    fprintf(stdout, "%s: Not Implemented !!!\n", __func__);
+    TRACE_PRINT("%s: Not Implemented !!!\n", __func__);
     return OK;
 }
 
@@ -468,7 +467,7 @@ ReturnStatus_t
 C62xADDAH_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    fprintf(stdout, "%s: Not Implemented !!!\n", __func__);
+    TRACE_PRINT("%s: Not Implemented !!!\n", __func__);
     return OK;
 }
 
@@ -476,7 +475,7 @@ ReturnStatus_t
 C62xADDAH_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    fprintf(stdout, "%s: Not Implemented !!!\n", __func__);
+    TRACE_PRINT("%s: Not Implemented !!!\n", __func__);
     return OK;
 }
 
@@ -485,7 +484,7 @@ ReturnStatus_t
 C62xADDAW_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    fprintf(stdout, "%s: Not Implemented !!!\n", __func__);
+    TRACE_PRINT("%s: Not Implemented !!!\n", __func__);
     return OK;
 }
 
@@ -493,7 +492,7 @@ ReturnStatus_t
 C62xADDAW_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    fprintf(stdout, "%s: Not Implemented !!!\n", __func__);
+    TRACE_PRINT("%s: Not Implemented !!!\n", __func__);
     return OK;
 }
 
@@ -508,11 +507,10 @@ C62xADDK_SC16_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_z
         int32_t rd    = (int32_t) proc_state->m_register[idx_rd];
         rd   = rd + cst16;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADDK      0x%x,%s\n",
-                GetPC(proc_state), cst16, REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADDK      0x%x,%s\n",
+                GetPC(proc_state), cst16, REG(idx_rd));
     }
     return OK;
 }
@@ -530,12 +528,12 @@ C62xADDU_UR32_UR32_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 
         uint32_t rdh = (rd >> 32) & 0x000000FF;
         uint32_t rdl = rd & 0xFFFFFFFF;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADDU      %s,%s,%s:%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
-#endif
+
         AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tADDU      %s,%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -556,12 +554,11 @@ C62xADDU_UR32_UR40_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         uint32_t rdh = (rd >> 32) & 0x000000FF;
         uint32_t rdl = rd & 0xFFFFFFFF;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADDU      %s,%s:%s,%s:%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
-#endif
         AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tADDU      %s,%s:%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -584,11 +581,10 @@ C62xADD2_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 
         int32_t rd  = ((int32_t)(ra_msb16 + rb_msb16) << 16) | (ra_lsb16 + rb_lsb16);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tADD2      %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADD2      %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -604,11 +600,10 @@ C62xAND_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd = ra & rb;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tAND       %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tAND       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -623,11 +618,10 @@ C62xAND_SC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         uint32_t rb  = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd  = cst5 & rb;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tAND       0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tAND       0x%x,%s,%s\n",
+                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -642,10 +636,9 @@ C62xB_SC21(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uin
         int32_t rd      = constant & 0x1FFFFF;
         uint16_t idx_rd = REG_PC_INDEX;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tB         0x%x\n", GetPC(proc_state), rd);
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tB         0x%x\n", GetPC(proc_state), rd);
     }
     return OK;
 }
@@ -659,10 +652,9 @@ C62xB_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uin
         uint32_t rd     = (uint32_t) proc_state->m_register[idx_ra];
         uint16_t idx_rd = REG_PC_INDEX;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tB         %s\n", GetPC(proc_state), REG(idx_ra));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tB         %s\n", GetPC(proc_state), REG(idx_ra));
     }
     return OK;
 }
@@ -688,11 +680,10 @@ C62xCLR_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
         uint32_t rd = rb_hi | rb_lo;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCLR       %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCLR       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -716,11 +707,10 @@ C62xCLR_UR32_UC5_UC5_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
 
         uint32_t rd = rb_hi | rb_lo;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCLR       %s,0x%x,0x%x,%s\n",
-                GetPC(proc_state), REG(idx_rb), csta, cstb, REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCLR       %s,0x%x,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_rb), csta, cstb, REG(idx_rd));
     }
     return OK;
 }
@@ -736,11 +726,10 @@ C62xCMPEQ_SR32_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         int32_t rb  = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd = (uint32_t)(ra == rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPEQ     %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPEQ     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -755,11 +744,10 @@ C62xCMPEQ_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd   = (uint32_t)(cst5 == rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPEQ     0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPEQ     0x%x,%s,%s\n",
+                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -776,11 +764,10 @@ C62xCMPEQ_SR32_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         int64_t rb   = ((int64_t) rbh) << 32 | rbl;
         uint32_t rd  = (uint32_t)(ra == rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPEQ     %s,%s:%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPEQ     %s,%s:%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -797,11 +784,10 @@ C62xCMPEQ_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         int64_t rb   = ((int64_t) rbh) << 32 | rbl;
         uint32_t rd  = (uint32_t)(cst5 == rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPEQ     0x%x,%s:%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPEQ     0x%x,%s:%s,%s\n",
+                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -817,11 +803,10 @@ C62xCMPGT_SR32_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         int32_t rb  = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd = (uint32_t)(ra > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPGT     %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPGT     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -836,11 +821,10 @@ C62xCMPGT_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd   = (uint32_t)(cst5 > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPGT     0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPGT     0x%x,%s,%s\n",
+                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -857,11 +841,10 @@ C62xCMPGT_SR32_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         int64_t rb   = ((int64_t) rbh) << 32 | rbl;
         uint32_t rd  = (uint32_t)(ra > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPGT     %s,%s:%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPGT     %s,%s:%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -878,11 +861,10 @@ C62xCMPGT_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         int64_t rb   = ((int64_t) rbh) << 32 | rbl;
         uint32_t rd  = (uint32_t)(cst5 > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPGT     0x%x,%s:%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPGT     0x%x,%s:%s,%s\n",
+                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -898,11 +880,10 @@ C62xCMPGTU_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
         uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd = (uint32_t)(ra > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPGTU     %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPGTU     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -917,11 +898,10 @@ C62xCMPGTU_UC4_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         uint32_t rb    = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd    = (uint32_t)(ucst4 > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPGTU    0x%x,%s,%s\n",
-                GetPC(proc_state), ucst4, REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPGTU    0x%x,%s,%s\n",
+                GetPC(proc_state), ucst4, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -938,11 +918,10 @@ C62xCMPGTU_UR32_UR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
         uint64_t rb  = ((uint64_t) rbh) << 32 | rbl;
         uint32_t rd  = (uint32_t)(ra > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPGTU    %s,%s:%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPGTU    %s,%s:%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -959,11 +938,10 @@ C62xCMPGTU_UC4_UR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         uint64_t rb    = ((uint64_t) rbh) << 32 | rbl;
         uint32_t rd    = (uint32_t)(ucst4 > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPGTU    0x%x,%s:%s,%s\n",
-                GetPC(proc_state), ucst4, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPGTU    0x%x,%s:%s,%s\n",
+                GetPC(proc_state), ucst4, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -979,11 +957,10 @@ C62xCMPLT_SR32_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         int32_t rb  = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd = (uint32_t)(ra < rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPLT     %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPLT     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -998,11 +975,10 @@ C62xCMPLT_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd   = (uint32_t)(cst5 < rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPLT     0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPLT     0x%x,%s,%s\n",
+                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1019,11 +995,10 @@ C62xCMPLT_SR32_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         int64_t rb   = ((int64_t) rbh) << 32 | rbl;
         uint32_t rd  = (uint32_t)(ra < rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPLT     %s,%s:%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPLT     %s,%s:%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -1040,11 +1015,10 @@ C62xCMPLT_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         int64_t rb   = ((int64_t) rbh) << 32 | rbl;
         uint32_t rd  = (uint32_t)(cst5 < rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPLT     0x%x,%s:%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPLT     0x%x,%s:%s,%s\n",
+                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -1060,11 +1034,10 @@ C62xCMPLTU_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
         uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd = (uint32_t)(ra < rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPLTU     %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPLTU     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1079,11 +1052,10 @@ C62xCMPLTU_UC4_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         uint32_t rb    = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd    = (uint32_t)(ucst4 < rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPLTU    0x%x,%s,%s\n",
-                GetPC(proc_state), ucst4, REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPLTU    0x%x,%s,%s\n",
+                GetPC(proc_state), ucst4, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1100,11 +1072,10 @@ C62xCMPLTU_UR32_UR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
         uint64_t rb  = ((uint64_t) rbh) << 32 | rbl;
         uint32_t rd  = (uint32_t)(ra < rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPLTU    %s,%s:%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPLTU    %s,%s:%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -1121,11 +1092,10 @@ C62xCMPLTU_UC4_UR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         uint64_t rb    = ((uint64_t) rbh) << 32 | rbl;
         uint32_t rd    = (uint32_t)(ucst4 > rb);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tCMPLTU    0x%x,%s:%s,%s\n",
-                GetPC(proc_state), ucst4, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tCMPLTU    0x%x,%s:%s,%s\n",
+                GetPC(proc_state), ucst4, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -1145,11 +1115,10 @@ C62xEXT_UR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
         int32_t rd    = (rb << csta) >> cstb;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tEXT       %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tEXT       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1167,11 +1136,10 @@ C62xEXT_SR32_UC5_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
 
         int32_t rd    = (rb << csta) >> cstb;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tEXT       %s,0x%x,0x%x,%s\n",
-                GetPC(proc_state), REG(idx_rb), csta, cstb, REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tEXT       %s,0x%x,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_rb), csta, cstb, REG(idx_rd));
     }
     return OK;
 }
@@ -1191,11 +1159,10 @@ C62xEXTU_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 
         uint32_t rd   = (rb << csta) >> cstb;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tEXTU      %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tEXTU      %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1213,11 +1180,10 @@ C62xEXTU_UR32_UC5_UC5_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint
 
         uint32_t rd    = (rb << csta) >> cstb;
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tEXTU       %s,0x%x,0x%x,%s\n",
-                GetPC(proc_state), REG(idx_rb), csta, cstb, REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tEXTU       %s,0x%x,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_rb), csta, cstb, REG(idx_rd));
     }
     return OK;
 }
@@ -1228,14 +1194,58 @@ C62xIDLE(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint1
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tIDLE\n", GetPC(proc_state));
-#endif
+        TRACE_PRINT("%08x\tIDLE\n", GetPC(proc_state));
     }
     return WAIT_FOR_INTERRUPT;
 }
 
-/// LDB - Load Byte from Memory.
+int8_t * CalcMemAddrByMode(C62x_Proc_State_t * proc_state, uint32_t base_reg, uint16_t base_idx,
+                     uint32_t ucst5, uint8_t mode, uint8_t shift)
+{
+    int8_t * ptr = NULL; /* NOTE: We use int8_t * type so pointer arithmetic is ALWAYS in byte multiples  */
+
+    switch(mode)
+    {
+        case CST_NEGATIVE_OFFSET:        // *-R[ucst5]
+            ptr = (int8_t *) base_reg - (ucst5 << shift);
+            break;
+
+        case CST_POSITIVE_OFFSET:        // *+R[ucst5]
+            ptr = (int8_t *) base_reg + (ucst5 << shift);
+            break;
+
+        case CST_OFFSET_PRE_DECR:        // *--R[ucst5]
+            base_reg -= ucst5 << shift;
+            ptr = (int8_t *) base_reg;
+            AddDelayedRegister(proc_state, base_idx, (uint32_t) base_reg, 0);
+            break;
+
+        case CST_OFFSET_PRE_INCR:        // *++R[ucst5]
+            base_reg += ucst5 << shift;
+            ptr = (int8_t *) base_reg;
+            AddDelayedRegister(proc_state, base_idx, (uint32_t) base_reg, 0);
+            break;
+
+        case CST_OFFSET_POST_DECR:       // *R--[ucst5]
+            ptr = (int8_t *) base_reg;
+            base_reg -= ucst5 << shift;
+            AddDelayedRegister(proc_state, base_idx, (uint32_t) base_reg, 0);
+            break;
+
+        case CST_OFFSET_POST_INCR:       // *R++[ucst5]
+            ptr = (int8_t *) base_reg;
+            base_reg += ucst5 << shift;
+            AddDelayedRegister(proc_state, base_idx, (uint32_t) base_reg, 0);
+            break;
+
+        default:
+            ASSERT(0, "Unknown Addressing Mode");
+    }
+
+    return (ptr);
+}
+
+/// LDB - Load Byte from Memory, Sign Extended
 /// We will use the same target addresses here as this code will execute in KVM.
 ReturnStatus_t
 C62xLDB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
@@ -1247,62 +1257,151 @@ C62xLDB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
         uint32_t rd   = 0x0;
-        int8_t *  ptr = NULL;
+        int8_t * ptr  = NULL; /* NOTE: We use int8_t * type so pointer arithmetic is ALWAYS in byte multiples  */
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        switch(mode)
-        {
-            case CST_NEGATIVE_OFFSET:        // *-R[ucst5]
-                ptr = (int8_t *) rb - ucst5;
-                break;
-
-            case CST_POSITIVE_OFFSET:        // *+R[ucst5]
-                ptr = (int8_t *) rb + ucst5;
-                break;
-
-            case CST_OFFSET_PRE_DECR:        // *--R[ucst5]
-                ptr = (int8_t *) --rb + ucst5;
-                AddDelayedRegister(proc_state, idx_rb, (uint32_t) rb, 0);
-                break;
-
-            case CST_OFFSET_PRE_INCR:        // *++R[ucst5]
-                ptr = (int8_t *) ++rb + ucst5;
-                AddDelayedRegister(proc_state, idx_rb, (uint32_t) rb, 0);
-                break;
-
-            case CST_OFFSET_POST_DECR:       // *R--[ucst5]
-                ptr = (int8_t *) rb-- + ucst5;
-                AddDelayedRegister(proc_state, idx_rb, (uint32_t) rb, 0);
-                break;
-
-            case CST_OFFSET_POST_INCR:       // *R++[ucst5]
-                ptr = (int8_t *) rb++ + ucst5;
-                AddDelayedRegister(proc_state, idx_rb, (uint32_t) rb, 0);
-                break;
-
-            default:
-                ASSERT(0, "Unknown Addressing Mode");
-        }
-
+        ptr = CalcMemAddrByMode(proc_state, rb, idx_rb, ucst5, mode, 0);
         // Now we should have a valid address (mode-wise).
-        rd = *ptr;
+        rd = * ((int8_t *) ptr);
 
         if(0x80 & rd) // Need Sign Extension ?
             rd = rd | 0xFFFFFF00;
         else
             rd = rd & 0x000000FF;
-        
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
-                GetPC(proc_state), ucst5, REG(idx_rb), REG(idx_rd), ptr, *ptr);
-#endif
+       
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+                GetPC(proc_state), ucst5, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+    }
+    return OK;
+}
+
+/// LDBU - Load Byte from Memory, Zero Extended
+ReturnStatus_t
+C62xLDBU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint8_t ucst5 = constant & 0x1F;
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+        int8_t * ptr  = NULL; /* NOTE: We use int8_t * type so pointer arithmetic is ALWAYS in byte multiples  */
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        ptr = CalcMemAddrByMode(proc_state, rb, idx_rb, ucst5, mode, 0);
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int8_t *) ptr);
+        rd = rd & 0x000000FF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+                GetPC(proc_state), ucst5, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+    }
+    return OK;
+}
+
+/// LDH - Load Halfword from Memory, Sign Extended
+/// We will use the same target addresses here as this code will execute in KVM.
+ReturnStatus_t
+C62xLDH_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint8_t ucst5 = constant & 0x1F;
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+        int8_t * ptr  = NULL; /* NOTE: We use int8_t * type so pointer arithmetic is ALWAYS in byte multiples  */
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        ptr = CalcMemAddrByMode(proc_state, rb, idx_rb, ucst5, mode, 1);
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int16_t *) ptr);
+
+        if(0x8000 & rd) // Need Sign Extension ?
+            rd = rd | 0xFFFF0000;
+        else
+            rd = rd & 0x0000FFFF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%04X\n",
+                GetPC(proc_state), ucst5, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+    }
+    return OK;
+}
+
+/// LDHU - Load Halfword from Memory, Zero Extended
+/// We will use the same target addresses here as this code will execute in KVM.
+ReturnStatus_t
+C62xLDHU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint8_t ucst5 = constant & 0x1F;
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+        int8_t * ptr  = NULL; /* NOTE: We use int8_t * type so pointer arithmetic is ALWAYS in byte multiples  */
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        ptr = CalcMemAddrByMode(proc_state, rb, idx_rb, ucst5, mode, 1);
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int16_t *) ptr);
+        rd = rd & 0x0000FFFF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDHU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%04X\n",
+                GetPC(proc_state), ucst5, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+    }
+    return OK;
+}
+
+/// LDW - Load Word from Memory
+/// We will use the same target addresses here as this code will execute in KVM.
+ReturnStatus_t
+C62xLDW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint8_t ucst5 = constant & 0x1F;
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+        int8_t * ptr  = NULL; /* NOTE: We use int8_t * type so pointer arithmetic is ALWAYS in byte multiples  */
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        ptr = CalcMemAddrByMode(proc_state, rb, idx_rb, ucst5, mode, 2);
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int32_t *) ptr);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
+                GetPC(proc_state), ucst5, REG(idx_rb), REG(idx_rd), ptr, *ptr);
     }
     return OK;
 }
 
 // Working Here
+
+
+
+
+
 
 
 ReturnStatus_t
@@ -1313,11 +1412,10 @@ C62xMV_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zer
     {
         int32_t ra = (int32_t) proc_state->m_register[idx_ra];
         int32_t rd = ra;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tMV        %s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rd));
-#endif
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMV        %s,%s\n", GetPC(proc_state), REG(idx_ra), REG(idx_rd));
     }
     return OK;
 }
@@ -1331,11 +1429,10 @@ C62xSHRU_UR32_UC5_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
         uint8_t ucst5 = constant & 0x1F;
         uint32_t rd   = ra >> ucst5;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tSHRU      %s,0x%x,%s\n",
-                GetPC(proc_state), REG(idx_ra), ucst5, REG(idx_rd));
-#endif
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSHRU      %s,0x%x,%s\n", GetPC(proc_state), REG(idx_ra), ucst5, REG(idx_rd));
     }
     return OK;
 }
@@ -1349,11 +1446,11 @@ C62xMVK_SC16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_ze
         //int32_t scst16 = ((constant & 0x0000ffff) << 16) >> 16;
         int32_t scst16 = constant;
         int32_t rd = scst16;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tMVK       0x%x,%s\n",
-                GetPC(proc_state), constant, REG(idx_rd));
-#endif
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMVK       0x%x,%s\n",
+                GetPC(proc_state), constant, REG(idx_rd));
     }
     return OK;
 }
@@ -1368,11 +1465,10 @@ C62xMVKH_UC16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_z
         uint32_t rd     = (uint32_t) proc_state->m_register[idx_rd];
         rd              = (rd & 0x0000FFFF) | (ucst16 & 0xFFFF0000);
 
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tMVKH      0x%x,%s\n",
-                GetPC(proc_state), constant, REG(idx_rd));
-#endif
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMVKH      0x%x,%s\n",
+                GetPC(proc_state), constant, REG(idx_rd));
     }
     return OK;
 }
@@ -1386,11 +1482,11 @@ C62xSHL_SR32_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         int32_t ra    = (int32_t) proc_state->m_register[idx_ra];
         uint8_t ucst5 = constant & 0x1F;
         int32_t rd    = ra << ucst5;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tSHL       %s,0x%x,%s\n",
-                GetPC(proc_state), REG(idx_ra), ucst5, REG(idx_rd));
-#endif
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSHL       %s,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_ra), ucst5, REG(idx_rd));
     }
     return OK;
 }
@@ -1404,11 +1500,11 @@ C62xXOR_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         uint32_t ra = (uint32_t) proc_state->m_register[idx_ra];
         uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd = ra ^ rb;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tXOR       %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tXOR       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1422,11 +1518,11 @@ C62xOR_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         uint32_t ra = (uint32_t) proc_state->m_register[idx_ra];
         uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd = ra | rb;
-#ifdef ENABLE_TRACE
-        fprintf(stdout, "%08x\tOR        %s,%s,%s\n",
-                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
-#endif
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tOR        %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }

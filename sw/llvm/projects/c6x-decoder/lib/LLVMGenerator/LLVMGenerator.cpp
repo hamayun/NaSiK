@@ -248,7 +248,7 @@ namespace native
 #endif
         }
 
-        //CreateCallByName("ShowProcessorState");
+        CreateCallByName("ShowProcessorState");
 
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
