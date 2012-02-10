@@ -1396,10 +1396,37 @@ C62xLDW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
     return OK;
 }
 
+/// LMBD - Left Most Bit Detection
+ReturnStatus_t
+C62xLMBD_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t rd   = 0x0;
+        uint32_t detect_one = constant & 0x1; /* What are we searching for 0 or 1 */
+        uint32_t mask = 0x80000000;
+
+        if(!detect_one)
+            rb = ~rb;  /* Invert bits; So we always look for the left most 1 bit */
+
+        TRACE_PRINT("detect_one = %d\n", detect_one);
+
+        while(!(mask & rb) && mask)
+        {
+            rd++; mask >>= 1;
+            TRACE_PRINT("rd = %2d, mask = 0x%08X\n", rd, mask);
+        }
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+        TRACE_PRINT("%08x\tLMBD      0x%x,%s,%s\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
 // Working Here
-
-
-
 
 
 
