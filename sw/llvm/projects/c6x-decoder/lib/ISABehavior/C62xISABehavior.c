@@ -1372,7 +1372,7 @@ C62xLDHU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 /// We will use the same target addresses here as this code will execute in KVM.
 ReturnStatus_t
 C62xLDW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+                      uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
@@ -1399,7 +1399,7 @@ C62xLDW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 /// LMBD - Left Most Bit Detection
 ReturnStatus_t
 C62xLMBD_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
@@ -1426,10 +1426,347 @@ C62xLMBD_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
     return OK;
 }
 
-// Working Here
+/// MPY - Multiply Signed 16 LSB x Signed 16 LSB.
+ReturnStatus_t
+C62xMPY_SR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t ra = (int16_t) proc_state->m_register[idx_ra];
+        int16_t rb = (int16_t) proc_state->m_register[idx_rb];
+        int32_t rd = ra * rb;
 
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
+        TRACE_PRINT("%08x\tMPY       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
 
+/// MPY - Multiply Signed 16 LSB x Signed 16 LSB.
+ReturnStatus_t
+C62xMPY_SC5_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t ra = (int16_t) 0x1F & constant;
+        int16_t rb = (int16_t) proc_state->m_register[idx_rb];
+        int32_t rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPY       0x%x,%s,%s\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYH - Multiply Signed 16 MSB x Signed 16 MSB.
+ReturnStatus_t
+C62xMPYH_SR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t ra = (int16_t) (proc_state->m_register[idx_ra] >> 16);
+        int16_t rb = (int16_t) (proc_state->m_register[idx_rb] >> 16);
+        int32_t rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYH      %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYHL - Multiply Signed 16 MSB x Signed 16 LSB.
+ReturnStatus_t
+C62xMPYHL_SR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t ra = (int16_t) (proc_state->m_register[idx_ra] >> 16);
+        int16_t rb = (int16_t)  proc_state->m_register[idx_rb];
+        int32_t rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYHL     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYHLU - Multiply Unsigned 16 MSB x Unsigned 16 LSB.
+ReturnStatus_t
+C62xMPYHLU_UR16_UR16_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint16_t ra = (uint16_t) (proc_state->m_register[idx_ra] >> 16);
+        uint16_t rb = (uint16_t)  proc_state->m_register[idx_rb];
+        uint32_t rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYHLU    %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYHSLU - Multiply Signed 16 MSB x Unsigned 16 LSB.
+ReturnStatus_t
+C62xMPYHSLU_SR16_UR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                           uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t  ra = (int16_t) (proc_state->m_register[idx_ra] >> 16);
+        uint16_t rb = (uint16_t) proc_state->m_register[idx_rb];
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYHSLU   %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYHSU - Multiply Signed 16 MSB x Unsigned 16 MSB.
+ReturnStatus_t
+C62xMPYHSU_SR16_UR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t  ra = (int16_t)  (proc_state->m_register[idx_ra] >> 16);
+        uint16_t rb = (uint16_t) (proc_state->m_register[idx_rb] >> 16);
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYHSU    %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYHU - Multiply Unsigned 16 MSB x Unsigned 16 MSB.
+ReturnStatus_t
+C62xMPYHU_UR16_UR16_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint16_t ra = (uint16_t) (proc_state->m_register[idx_ra] >> 16);
+        uint16_t rb = (uint16_t) (proc_state->m_register[idx_rb] >> 16);
+        uint32_t rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYHU     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYHULS - Multiply Unsigned 16 MSB x Signed 16 LSB.
+ReturnStatus_t
+C62xMPYHULS_UR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint16_t ra = (uint16_t) (proc_state->m_register[idx_ra] >> 16);
+        int16_t  rb = (int16_t)   proc_state->m_register[idx_rb];
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYHULS   %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYHUS - Multiply Unsigned 16 MSB x Signed 16 MSB.
+ReturnStatus_t
+C62xMPYHUS_UR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint16_t ra = (uint16_t) (proc_state->m_register[idx_ra] >> 16);
+        int16_t  rb = (int16_t)  (proc_state->m_register[idx_rb] >> 16);
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYHUS   %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYLH - Multiply Signed 16 LSB x Signed 16 MSB.
+ReturnStatus_t
+C62xMPYLH_SR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t  ra = (int16_t)  proc_state->m_register[idx_ra];
+        int16_t  rb = (int16_t) (proc_state->m_register[idx_rb] >> 16);
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYLH    %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYLHU - Multiply Unsigned 16 LSB x Unsigned 16 MSB.
+ReturnStatus_t
+C62xMPYLHU_UR16_UR16_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint16_t ra = (uint16_t)  proc_state->m_register[idx_ra];
+        uint16_t rb = (uint16_t) (proc_state->m_register[idx_rb] >> 16);
+        uint32_t rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYLHU   %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYLSHU - Multiply Signed 16 LSB x Unsigned 16 MSB.
+ReturnStatus_t
+C62xMPYLSHU_SR16_UR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t  ra = (int16_t)   proc_state->m_register[idx_ra];
+        uint16_t rb = (uint16_t) (proc_state->m_register[idx_rb] >> 16);
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYLSHU   %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYLUHS - Multiply Unsigned 16 LSB x Signed 16 MSB.
+ReturnStatus_t
+C62xMPYLUHS_UR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint16_t ra = (uint16_t) proc_state->m_register[idx_ra];
+        int16_t  rb = (int16_t) (proc_state->m_register[idx_rb] >> 16);
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYLUHS   %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYSU - Multiply Signed 16 LSB x Unsigned 16 LSB.
+ReturnStatus_t
+C62xMPYSU_SR16_UR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t  ra = (int16_t)  proc_state->m_register[idx_ra];
+        uint16_t rb = (uint16_t) proc_state->m_register[idx_rb];
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYSU     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYSU - Multiply Signed 16 LSB x Unsigned 16 LSB.
+ReturnStatus_t
+C62xMPYSU_SC5_UR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t scst5 = (int16_t) 0x1F & constant;
+        uint16_t rb = (uint16_t) proc_state->m_register[idx_rb];
+        int32_t  rd = scst5 * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYSU     0x%x,%s,%s\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYU - Multiply Unsigned 16 LSB x Unsigned 16 LSB.
+ReturnStatus_t
+C62xMPYU_UR16_UR16_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint16_t ra = (uint16_t) proc_state->m_register[idx_ra];
+        uint16_t rb = (uint16_t) proc_state->m_register[idx_rb];
+        uint32_t rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYU      %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MPYUS - Multiply Unsigned 16 LSB x Signed 16 LSB.
+ReturnStatus_t
+C62xMPYUS_UR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint16_t ra = (uint16_t) proc_state->m_register[idx_ra];
+        int16_t  rb = (int16_t)  proc_state->m_register[idx_rb];
+        int32_t  rd = ra * rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMPYUS      %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
 
 ReturnStatus_t
 C62xMV_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
@@ -1437,8 +1774,7 @@ C62xMV_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zer
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra = (int32_t) proc_state->m_register[idx_ra];
-        int32_t rd = ra;
+        int32_t rd = (int32_t) proc_state->m_register[idx_ra];
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1446,6 +1782,11 @@ C62xMV_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zer
     }
     return OK;
 }
+
+// Working Here
+
+
+
 
 ReturnStatus_t
 C62xSHRU_UR32_UC5_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,

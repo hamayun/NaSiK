@@ -821,7 +821,6 @@ namespace native
             SetMnemonic("MPYHSU"); SetDelaySlots((uint8_t) C62X_MULTIPLY_DELAY);
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
             SetPreferredPrintMode(MODE_DEC);
-            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 
         virtual ~C62xMPYHSUInstr() {}
