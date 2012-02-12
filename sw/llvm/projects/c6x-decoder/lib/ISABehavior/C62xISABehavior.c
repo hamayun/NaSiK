@@ -1269,7 +1269,7 @@ C62xLDB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
             rd = rd | 0xFFFFFF00;
         else
             rd = rd & 0x000000FF;
-       
+
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
@@ -1769,6 +1769,24 @@ C62xMPYUS_UR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
 }
 
 ReturnStatus_t
+C62xMV_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                 uint16_t idx_rah, uint16_t idx_ral, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t rdh = (int32_t) proc_state->m_register[idx_rah];
+        int32_t rdl = (int32_t) proc_state->m_register[idx_ral];
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tMV        %s:%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+
+ReturnStatus_t
 C62xMV_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rd, uint8_t delay)
 {
@@ -1783,9 +1801,114 @@ C62xMV_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zer
     return OK;
 }
 
+ReturnStatus_t
+C62xMV_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                 uint16_t idx_ra, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t rd = (uint32_t) proc_state->m_register[idx_ra];
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMV        %s,%s\n", GetPC(proc_state), REG(idx_ra), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// MVC - Move between control file and register file.
+/*
+ * Any write to the ISR or ICR (by the MVC instruction) effectively has one delay
+ * slot because the results cannot be read (by the MVC instruction) in the IFR until
+ * two cycles after the write to the ISR or ICR.
+ * Note: The six MSBs of the AMR are reserved and therefore are not written to.
+ * Refer to Table 3-16. Register Addresses for Accessing the Control Registers,
+ * for R/W permissions on Control Registers
+ * Any write to the interrupt clear register (ICR) is ignored by a simultaneous write to the same bit in ISR.
+ */
+ReturnStatus_t
+C62xMVC_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                 uint16_t idx_ra, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        if(idx_ra != REG_ICR_INDEX && idx_ra != REG_ISR_INDEX &&
+           idx_rd != REG_IFR_INDEX && idx_rd != REG_PC_INDEX)
+        {
+            uint32_t rd = (uint32_t) proc_state->m_register[idx_ra];
+
+            if(idx_rd == REG_ISR_INDEX || idx_rd == REG_ICR_INDEX) delay++;
+
+            AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+            TRACE_PRINT("%08x\tMVC        %s,%s\n", GetPC(proc_state), REG(idx_ra), REG(idx_rd));
+        }
+        else
+        {
+            ASSERT(1, "Invalid MVC Instruction Found !!!");
+        }
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xMVK_SC16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                  int32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        if(constant & 0x8000)
+            constant |= 0xFFFF0000;
+        else
+            constant &= 0x0000FFFF;
+
+        int32_t rd = constant;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMVK       0x%x,%s\n",
+                GetPC(proc_state), constant, REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xMVKH_UC16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                   int32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t rd = (int32_t) proc_state->m_register[idx_rd];
+
+        rd = (rd & 0x0000FFFF) | (constant << 16);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMVKH      0x%x,%s\n",
+                GetPC(proc_state), constant, REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xMVKLH_UC16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                   int32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t rd = (int32_t) proc_state->m_register[idx_rd];
+
+        rd = (rd & 0x0000FFFF) | (constant << 16);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tMVKLH     0x%x,%s\n",
+                GetPC(proc_state), constant, REG(idx_rd));
+    }
+    return OK;
+}
+
 // Working Here
-
-
 
 
 ReturnStatus_t
@@ -1801,42 +1924,6 @@ C62xSHRU_UR32_UC5_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tSHRU      %s,0x%x,%s\n", GetPC(proc_state), REG(idx_ra), ucst5, REG(idx_rd));
-    }
-    return OK;
-}
-
-ReturnStatus_t
-C62xMVK_SC16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant, uint16_t idx_rd, uint8_t delay)
-{
-    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
-    {
-        //int32_t scst16 = ((constant & 0x0000ffff) << 16) >> 16;
-        int32_t scst16 = constant;
-        int32_t rd = scst16;
-
-        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
-
-        TRACE_PRINT("%08x\tMVK       0x%x,%s\n",
-                GetPC(proc_state), constant, REG(idx_rd));
-    }
-    return OK;
-}
-
-ReturnStatus_t
-C62xMVKH_UC16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant, uint16_t idx_rd, uint8_t delay)
-{
-    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
-    {
-        uint32_t ucst16 = (uint32_t) constant;
-        uint32_t rd     = (uint32_t) proc_state->m_register[idx_rd];
-        rd              = (rd & 0x0000FFFF) | (ucst16 & 0xFFFF0000);
-
-        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
-
-        TRACE_PRINT("%08x\tMVKH      0x%x,%s\n",
-                GetPC(proc_state), constant, REG(idx_rd));
     }
     return OK;
 }
