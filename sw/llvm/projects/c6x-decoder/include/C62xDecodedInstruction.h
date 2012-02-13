@@ -681,7 +681,6 @@ namespace native
         {
             SetMnemonic("NORM");
             SetDestRegister(dst_reg); AddOperand(src1_opr);
-            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 
         virtual ~C62xNORMInstr() {}
