@@ -499,7 +499,6 @@ namespace native
         {
             SetMnemonic("SSHL");
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
-            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 
         virtual ~C62xSSHLInstr() {}
@@ -963,7 +962,6 @@ namespace native
             SetMnemonic("SMPY"); SetDelaySlots((uint8_t) C62X_MULTIPLY_DELAY);
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
             SetPreferredPrintMode(MODE_DEC);
-            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 
         virtual ~C62xSMPYInstr() {}

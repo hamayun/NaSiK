@@ -694,7 +694,7 @@ C62xCLR_UR32_UC5_UC5_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
                         uint16_t idx_ra, int32_t constanta, int32_t constantb, uint16_t idx_rd, uint8_t delay)
 {
     ASSERT(1, "Test This Instruction !!!");
-    
+
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
@@ -1165,7 +1165,7 @@ C62xEXTU_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 
         uint16_t csta = (uint16_t) (rb & 0x3E0) >> 5;   /* bits 5 to 9 */
         uint16_t cstb = (uint16_t) rb & 0x1F;           /* bits 0 to 4 */
-        
+
         uint32_t rd   = (ra << csta) >> cstb;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -2124,15 +2124,18 @@ C62xSADD_SR32_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         int64_t rbl = (int64_t) proc_state->m_register[idx_rbl];
         int32_t sflag = 0;
 
+        rbh        = ((rbh & 0x80) ? (rbh | 0xFFFFFF00) : (rbh & 0x000000FF));
         int64_t rb = (rbh << 32) | rbl;
-        int64_t rd = ra + rb;
 
-        if(!(ra & 0x80000000) && !(rb & 0x8000000000) && (rd & 0x8000000000))
+        int64_t rd = ra + rb;
+        rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));
+
+        if((ra > 0) && (rb > 0) && (rd < 0))
         {
             rd = 0x7FFFFFFFFF; sflag = 1;
             TRACE_PRINT("+VE Saturation\n");
         }
-        else if((ra & 0x80000000) && (rb & 0x8000000000) && !(rd & 0x8000000000))
+        else if((ra < 0) && (rb < 0) && (rd > 0))
         {
             rd = 0x8000000000; sflag = 1;
             TRACE_PRINT("-VE Saturation\n");
@@ -2201,20 +2204,23 @@ C62xSADD_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t scst5 = ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
+        int32_t ra  = ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
         int64_t rbh = (int64_t) proc_state->m_register[idx_rbh];
         int64_t rbl = (int64_t) proc_state->m_register[idx_rbl];
         int32_t sflag = 0;
 
+        rbh        = ((rbh & 0x80) ? (rbh | 0xFFFFFF00) : (rbh & 0x000000FF));
         int64_t rb = (rbh << 32) | rbl;
-        int64_t rd = scst5 + rb;
 
-        if(!(scst5 & 0x80000000) && !(rb & 0x8000000000) && (rd & 0x8000000000)) // 0x80000000 for scst5 is valid here, sign extended above
+        int64_t rd = ra + rb;
+        rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));
+
+        if((ra > 0) && (rb > 0) && (rd < 0))
         {
             rd = 0x7FFFFFFFFF; sflag = 1;
             TRACE_PRINT("+VE Saturation\n");
         }
-        else if((scst5 & 0x80000000) && (rb & 0x8000000000) && !(rd & 0x8000000000))
+        else if((ra < 0) && (rb < 0) && (rd > 0))
         {
             rd = 0x8000000000; sflag = 1;
             TRACE_PRINT("-VE Saturation\n");
@@ -2234,7 +2240,7 @@ C62xSADD_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         }
 
         TRACE_PRINT("%08x\tSADD      0x%x,%s:%s,%s:%s\n",
-                    GetPC(proc_state), scst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
+                    GetPC(proc_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -2333,9 +2339,6 @@ ReturnStatus_t
 C62xSET_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    proc_state->m_register[idx_ra] = 0x9ED31A31;
-    proc_state->m_register[idx_rb] = 0x0000C197;
-
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
@@ -2372,42 +2375,789 @@ C62xSET_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
     return OK;
 }
 
-// Working Here
+/// SHL - Arithmetic Shift Left
+/*
+ * The src2 operand is shifted to the left by the src1 operand. The result is placed in dst.
+ * When a register is used, the six LSBs specify the shift amount and valid values are 0-40.
+ * When an immediate is used, valid shift amounts are 0-31. If src2 is a register pair, only
+ * the bottom 40 bits of the register pair are shifted. The upper 24 bits of the register pair
+ * are unused.
+ * If 39 < src1 < 64, src2 is shifted to the left by 40. Only the six LSBs of src1 are used by
+ * the shifter, so any bits set above bit 5 do not affect execution.
+ */
+
+ReturnStatus_t
+C62xSHL_SR32_UR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra     = (int32_t) proc_state->m_register[idx_ra];
+        int32_t shift  = (int32_t) proc_state->m_register[idx_rb] & 0x3F;
+
+        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+
+        int32_t rd     = ra << shift;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSHL       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSHL_SR40_UR32_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_rah, uint16_t idx_ral, uint16_t idx_rb, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
+        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        int32_t shift  = (int32_t)  proc_state->m_register[idx_rb] & 0x3F;
+
+        ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
+
+        uint64_t ra    = (rah << 32) | ral;
+        uint64_t rd    = ra << shift;
+
+        uint32_t rdh   = (rd >> 32) & 0xFF;
+        uint32_t rdl   = rd & 0xFFFFFFFF;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tSHL       %s:%s,%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSHL_UR32_UR32_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint64_t ra    = (uint64_t) proc_state->m_register[idx_ra];
+        int32_t shift  = (int32_t)  proc_state->m_register[idx_rb] & 0x3F;
+
+        ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
+
+        uint64_t rd    =  ra << shift;
+        uint32_t rdh   = (rd >> 32) & 0xFF;
+        uint32_t rdl   = rd & 0xFFFFFFFF;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tSHL       %s,%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
 
 ReturnStatus_t
 C62xSHL_SR32_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
+                      uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra    = (int32_t) proc_state->m_register[idx_ra];
-        uint8_t ucst5 = constant & 0x1F;
-        int32_t rd    = ra << ucst5;
+        uint8_t shift = constant & 0x1F;
+
+        int32_t rd    = ra << shift;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tSHL       %s,0x%x,%s\n",
-                GetPC(proc_state), REG(idx_ra), ucst5, REG(idx_rd));
+                GetPC(proc_state), REG(idx_ra), shift, REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSHL_SR40_UC5_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_rah, uint16_t idx_ral, uint32_t constant, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
+        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        uint8_t shift  = constant & 0x1F;
+
+        uint64_t ra    = (rah << 32) | ral;
+        uint64_t rd    = ra << shift;
+
+        uint32_t rdh   = (rd >> 32) & 0xFF;
+        uint32_t rdl   = rd & 0xFFFFFFFF;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tSHL       %s:%s,0x%x,%s:%s\n",
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), shift, REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSHL_UR32_UC5_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint32_t constant, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint64_t ra    = (uint64_t) proc_state->m_register[idx_ra];
+        uint8_t shift  = constant & 0x1F;
+
+        uint64_t rd    = ra << shift;
+
+        uint32_t rdh   = (rd >> 32) & 0xFF;
+        uint32_t rdl   = rd & 0xFFFFFFFF;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tSHL       %s,0x%x,%s:%s\n",
+                GetPC(proc_state), REG(idx_ra), shift, REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+
+/// SHR - Arithmetic Shift Right
+/*
+ * The src2 operand is shifted to the right by the src1 operand. The sign-extended
+ * result is placed in dst. When a register is used, the six LSBs specify the shift
+ * amount and valid values are 0--40. When an immediate value is used, valid
+ * shift amounts are 0–31.
+ * If 39 < src1 < 64, src2 is shifted to the right by 40. Only the six LSBs of src1 are
+ * used by the shifter, so any bits set above bit 5 do not affect execution.
+ */
+ReturnStatus_t
+C62xSHR_SR32_UR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra     = (int32_t) proc_state->m_register[idx_ra];
+        int32_t shift  = (int32_t) proc_state->m_register[idx_rb] & 0x3F;
+
+        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+
+        int32_t rd     = ra >> shift;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSHR       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSHR_SR40_UR32_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_rah, uint16_t idx_ral, uint16_t idx_rb, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
+        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        int32_t shift  = (int32_t)  proc_state->m_register[idx_rb] & 0x3F;
+
+        ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
+
+        rah            = (rah & 0x80 ? rah | 0xFFFFFF00 : rah & 0x000000FF );      // Sign Extension
+        int64_t ra     = (rah << 32) | ral;
+        int64_t rd     = ra >> shift;
+
+        uint32_t rdh   = (rd >> 32) & 0xFF;
+        uint32_t rdl   = rd & 0xFFFFFFFF;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tSHR       %s:%s,%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSHR_SR32_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                      uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra    = (int32_t) proc_state->m_register[idx_ra];
+        int8_t shift  = constant & 0x1F;
+
+        int32_t rd    = ra >> shift;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSHR       %s,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_ra), shift, REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSHR_SR40_UC5_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_rah, uint16_t idx_ral, uint32_t constant, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
+        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        uint8_t shift  = constant & 0x1F;
+
+        rah            = (rah & 0x80 ? rah | 0xFFFFFF00 : rah & 0x000000FF );      // Sign Extension
+        int64_t ra     = (rah << 32) | ral;
+        int64_t rd     = ra >> shift;
+
+        uint32_t rdh   = (rd >> 32) & 0xFF;
+        uint32_t rdl   = rd & 0xFFFFFFFF;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tSHR       %s:%s,0x%x,%s:%s\n",
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), shift, REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+
+/// SHRU - Logical Shift Right
+/*
+ * The src2 operand is shifted to the right by the src1 operand. The zero-extended result is
+ * placed in dst. When a register is used, the six LSBs specify the shift amount and valid
+ * values are 0-40. When an immediate value is used, valid shift amounts are 0-31. If src2
+ * is a register pair, only the bottom 40 bits of the register pair are shifted. The upper 24
+ * bits of the register pair are unused.
+ * If 39 < src1 < 64, src2 is shifted to the right by 40. Only the six LSBs of src1 are used by
+ * the shifter, so any bits set above bit 5 do not affect execution.
+ */
+ReturnStatus_t
+C62xSHRU_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra    = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t shift = (uint32_t) proc_state->m_register[idx_rb] & 0x3F;
+
+        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+
+        uint32_t rd    = ra >> shift;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSHRU      %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSHRU_UR40_UR32_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_rah, uint16_t idx_ral, uint16_t idx_rb, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
+        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        uint32_t shift = (uint32_t) proc_state->m_register[idx_rb] & 0x3F;
+
+        ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
+
+        uint64_t ra    = (rah << 32) | ral;
+        uint64_t rd    = ra >> shift;
+
+        uint32_t rdh   = (rd >> 32) & 0xFF;
+        uint32_t rdl   = rd & 0xFFFFFFFF;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tSHRU      %s:%s,%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
 
 ReturnStatus_t
 C62xSHRU_UR32_UC5_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
+                      uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
-        uint8_t ucst5 = constant & 0x1F;
-        uint32_t rd   = ra >> ucst5;
+        uint8_t shift = constant & 0x1F;
+
+        uint32_t rd   = ra >> shift;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
-        TRACE_PRINT("%08x\tSHRU      %s,0x%x,%s\n", GetPC(proc_state), REG(idx_ra), ucst5, REG(idx_rd));
+        TRACE_PRINT("%08x\tSHRU      %s,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_ra), shift, REG(idx_rd));
     }
     return OK;
 }
+
+ReturnStatus_t
+C62xSHRU_UR40_UC5_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_rah, uint16_t idx_ral, uint32_t constant, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
+        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        uint8_t shift  = constant & 0x1F;
+
+        uint64_t ra    = (rah << 32) | ral;
+        uint64_t rd    = ra >> shift;
+
+        uint32_t rdh   = (rd >> 32) & 0xFF;
+        uint32_t rdl   = rd & 0xFFFFFFFF;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tSHRU      %s:%s,0x%x,%s:%s\n",
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), shift, REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+
+/// SMPY - Multiply Signed 16 LSB × Signed 16 LSB With Left Shift and Saturation
+/*
+ * The 16 least-significant bits of src1 operand is multiplied by the 16 least-significant bits
+ * of the src2 operand. The result is left shifted by 1 and placed in dst. If the left-shifted
+ * result is 8000 0000h, then the result is saturated to 7FFF FFFFh. If a saturate occurs,
+ * the SAT bit in CSR is set one cycle after dst is written. The source operands are signed
+ * by default.
+ */
+ReturnStatus_t
+C62xSMPY_SR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t ra = (int16_t) proc_state->m_register[idx_ra];
+        int16_t rb = (int16_t) proc_state->m_register[idx_rb];
+        int32_t sflag = 0;
+
+        int32_t rd = (ra * rb) << 1;
+
+        if(rd == 0x80000000)
+        {
+            rd = 0x7FFFFFFF; sflag = 1;
+        }
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSMPY      %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// SMPYH - Multiply Signed 16 MSB × Signed 16 MSB With Left Shift and Saturation
+ReturnStatus_t
+C62xSMPYH_SR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t ra = (int16_t) (proc_state->m_register[idx_ra] >> 16);
+        int16_t rb = (int16_t) (proc_state->m_register[idx_rb] >> 16);
+        int32_t sflag = 0;
+
+        int32_t rd = (ra * rb) << 1;
+
+        if(rd == 0x80000000)
+        {
+            rd = 0x7FFFFFFF; sflag = 1;
+        }
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSMPYH     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// SMPYHL - Multiply Signed 16 MSB × Signed 16 LSB With Left Shift and Saturation
+ReturnStatus_t
+C62xSMPYHL_SR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t ra = (int16_t) (proc_state->m_register[idx_ra] >> 16);
+        int16_t rb = (int16_t)  proc_state->m_register[idx_rb];
+        int32_t sflag = 0;
+
+        int32_t rd = (ra * rb) << 1;
+
+        if(rd == 0x80000000)
+        {
+            rd = 0x7FFFFFFF; sflag = 1;
+        }
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSMPYHL    %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// SMPYLH - Multiply Signed 16 LSB × Signed 16 MSB With Left Shift and Saturation
+ReturnStatus_t
+C62xSMPYLH_SR16_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                          uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int16_t ra = (int16_t)  proc_state->m_register[idx_ra];
+        int16_t rb = (int16_t) (proc_state->m_register[idx_rb] >> 16);
+        int32_t sflag = 0;
+
+        int32_t rd = (ra * rb) << 1;
+
+        if(rd == 0x80000000)
+        {
+            rd = 0x7FFFFFFF; sflag = 1;
+        }
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSMPYLH    %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// SSHL - Shift Left With Saturation
+/*
+ * The src2 operand is shifted to the left by the src1 operand. The result is placed in dst.
+ * When a register is used to specify the shift, the 5 least-significant bits specify the shift
+ * amount. Valid values are 0 through 31, and the result of the shift is invalid if the shift
+ * amount is greater than 31. The result of the shift is saturated to 32 bits. If a saturate
+ * occurs, the SAT bit in CSR is set one cycle after dst is written.
+ */
+ReturnStatus_t
+C62xSSHL_SR32_UR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra     = (int32_t) proc_state->m_register[idx_ra];
+        int32_t shift  = (int32_t) proc_state->m_register[idx_rb] & 0x1F; // 0x3F for C64x !!!
+        int32_t sflag  = 0;
+        uint32_t bitmask = 0x80000000;
+        uint32_t signbit = ra & bitmask;
+
+        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+
+        for(int i = 30; i >= (31 - shift); i--)
+        {
+            if(signbit && !(ra & signbit))
+            {
+                sflag = 1; break;
+            }
+            else if(bitmask & ra)
+            {
+                sflag = 1; break;
+            }
+
+            signbit >>= 1;
+            bitmask >>= 1;
+        }
+
+        int32_t rd = ra << shift;
+
+        if(sflag && ra > 0)
+            rd = 0x7FFFFFFF;
+        else if(sflag && ra < 0)
+            rd = 0x80000000;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSSHL       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSSHL_SR32_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra     = (int32_t) proc_state->m_register[idx_ra];
+        int32_t shift  = constant & 0x1F;
+        int32_t sflag  = 0;
+        uint32_t bitmask = 0x80000000;
+        uint32_t signbit = ra & bitmask;
+
+        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+
+        for(int i = 30; i >= (31 - shift); i--)
+        {
+            if(signbit && !(ra & signbit))
+            {
+                sflag = 1; break;
+            }
+            else if(bitmask & ra)
+            {
+                sflag = 1; break;
+            }
+
+            signbit >>= 1;
+            bitmask >>= 1;
+        }
+
+        int32_t rd = ra << shift;
+
+        if(sflag && ra > 0)
+            rd = 0x7FFFFFFF;
+        else if(sflag && ra < 0)
+            rd = 0x80000000;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSSHL       %s,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_ra), shift, REG(idx_rd));
+    }
+    return OK;
+}
+
+/// SSUB - Subtract Two Signed Integers With Saturation
+/*
+ * src2 is subtracted from src1 and is saturated to the result size according to the following
+ * rules:
+ * 1. If the result is an int and src1 - src2 > 2^31 - 1, then the result is 2^31 - 1.
+ * 2. If the result is an int and src1 - src2 < -2^31, then the result is -2^31.
+ * 3. If the result is a long and src1 - src2 > 2^39 - 1, then the result is 2^39 - 1.
+ * 4. If the result is a long and src1 - src2 < -2^39, then the result is -2^39.
+ * The result is placed in dst. If a saturate occurs, the SAT bit in CSR is set one cycle after
+ * dst is written.
+ */
+
+ReturnStatus_t
+C62xSSUB_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra = (int32_t) proc_state->m_register[idx_ra];
+        int32_t rb = (int32_t) proc_state->m_register[idx_rb];
+        int32_t sflag = 0;
+
+        int32_t rd = ra - rb;
+
+        if((ra < 0) && (rb > 0) && (rd > 0))
+        {
+            rd = 0x80000000; sflag = 1;
+            TRACE_PRINT("-VE Saturation\n");
+        }
+        else if((ra > 0) && (rb < 0) && (rd < 0))
+        {
+            rd = 0x7FFFFFFF; sflag = 1;
+            TRACE_PRINT("+VE Saturation\n");
+        }
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSSUB      %s,%s,%s\n",
+                    GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSSUB_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
+        int32_t rb = (int32_t) proc_state->m_register[idx_rb];
+        int32_t sflag = 0;
+
+        int32_t rd = ra - rb;
+
+        if((ra < 0) && (rb > 0) && (rd > 0))
+        {
+            rd = 0x80000000; sflag = 1;
+            TRACE_PRINT("-VE Saturation\n");
+        }
+        else if((ra > 0) && (rb < 0) && (rd < 0))
+        {
+            rd = 0x7FFFFFFF; sflag = 1;
+            TRACE_PRINT("+VE Saturation\n");
+        }
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSSUB      0x%x,%s,%s\n",
+                    GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSSUB_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint32_t constant, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra  = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
+        int64_t rbh = (int64_t) proc_state->m_register[idx_rbh];
+        int64_t rbl = (int64_t) proc_state->m_register[idx_rbl];
+        int32_t sflag = 0;
+
+        rbh        = ((rbh & 0x80) ? (rbh | 0xFFFFFF00) : (rbh & 0x000000FF));
+        int64_t rb = (rbh << 32) | rbl;
+
+        int64_t rd = ra - rb;
+        rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));
+
+        if((ra < 0) && (rb > 0) && (rd > 0))
+        {
+            rd = 0x8000000000; sflag = 1;
+            TRACE_PRINT("-VE Saturation\n");
+        }
+        else if((ra > 0) && (rb < 0) && (rd < 0))
+        {
+            rd = 0x7FFFFFFFFF; sflag = 1;
+            TRACE_PRINT("+VE Saturation\n");
+        }
+
+        int32_t rdh = (int32_t) (rd >> 32) & 0xFF;
+        int32_t rdl = (int32_t) (rd & 0xFFFFFFFF);
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        if(sflag)
+        {
+            uint32_t csr = (uint32_t) proc_state->m_register[REG_CSR_INDEX];
+            csr |= 1 << 9;  /* SAT bit is at position 9 in CSR */
+            AddDelayedRegister(proc_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
+        }
+
+        TRACE_PRINT("%08x\tSSUB      0x%x,%s:%s,%s:%s\n",
+                    GetPC(proc_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+/*  For SSUB
+    constant = 0x1E; // -2; With -1 we will still remain in range
+    proc_state->m_register[idx_rbh] = 0x7F;
+    proc_state->m_register[idx_rbl] = 0xFFFFFFFF;
+ */
+
+
+
+
+
+
+
+// Working Here
+/*
+    proc_state->m_register[idx_ra] = 0x5A2E51A3;
+    proc_state->m_register[idx_rb] = 0x802A3FA2;
+
+    proc_state->m_register[idx_ra] = 0xD8000000;
+    proc_state->m_register[idx_ra] = 0x80000000;
+    proc_state->m_register[idx_rb] = 0x0;
+
+
+ * if (bit(31) through bit(31 - src1) of src2 are all 1s or all 0s),
+        dst = src2 << src1;
+else if (src2 > 0)
+    saturate dst to 7FFF FFFFh;
+else if (src2 < 0)
+    saturate dst to 8000 0000h
+
+    proc_state->m_register[idx_ra] = 0x00008000;
+    proc_state->m_register[idx_rb] = 0x00008000;
+
+    proc_state->m_register[idx_rah] = 0x7F;
+    proc_state->m_register[idx_ral] = 0xAA000000;
+    proc_state->m_register[idx_rb]  = 45;
+
+    proc_state->m_register[idx_ra] = 0x9ED31A31;
+    proc_state->m_register[idx_rb] = 0x0000C197;
+
+    proc_state->m_register[idx_rah] = 0xFF;
+    proc_state->m_register[idx_ral] = 0xAA000000;
+    constant  = 16;
+
+*/
+
 
 ReturnStatus_t
 C62xXOR_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
