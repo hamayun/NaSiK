@@ -45,21 +45,38 @@ typedef struct C62x_DelayTable_Node
 } C62x_DelayTable_Node_t;
 /* LLVM Type ... { i16, i32, \2 } */
 
-typedef struct C62x_DelayTable_Queue
+typedef struct C62x_Delay_Queue
 {
     C62x_DelayTable_Node_t      * m_head_node;
     C62x_DelayTable_Node_t      * m_tail_node;
     uint32_t                      m_num_busy_nodes;
     uint32_t                      m_max_busy_nodes;
-} C62x_DelayTable_Queue_t;
+} C62x_Delay_Queue_t;
 /* LLVM Type ... { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 } */
+
+/* Memory Write-Back Node */
+typedef struct C62x_MWBack_Node
+{
+    uint8_t                       m_size;     /* 1, 2 or 4 */
+    uint32_t                      m_addr;
+    uint32_t                      m_value;
+    struct C62x_MWBack_Node     * m_next_node;
+} C62x_MWBack_Node_t;
+
+typedef struct C62x_MWB_Queue
+{
+    C62x_MWBack_Node_t          * m_head_node;
+    C62x_MWBack_Node_t          * m_tail_node;
+    uint32_t                      m_is_empty;
+} C62x_MWB_Queue_t;
 
 typedef struct C62x_Processor_State
 {
     uint64_t                      m_curr_cpu_cycle;
     uint32_t                    * p_pc;
     uint32_t                      m_register[C62X_REG_BANKS * C62X_REGS_PER_BANK];
-    C62x_DelayTable_Queue_t       m_delay_table[C62X_MAX_DELAY_SLOTS + 1];
+    C62x_Delay_Queue_t            m_delay_q[C62X_MAX_DELAY_SLOTS + 1];
+    C62x_MWB_Queue_t              m_mwback_q[C62X_MAX_DELAY_SLOTS + 1];
 } C62x_Proc_State_t;
 /* LLVM Type ... { i64, i32*, [48 x i32], [6 x { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 }] } */
 

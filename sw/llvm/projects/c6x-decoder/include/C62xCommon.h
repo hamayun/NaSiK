@@ -61,7 +61,7 @@ namespace native
     #define NOP                     0x000
 
     // Delay Slots
-    #define C62X_STORE_DELAY        0x0
+    #define C62X_STORE_DELAY        0x2       /* Used in Memory Write Queues */
     #define C62X_SINGLE_CYCLE       0x0
     #define C62X_MULTIPLY_DELAY     0x1
     #define C62X_LOAD_DELAY         0x4

@@ -72,7 +72,9 @@ char * REG(uint16_t idx)
     return (str);
 }
 
-int32_t InitDelayTableQueue(C62x_DelayTable_Queue_t * delay_queue)
+////////////////////////////////////////////////////////////////////////////////
+
+int32_t InitDelayQueue(C62x_Delay_Queue_t * delay_queue)
 {
     C62x_DelayTable_Node_t * curr_node   = NULL;
     C62x_DelayTable_Node_t * prev_node   = NULL;
@@ -89,7 +91,7 @@ int32_t InitDelayTableQueue(C62x_DelayTable_Queue_t * delay_queue)
         curr_node = malloc(sizeof(C62x_DelayTable_Node_t));
         if(!curr_node)
         {
-            printf("Error: Allocating Memory for Delay Table Node\n");
+            printf("Error: Allocating Memory for Delay Node\n");
             return (-1);
         }
 
@@ -110,7 +112,7 @@ int32_t InitDelayTableQueue(C62x_DelayTable_Queue_t * delay_queue)
     return(0);
 }
 
-int32_t ProduceDelayRegister(C62x_DelayTable_Queue_t * delay_queue, uint16_t reg_id, uint32_t value)
+int32_t ProduceDelayRegister(C62x_Delay_Queue_t * delay_queue, uint16_t reg_id, uint32_t value)
 {
     if(delay_queue->m_tail_node->m_next_node == delay_queue->m_head_node)
     {
@@ -132,7 +134,7 @@ int32_t ProduceDelayRegister(C62x_DelayTable_Queue_t * delay_queue, uint16_t reg
     return (0);
 }
 
-C62x_DelayTable_Node_t * ConsumeDelayRegister(C62x_DelayTable_Queue_t * delay_queue)
+C62x_DelayTable_Node_t * ConsumeDelayRegister(C62x_Delay_Queue_t * delay_queue)
 {
     if(delay_queue->m_num_busy_nodes > 0)
     {
@@ -152,6 +154,124 @@ C62x_DelayTable_Node_t * ConsumeDelayRegister(C62x_DelayTable_Queue_t * delay_qu
     return (NULL);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+int32_t InitMemWriteBackQueue(C62x_MWB_Queue_t * mwb_queue)
+{
+    C62x_MWBack_Node_t * curr_node   = NULL;
+    C62x_MWBack_Node_t * prev_node   = NULL;
+    uint32_t             nodes_count = 0;
+
+    mwb_queue->m_head_node = NULL;
+    mwb_queue->m_tail_node = NULL;
+
+    // Supposing that We can have a max of FETCH_PACKET_SIZE Memory Writes in each cycle
+    while(nodes_count < FETCH_PACKET_SIZE)
+    {
+        curr_node = malloc(sizeof(C62x_MWBack_Node_t));
+        if(!curr_node)
+        {
+            printf("Error: Allocating Memory for Write Back Node\n");
+            return (-1);
+        }
+
+        if(!mwb_queue->m_head_node)
+        {
+            mwb_queue->m_head_node = curr_node;
+            prev_node   = curr_node;
+        }
+
+        curr_node->m_next_node = mwb_queue->m_head_node;
+        prev_node->m_next_node = curr_node;
+        prev_node = curr_node;
+        curr_node = NULL;
+        nodes_count++;
+    }
+
+    mwb_queue->m_tail_node = mwb_queue->m_head_node;
+    mwb_queue->m_is_empty = 1;
+    return(0);
+}
+
+int32_t ProduceMemWriteBack(C62x_MWB_Queue_t * mwb_queue, uint8_t size, uint32_t addr, uint32_t value)
+{
+    if(mwb_queue->m_tail_node->m_next_node == mwb_queue->m_head_node)
+    {
+        printf("Error: Memory Write-Back Queue Full\n");
+        return (-1);
+    }
+
+    mwb_queue->m_tail_node->m_size = size;
+    mwb_queue->m_tail_node->m_addr = addr;
+    mwb_queue->m_tail_node->m_value = value;
+    mwb_queue->m_is_empty = 0;
+
+    mwb_queue->m_tail_node = mwb_queue->m_tail_node->m_next_node;
+
+    return (0);
+}
+
+int32_t AddMemWriteBack(C62x_Proc_State_t * proc_state, uint8_t size, uint32_t addr, uint32_t value)
+{
+    uint32_t           mwb_queue_id = (proc_state->m_curr_cpu_cycle + C62X_STORE_DELAY + 1) % (C62X_MAX_DELAY_SLOTS + 1);
+    C62x_MWB_Queue_t * mwb_queue    = & proc_state->m_mwback_q[mwb_queue_id];
+
+    ProduceMemWriteBack(mwb_queue, size, addr, value);
+    return (0);
+}
+
+C62x_MWBack_Node_t * ConsumeMemWriteBack(C62x_MWB_Queue_t * mwb_queue)
+{
+    if(mwb_queue->m_is_empty)
+    {
+        printf("Memory Write Back Queue Empty !!!\n");
+        return (NULL);
+    }
+
+    C62x_MWBack_Node_t * mwb_node = mwb_queue->m_head_node;
+    mwb_queue->m_head_node = mwb_node->m_next_node;
+
+    if(mwb_node == mwb_queue->m_tail_node)
+            mwb_queue->m_is_empty = 1;
+
+    return (mwb_node);
+}
+
+int32_t UpdateMemory(C62x_Proc_State_t * proc_state)
+{
+    C62x_MWB_Queue_t    * mwb_queue = & proc_state->m_mwback_q[proc_state->m_curr_cpu_cycle % (C62X_MAX_DELAY_SLOTS + 1)];
+    C62x_MWBack_Node_t  * mwb_node  = NULL;
+
+    while(! mwb_queue->m_is_empty)
+    {
+        mwb_node = ConsumeMemWriteBack(mwb_queue);
+        switch(mwb_node->m_size)
+        {
+            case 1:
+                *((uint8_t *) mwb_node->m_addr) = (uint8_t) mwb_node->m_value;
+                TRACE_PRINT("Mem[0x%08X] = 0x%02X\n", mwb_node->m_addr, (uint8_t) mwb_node->m_value);
+                break;
+
+            case 2:
+                *((uint16_t *) mwb_node->m_addr) = (uint16_t) mwb_node->m_value;
+                TRACE_PRINT("Mem[0x%08X] = 0x%04X\n", mwb_node->m_addr, (uint16_t) mwb_node->m_value);
+                break;
+
+            case 4:
+                *((uint32_t *) mwb_node->m_addr) = (uint32_t) mwb_node->m_value;
+                TRACE_PRINT("Mem[0x%08X] = 0x%08X\n", mwb_node->m_addr, (uint32_t) mwb_node->m_value);
+                break;
+
+            default:
+                ASSERT(1, "Unknown Memory Write-Back Size");
+        }
+    }
+
+    return (0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 int32_t InitProcessorState(C62x_Proc_State_t * proc_state)
 {
     uint32_t index;
@@ -163,9 +283,15 @@ int32_t InitProcessorState(C62x_Proc_State_t * proc_state)
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
-        if(InitDelayTableQueue(& proc_state->m_delay_table[index]))
+        if(InitDelayQueue(& proc_state->m_delay_q[index]))
         {
-            printf("Error: Initializing Delay Table Queue [%d]\n", index);
+            printf("Error: Initializing Delay Queue [%d]\n", index);
+            return (-1);
+        }
+
+        if(InitMemWriteBackQueue(& proc_state->m_mwback_q[index]))
+        {
+            printf("Error: Initializing Write Back Queue [%d]\n", index);
             return (-1);
         }
     }
@@ -173,9 +299,11 @@ int32_t InitProcessorState(C62x_Proc_State_t * proc_state)
     for(index = 0; index < C62X_REG_BANKS; index++)
         BANKS[index] = 'A' + index;
 
-    printf("(Parameterized) Processor State Initialized\n");
+    //printf("(Parameterized) Processor State Initialized\n");
     return (0);
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 int32_t IncrementPC(C62x_Proc_State_t * proc_state, int32_t offset)
 {
@@ -205,9 +333,11 @@ uint64_t GetCycles(C62x_Proc_State_t * proc_state)
     return(proc_state->m_curr_cpu_cycle);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 int32_t UpdateRegisters(C62x_Proc_State_t * proc_state)
 {
-    C62x_DelayTable_Queue_t * delay_queue = & proc_state->m_delay_table[proc_state->m_curr_cpu_cycle % (C62X_MAX_DELAY_SLOTS + 1)];
+    C62x_Delay_Queue_t * delay_queue = & proc_state->m_delay_q[proc_state->m_curr_cpu_cycle % (C62X_MAX_DELAY_SLOTS + 1)];
     C62x_DelayTable_Node_t  * delay_reg = NULL;
 
     while((delay_reg = ConsumeDelayRegister(delay_queue)) != NULL)
@@ -223,7 +353,7 @@ int32_t UpdateRegisters(C62x_Proc_State_t * proc_state)
 int32_t AddDelayedRegister(C62x_Proc_State_t * proc_state, uint16_t reg_id, uint32_t value, uint8_t delay_slots)
 {
     uint32_t                  delay_queue_id = (proc_state->m_curr_cpu_cycle + delay_slots + 1) % (C62X_MAX_DELAY_SLOTS + 1);
-    C62x_DelayTable_Queue_t * delay_queue    = & proc_state->m_delay_table[delay_queue_id];
+    C62x_Delay_Queue_t * delay_queue    = & proc_state->m_delay_q[delay_queue_id];
 
     //printf("Add Register: [%4s]=%08x, +%d\n\n", REG(reg_id), value, delay_slots);
     ProduceDelayRegister(delay_queue, reg_id, value);
@@ -231,11 +361,15 @@ int32_t AddDelayedRegister(C62x_Proc_State_t * proc_state, uint16_t reg_id, uint
     return (0);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
 {
     uint32_t reg_id, index;
 
-    printf("Cycle: %016lld, PC = %08x, Registers:\n", proc_state->m_curr_cpu_cycle, *proc_state->p_pc);
+    printf("Cycle: %016lld      ", proc_state->m_curr_cpu_cycle);
+    printf("PC =%08x  ", *proc_state->p_pc);
+    printf("Registers:\n");
     for(reg_id = 0; reg_id < (C62X_REG_BANKS * C62X_REGS_PER_BANK); reg_id++)
     {
         printf("%4s=%08x ", REG(reg_id), proc_state->m_register[reg_id]);
@@ -244,7 +378,7 @@ int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
-        C62x_DelayTable_Queue_t * delay_queue = & proc_state->m_delay_table[index];
+        C62x_Delay_Queue_t    * delay_queue = & proc_state->m_delay_q[index];
         C62x_DelayTable_Node_t  * curr_node = delay_queue->m_head_node;
 
         if(proc_state->m_curr_cpu_cycle % (C62X_MAX_DELAY_SLOTS + 1) == index)
@@ -252,7 +386,7 @@ int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
         else
             printf("  ");
 
-        printf("Queue[%d(Max=%02d)]: { ", index, delay_queue->m_max_busy_nodes);
+        printf("Queue[%d(%02d)]: { ", index, delay_queue->m_max_busy_nodes);
         while(curr_node != delay_queue->m_tail_node)
         {
             printf("%4s=%08x ", REG(curr_node->m_reg_id), curr_node->m_value);
@@ -261,9 +395,50 @@ int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
         printf("}\n");
     }
 
+    for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
+    {
+        C62x_MWB_Queue_t   * mwb_queue = & proc_state->m_mwback_q[index];
+        C62x_MWBack_Node_t * curr_node = mwb_queue->m_head_node;
+
+        if(proc_state->m_curr_cpu_cycle % (C62X_MAX_DELAY_SLOTS + 1) == index)
+            printf("->");
+        else
+            printf("  ");
+
+        printf("MWB-Queue[%d]: { ", index);
+        while(curr_node != mwb_queue->m_tail_node)
+        {
+            switch(curr_node->m_size)
+            {
+                case 1:
+                    *((uint8_t *) curr_node->m_addr) = (uint8_t) curr_node->m_value;
+                    printf("Mem[0x%08X] = 0x%02X ", curr_node->m_addr, (uint8_t) curr_node->m_value);
+                    break;
+
+                case 2:
+                    *((uint16_t *) curr_node->m_addr) = (uint16_t) curr_node->m_value;
+                    printf("Mem[0x%08X] = 0x%04X ", curr_node->m_addr, (uint16_t) curr_node->m_value);
+                    break;
+
+                case 4:
+                    *((uint32_t *) curr_node->m_addr) = (uint32_t) curr_node->m_value;
+                    printf("Mem[0x%08X] = 0x%08X ", curr_node->m_addr, (uint32_t) curr_node->m_value);
+                    break;
+
+                default:
+                    ASSERT(1, "Unknown Memory Write-Back Size");
+            }
+
+            curr_node = curr_node->m_next_node;
+        }
+        printf("}\n");
+    }
+
     printf("\n");
     return (0);
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 uint8_t ExecuteDecision(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc)
 {
