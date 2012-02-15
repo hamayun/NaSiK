@@ -120,4 +120,10 @@ typedef enum ReturnStatus
 #define U64_TO_C6XMSB12(u64) (u64 >> 32 & 0xFF)
 #define U64_TO_C6XLSB32(u64) (u64 & 0xFFFFFFFF)
 
+#define C6XSC5_TO_S32(scst5)                                                   \
+    ((int32_t)((scst5 & 0x10) ? (scst5 | 0xFFFFFFE0) : (scst5 & 0x1F)))
+
+#define C6XSC5_TO_S64(scst5)                                                   \
+    ((int64_t)((scst5 & 0x10) ? (scst5 | 0xFFFFFFFFFFFFFFE0) : (scst5 & 0x1F)))
+
 #endif	/* C62X_PROCESSOR_H */

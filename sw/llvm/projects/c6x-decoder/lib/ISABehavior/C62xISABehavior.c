@@ -583,7 +583,7 @@ C62xADD_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t ra  = C6XSC5_TO_S32(constant);
         int32_t rb  = (int32_t) proc_state->m_register[idx_rb];
         int32_t rd  = ra + rb;
 
@@ -601,7 +601,7 @@ C62xADD_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = (uint32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t ra  = C6XSC5_TO_S32(constant);
         int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
 
@@ -788,7 +788,7 @@ C62xAND_SC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra  = (uint32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        uint32_t ra  = C6XSC5_TO_S32(constant);
         uint32_t rb  = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd  = ra & rb;
 
@@ -918,7 +918,7 @@ C62xCMPEQ_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra    = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t ra    = C6XSC5_TO_S32(constant);
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd   = (uint32_t)(ra == rb);
 
@@ -956,7 +956,7 @@ C62xCMPEQ_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int64_t ra  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int64_t ra  = C6XSC5_TO_S64(constant);
         int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
         int64_t rb  = C6X40_TO_S64(rbh, rbl);
@@ -995,7 +995,7 @@ C62xCMPGT_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra    = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t ra    = C6XSC5_TO_S32(constant);
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd   = (uint32_t)(ra > rb);
 
@@ -1033,7 +1033,7 @@ C62xCMPGT_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int64_t ra  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int64_t ra  = C6XSC5_TO_S64(constant);
         int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
         int64_t rb  = C6X40_TO_S64(rbh, rbl);
@@ -1149,7 +1149,7 @@ C62xCMPLT_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra    = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t ra    = C6XSC5_TO_S32(constant);
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
         uint32_t rd   = (uint32_t)(ra < rb);
 
@@ -1187,7 +1187,7 @@ C62xCMPLT_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int64_t ra   = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int64_t ra   = C6XSC5_TO_S64(constant);
         int32_t rbh  = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl  = (int32_t) proc_state->m_register[idx_rbl];
         int64_t rb   = C6X40_TO_S64(rbh, rbl);
@@ -2503,7 +2503,7 @@ C62xOR_SC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra = (uint32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        uint32_t ra = C6XSC5_TO_S32(constant);
         uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd = ra | rb;
 
@@ -2623,7 +2623,7 @@ C62xSADD_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t ra = C6XSC5_TO_S32(constant);
         int32_t rb = (int32_t) proc_state->m_register[idx_rb];
         int32_t sflag = 0;
 
@@ -2662,7 +2662,7 @@ C62xSADD_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
     ASSERT(1, "Test Again");
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int64_t ra    = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int64_t ra    = C6XSC5_TO_S64(constant);
         int64_t rbh   = (int64_t) proc_state->m_register[idx_rbh];
         int64_t rbl   = (int64_t) proc_state->m_register[idx_rbl];
         int32_t sflag = 0;
@@ -3491,7 +3491,7 @@ C62xSSUB_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t ra = C6XSC5_TO_S32(constant);
         int32_t rb = (int32_t) proc_state->m_register[idx_rb];
         int32_t sflag = 0;
 
@@ -3530,9 +3530,9 @@ C62xSSUB_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
     ASSERT(1, "Test Again");
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int64_t ra  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
-        int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
-        int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
+        int64_t ra    = C6XSC5_TO_S64(constant);
+        int32_t rbh   = (int32_t) proc_state->m_register[idx_rbh];
+        int32_t rbl   = (int32_t) proc_state->m_register[idx_rbl];
         int32_t sflag = 0;
 
         int64_t rb = C6X40_TO_S64(rbh, rbl);
@@ -3881,7 +3881,7 @@ C62xSUB_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t ra  = C6XSC5_TO_S32(constant);
         int32_t rb  = (int32_t) proc_state->m_register[idx_rb];
         int32_t rd  = ra - rb;
 
@@ -3899,7 +3899,7 @@ C62xSUB_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int64_t ra  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int64_t ra  = C6XSC5_TO_S64(constant);
         int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
 
@@ -3925,7 +3925,7 @@ C62xSUB_SR32_SC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra  = (int32_t) proc_state->m_register[idx_ra];
-        int32_t rb  = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        int32_t rb  = C6XSC5_TO_S32(constant);
         int32_t rd  = ra - rb;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -3962,7 +3962,7 @@ C62xSUB_SR40_SC5_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
     {
         int32_t rah = (int32_t) proc_state->m_register[idx_rah];
         int32_t ral = (int32_t) proc_state->m_register[idx_ral];
-        int64_t rb  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int64_t rb  = C6XSC5_TO_S64(constant);
 
         int64_t ra  = C6X40_TO_S64(rah, ral);
 
@@ -4231,7 +4231,7 @@ C62xXOR_SC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra = (uint32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        uint32_t ra = C6XSC5_TO_S32(constant);
         uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
         uint32_t rd = ra ^ rb;
 
