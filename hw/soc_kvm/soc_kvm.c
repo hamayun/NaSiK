@@ -873,7 +873,7 @@ int soc_fill_memory_pattern(uint32_t size, uint32_t pattern)
         if(pattern)
             *curr_ptr = pattern;
         else
-            *curr_ptr = (uint32_t) kvm_phy_addr + 0x65432100;
+            *curr_ptr = (uint32_t) kvm_phy_addr + 0x56341200;
         
         curr_ptr++;
         kvm_phy_addr++;
@@ -888,25 +888,21 @@ int soc_fill_memory_pattern(uint32_t size, uint32_t pattern)
     return (0);
 }
 
-int soc_memory_dump(uint32_t from, uint32_t to)
+void soc_memory_dump(unsigned long addr, unsigned long size)
 {
-    uint32_t *  address = (uint32_t *) soc_kvm_init_data.vm_mem;
+    unsigned char *p;
+    unsigned long n;
 
-    uint32_t *  curr_ptr = (uint32_t *) address + ( from / sizeof(uint32_t) );
-    uint32_t *   end_ptr = (uint32_t *) address + ( to / sizeof(uint32_t) );
+    size &= ~15; /* mod 16 */
+    if (!size) return;
 
-    printf("%s: Dumping Memory from 0x%08x to 0x%08x (KVM PHY:0x%08x - 0x%08x)\n",
-            __func__, (uint32_t) address,
-            (uint32_t) ((unsigned char *) end_ptr - 1),
-            (uint32_t) ((unsigned char *) address - soc_kvm_init_data.vm_mem),
-            (uint32_t) ((unsigned char *) end_ptr - soc_kvm_init_data.vm_mem - 1));
+    p = (unsigned char *) soc_kvm_init_data.vm_mem + addr;
 
-    while (curr_ptr < end_ptr)
-    {
-        printf("[%08X] = 0x%08X\n", (unsigned char *) curr_ptr - (unsigned char *) address, *curr_ptr);
-        curr_ptr++;
+    for (n = 0; n < size; n += 16) {
+        printf("  0x%08lx: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n",
+               addr + n, p[n + 0], p[n + 1], p[n + 2], p[n + 3], p[n + 4], p[n + 5], p[n + 6], p[n + 7],
+                         p[n + 8], p[n + 9], p[n + 10], p[n + 11], p[n + 12], p[n + 13], p[n + 14], p[n + 15]);
     }
-
     return 0;
 }
 

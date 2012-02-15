@@ -31,10 +31,6 @@ char BANKS[C62X_REG_BANKS];
 #define MAX_REG_PER_INSTR     10
 #define MAX_REG_NAME_LEN      3
 
-#define LDSTB_REG_INC_SIZE 4   /* For Use In Pre/Post Inc/Dec of Base Register */
-#define LDSTH_REG_INC_SIZE 4   /* For Use In Pre/Post Inc/Dec of Base Register */
-#define LDSTW_REG_INC_SIZE 4   /* For Use In Pre/Post Inc/Dec of Base Register */
-
 char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
                        "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
 
@@ -76,9 +72,9 @@ char * REG(uint16_t idx)
 
 int32_t InitDelayQueue(C62x_Delay_Queue_t * delay_queue)
 {
-    C62x_DelayTable_Node_t * curr_node   = NULL;
-    C62x_DelayTable_Node_t * prev_node   = NULL;
-    uint32_t                 nodes_count = 0;
+    C62x_Delay_Node_t * curr_node = NULL;
+    C62x_Delay_Node_t * prev_node = NULL;
+    uint32_t          nodes_count = 0;
 
     delay_queue->m_head_node = NULL;
     delay_queue->m_tail_node = NULL;
@@ -88,7 +84,7 @@ int32_t InitDelayQueue(C62x_Delay_Queue_t * delay_queue)
     // Because Destination can be a Long Register in C62x: So 2 Times
     while(nodes_count < (C62X_MAX_DELAY_SLOTS * FETCH_PACKET_SIZE * 2))
     {
-        curr_node = malloc(sizeof(C62x_DelayTable_Node_t));
+        curr_node = malloc(sizeof(C62x_Delay_Node_t));
         if(!curr_node)
         {
             printf("Error: Allocating Memory for Delay Node\n");
@@ -134,7 +130,7 @@ int32_t ProduceDelayRegister(C62x_Delay_Queue_t * delay_queue, uint16_t reg_id, 
     return (0);
 }
 
-C62x_DelayTable_Node_t * ConsumeDelayRegister(C62x_Delay_Queue_t * delay_queue)
+C62x_Delay_Node_t * ConsumeDelayRegister(C62x_Delay_Queue_t * delay_queue)
 {
     if(delay_queue->m_num_busy_nodes > 0)
     {
@@ -144,7 +140,7 @@ C62x_DelayTable_Node_t * ConsumeDelayRegister(C62x_Delay_Queue_t * delay_queue)
             return (NULL);
         }
 
-        C62x_DelayTable_Node_t * delay_register = delay_queue->m_head_node;
+        C62x_Delay_Node_t * delay_register = delay_queue->m_head_node;
         delay_queue->m_head_node = delay_queue->m_head_node->m_next_node;
         delay_queue->m_num_busy_nodes--;
 
@@ -234,8 +230,10 @@ C62x_MWBack_Node_t * ConsumeMemWriteBack(C62x_MWB_Queue_t * mwb_queue)
     C62x_MWBack_Node_t * mwb_node = mwb_queue->m_head_node;
     mwb_queue->m_head_node = mwb_node->m_next_node;
 
-    if(mwb_node == mwb_queue->m_tail_node)
+    if(mwb_queue->m_head_node == mwb_queue->m_tail_node)
+    {
             mwb_queue->m_is_empty = 1;
+    }
 
     return (mwb_node);
 }
@@ -341,7 +339,7 @@ uint64_t GetCycles(C62x_Proc_State_t * proc_state)
 int32_t UpdateRegisters(C62x_Proc_State_t * proc_state)
 {
     C62x_Delay_Queue_t * delay_queue = & proc_state->m_delay_q[proc_state->m_curr_cpu_cycle % (C62X_MAX_DELAY_SLOTS + 1)];
-    C62x_DelayTable_Node_t  * delay_reg = NULL;
+    C62x_Delay_Node_t  * delay_reg = NULL;
 
     while((delay_reg = ConsumeDelayRegister(delay_queue)) != NULL)
     {
@@ -381,8 +379,8 @@ int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
-        C62x_Delay_Queue_t    * delay_queue = & proc_state->m_delay_q[index];
-        C62x_DelayTable_Node_t  * curr_node = delay_queue->m_head_node;
+        C62x_Delay_Queue_t * delay_queue = & proc_state->m_delay_q[index];
+        C62x_Delay_Node_t    * curr_node = delay_queue->m_head_node;
 
         if(proc_state->m_curr_cpu_cycle % (C62X_MAX_DELAY_SLOTS + 1) == index)
             printf("->");
@@ -1390,7 +1388,7 @@ C62xIDLE(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint1
 
 // We use this function to calculate memory address using base + (constant or register) offsets.
 int8_t * FindMemoryAddress(C62x_Proc_State_t * proc_state, uint32_t base_reg, uint16_t base_idx,
-                           uint32_t constant, uint8_t mode, uint8_t shift)
+                           uint32_t offset, uint8_t mode, C62xAlignment_t shift)
 {
     int8_t * ptr = NULL; /* NOTE: We use int8_t * type so pointer arithmetic is ALWAYS in byte multiples  */
 
@@ -1398,24 +1396,24 @@ int8_t * FindMemoryAddress(C62x_Proc_State_t * proc_state, uint32_t base_reg, ui
     {
         case CST_NEGATIVE_OFFSET:        // *-R[constant]
         case REG_NEGATIVE_OFFSET:        // *-R[offsetR]
-            ptr = (int8_t *) base_reg - (constant << shift);
+            ptr = (int8_t *) base_reg - (offset << shift);
             break;
 
         case CST_POSITIVE_OFFSET:        // *+R[constant]
         case REG_POSITIVE_OFFSET:        // *+R[offsetR]
-            ptr = (int8_t *) base_reg + (constant << shift);
+            ptr = (int8_t *) base_reg + (offset << shift);
             break;
 
         case CST_OFFSET_PRE_DECR:        // *--R[constant]
         case REG_OFFSET_PRE_DECR:        // *--R[offsetR]
-            base_reg -= constant << shift;
+            base_reg -= offset << shift;
             ptr = (int8_t *) base_reg;
             AddDelayedRegister(proc_state, base_idx, (uint32_t) base_reg, 0);
             break;
 
         case CST_OFFSET_PRE_INCR:        // *++R[constant]
         case REG_OFFSET_PRE_INCR:        // *++R[offsetR]
-            base_reg += constant << shift;
+            base_reg += offset << shift;
             ptr = (int8_t *) base_reg;
             AddDelayedRegister(proc_state, base_idx, (uint32_t) base_reg, 0);
             break;
@@ -1423,14 +1421,14 @@ int8_t * FindMemoryAddress(C62x_Proc_State_t * proc_state, uint32_t base_reg, ui
         case CST_OFFSET_POST_DECR:       // *R--[constant]
         case REG_OFFSET_POST_DECR:       // *R--[offsetR]
             ptr = (int8_t *) base_reg;
-            base_reg -= constant << shift;
+            base_reg -= offset << shift;
             AddDelayedRegister(proc_state, base_idx, (uint32_t) base_reg, 0);
             break;
 
         case CST_OFFSET_POST_INCR:       // *R++[constant]
         case REG_OFFSET_POST_INCR:       // *R++[offsetR]
             ptr = (int8_t *) base_reg;
-            base_reg += constant << shift;
+            base_reg += offset << shift;
             AddDelayedRegister(proc_state, base_idx, (uint32_t) base_reg, 0);
             break;
 
@@ -1444,8 +1442,39 @@ int8_t * FindMemoryAddress(C62x_Proc_State_t * proc_state, uint32_t base_reg, ui
 /// LDB - Load Byte from Memory, Sign Extended
 /// We will use the same target addresses here as this code will execute in KVM.
 ReturnStatus_t
+C62xLDB_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, ra, mode, BYTE_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int8_t *) ptr);
+
+        if(0x80 & rd) // Need Sign Extension ?
+            rd = rd | 0xFFFFFF00;
+        else
+            rd = rd & 0x000000FF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDB       %s,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
+ReturnStatus_t
 C62xLDB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+                      uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
@@ -1455,7 +1484,7 @@ C62xLDB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 0);
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int8_t *) ptr);
@@ -1468,12 +1497,69 @@ C62xLDB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
-                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xLDB_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int8_t *) ptr);
+
+        if(0x80 & rd) // Need Sign Extension ?
+            rd = rd | 0xFFFFFF00;
+        else
+            rd = rd & 0x000000FF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
 }
 
 /// LDBU - Load Byte from Memory, Zero Extended
+ReturnStatus_t
+C62xLDBU_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, ra, mode, BYTE_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int8_t *) ptr);
+        rd = rd & 0x000000FF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDBU      %s,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
 ReturnStatus_t
 C62xLDBU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
@@ -1486,7 +1572,7 @@ C62xLDBU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 0);
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int8_t *) ptr);
@@ -1495,13 +1581,70 @@ C62xLDBU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
-                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xLDBU_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int8_t *) ptr);
+        rd = rd & 0x000000FF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
 }
 
 /// LDH - Load Halfword from Memory, Sign Extended
 /// We will use the same target addresses here as this code will execute in KVM.
+ReturnStatus_t
+C62xLDH_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, ra, mode, HWORD_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int16_t *) ptr);
+
+        if(0x8000 & rd) // Need Sign Extension ?
+            rd = rd | 0xFFFF0000;
+        else
+            rd = rd & 0x0000FFFF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDH       %s,%s,%s\t\tMEM[0x%08X] = 0x%04X\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
 ReturnStatus_t
 C62xLDH_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
@@ -1514,7 +1657,7 @@ C62xLDH_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 1);
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int16_t *) ptr);
@@ -1527,13 +1670,70 @@ C62xLDH_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tLDH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%04X\n",
-                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xLDH_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int16_t *) ptr);
+
+        if(0x8000 & rd) // Need Sign Extension ?
+            rd = rd | 0xFFFF0000;
+        else
+            rd = rd & 0x0000FFFF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%04X\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
 }
 
 /// LDHU - Load Halfword from Memory, Zero Extended
 /// We will use the same target addresses here as this code will execute in KVM.
+ReturnStatus_t
+C62xLDHU_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, ra, mode, HWORD_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int16_t *) ptr);
+        rd = rd & 0x0000FFFF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDHU      %s,%s,%s\t\tMEM[0x%08X] = 0x%04X\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
 ReturnStatus_t
 C62xLDHU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
@@ -1546,7 +1746,7 @@ C62xLDHU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 1);
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int16_t *) ptr);
@@ -1555,13 +1755,65 @@ C62xLDHU_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tLDHU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%04X\n",
-                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xLDHU_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int16_t *) ptr);
+        rd = rd & 0x0000FFFF;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDHU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%04X\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
 }
 
 /// LDW - Load Word from Memory
 /// We will use the same target addresses here as this code will execute in KVM.
+ReturnStatus_t
+C62xLDW_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, ra, mode, WORD_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int32_t *) ptr);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDW       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
 ReturnStatus_t
 C62xLDW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
@@ -1574,7 +1826,7 @@ C62xLDW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 2);
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, WORD_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int32_t *) ptr);
@@ -1582,7 +1834,32 @@ C62xLDW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tLDW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
-                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *ptr);
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xLDW_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t rd   = 0x0;
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int8_t * ptr  = FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, WORD_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        rd = * ((int32_t *) ptr);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLDW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
 }
@@ -3302,6 +3579,35 @@ C62xSSUB_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 /// STB - Store Byte to Memory
 /// We will use the same target addresses here as this code will execute in KVM.
 ReturnStatus_t
+C62xSTB_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t src  = (uint32_t) proc_state->m_register[idx_rd];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, ra, mode, BYTE_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        // Put Value in the Write Back Buffer.
+        if(AddMemWriteBack(proc_state, MWB_BYTE, (uint32_t) ptr, src, delay))
+        {
+           ASSERT(1, "Error in Add Memory Write Back\n");
+           return (ERROR);
+        }
+
+        TRACE_PRINT("%08x\tSTB       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
 C62xSTB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
 {
@@ -3313,7 +3619,7 @@ C62xSTB_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 0);
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         // Put Value in the Write Back Buffer.
@@ -3341,7 +3647,7 @@ C62xSTB_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 0);
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         // Put Value in the Write Back Buffer.
@@ -3359,6 +3665,35 @@ C62xSTB_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
 /// STH - Store Halfword to Memory
 ReturnStatus_t
+C62xSTH_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t src  = (uint32_t) proc_state->m_register[idx_rd];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, ra, mode, HWORD_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        // Put Value in the Write Back Buffer.
+        if(AddMemWriteBack(proc_state, MWB_HWORD, (uint32_t) ptr, src, delay))
+        {
+           ASSERT(1, "Error in Add Memory Write Back\n");
+           return (ERROR);
+        }
+
+        TRACE_PRINT("%08x\tSTH       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
 C62xSTH_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
 {
@@ -3370,7 +3705,7 @@ C62xSTH_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 1);
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         // Put Value in the Write Back Buffer.
@@ -3398,7 +3733,7 @@ C62xSTH_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 1);
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         // Put Value in the Write Back Buffer.
@@ -3416,6 +3751,35 @@ C62xSTH_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
 /// STW - Store Word to Memory
 ReturnStatus_t
+C62xSTW_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb   = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t amr  = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+        uint32_t src  = (uint32_t) proc_state->m_register[idx_rd];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, ra, mode, WORD_ALIGN);
+
+        // Now we should have a valid address (mode-wise).
+        // Put Value in the Write Back Buffer.
+        if(AddMemWriteBack(proc_state, MWB_WORD, (uint32_t) ptr, src, delay))
+        {
+           ASSERT(1, "Error in Add Memory Write Back\n");
+           return (ERROR);
+        }
+
+        TRACE_PRINT("%08x\tSTW       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
 C62xSTW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                       uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t mode, uint8_t delay)
 {
@@ -3427,7 +3791,7 @@ C62xSTW_UC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 2);
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, WORD_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         // Put Value in the Write Back Buffer.
@@ -3455,7 +3819,7 @@ C62xSTW_UC15_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, 2);
+        uint32_t *ptr = (uint32_t *) FindMemoryAddress(proc_state, rb, idx_rb, constant, mode, WORD_ALIGN);
 
         // Now we should have a valid address (mode-wise).
         // Put Value in the Write Back Buffer.

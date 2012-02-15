@@ -144,7 +144,10 @@ namespace native
         // Add an instruction that returns if the PC update is indicated by the above function call;
         //GetIRBuilder().CreateICmpEQ(pc_updated, Geti1Value(1), "");
         //CreateCallByName("ShowProcessorState");
+        CreateCallByName("UpdateMemory");
+
         exec_packet->ResetInstrIterator();
+
         while((instr = exec_packet->GetNextInstruction()))
         {
             dec_instr = instr->GetDecodedInstruction();
@@ -235,6 +238,8 @@ namespace native
         p_proc_state->setName("proc_state");
 
         GetIRBuilder().SetInsertPoint(gen_block);
+
+        CreateCallByName("UpdateMemory");
 
         exec_packet->ResetInstrIterator();
         while((instr = exec_packet->GetNextInstruction()))

@@ -37,22 +37,29 @@
 #define TRACE_PRINT(fmt, args...) do {} while(0)
 #endif
 
-typedef struct C62x_DelayTable_Node
+typedef struct C62x_Delay_Node
 {
-    uint16_t                      m_reg_id;
-    uint32_t                      m_value;
-    struct C62x_DelayTable_Node * m_next_node;
-} C62x_DelayTable_Node_t;
+    uint16_t                 m_reg_id;
+    uint32_t                 m_value;
+    struct C62x_Delay_Node * m_next_node;
+} C62x_Delay_Node_t;
 /* LLVM Type ... { i16, i32, \2 } */
 
 typedef struct C62x_Delay_Queue
 {
-    C62x_DelayTable_Node_t      * m_head_node;
-    C62x_DelayTable_Node_t      * m_tail_node;
-    uint32_t                      m_num_busy_nodes;
-    uint32_t                      m_max_busy_nodes;
+    C62x_Delay_Node_t      * m_head_node;
+    C62x_Delay_Node_t      * m_tail_node;
+    uint32_t                 m_num_busy_nodes;
+    uint32_t                 m_max_busy_nodes;
 } C62x_Delay_Queue_t;
 /* LLVM Type ... { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 } */
+
+typedef enum C62xAlignment
+{
+    BYTE_ALIGN  = 0,
+    HWORD_ALIGN = 1,
+    WORD_ALIGN  = 2
+} C62xAlignment_t;
 
 typedef enum C62xMWB_Size
 {

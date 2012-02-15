@@ -1852,7 +1852,6 @@ namespace native
             case 0x02 :
             {
                 /*LDB Load Byte ucst15, m_dst; {+baseR[offset], dst} */// No Left Shift on ucst15/offset required
-                COUT << "Type B" << endl;
                 dec_instr_eu = new C62xLDBInstr(dec_instr, dest_reg, src1_opr, src2_opr, CST_POSITIVE_OFFSET);
             }
             break;
