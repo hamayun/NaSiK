@@ -489,8 +489,7 @@ C62xABS_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_ze
     {
         int32_t rah = (int32_t) proc_state->m_register[idx_rah];
         int32_t ral = (int32_t) proc_state->m_register[idx_ral];
-        int64_t ra  = ((int64_t) rah) << 32 | ral;
-
+        int64_t ra  = C6X40_TO_S64(rah, ral);
         int64_t rd;
 
         if(ra >= 0)
@@ -563,7 +562,7 @@ C62xADD_SR32_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
 
-        int64_t rb  = ((int64_t) rbh) << 32 | rbl;
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
         int64_t rd  = ra + rb;
 
         int32_t rdh = rd >> 32 & 0xFF;
@@ -584,14 +583,14 @@ C62xADD_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int8_t cst5 = constant & 0x1F;
+        int32_t ra  = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rb  = (int32_t) proc_state->m_register[idx_rb];
-        int32_t rd  = cst5 + rb;
+        int32_t rd  = ra + rb;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tADD       0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -602,12 +601,12 @@ C62xADD_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int8_t cst5 = constant & 0x1F;
+        int32_t ra  = (uint32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
 
-        int64_t rb  = ((int64_t) rbh) << 32 | rbl;
-        int64_t rd  = cst5 + rb;
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
+        int64_t rd  = ra + rb;
 
         int32_t rdh = rd >> 32 & 0xFF;
         int32_t rdl = rd & 0xFFFFFFFF;
@@ -616,7 +615,7 @@ C62xADD_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
 
         TRACE_PRINT("%08x\tADD       0x%x,%s:%s,%s:%s\n",
-                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
+                GetPC(proc_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -723,7 +722,7 @@ C62xADDU_UR32_UR40_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
         uint32_t rbh = (uint32_t) proc_state->m_register[idx_rbh];
         uint32_t rbl = (uint32_t) proc_state->m_register[idx_rbl];
 
-        uint64_t rb  = ((int64_t) rbh) << 32 | rbl;
+        uint64_t rb  = C6X40_TO_U64(rbh, rbl);
         uint64_t rd  = ra + rb;
 
         uint32_t rdh = (rd >> 32) & 0x000000FF;
@@ -789,14 +788,14 @@ C62xAND_SC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t cst5 = (int16_t) constant & 0x1F;
+        uint32_t ra  = (uint32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         uint32_t rb  = (uint32_t) proc_state->m_register[idx_rb];
-        uint32_t rd  = cst5 & rb;
+        uint32_t rd  = ra & rb;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tAND       0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -919,14 +918,14 @@ C62xCMPEQ_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t cst5  = (int16_t) constant & 0x1F;
+        int32_t ra    = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
-        uint32_t rd   = (uint32_t)(cst5 == rb);
+        uint32_t rd   = (uint32_t)(ra == rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPEQ     0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -937,11 +936,11 @@ C62xCMPEQ_SR32_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
-        int32_t rbh  = (int32_t) proc_state->m_register[idx_rbh];
-        int32_t rbl  = (int32_t) proc_state->m_register[idx_rbl];
-        int64_t rb   = ((int64_t) rbh) << 32 | rbl;
-        uint32_t rd  = (uint32_t)(ra == rb);
+        int32_t  ra = (int32_t) proc_state->m_register[idx_ra];
+        int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
+        int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
+        int64_t  rb = C6X40_TO_S64(rbh, rbl);
+        uint32_t rd = (uint32_t)(ra == rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
@@ -957,16 +956,16 @@ C62xCMPEQ_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t cst5 = (int16_t) constant & 0x1F;
-        int32_t rbh  = (int32_t) proc_state->m_register[idx_rbh];
-        int32_t rbl  = (int32_t) proc_state->m_register[idx_rbl];
-        int64_t rb   = ((int64_t) rbh) << 32 | rbl;
-        uint32_t rd  = (uint32_t)(cst5 == rb);
+        int64_t ra  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
+        int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
+        uint32_t rd = (uint32_t)(ra == rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPEQ     0x%x,%s:%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -996,14 +995,14 @@ C62xCMPGT_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t cst5  = (int16_t) constant & 0x1F;
+        int32_t ra    = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
-        uint32_t rd   = (uint32_t)(cst5 > rb);
+        uint32_t rd   = (uint32_t)(ra > rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPGT     0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1017,7 +1016,7 @@ C62xCMPGT_SR32_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
         int32_t rbh  = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl  = (int32_t) proc_state->m_register[idx_rbl];
-        int64_t rb   = ((int64_t) rbh) << 32 | rbl;
+        int64_t rb   = C6X40_TO_S64(rbh, rbl);
         uint32_t rd  = (uint32_t)(ra > rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -1034,16 +1033,16 @@ C62xCMPGT_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t cst5 = (int16_t) constant & 0x1F;
-        int32_t rbh  = (int32_t) proc_state->m_register[idx_rbh];
-        int32_t rbl  = (int32_t) proc_state->m_register[idx_rbl];
-        int64_t rb   = ((int64_t) rbh) << 32 | rbl;
-        uint32_t rd  = (uint32_t)(cst5 > rb);
+        int64_t ra  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
+        int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
+        uint32_t rd = (uint32_t)(ra > rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPGT     0x%x,%s:%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -1094,7 +1093,7 @@ C62xCMPGTU_UR32_UR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
         uint32_t ra  = (uint32_t) proc_state->m_register[idx_ra];
         uint32_t rbh = (uint32_t) proc_state->m_register[idx_rbh];
         uint32_t rbl = (uint32_t) proc_state->m_register[idx_rbl];
-        uint64_t rb  = ((uint64_t) rbh) << 32 | rbl;
+        uint64_t rb  = C6X40_TO_U64(rbh, rbl);
         uint32_t rd  = (uint32_t)(ra > rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -1114,7 +1113,7 @@ C62xCMPGTU_UC4_UR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         uint16_t ucst4 = (uint16_t) constant & 0xF;
         uint32_t rbh   = (uint32_t) proc_state->m_register[idx_rbh];
         uint32_t rbl   = (uint32_t) proc_state->m_register[idx_rbl];
-        uint64_t rb    = ((uint64_t) rbh) << 32 | rbl;
+        uint64_t rb    = C6X40_TO_U64(rbh, rbl);
         uint32_t rd    = (uint32_t)(ucst4 > rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -1150,14 +1149,14 @@ C62xCMPLT_SC5_SR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t cst5  = (int16_t) constant & 0x1F;
+        int32_t ra    = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rb    = (int32_t) proc_state->m_register[idx_rb];
-        uint32_t rd   = (uint32_t)(cst5 < rb);
+        uint32_t rd   = (uint32_t)(ra < rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPLT     0x%x,%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rb), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1171,7 +1170,7 @@ C62xCMPLT_SR32_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
         int32_t rbh  = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl  = (int32_t) proc_state->m_register[idx_rbl];
-        int64_t rb   = ((int64_t) rbh) << 32 | rbl;
+        int64_t rb   = C6X40_TO_S64(rbh, rbl);
         uint32_t rd  = (uint32_t)(ra < rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -1188,16 +1187,16 @@ C62xCMPLT_SC5_SR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t cst5 = (int16_t) constant & 0x1F;
+        int64_t ra   = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
         int32_t rbh  = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl  = (int32_t) proc_state->m_register[idx_rbl];
-        int64_t rb   = ((int64_t) rbh) << 32 | rbl;
-        uint32_t rd  = (uint32_t)(cst5 < rb);
+        int64_t rb   = C6X40_TO_S64(rbh, rbl);
+        uint32_t rd  = (uint32_t)(ra < rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPLT     0x%x,%s:%s,%s\n",
-                GetPC(proc_state), cst5, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -1248,7 +1247,7 @@ C62xCMPLTU_UR32_UR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8
         uint32_t ra  = (uint32_t) proc_state->m_register[idx_ra];
         uint32_t rbh = (uint32_t) proc_state->m_register[idx_rbh];
         uint32_t rbl = (uint32_t) proc_state->m_register[idx_rbl];
-        uint64_t rb  = ((uint64_t) rbh) << 32 | rbl;
+        uint64_t rb  = C6X40_TO_U64(rbh, rbl);
         uint32_t rd  = (uint32_t)(ra < rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -1268,7 +1267,7 @@ C62xCMPLTU_UC4_UR40_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_
         uint16_t ucst4 = (uint16_t) constant & 0xF;
         uint32_t rbh   = (uint32_t) proc_state->m_register[idx_rbh];
         uint32_t rbl   = (uint32_t) proc_state->m_register[idx_rbl];
-        uint64_t rb    = ((uint64_t) rbh) << 32 | rbl;
+        uint64_t rb    = C6X40_TO_U64(rbh, rbl);
         uint32_t rd    = (uint32_t)(ucst4 > rb);
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -1920,7 +1919,7 @@ C62xMPY_SC5_SR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t) 0x1F & constant;
+        int16_t ra = (int16_t) ((constant & 0x10) ? (constant | 0xFFE0) : (constant & 0x1F));
         int16_t rb = (int16_t) proc_state->m_register[idx_rb];
         int32_t rd = ra * rb;
 
@@ -2186,9 +2185,9 @@ C62xMPYSU_SC5_UR16_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int16_t scst5 = (int16_t) 0x1F & constant;
+        int16_t  ra = (int16_t) ((constant & 0x10) ? (constant | 0xFFE0) : (constant & 0x1F));
         uint16_t rb = (uint16_t) proc_state->m_register[idx_rb];
-        int32_t  rd = scst5 * rb;
+        int32_t  rd = ra * rb;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
@@ -2400,7 +2399,7 @@ C62xNEG_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_ze
         int64_t rah = (int64_t) proc_state->m_register[idx_rah];
         int64_t ral = (int64_t) proc_state->m_register[idx_ral];
 
-        int64_t  rd  = 0 - ((rah << 32) | ral);
+        int64_t  rd  = 0 - C6X40_TO_S64(rah, ral);
         uint32_t rdh = (rd >> 32) & 0x000000FF;
         uint32_t rdl = rd & 0xFFFFFFFF;
 
@@ -2503,14 +2502,14 @@ C62xOR_SC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t scst5 = ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
+        uint32_t ra = (uint32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
-        uint32_t rd = scst5 | rb;
+        uint32_t rd = ra | rb;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tOR        0x%x,%s,%s\n",
-                GetPC(proc_state), scst5, REG(idx_rb), REG(idx_rd));
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -2574,18 +2573,18 @@ ReturnStatus_t
 C62xSADD_SR32_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
 {
+    ASSERT(1, "Test this instruction again");
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra =  (int32_t) proc_state->m_register[idx_ra];
-        int64_t rbh = (int64_t) proc_state->m_register[idx_rbh];
-        int64_t rbl = (int64_t) proc_state->m_register[idx_rbl];
+        int32_t ra  = (int32_t) proc_state->m_register[idx_ra];
+        int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
+        int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
         int32_t sflag = 0;
 
-        rbh        = ((rbh & 0x80) ? (rbh | 0xFFFFFF00) : (rbh & 0x000000FF));
-        int64_t rb = (rbh << 32) | rbl;
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
 
-        int64_t rd = ra + rb;
-        rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));
+        int64_t rd  = ra + rb;
+        rd          = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));  // Should not need this ???
 
         if((ra > 0) && (rb > 0) && (rd < 0))
         {
@@ -2623,18 +2622,18 @@ C62xSADD_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t scst5 = ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
+        int32_t ra = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rb = (int32_t) proc_state->m_register[idx_rb];
         int32_t sflag = 0;
 
-        int32_t rd = scst5 + rb;
+        int32_t rd = ra + rb;
 
-        if((scst5 > 0) && (rb > 0) && (rd < 0))
+        if((ra > 0) && (rb > 0) && (rd < 0))
         {
             rd = 0x7FFFFFFF; sflag = 1;
             TRACE_PRINT("+VE Saturation\n");
         }
-        else if((scst5 < 0) && (rb < 0) && (rd > 0))
+        else if((ra < 0) && (rb < 0) && (rd > 0))
         {
             rd = 0x80000000; sflag = 1;
             TRACE_PRINT("-VE Saturation\n");
@@ -2650,7 +2649,7 @@ C62xSADD_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         }
 
         TRACE_PRINT("%08x\tSADD      0x%x,%s,%s\n",
-                    GetPC(proc_state), scst5, REG(idx_rb), REG(idx_rd));
+                    GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -2659,15 +2658,15 @@ ReturnStatus_t
 C62xSADD_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                        uint32_t constant, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
 {
+    ASSERT(1, "Test Again");
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
-        int64_t rbh = (int64_t) proc_state->m_register[idx_rbh];
-        int64_t rbl = (int64_t) proc_state->m_register[idx_rbl];
+        int64_t ra    = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int64_t rbh   = (int64_t) proc_state->m_register[idx_rbh];
+        int64_t rbl   = (int64_t) proc_state->m_register[idx_rbl];
         int32_t sflag = 0;
 
-        rbh        = ((rbh & 0x80) ? (rbh | 0xFFFFFF00) : (rbh & 0x000000FF));
-        int64_t rb = (rbh << 32) | rbl;
+        int64_t rb    = C6X40_TO_S64(rbh, rbl);
 
         int64_t rd = ra + rb;
         rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));
@@ -2715,11 +2714,11 @@ C62xSAT_SR40_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_ze
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int64_t rah = (int64_t) proc_state->m_register[idx_rah];
-        int64_t ral = (int64_t) proc_state->m_register[idx_ral];
+        int32_t rah = (int32_t) proc_state->m_register[idx_rah];
+        int32_t ral = (int32_t) proc_state->m_register[idx_ral];
         int32_t sflag = 0;
 
-        int64_t ra = (rah << 32) | ral;
+        int64_t  ra = C6X40_TO_S64(rah, ral);
         uint32_t rd = ra & 0xFFFFFFFF;
 
         if(!(ra & 0x8000000000) && ra > 0x7FFFFFFF)
@@ -2870,13 +2869,13 @@ C62xSHL_SR40_UR32_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
-        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        uint32_t rah   = (uint32_t) proc_state->m_register[idx_rah];
+        uint32_t ral   = (uint32_t) proc_state->m_register[idx_ral];
         int32_t shift  = (int32_t)  proc_state->m_register[idx_rb] & 0x3F;
 
         ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
-        uint64_t ra    = (rah << 32) | ral;
+        uint64_t ra    = C6X40_TO_U64(rah, ral);
         uint64_t rd    = ra << shift;
 
         uint32_t rdh   = (rd >> 32) & 0xFF;
@@ -2903,6 +2902,7 @@ C62xSHL_UR32_UR32_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
         ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
         uint64_t rd    =  ra << shift;
+
         uint32_t rdh   = (rd >> 32) & 0xFF;
         uint32_t rdl   = rd & 0xFFFFFFFF;
 
@@ -2940,11 +2940,11 @@ C62xSHL_SR40_UC5_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
-        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        uint32_t rah   = (uint32_t) proc_state->m_register[idx_rah];
+        uint32_t ral   = (uint32_t) proc_state->m_register[idx_ral];
         uint8_t shift  = constant & 0x1F;
 
-        uint64_t ra    = (rah << 32) | ral;
+        int64_t  ra    = C6X40_TO_S64(rah, ral);
         uint64_t rd    = ra << shift;
 
         uint32_t rdh   = (rd >> 32) & 0xFF;
@@ -3018,14 +3018,13 @@ C62xSHR_SR40_UR32_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
-        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
-        int32_t shift  = (int32_t)  proc_state->m_register[idx_rb] & 0x3F;
+        int32_t rah    = (int32_t) proc_state->m_register[idx_rah];
+        int32_t ral    = (int32_t) proc_state->m_register[idx_ral];
+        int32_t shift  = (int32_t) proc_state->m_register[idx_rb] & 0x3F;
 
         ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
-        rah            = (rah & 0x80 ? rah | 0xFFFFFF00 : rah & 0x000000FF );      // Sign Extension
-        int64_t ra     = (rah << 32) | ral;
+        int64_t ra     = C6X40_TO_S64(rah, ral);
         int64_t rd     = ra >> shift;
 
         uint32_t rdh   = (rd >> 32) & 0xFF;
@@ -3065,12 +3064,11 @@ C62xSHR_SR40_UC5_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
-        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        int32_t rah    = (int32_t) proc_state->m_register[idx_rah];
+        int32_t ral    = (int32_t) proc_state->m_register[idx_ral];
         uint8_t shift  = constant & 0x1F;
 
-        rah            = (rah & 0x80 ? rah | 0xFFFFFF00 : rah & 0x000000FF );      // Sign Extension
-        int64_t ra     = (rah << 32) | ral;
+        int64_t ra     = C6X40_TO_S64(rah, ral);
         int64_t rd     = ra >> shift;
 
         uint32_t rdh   = (rd >> 32) & 0xFF;
@@ -3122,13 +3120,13 @@ C62xSHRU_UR40_UR32_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
-        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        uint32_t rah   = (uint32_t) proc_state->m_register[idx_rah];
+        uint32_t ral   = (uint32_t) proc_state->m_register[idx_ral];
         uint32_t shift = (uint32_t) proc_state->m_register[idx_rb] & 0x3F;
 
         ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
-        uint64_t ra    = (rah << 32) | ral;
+        uint64_t ra    = C6X40_TO_U64(rah, ral);
         uint64_t rd    = ra >> shift;
 
         uint32_t rdh   = (rd >> 32) & 0xFF;
@@ -3168,11 +3166,11 @@ C62xSHRU_UR40_UC5_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        uint64_t rah   = (uint64_t) proc_state->m_register[idx_rah];
-        uint64_t ral   = (uint64_t) proc_state->m_register[idx_ral];
+        uint32_t rah   = (uint32_t) proc_state->m_register[idx_rah];
+        uint32_t ral   = (uint32_t) proc_state->m_register[idx_ral];
         uint8_t shift  = constant & 0x1F;
 
-        uint64_t ra    = (rah << 32) | ral;
+        uint64_t ra    = C6X40_TO_U64(rah, ral);
         uint64_t rd    = ra >> shift;
 
         uint32_t rdh   = (rd >> 32) & 0xFF;
@@ -3492,7 +3490,7 @@ C62xSSUB_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
+        int32_t ra = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rb = (int32_t) proc_state->m_register[idx_rb];
         int32_t sflag = 0;
 
@@ -3528,18 +3526,18 @@ ReturnStatus_t
 C62xSSUB_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                        uint32_t constant, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
 {
+    ASSERT(1, "Test Again");
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x0000001F));
-        int64_t rbh = (int64_t) proc_state->m_register[idx_rbh];
-        int64_t rbl = (int64_t) proc_state->m_register[idx_rbl];
+        int64_t ra  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
+        int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
+        int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
         int32_t sflag = 0;
 
-        rbh        = ((rbh & 0x80) ? (rbh | 0xFFFFFF00) : (rbh & 0x000000FF));
-        int64_t rb = (rbh << 32) | rbl;
+        int64_t rb = C6X40_TO_S64(rbh, rbl);
 
         int64_t rd = ra - rb;
-        rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));
+        rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));  /// ???? 
 
         if((ra < 0) && (rb > 0) && (rd > 0))
         {
@@ -3882,7 +3880,7 @@ C62xSUB_SC5_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int8_t  ra  = (int8_t) ((constant & 0x10) ? (constant | 0xE0) : (constant & 0x0F));
+        int32_t ra  = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rb  = (int32_t) proc_state->m_register[idx_rb];
         int32_t rd  = ra - rb;
 
@@ -3900,11 +3898,11 @@ C62xSUB_SC5_SR40_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
 {
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
-        int8_t  ra  = (int8_t) ((constant & 0x10) ? (constant | 0xE0) : (constant & 0x0F));
+        int64_t ra  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
         int32_t rbh = (int32_t) proc_state->m_register[idx_rbh];
         int32_t rbl = (int32_t) proc_state->m_register[idx_rbl];
 
-        int64_t rb  = ((int64_t) rbh) << 32 | rbl;
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
         int64_t rd  = ra - rb;
 
         int32_t rdh = rd >> 32 & 0xFF;
@@ -3926,7 +3924,7 @@ C62xSUB_SR32_SC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra  = (int32_t) proc_state->m_register[idx_ra];
-        int8_t  rb  = (int8_t) ((constant & 0x10) ? (constant | 0xE0) : (constant & 0x0F));
+        int32_t rb  = (int32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
         int32_t rd  = ra - rb;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -3944,7 +3942,7 @@ C62xSUB_SR32_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
     if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra  = (int32_t) proc_state->m_register[idx_ra];
-        uint8_t rb  = (uint8_t) (constant & 0x1F));
+        uint8_t rb  = (uint8_t) (constant & 0x1F);
         int32_t rd  = ra - rb;
 
         AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
@@ -3963,9 +3961,9 @@ C62xSUB_SR40_SC5_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
     {
         int32_t rah = (int32_t) proc_state->m_register[idx_rah];
         int32_t ral = (int32_t) proc_state->m_register[idx_ral];
-        int8_t  rb  = (int8_t) ((constant & 0x10) ? (constant | 0xE0) : (constant & 0x0F));
+        int64_t rb  = (int64_t) ((constant & 0x10) ? (constant | 0xFFFFFFFFFFFFFFE0) : (constant & 0x1F));
 
-        int64_t ra  = ((int64_t) rah) << 32 | ral;
+        int64_t ra  = C6X40_TO_S64(rah, ral);
         int64_t rd  = ra - rb;
 
         int32_t rdh = rd >> 32 & 0xFF;
@@ -3975,49 +3973,238 @@ C62xSUB_SR40_SC5_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
         AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
 
         TRACE_PRINT("%08x\tSUB       %s:%s,0x%x,%s:%s\n",
-                GetPC(proc_state), REG(idx_rbh), REG(idx_rbl), constant, REG(idx_rdh), REG(idx_rdl));
+                GetPC(proc_state), REG(idx_rah), REG(idx_ral), constant, REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
 
-// Working Here
+/// SUBAB - Subtract Using Byte Addressing Mode
+ReturnStatus_t
+C62xSUBAB_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
+        int32_t rb   = (int32_t) proc_state->m_register[idx_rb];
+        uint32_t amr = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra - rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSUBAB     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSUBAB_SR32_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
+        uint8_t rb   = (int8_t) constant & 0x1F;
+        uint32_t amr = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra - rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSUBAB     %s,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_ra), constant, REG(idx_rd));
+    }
+    return OK;
+}
+
+/// SUBAH - Subtract Using Halfword Addressing Mode
+ReturnStatus_t
+C62xSUBAH_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
+        int32_t rb   = (int32_t) proc_state->m_register[idx_rb];
+        uint32_t amr = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra - (rb << 1);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSUBAH     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSUBAH_SR32_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
+        uint8_t rb   = (int8_t) constant & 0x1F;
+        uint32_t amr = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra - (rb << 1);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSUBAH     %s,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_ra), constant, REG(idx_rd));
+    }
+    return OK;
+}
+
+/// SUBAW - Subtract Using Word Addressing Mode
+ReturnStatus_t
+C62xSUBAW_SR32_SR32_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
+        int32_t rb   = (int32_t) proc_state->m_register[idx_rb];
+        uint32_t amr = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra - (rb << 2);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSUBAW     %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xSUBAW_SR32_UC5_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) proc_state->m_register[idx_ra];
+        uint8_t rb   = (int8_t) constant & 0x1F;
+        uint32_t amr = (uint32_t) proc_state->m_register[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra - (rb << 2);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSUBAW     %s,0x%x,%s\n",
+                GetPC(proc_state), REG(idx_ra), constant, REG(idx_rd));
+    }
+    return OK;
+}
+
+/// SUBC - Subtract Conditionally and Shift—Used for Division
 /*
-    proc_state->m_register[idx_rd] = 0xABCDAABB;
-    proc_state->m_register[idx_rb] = 0x1000;
-    constant = 0x15;
+ * Subtract src2 from src1. If result is greater than or equal to 0, left shift result by 1, add 1
+ * to it, and place it in dst. If result is less than 0, left shift src1 by 1, and place it in dst. This
+ * step is commonly used in division.
+ */
+ReturnStatus_t
+C62xSUBC_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
 
-    proc_state->m_register[idx_ra] = 0x5A2E51A3;
-    proc_state->m_register[idx_rb] = 0x802A3FA2;
+        int32_t result = ra - rb;
+        uint32_t rd    = 0;
 
-    proc_state->m_register[idx_ra] = 0xD8000000;
-    proc_state->m_register[idx_ra] = 0x80000000;
-    proc_state->m_register[idx_rb] = 0x0;
+        if(result >= 0)
+            rd = (result << 1) + 1;
+        else
+            rd = ra << 1;
 
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
 
- * if (bit(31) through bit(31 - src1) of src2 are all 1s or all 0s),
-        dst = src2 << src1;
-else if (src2 > 0)
-    saturate dst to 7FFF FFFFh;
-else if (src2 < 0)
-    saturate dst to 8000 0000h
+        TRACE_PRINT("%08x\tSUBC      %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
 
-    proc_state->m_register[idx_ra] = 0x00008000;
-    proc_state->m_register[idx_rb] = 0x00008000;
+/// SUBU - Subtract Two Unsigned Integers Without Saturation
+ReturnStatus_t
+C62xSUBU_UR32_UR32_UR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra = (uint32_t) proc_state->m_register[idx_ra];
+        uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
 
-    proc_state->m_register[idx_rah] = 0x7F;
-    proc_state->m_register[idx_ral] = 0xAA000000;
-    proc_state->m_register[idx_rb]  = 45;
+        uint64_t rd = ra - rb;
+        
+        uint32_t rdh = (rd >> 32) & 0x000000FF;
+        uint32_t rdl = rd & 0xFFFFFFFF;
 
-    proc_state->m_register[idx_ra] = 0x9ED31A31;
-    proc_state->m_register[idx_rb] = 0x0000C197;
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
 
-    proc_state->m_register[idx_rah] = 0xFF;
-    proc_state->m_register[idx_ral] = 0xAA000000;
-    constant  = 16;
+        TRACE_PRINT("%08x\tSUBU      %s,%s,%s:%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
 
-*/
+/// SUB2 - Subtract Two 16-Bit Integers on Upper and Lower Register Halves
+/*
+ * The upper and lower halves of src2 are subtracted from the upper and lower halves of
+ * src1 and the result is placed in dst. Any borrow from the lower-half subtraction does not
+ * affect the upper-half subtraction. Specifically, the upper-half of src2 is subtracted from
+ * the upper-half of src1 and placed in the upper-half of dst. The lower-half of src2 is
+ * subtracted from the lower-half of src1 and placed in the lower-half of dst.
+ */
+ReturnStatus_t
+C62xSUB2_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra = (int32_t) proc_state->m_register[idx_ra];
+        uint32_t rb = (int32_t) proc_state->m_register[idx_rb];
 
+        uint16_t rah = ra >> 16;
+        uint16_t ral = ra & 0xFFFF;
+        uint16_t rbh = rb >> 16;
+        uint16_t rbl = rb & 0xFFFF;
 
+        uint32_t rd = ((rah - rbh) << 16) | (ral - rbl);
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tSUB2       %s,%s,%s\n",
+                GetPC(proc_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
+/// XOR - Bitwise Exclusive OR
+/*
+ * Performs a bitwise exclusive-OR (XOR) operation between src1 and src2. The result is
+ * placed in dst. The scst5 operands are sign extended to 32 bits.
+ */
 ReturnStatus_t
 C62xXOR_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
@@ -4036,3 +4223,20 @@ C62xXOR_UR32_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t 
     return OK;
 }
 
+ReturnStatus_t
+C62xXOR_SC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                      uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra = (uint32_t) ((constant & 0x10) ? (constant | 0xFFFFFFE0) : (constant & 0x1F));
+        uint32_t rb = (uint32_t) proc_state->m_register[idx_rb];
+        uint32_t rd = ra ^ rb;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tXOR       0x%x,%s,%s\n",
+                GetPC(proc_state), constant, REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}

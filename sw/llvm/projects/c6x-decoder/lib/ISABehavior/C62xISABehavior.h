@@ -112,4 +112,11 @@ typedef enum ReturnStatus
 #define REG_NRP_INDEX  (REG_BANK_C * C62X_REGS_PER_BANK) + REG_NRP
 #define REG_PC_INDEX   (REG_BANK_C * C62X_REGS_PER_BANK) + REG_PCE1
 
+#define C6X40_TO_U64(msb32,lsb32)                                              \
+    ((((uint64_t) msb32) << 32) | lsb32)
+
+#define C6X40_TO_S64(msb32,lsb32)                                              \
+    (((int64_t)((msb32 & 0x80) ? (msb32 | 0xFFFFFF00) : (msb32 & 0x000000FF)) << 32) | lsb32)
+
+
 #endif	/* C62X_PROCESSOR_H */
