@@ -4242,3 +4242,36 @@ C62xXOR_SC5_UR32_UR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t b
     }
     return OK;
 }
+
+/// ZERO - Zero a Register
+ReturnStatus_t
+C62xZERO_SR32(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+              uint16_t idx_rd, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t rd = 0x0;
+
+        AddDelayedRegister(proc_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tZERO      %s\n", GetPC(proc_state), REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xZERO_SR40(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+              uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
+{
+    if(ExecuteDecision(proc_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t rdh = 0x0;
+        int32_t rdl = 0x0;
+
+        AddDelayedRegister(proc_state, idx_rdh, (uint32_t) rdh, delay);
+        AddDelayedRegister(proc_state, idx_rdl, (uint32_t) rdl, delay);
+
+        TRACE_PRINT("%08x\tZERO      %s:%s\n", GetPC(proc_state), REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
