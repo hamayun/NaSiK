@@ -1227,7 +1227,7 @@ namespace native
                      C62xOperand * src1_opr, C62xOperand * src2_opr, C62xLoadStoreMode_t mode) :
                      C62xLDSTInstr(dec_instr, mode, STORE_INSTR)
         {
-            SetMnemonic("STB");
+            SetMnemonic("STB"); SetDelaySlots((uint8_t) C62X_STORE_DELAY);
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
         }
 
@@ -1241,7 +1241,7 @@ namespace native
                      C62xOperand * src1_opr, C62xOperand * src2_opr, C62xLoadStoreMode_t mode) :
                      C62xLDSTInstr(dec_instr, mode, STORE_INSTR)
         {
-            SetMnemonic("STH");
+            SetMnemonic("STH"); SetDelaySlots((uint8_t) C62X_STORE_DELAY);
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
         }
 
@@ -1255,7 +1255,7 @@ namespace native
                      C62xOperand * src1_opr, C62xOperand * src2_opr, C62xLoadStoreMode_t mode) :
                      C62xLDSTInstr(dec_instr, mode, STORE_INSTR)
         {
-            SetMnemonic("STW");
+            SetMnemonic("STW"); SetDelaySlots((uint8_t) C62X_STORE_DELAY);
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
         }
 

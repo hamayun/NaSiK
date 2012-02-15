@@ -54,10 +54,17 @@ typedef struct C62x_Delay_Queue
 } C62x_Delay_Queue_t;
 /* LLVM Type ... { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 } */
 
+typedef enum C62xMWB_Size
+{
+    MWB_BYTE  = 1,
+    MWB_HWORD = 2,
+    MWB_WORD  = 4
+} C62xMWB_Size_t;
+
 /* Memory Write-Back Node */
 typedef struct C62x_MWBack_Node
 {
-    uint8_t                       m_size;     /* 1, 2 or 4 */
+    C62xMWB_Size_t                m_size;     /* MWB_BYTE, MWB_HWORD or MWB_WORD */
     uint32_t                      m_addr;
     uint32_t                      m_value;
     struct C62x_MWBack_Node     * m_next_node;
