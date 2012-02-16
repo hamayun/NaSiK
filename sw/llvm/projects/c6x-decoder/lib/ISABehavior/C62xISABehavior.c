@@ -569,6 +569,24 @@ C62xADD_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 }
 
 ReturnStatus_t
+C62xADD_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                      uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
+{
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rb  = constant & 0x1F;
+        int32_t rd  = ra + rb;
+
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADD       %s,0x%x,%s\n",
+                Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
+    }
+    return OK;
+}
+
+ReturnStatus_t
 C62xADD_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
 {
@@ -1222,7 +1240,7 @@ C62xCMPGTU_UC4_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra = constant;
+        uint32_t ra = constant & 0xF;
         uint32_t rb = (uint32_t) p_state->m_reg[idx_rb];
         uint32_t rd = (uint32_t)(ra > rb);
 
@@ -1260,7 +1278,7 @@ C62xCMPGTU_UC4_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra  = constant;
+        uint32_t ra  = constant & 0xF;
         uint32_t rbh = (uint32_t) p_state->m_reg[idx_rbh];
         uint32_t rbl = (uint32_t) p_state->m_reg[idx_rbl];
         uint64_t rb  = C6X40_TO_U64(rbh, rbl);
@@ -1376,7 +1394,7 @@ C62xCMPLTU_UC4_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra = constant;
+        uint32_t ra = constant & 0xF;
         uint32_t rb = (uint32_t) p_state->m_reg[idx_rb];
         uint32_t rd = (uint32_t)(ra < rb);
 
@@ -1414,7 +1432,7 @@ C62xCMPLTU_UC4_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra  = constant;
+        uint32_t ra  = constant & 0xF;
         uint32_t rbh = (uint32_t) p_state->m_reg[idx_rbh];
         uint32_t rbl = (uint32_t) p_state->m_reg[idx_rbl];
         uint64_t rb  = C6X40_TO_U64(rbh, rbl);

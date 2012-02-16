@@ -60,5 +60,6 @@ rm -f ${PFORM_DIR}/kvm_c6x_bootstrap
 rm -f ${PFORM_DIR}/target_binary_text
 rm -f ${GENERATED_APP}/c6x-decoder
 rm -f ${GENERATED_APP}/instructions.bin
+rm -f ${GENERATED_APP}/matmult.coff
 
 

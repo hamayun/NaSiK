@@ -66,6 +66,7 @@ else
 fi
 
 ln -sf ${TARGET_BIN_WRITER}/instructions.bin ${GENERATED_APP}/instructions.bin
+ln -sf /home/hamayun/examples/matmult/matmult.coff ${GENERATED_APP}/matmult.coff
 
 if [ "$1" = "kvm" ]; then
 print_step "Building Bootstrap(s) ... "
@@ -80,6 +81,7 @@ fi
 print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
 ./c6x-decoder instructions.bin instructions.asm
+#./c6x-decoder matmult.coff matmult.asm
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "
     exit 1

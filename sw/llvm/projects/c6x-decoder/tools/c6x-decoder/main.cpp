@@ -23,7 +23,7 @@
 
 using namespace native;
 
-//#define COFF_INPUT_FILE
+#define COFF_INPUT_FILE
 #define GENERATE_CODE
 //#define BASIC_BLOCK_LEVEL_CODE
 
@@ -70,11 +70,13 @@ int main (int argc, char ** argv)
         instr_address += 4;
     }
 
+#ifndef COFF_INPUT_FILE
     // Dump the different sections of input binary to files for loading to KVM Memory
     COUT << "Dumping .text section ..." << endl;
     reader->DumpSection(argv[1], argv[1], ".text");
     COUT << "Dumping .data section ..." << endl;
     reader->DumpSection(argv[1], argv[1], ".data");
+#endif
 
     FetchPacketList fetch_packet_list(&instruction_list);
     ExecutePacketList execute_packet_list(&instruction_list);
@@ -93,7 +95,7 @@ int main (int argc, char ** argv)
     }
 
 #ifdef COFF_INPUT_FILE
-    instruction_list.MarkBranchTargets();
+    //instruction_list.MarkBranchTargets();
 #endif
     BasicBlockList basic_block_list (& execute_packet_list);
 

@@ -438,8 +438,8 @@ namespace native
 
             case 0x5e :
             {
-                /*CMPLTU ucst5, xusint, usint*/
-                C62xOperand * src1_opr = new C62xConstant(false, 5, dh->GetUIntConst1());
+                /*CMPLTU ucst4, xusint, usint*/
+                C62xOperand * src1_opr = new C62xConstant(false, 4, dh->GetUIntConst1());
                 C62xOperand * src2_opr = new C62xRegister(false, 32, dh->GetCrossBankId(), dh->GetSrc2());
                 C62xOperand * dest_reg = new C62xRegister(false, 32, dh->GetDestBankId(), dh->GetDest());
                 dec_instr_eu = new C62xCMPLTUInstr(dec_instr, dest_reg, src1_opr, src2_opr);
@@ -458,8 +458,8 @@ namespace native
 
             case 0x5c :
             {
-                /*CMPLTU ucst5, uslong, usint*/
-                C62xOperand * src1_opr = new C62xConstant(false, 5, dh->GetUIntConst1());
+                /*CMPLTU ucst4, uslong, usint*/
+                C62xOperand * src1_opr = new C62xConstant(false, 4, dh->GetUIntConst1());
                 C62xOperand * src2_opr = new C62xMultiRegister(false, 40, dh->GetDestBankId(), dh->GetSrc2() + 1, dh->GetSrc2());
                 C62xOperand * dest_reg = new C62xRegister(false, 32, dh->GetDestBankId(), dh->GetDest());
                 dec_instr_eu = new C62xCMPLTUInstr(dec_instr, dest_reg, src1_opr, src2_opr);
@@ -1262,7 +1262,7 @@ namespace native
             {
                 /*ADDK cst16, usint*/
                 C62xOperand * src1_opr = new C62xConstant(true, 16, scst16);
-                C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
+                C62xOperand * dest_reg = new C62xRegister(false, 32, dh->GetDestBankId(), dh->GetDest());
                 dec_instr_eu = new C62xADDKInstr(dec_instr, dest_reg, src1_opr);
             }
             break;
@@ -1645,7 +1645,7 @@ namespace native
                 }
                 else
                 {
-                    /* ADD ucst5, sint, sint*/
+                    /* ADD sint, ucst5, sint*/
                     C62xOperand * src1_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc2());
                     C62xOperand * src2_opr = new C62xConstant(false, 5, dh->GetUIntConst1());
                     C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
@@ -1821,8 +1821,8 @@ namespace native
 
         C62xOperand * src1_opr = new C62xConstant(false, 15, dh->GetUIntConst15());
         // Base Register Register always belong to SideB in this Mode i.e. UnitD_LDSTOFFSET
-        C62xOperand * src2_opr = new C62xRegister(true, 32, REG_BANK_B, base_reg_id);
-        C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
+        C62xOperand * src2_opr = new C62xRegister(false, 32, REG_BANK_B, base_reg_id);
+        C62xOperand * dest_reg = new C62xRegister(false, 32, dh->GetDestBankId(), dh->GetDest());
 
         // Here we correct the decoding unit id. Its a special case in this unit.
         dec_instr->GetExecutionUnit()->SetUnitId(dh->GetDUnitId() + 1);
