@@ -22,18 +22,6 @@
 #include "C62xISABehavior.h"
 #include "stdio.h"
 
-char BANKS[C62X_REG_BANKS];
-
-#define BANKINDEX(idx) idx / C62X_REGS_PER_BANK
-#define BANKNAME(idx)  BANKS[BANKINDEX(idx)]
-#define RNUM(idx)      idx % C62X_REGS_PER_BANK
-
-#define MAX_REG_PER_INSTR     10
-#define MAX_REG_NAME_LEN      3
-
-char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
-                       "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
-
 void Dump(char * rn, uint16_t sz)
 {
     uint16_t idx = 0;
@@ -42,7 +30,6 @@ void Dump(char * rn, uint16_t sz)
         printf("%x ", rn[idx]);
     printf("\n");
 }
-
 
 char * REG(uint16_t idx)
 {
@@ -270,7 +257,6 @@ int32_t UpdateMemory(C62x_Proc_State_t * proc_state)
 
     return (0);
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 int32_t InitProcessorState(C62x_Proc_State_t * proc_state)
@@ -303,7 +289,6 @@ int32_t InitProcessorState(C62x_Proc_State_t * proc_state)
     //printf("(Parameterized) Processor State Initialized\n");
     return (0);
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 int32_t IncrementPC(C62x_Proc_State_t * proc_state, int32_t offset)
@@ -333,7 +318,6 @@ uint64_t GetCycles(C62x_Proc_State_t * proc_state)
 {
     return(proc_state->m_curr_cpu_cycle);
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 int32_t UpdateRegisters(C62x_Proc_State_t * proc_state)
@@ -361,7 +345,6 @@ int32_t AddDelayedRegister(C62x_Proc_State_t * proc_state, uint16_t reg_id, uint
 
     return (0);
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
@@ -438,7 +421,6 @@ int32_t ShowProcessorState(C62x_Proc_State_t * proc_state)
     printf("\n");
     return (0);
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 uint8_t ExecuteDecision(C62x_Proc_State_t * proc_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc)

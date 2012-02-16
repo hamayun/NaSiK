@@ -126,4 +126,16 @@ typedef enum ReturnStatus
 #define C6XSC5_TO_S64(scst5)                                                   \
     ((int64_t)((scst5 & 0x10) ? (scst5 | 0xFFFFFFFFFFFFFFE0) : (scst5 & 0x1F)))
 
+char BANKS[C62X_REG_BANKS];
+
+#define BANKINDEX(idx) idx / C62X_REGS_PER_BANK
+#define BANKNAME(idx)  BANKS[BANKINDEX(idx)]
+#define RNUM(idx)      idx % C62X_REGS_PER_BANK
+
+#define MAX_REG_PER_INSTR     10
+#define MAX_REG_NAME_LEN      3
+
+char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
+                       "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
+
 #endif	/* C62X_PROCESSOR_H */
