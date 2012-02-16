@@ -117,14 +117,30 @@ typedef enum ReturnStatus
 #define C6X40_TO_S64(msb32,lsb32)                                              \
     (((int64_t)((msb32 & 0x80) ? (msb32 | 0xFFFFFF00) : (msb32 & 0x000000FF)) << 32) | lsb32)
 
-#define U64_TO_C6XMSB12(u64) (u64 >> 32 & 0xFF)
-#define U64_TO_C6XLSB32(u64) (u64 & 0xFFFFFFFF)
+#define C6XSC5_TO_S64(scst5)                                                   \
+    ((int64_t)((scst5 & 0x10) ? (scst5 | 0xFFFFFFFFFFFFFFE0) : (scst5 & 0x1F)))
 
 #define C6XSC5_TO_S32(scst5)                                                   \
     ((int32_t)((scst5 & 0x10) ? (scst5 | 0xFFFFFFE0) : (scst5 & 0x1F)))
 
-#define C6XSC5_TO_S64(scst5)                                                   \
-    ((int64_t)((scst5 & 0x10) ? (scst5 | 0xFFFFFFFFFFFFFFE0) : (scst5 & 0x1F)))
+#define C6XSC5_TO_S16(scst5)                                                   \
+    ((int16_t)((scst5 & 0x10) ? (scst5 | 0xFFE0) : (scst5 & 0x1F)))
+
+#define C6XSCST21_TO_S32(scst21)                                               \
+    ((int32_t)((scst21 & 0x100000) ? (scst21 | 0xFFE00000) : (scst21 & 0x1FFFFF)))
+
+#define GET_BITS_5_TO_9(u32) ((u32 & 0x3E0) >> 5)
+#define GET_BITS_0_TO_4(u32) (u32 & 0x1F)
+#define GET_BITS_0_TO_5(u32) (u32 & 0x3F)
+
+#define U64_TO_C6XMSB12(u64) (u64 >> 32 & 0xFF)
+#define U64_TO_C6XLSB32(u64) (u64 & 0xFFFFFFFF)
+
+#define GET_MSB16(u32) ((u32 >> 16) & 0xFFFF)
+#define GET_LSB16(u32) (u32 & 0xFFFF)
+
+#define S8_TO_S32(s8) ((int32_t) (s8 & 0x80) ? (s8 | 0xFFFFFF00) : s8)
+#define S16_TO_S32(s16) ((int32_t) (s16 & 0x8000) ? (s16 | 0xFFFF0000) : s16)
 
 char BANKS[C62X_REG_BANKS];
 
@@ -134,5 +150,7 @@ char BANKS[C62X_REG_BANKS];
 
 #define MAX_REG_PER_INSTR     10
 #define MAX_REG_NAME_LEN      3
+
+#define TEST_AGAIN() ASSERT(1, "Test This Instruction Again\n")
 
 #endif	/* C62X_PROCESSOR_H */

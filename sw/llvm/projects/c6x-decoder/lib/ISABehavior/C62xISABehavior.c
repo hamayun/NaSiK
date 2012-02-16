@@ -598,15 +598,43 @@ ReturnStatus_t
 C62xADDAB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "%s: Not Implemented !!!\n");
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rb   = (int32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra + rb;
+
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADDAB     %s,%s,%s\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
     return OK;
 }
 
 ReturnStatus_t
-C62xADDAB_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+C62xADDAB_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "%s: Not Implemented !!!\n");
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rb   = constant & 0x1F;
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra + rb;
+
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADDAB     %s,0x%x,%s\n",
+                Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
+    }
     return OK;
 }
 
@@ -615,15 +643,43 @@ ReturnStatus_t
 C62xADDAH_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "%s: Not Implemented !!!\n");
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rb   = (int32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra + (rb << 1);
+
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADDAH     %s,%s,%s\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
     return OK;
 }
 
 ReturnStatus_t
-C62xADDAH_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+C62xADDAH_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "%s: Not Implemented !!!\n");
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rb   = constant & 0x1F;
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra + (rb << 1);
+
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADDAH     %s,0x%x,%s\n",
+                Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
+    }
     return OK;
 }
 
@@ -632,15 +688,43 @@ ReturnStatus_t
 C62xADDAW_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "%s: Not Implemented !!!\n");
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rb   = (int32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra + (rb << 2);
+
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADDAW     %s,%s,%s\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
     return OK;
 }
 
 ReturnStatus_t
-C62xADDAW_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+C62xADDAW_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint32_t constant, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "%s: Not Implemented !!!\n");
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        int32_t  ra  = (int32_t) p_state->m_reg[idx_ra];
+        int32_t  rb  = constant & 0x1F;
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+
+        ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
+
+        int32_t rd = ra + (rb << 2);
+
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tADDAW     %s,0x%x,%s\n",
+                Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
+    }
     return OK;
 }
 
@@ -651,13 +735,13 @@ C62xADDK_SC16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, 
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t cst16 = constant & 0xFFFF;
-        int32_t rd    = cst16 + (int32_t) p_state->m_reg[idx_rd];
+        int16_t ra  = GET_LSB16(constant);
+        int32_t rd  = ra + (int32_t) p_state->m_reg[idx_rd];
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tADDK      0x%x,%s\n",
-                Get_DSP_PC(p_state), cst16, REG(idx_rd));
+                Get_DSP_PC(p_state), constant, REG(idx_rd));
     }
     return OK;
 }
@@ -720,11 +804,11 @@ C62xADD2_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
         int32_t rb  = (int32_t) p_state->m_reg[idx_rb];
 
-        int16_t ra_msb16 = (ra >> 16) & 0xFFFF;
-        int16_t ra_lsb16 = ra & 0xFFFF;
+        int16_t ra_msb16 = GET_MSB16(ra);
+        int16_t ra_lsb16 = GET_LSB16(ra);
 
-        int16_t rb_msb16 = (rb >> 16) & 0xFFFF;
-        int16_t rb_lsb16 = rb & 0xFFFF;
+        int16_t rb_msb16 = GET_MSB16(rb);
+        int16_t rb_lsb16 = GET_LSB16(rb);
 
         int32_t rd  = ((int32_t)(ra_msb16 + rb_msb16) << 16) | (ra_lsb16 + rb_lsb16);
 
@@ -737,6 +821,10 @@ C62xADD2_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 }
 
 /// AND - Bitwise AND
+/*
+ * Performs a bitwise AND operation between src1 and src2. The result is placed
+ * in dst. The scst5 operands are sign extended to 32 bits.
+ */
 ReturnStatus_t
 C62xAND_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
@@ -773,22 +861,78 @@ C62xAND_SC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     return OK;
 }
 
-/// B - Branch using a displacement / Register / IRP / NRP
+/// B - Branch using a displacement
+/*
+ * A 21-bit signed constant, cst21, is shifted left by 2 bits and is added to the
+ * address of the first instruction of the fetch packet that contains the branch
+ * instruction. The result is placed in the program fetch counter (PFC). The
+ * assembler/linker automatically computes the correct value for cst21 by the
+ * following formula:
+ * cst21 = (label - PCE1) >> 2
+ * If two branches are in the same execute packet and both are taken, behavior
+ * is undefined.
+ * Two conditional branches can be in the same execute packet if one branch
+ * uses a displacement and the other uses a register, IRP, or NRP. As long as only
+ * one branch has a true condition, the code executes in a well-defined way.
+ *
+ * Notes:
+ * 1) PCE1 (program counter) represents the address of the first instruction
+ *    in the fetch packet in the E1 stage of the pipeline. PFC is the program
+ *    fetch counter.
+ * 2) The execute packets in the delay slots of a branch cannot be interrupted.
+ *    This is true regardless of whether the branch is taken.
+ * 3) See section 3.4.2 on page 3-9 for information on branching into the
+ *    middle of an execute packet.
+ */
+
 ReturnStatus_t
 C62xB_SC21(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant, uint8_t delay)
+                        uint32_t constant, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t rd      = constant & 0x1FFFFF;
-        uint16_t idx_rd = REG_PC_INDEX;
+        int32_t  rd = C6XSCST21_TO_S32(constant);
 
-        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+        EnQ_Delay_Reg(p_state, REG_PC_INDEX, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tB         0x%x\n", Get_DSP_PC(p_state), rd);
     }
     return OK;
 }
+
+/// B - Branch Using a Register / IRP / NRP
+/*
+ * src2 is placed in the program fetch counter (PFC).
+ * If two branches are in the same execute packet and are both taken, behavior
+ * is undefined.
+ * Two conditional branches can be in the same execute packet if one branch
+ * uses a displacement and the other uses a register, IRP, or NRP. As long as only
+ * one branch has a true condition, the code executes in a well-defined way.
+ * Notes:
+ * 1) This instruction executes on .S2 only. PFC is program fetch counter.
+ * 2) The execute packets in the delay slots of a branch cannot be interrupted.
+ *    This is true regardless of whether the branch is taken.
+ * 3) See section 3.4.2 on page 3-9 for information on branching into the
+ *    middle of an execute packet.
+ *
+ * Branch Using a IRP:
+ * IRP is placed in the program fetch counter (PFC). This instruction also moves
+ * the PGIE bit value to the GIE bit. The PGIE bit is unchanged.
+ * If two branches are in the same execute packet and are both taken, behavior
+ * is undefined.
+ * Two conditional branches can be in the same execute packet if one branch
+ * uses a displacement and the other uses a register, IRP, or NRP. As long as only
+ * one branch has a true condition, the code executes in a well-defined way.
+ *
+ * Branch Using a NRP:
+ * NRP is placed in the program fetch counter (PFC). This instruction also sets
+ * the NMIE bit. The PGIE bit is unchanged.
+ * If two branches are in the same execute packet and are both taken, behavior
+ * is undefined.
+ * Two conditional branches can be in the same execute packet if one branch
+ * uses a displacement and the other uses a register, IRP, or NRP. As long as only
+ * one branch has a true condition, the code executes in a well-defined way.
+ */
 
 ReturnStatus_t
 C62xB_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
@@ -796,10 +940,12 @@ C62xB_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rd     = (uint32_t) p_state->m_reg[idx_ra];
-        uint16_t idx_rd = REG_PC_INDEX;
+        uint32_t rd = (uint32_t) p_state->m_reg[idx_ra];
 
-        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+        // TODO: Move the PGIE bit value to the GIE bit, if its B IRP Instruction.
+        // Set the sets NMIE bit if its B NRP Instruction.
+
+        EnQ_Delay_Reg(p_state, REG_PC_INDEX, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tB         %s\n", Get_DSP_PC(p_state), REG(idx_ra));
     }
@@ -811,15 +957,13 @@ ReturnStatus_t
 C62xCLR_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "Test This Instruction !!!");
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
 
-        uint16_t csta = (uint16_t) (rb & 0x3E0) >> 5;   /* bits 5 to 9 */
-        uint16_t cstb = (uint16_t) rb & 0x1F;           /* bits 0 to 4 */
+        uint16_t csta = GET_BITS_5_TO_9(rb);
+        uint16_t cstb = GET_BITS_0_TO_4(rb);
 
         uint16_t rshift = cstb + 1;
         uint16_t lshift = 32 - csta;
@@ -839,10 +983,8 @@ C62xCLR_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
 ReturnStatus_t
 C62xCLR_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint16_t idx_ra, int32_t constanta, int32_t constantb, uint16_t idx_rd, uint8_t delay)
+                        uint16_t idx_ra, uint32_t constanta, uint32_t constantb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "Test This Instruction !!!");
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
@@ -873,8 +1015,8 @@ C62xCMPEQ_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
-        int32_t rb  = (int32_t) p_state->m_reg[idx_rb];
+        int32_t  ra = (int32_t) p_state->m_reg[idx_ra];
+        int32_t  rb = (int32_t) p_state->m_reg[idx_rb];
         uint32_t rd = (uint32_t)(ra == rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -887,13 +1029,13 @@ C62xCMPEQ_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
 ReturnStatus_t
 C62xCMPEQ_SC5_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra    = C6XSC5_TO_S32(constant);
-        int32_t rb    = (int32_t) p_state->m_reg[idx_rb];
-        uint32_t rd   = (uint32_t)(ra == rb);
+        int32_t  ra = C6XSC5_TO_S32(constant);
+        int32_t  rb = (int32_t) p_state->m_reg[idx_rb];
+        uint32_t rd = (uint32_t)(ra == rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -925,7 +1067,7 @@ C62xCMPEQ_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
 ReturnStatus_t
 C62xCMPEQ_SC5_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
+                        uint32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
@@ -944,14 +1086,43 @@ C62xCMPEQ_SC5_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 }
 
 /// CMPGT - Compare for Greater Than; Signed Integers
+/*
+ * Performs a signed comparison of src1 to src2. If src1 is greater than src2, then
+ * a 1 is written to dst; otherwise, a 0 is written to dst.
+ *
+ * Note:
+ * The CMPGT instruction allows using a 5-bit constant as src1. If src2 is a 5-bit
+ * constant, as in
+ *
+ * CMPGT .L1 A4, 5, A0
+ *
+ * Then to implement this operation, the assembler converts this instruction to
+ *
+ * CMPLT .L1 5, A4, A0
+ *
+ * These two instructions are equivalent, with the second instruction using the
+ * conventional operand types for src1 and src2.
+ *
+ * Similarly, the CMPGT instruction allows a cross path operand to be used as
+ * src2. If src1 is a cross path operand as in
+ *
+ * CMPGT .L1x B4, A5, A0
+ *
+ * Then to implement this operation the assembler converts this instruction to
+ *
+ * CMPLT .L1x A5, B4, A0
+ *
+ * In both of these operations the listing file (.lst) will have the first implementa-
+ * tion, and the second implementation will appear in the debugger.
+ */
 ReturnStatus_t
 C62xCMPGT_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
-        int32_t rb  = (int32_t) p_state->m_reg[idx_rb];
+        int32_t  ra = (int32_t) p_state->m_reg[idx_ra];
+        int32_t  rb = (int32_t) p_state->m_reg[idx_rb];
         uint32_t rd = (uint32_t)(ra > rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -964,13 +1135,13 @@ C62xCMPGT_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
 ReturnStatus_t
 C62xCMPGT_SC5_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra    = C6XSC5_TO_S32(constant);
-        int32_t rb    = (int32_t) p_state->m_reg[idx_rb];
-        uint32_t rd   = (uint32_t)(ra > rb);
+        int32_t  ra = C6XSC5_TO_S32(constant);
+        int32_t  rb = (int32_t) p_state->m_reg[idx_rb];
+        uint32_t rd = (uint32_t)(ra > rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -986,11 +1157,11 @@ C62xCMPGT_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
-        int32_t rbh  = (int32_t) p_state->m_reg[idx_rbh];
-        int32_t rbl  = (int32_t) p_state->m_reg[idx_rbl];
-        int64_t rb   = C6X40_TO_S64(rbh, rbl);
-        uint32_t rd  = (uint32_t)(ra > rb);
+        int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rbh = (int32_t) p_state->m_reg[idx_rbh];
+        int32_t rbl = (int32_t) p_state->m_reg[idx_rbl];
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
+        uint32_t rd = (uint32_t)(ra > rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1002,7 +1173,7 @@ C62xCMPGT_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
 ReturnStatus_t
 C62xCMPGT_SC5_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
+                        uint32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
@@ -1021,6 +1192,12 @@ C62xCMPGT_SC5_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 }
 
 /// CMPGTU - Compare for Greater Than; Unsigned Integers
+/*
+ * Performs an unsigned comparison of src1 to src2. If src1 is greater than src2,
+ * then a 1 is written to dst; otherwise, a 0 is written to dst. Only the four LSBs
+ * are valid in the 5-bit dst field when the ucst4 operand is used. If the MSB of the
+ * dst field is nonzero, the result is invalid.
+ */
 ReturnStatus_t
 C62xCMPGTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
@@ -1041,18 +1218,18 @@ C62xCMPGTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
 ReturnStatus_t
 C62xCMPGTU_UC4_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ucst4 = (uint16_t) constant & 0xF;
-        uint32_t rb    = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t rd    = (uint32_t)(ucst4 > rb);
+        uint32_t ra = constant;
+        uint32_t rb = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t rd = (uint32_t)(ra > rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPGTU    0x%x,%s,%s\n",
-                Get_DSP_PC(p_state), ucst4, REG(idx_rb), REG(idx_rd));
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
@@ -1079,20 +1256,20 @@ C62xCMPGTU_UR32_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
 ReturnStatus_t
 C62xCMPGTU_UC4_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
+                        uint32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ucst4 = (uint16_t) constant & 0xF;
-        uint32_t rbh   = (uint32_t) p_state->m_reg[idx_rbh];
-        uint32_t rbl   = (uint32_t) p_state->m_reg[idx_rbl];
-        uint64_t rb    = C6X40_TO_U64(rbh, rbl);
-        uint32_t rd    = (uint32_t)(ucst4 > rb);
+        uint32_t ra  = constant;
+        uint32_t rbh = (uint32_t) p_state->m_reg[idx_rbh];
+        uint32_t rbl = (uint32_t) p_state->m_reg[idx_rbl];
+        uint64_t rb  = C6X40_TO_U64(rbh, rbl);
+        uint32_t rd  = (uint32_t)(ra > rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPGTU    0x%x,%s:%s,%s\n",
-                Get_DSP_PC(p_state), ucst4, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
+                Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -1104,8 +1281,8 @@ C62xCMPLT_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
-        int32_t rb  = (int32_t) p_state->m_reg[idx_rb];
+        int32_t  ra = (int32_t) p_state->m_reg[idx_ra];
+        int32_t  rb = (int32_t) p_state->m_reg[idx_rb];
         uint32_t rd = (uint32_t)(ra < rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -1118,13 +1295,13 @@ C62xCMPLT_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
 ReturnStatus_t
 C62xCMPLT_SC5_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra    = C6XSC5_TO_S32(constant);
-        int32_t rb    = (int32_t) p_state->m_reg[idx_rb];
-        uint32_t rd   = (uint32_t)(ra < rb);
+        int32_t  ra = C6XSC5_TO_S32(constant);
+        int32_t  rb = (int32_t) p_state->m_reg[idx_rb];
+        uint32_t rd = (uint32_t)(ra < rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1140,11 +1317,11 @@ C62xCMPLT_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
-        int32_t rbh  = (int32_t) p_state->m_reg[idx_rbh];
-        int32_t rbl  = (int32_t) p_state->m_reg[idx_rbl];
-        int64_t rb   = C6X40_TO_S64(rbh, rbl);
-        uint32_t rd  = (uint32_t)(ra < rb);
+        int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rbh = (int32_t) p_state->m_reg[idx_rbh];
+        int32_t rbl = (int32_t) p_state->m_reg[idx_rbl];
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
+        uint32_t rd = (uint32_t)(ra < rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1156,15 +1333,15 @@ C62xCMPLT_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
 ReturnStatus_t
 C62xCMPLT_SC5_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
+                        uint32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int64_t ra   = C6XSC5_TO_S64(constant);
-        int32_t rbh  = (int32_t) p_state->m_reg[idx_rbh];
-        int32_t rbl  = (int32_t) p_state->m_reg[idx_rbl];
-        int64_t rb   = C6X40_TO_S64(rbh, rbl);
-        uint32_t rd  = (uint32_t)(ra < rb);
+        int64_t ra  = C6XSC5_TO_S64(constant);
+        int32_t rbh = (int32_t) p_state->m_reg[idx_rbh];
+        int32_t rbl = (int32_t) p_state->m_reg[idx_rbl];
+        int64_t rb  = C6X40_TO_S64(rbh, rbl);
+        uint32_t rd = (uint32_t)(ra < rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1195,25 +1372,25 @@ C62xCMPLTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
 ReturnStatus_t
 C62xCMPLTU_UC4_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+                         uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ucst4 = (uint16_t) constant & 0xF;
-        uint32_t rb    = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t rd    = (uint32_t)(ucst4 < rb);
+        uint32_t ra = constant;
+        uint32_t rb = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t rd = (uint32_t)(ra < rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPLTU    0x%x,%s,%s\n",
-                Get_DSP_PC(p_state), ucst4, REG(idx_rb), REG(idx_rd));
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
 }
 
 ReturnStatus_t
 C62xCMPLTU_UR32_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint16_t idx_ra, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
+                          uint16_t idx_ra, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
@@ -1233,20 +1410,20 @@ C62xCMPLTU_UR32_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
 ReturnStatus_t
 C62xCMPLTU_UC4_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        int32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
+                        uint32_t constant,  uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ucst4 = (uint16_t) constant & 0xF;
-        uint32_t rbh   = (uint32_t) p_state->m_reg[idx_rbh];
-        uint32_t rbl   = (uint32_t) p_state->m_reg[idx_rbl];
-        uint64_t rb    = C6X40_TO_U64(rbh, rbl);
-        uint32_t rd    = (uint32_t)(ucst4 > rb);
+        uint32_t ra  = constant;
+        uint32_t rbh = (uint32_t) p_state->m_reg[idx_rbh];
+        uint32_t rbl = (uint32_t) p_state->m_reg[idx_rbl];
+        uint64_t rb  = C6X40_TO_U64(rbh, rbl);
+        uint32_t rd  = (uint32_t)(ra > rb);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
         TRACE_PRINT("%08x\tCMPLTU    0x%x,%s:%s,%s\n",
-                Get_DSP_PC(p_state), ucst4, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
+                Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
 }
@@ -1256,15 +1433,15 @@ ReturnStatus_t
 C62xEXT_UR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "Test This Instruction !!!");
+    TEST_AGAIN();
 
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
-        int32_t  rb   = (int32_t) p_state->m_reg[idx_rb];
+        int32_t ra    = (int32_t) p_state->m_reg[idx_ra];
+        int32_t rb    = (int32_t) p_state->m_reg[idx_rb];
 
-        uint16_t csta = (uint16_t) (rb & 0x3E0) >> 5;   /* bits 5 to 9 */
-        uint16_t cstb = (uint16_t) rb & 0x1F;           /* bits 0 to 4 */
+        uint16_t csta = GET_BITS_5_TO_9(rb);
+        uint16_t cstb = GET_BITS_0_TO_4(rb);
 
         int32_t rd    = (ra << csta) >> cstb;
 
@@ -1278,9 +1455,9 @@ C62xEXT_UR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
 ReturnStatus_t
 C62xEXT_SR32_UC5_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint16_t idx_ra, int32_t constanta, int32_t constantb, uint16_t idx_rd, uint8_t delay)
+                        uint16_t idx_ra, uint32_t constanta, uint32_t constantb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "Test This Instruction !!!");
+    TEST_AGAIN();
 
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
@@ -1304,15 +1481,15 @@ ReturnStatus_t
 C62xEXTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "Test This Instruction !!!");
+    TEST_AGAIN();
 
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
 
-        uint16_t csta = (uint16_t) (rb & 0x3E0) >> 5;   /* bits 5 to 9 */
-        uint16_t cstb = (uint16_t) rb & 0x1F;           /* bits 0 to 4 */
+        uint16_t csta = GET_BITS_5_TO_9(rb);
+        uint16_t cstb = GET_BITS_0_TO_4(rb);
 
         uint32_t rd   = (ra << csta) >> cstb;
 
@@ -1326,9 +1503,9 @@ C62xEXTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
 ReturnStatus_t
 C62xEXTU_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint16_t idx_ra, int32_t constanta, int32_t constantb, uint16_t idx_rd, uint8_t delay)
+                        uint16_t idx_ra, uint32_t constanta, uint32_t constantb, uint16_t idx_rd, uint8_t delay)
 {
-    ASSERT(1, "Test This Instruction !!!");
+    TEST_AGAIN();
 
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
@@ -1348,6 +1525,11 @@ C62xEXTU_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 }
 
 /// IDLE - Multi-cycle NOP with no termination until Interrupt.
+/*
+ * Performs an infinite multicycle NOP that terminates upon servicing an
+ * interrupt, or a branch occurs due to an IDLE instruction being in the delay slots
+ * of a branch.
+ */
 ReturnStatus_t
 C62xIDLE(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc, uint8_t delay)
 {
@@ -1405,7 +1587,7 @@ int8_t * FindMemoryAddress(C62x_DSPState_t * p_state, uint32_t base_reg, uint16_
             break;
 
         default:
-            ASSERT(0, "Unknown Addressing Mode");
+            ASSERT(1, "Unknown Addressing Mode");
     }
 
     return (ptr);
@@ -1419,10 +1601,10 @@ C62xLDB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t ra  = (uint32_t) p_state->m_reg[idx_ra];
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1430,11 +1612,7 @@ C62xLDB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int8_t *) ptr);
-
-        if(0x80 & rd) // Need Sign Extension ?
-            rd = rd | 0xFFFFFF00;
-        else
-            rd = rd & 0x000000FF;
+        rd = S8_TO_S32(rd); // Do Sign Extension
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1450,9 +1628,9 @@ C62xLDB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1460,11 +1638,7 @@ C62xLDB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int8_t *) ptr);
-
-        if(0x80 & rd) // Need Sign Extension ?
-            rd = rd | 0xFFFFFF00;
-        else
-            rd = rd & 0x000000FF;
+        rd = S8_TO_S32(rd); // Do Sign Extension
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1480,9 +1654,9 @@ C62xLDB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1490,11 +1664,7 @@ C62xLDB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int8_t *) ptr);
-
-        if(0x80 & rd) // Need Sign Extension ?
-            rd = rd | 0xFFFFFF00;
-        else
-            rd = rd & 0x000000FF;
+        rd = S8_TO_S32(rd); // Do Sign Extension
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1511,10 +1681,10 @@ C62xLDBU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t ra  = (uint32_t) p_state->m_reg[idx_ra];
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1522,7 +1692,6 @@ C62xLDBU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int8_t *) ptr);
-        rd = rd & 0x000000FF;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1538,9 +1707,9 @@ C62xLDBU_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1548,7 +1717,6 @@ C62xLDBU_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int8_t *) ptr);
-        rd = rd & 0x000000FF;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1564,9 +1732,9 @@ C62xLDBU_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1574,7 +1742,6 @@ C62xLDBU_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int8_t *) ptr);
-        rd = rd & 0x000000FF;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1592,10 +1759,10 @@ C62xLDH_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t ra  = (uint32_t) p_state->m_reg[idx_ra];
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1603,11 +1770,7 @@ C62xLDH_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int16_t *) ptr);
-
-        if(0x8000 & rd) // Need Sign Extension ?
-            rd = rd | 0xFFFF0000;
-        else
-            rd = rd & 0x0000FFFF;
+        rd = S16_TO_S32(rd); // Do Sign Extension
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1623,9 +1786,9 @@ C62xLDH_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1633,11 +1796,7 @@ C62xLDH_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int16_t *) ptr);
-
-        if(0x8000 & rd) // Need Sign Extension ?
-            rd = rd | 0xFFFF0000;
-        else
-            rd = rd & 0x0000FFFF;
+        rd = S16_TO_S32(rd); // Do Sign Extension
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1653,9 +1812,9 @@ C62xLDH_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1663,11 +1822,7 @@ C62xLDH_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int16_t *) ptr);
-
-        if(0x8000 & rd) // Need Sign Extension ?
-            rd = rd | 0xFFFF0000;
-        else
-            rd = rd & 0x0000FFFF;
+        rd = S16_TO_S32(rd); // Do Sign Extension
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1685,10 +1840,10 @@ C62xLDHU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t ra  = (uint32_t) p_state->m_reg[idx_ra];
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1696,7 +1851,6 @@ C62xLDHU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int16_t *) ptr);
-        rd = rd & 0x0000FFFF;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1712,9 +1866,9 @@ C62xLDHU_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1722,7 +1876,6 @@ C62xLDHU_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int16_t *) ptr);
-        rd = rd & 0x0000FFFF;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1738,9 +1891,9 @@ C62xLDHU_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1748,7 +1901,6 @@ C62xLDHU_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         // Now we should have a valid address (mode-wise).
         rd = * ((int16_t *) ptr);
-        rd = rd & 0x0000FFFF;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -1766,10 +1918,10 @@ C62xLDW_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t ra  = (uint32_t) p_state->m_reg[idx_ra];
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1792,9 +1944,9 @@ C62xLDW_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1817,9 +1969,9 @@ C62xLDW_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
-        uint32_t rd   = 0x0;
+        uint32_t rb  = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
+        uint32_t rd  = 0x0;
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -1837,6 +1989,42 @@ C62xLDW_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 }
 
 /// LMBD - Left Most Bit Detection
+/*
+ * The LSB of the src1 operand determines whether to search for a leftmost 1 or 0
+ * in src2. The number of bits to the left of the first 1 or 0 when searching for a 1
+ * or 0, respectively, is placed in dst.
+ */
+ReturnStatus_t
+C62xLMBD_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
+        uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
+        uint32_t rd   = 0x0;
+        uint32_t detect_one = ra & 0x1; /* What are we searching for 0 or 1 */
+        uint32_t mask = 0x80000000;
+
+        if(!detect_one)
+            rb = ~rb;  /* Invert bits; So we always look for the left most 1 bit */
+
+        TRACE_PRINT("detect_one = %d\n", detect_one);
+
+        while(!(mask & rb) && mask)
+        {
+            rd++; mask >>= 1;
+            TRACE_PRINT("rd = %2d, mask = 0x%08X\n", rd, mask);
+        }
+
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+
+        TRACE_PRINT("%08x\tLMBD      %s,%s,%s\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+    }
+    return OK;
+}
+
 ReturnStatus_t
 C62xLMBD_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                        uint32_t constant, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
@@ -1873,8 +2061,8 @@ C62xMPY_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t) p_state->m_reg[idx_ra];
-        int16_t rb = (int16_t) p_state->m_reg[idx_rb];
+        int16_t ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        int16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -1892,8 +2080,8 @@ C62xMPY_SC5_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t) ((constant & 0x10) ? (constant | 0xFFE0) : (constant & 0x1F));
-        int16_t rb = (int16_t) p_state->m_reg[idx_rb];
+        int16_t ra = C6XSC5_TO_S16(constant);
+        int16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -1911,8 +2099,8 @@ C62xMPYH_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t) (p_state->m_reg[idx_ra] >> 16);
-        int16_t rb = (int16_t) (p_state->m_reg[idx_rb] >> 16);
+        int16_t ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        int16_t rb = GET_MSB16(p_state->m_reg[idx_rb]);
         int32_t rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -1930,8 +2118,8 @@ C62xMPYHL_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t) (p_state->m_reg[idx_ra] >> 16);
-        int16_t rb = (int16_t)  p_state->m_reg[idx_rb];
+        int16_t ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        int16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -1949,8 +2137,8 @@ C62xMPYHLU_UR16_UR16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ra = (uint16_t) (p_state->m_reg[idx_ra] >> 16);
-        uint16_t rb = (uint16_t)  p_state->m_reg[idx_rb];
+        uint16_t ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        uint16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         uint32_t rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -1968,8 +2156,8 @@ C62xMPYHSLU_SR16_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t  ra = (int16_t) (p_state->m_reg[idx_ra] >> 16);
-        uint16_t rb = (uint16_t) p_state->m_reg[idx_rb];
+        int16_t  ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        uint16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -1987,8 +2175,8 @@ C62xMPYHSU_SR16_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t  ra = (int16_t)  (p_state->m_reg[idx_ra] >> 16);
-        uint16_t rb = (uint16_t) (p_state->m_reg[idx_rb] >> 16);
+        int16_t  ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        uint16_t rb = GET_MSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2006,8 +2194,8 @@ C62xMPYHU_UR16_UR16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ra = (uint16_t) (p_state->m_reg[idx_ra] >> 16);
-        uint16_t rb = (uint16_t) (p_state->m_reg[idx_rb] >> 16);
+        uint16_t ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        uint16_t rb = GET_MSB16(p_state->m_reg[idx_rb]);
         uint32_t rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2025,8 +2213,8 @@ C62xMPYHULS_UR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ra = (uint16_t) (p_state->m_reg[idx_ra] >> 16);
-        int16_t  rb = (int16_t)   p_state->m_reg[idx_rb];
+        uint16_t ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        int16_t  rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2044,8 +2232,8 @@ C62xMPYHUS_UR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ra = (uint16_t) (p_state->m_reg[idx_ra] >> 16);
-        int16_t  rb = (int16_t)  (p_state->m_reg[idx_rb] >> 16);
+        uint16_t ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        int16_t  rb = GET_MSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2063,8 +2251,8 @@ C62xMPYLH_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t  ra = (int16_t)  p_state->m_reg[idx_ra];
-        int16_t  rb = (int16_t) (p_state->m_reg[idx_rb] >> 16);
+        int16_t  ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        int16_t  rb = GET_MSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2082,8 +2270,8 @@ C62xMPYLHU_UR16_UR16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ra = (uint16_t)  p_state->m_reg[idx_ra];
-        uint16_t rb = (uint16_t) (p_state->m_reg[idx_rb] >> 16);
+        uint16_t ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        uint16_t rb = GET_MSB16(p_state->m_reg[idx_rb]);
         uint32_t rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2101,8 +2289,8 @@ C62xMPYLSHU_SR16_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t  ra = (int16_t)   p_state->m_reg[idx_ra];
-        uint16_t rb = (uint16_t) (p_state->m_reg[idx_rb] >> 16);
+        int16_t  ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        uint16_t rb = GET_MSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2120,8 +2308,8 @@ C62xMPYLUHS_UR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ra = (uint16_t) p_state->m_reg[idx_ra];
-        int16_t  rb = (int16_t) (p_state->m_reg[idx_rb] >> 16);
+        uint16_t ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        int16_t  rb = GET_MSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2139,8 +2327,8 @@ C62xMPYSU_SR16_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t  ra = (int16_t)  p_state->m_reg[idx_ra];
-        uint16_t rb = (uint16_t) p_state->m_reg[idx_rb];
+        int16_t  ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        uint16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2158,8 +2346,8 @@ C62xMPYSU_SC5_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t  ra = (int16_t) ((constant & 0x10) ? (constant | 0xFFE0) : (constant & 0x1F));
-        uint16_t rb = (uint16_t) p_state->m_reg[idx_rb];
+        int16_t  ra = C6XSC5_TO_S16(constant);
+        uint16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2177,8 +2365,8 @@ C62xMPYU_UR16_UR16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ra = (uint16_t) p_state->m_reg[idx_ra];
-        uint16_t rb = (uint16_t) p_state->m_reg[idx_rb];
+        uint16_t ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        uint16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         uint32_t rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2196,8 +2384,8 @@ C62xMPYUS_UR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint16_t ra = (uint16_t) p_state->m_reg[idx_ra];
-        int16_t  rb = (int16_t)  p_state->m_reg[idx_rb];
+        uint16_t ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        int16_t  rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t  rd = ra * rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -2293,16 +2481,11 @@ C62xMVC_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
 ReturnStatus_t
 C62xMVK_SC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                  int32_t constant, uint16_t idx_rd, uint8_t delay)
+                  uint32_t constant, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        if(constant & 0x8000)
-            constant |= 0xFFFF0000;
-        else
-            constant &= 0x0000FFFF;
-
-        int32_t rd = constant;
+        int32_t rd = S16_TO_S32(constant);
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -2314,7 +2497,7 @@ C62xMVK_SC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
 ReturnStatus_t
 C62xMVKH_UC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                   int32_t constant, uint16_t idx_rd, uint8_t delay)
+                   uint32_t constant, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
@@ -2332,7 +2515,7 @@ C62xMVKH_UC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, 
 
 ReturnStatus_t
 C62xMVKLH_UC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                   int32_t constant, uint16_t idx_rd, uint8_t delay)
+                   uint32_t constant, uint16_t idx_rd, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
@@ -2381,6 +2564,41 @@ C62xNEG_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
         EnQ_Delay_Reg(p_state, idx_rdl, (uint32_t) rdl, delay);
 
         TRACE_PRINT("%08x\tNEG       %s:%s,%s:%s\n", Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rdh), REG(idx_rdl));
+    }
+    return OK;
+}
+
+/// NOP - No Operation
+/*
+ * src is encoded as count - 1. For src + 1 cycles, no operation is performed. The
+ * maximum value for count is 9. NOP with no operand is treated like NOP 1 with
+ * src encoded as 0000.
+ * A multicycle NOP will not finish if a branch is completed first. For example, if
+ * a branch is initiated on cycle n and a NOP 5 instruction is initiated on cycle
+ * n + 3, the branch is complete on cycle n + 6 and the NOP is executed only from
+ * cycle n + 3 to cycle n + 5. A single-cycle NOP in parallel with other instructions
+ * does not affect operation.
+ */
+ReturnStatus_t
+C62xNOP(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+        uint8_t delay)
+{
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        TRACE_PRINT("%08x\tNOP\n", Get_DSP_PC(p_state));
+    }
+    return OK;
+}
+
+ReturnStatus_t
+C62xNOP_UC4(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+            uint32_t constant, uint8_t delay)
+{
+    if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
+    {
+        TEST_AGAIN();
+
+        TRACE_PRINT("%08x\tNOP       0x%x\n", Get_DSP_PC(p_state), constant);
     }
     return OK;
 }
@@ -2547,7 +2765,8 @@ ReturnStatus_t
 C62xSADD_SR32_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
 {
-    ASSERT(1, "Test this instruction again");
+    TEST_AGAIN();
+
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
@@ -2556,9 +2775,7 @@ C62xSADD_SR32_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         int32_t sflag = 0;
 
         int64_t rb  = C6X40_TO_S64(rbh, rbl);
-
         int64_t rd  = ra + rb;
-        rd          = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));  // Should not need this ???
 
         if((ra > 0) && (rb > 0) && (rd < 0))
         {
@@ -2632,7 +2849,8 @@ ReturnStatus_t
 C62xSADD_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                        uint32_t constant, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
 {
-    ASSERT(1, "Test Again");
+    TEST_AGAIN();
+
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int64_t ra    = C6XSC5_TO_S64(constant);
@@ -2641,9 +2859,7 @@ C62xSADD_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         int32_t sflag = 0;
 
         int64_t rb    = C6X40_TO_S64(rbh, rbl);
-
-        int64_t rd = ra + rb;
-        rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));
+        int64_t rd    = ra + rb;
 
         if((ra > 0) && (rb > 0) && (rd < 0))
         {
@@ -2774,14 +2990,13 @@ C62xSET_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
 
-        uint16_t csta = (uint16_t) (rb & 0x3E0) >> 5;   /* bits 5 to 9 */
-        uint16_t cstb = (uint16_t) rb & 0x1F;           /* bits 0 to 4 */
+        uint16_t csta = GET_BITS_5_TO_9(rb);
+        uint16_t cstb = GET_BITS_0_TO_4(rb);
 
         uint32_t rd = 0x0;
 
         if(cstb < csta)
         {
-            TRACE_PRINT("(cstb < csta) ==> (%d < %d), rb = 0x%08X\n", cstb, csta, rb);
             rd = ra;
         }
         else
@@ -2823,7 +3038,7 @@ C62xSHL_SR32_UR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra     = (int32_t) p_state->m_reg[idx_ra];
-        int32_t shift  = (int32_t) p_state->m_reg[idx_rb] & 0x3F;
+        int32_t shift  = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
         ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
 
@@ -2845,7 +3060,7 @@ C62xSHL_SR40_UR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     {
         uint32_t rah   = (uint32_t) p_state->m_reg[idx_rah];
         uint32_t ral   = (uint32_t) p_state->m_reg[idx_ral];
-        int32_t shift  = (int32_t)  p_state->m_reg[idx_rb] & 0x3F;
+        int32_t shift  = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
         ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
@@ -2871,7 +3086,7 @@ C62xSHL_UR32_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint64_t ra    = (uint64_t) p_state->m_reg[idx_ra];
-        int32_t shift  = (int32_t)  p_state->m_reg[idx_rb] & 0x3F;
+        int32_t shift  = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
         ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
@@ -2896,7 +3111,7 @@ C62xSHL_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra    = (int32_t) p_state->m_reg[idx_ra];
-        uint8_t shift = constant & 0x1F;
+        int32_t shift = constant & 0x1F;
 
         int32_t rd    = ra << shift;
 
@@ -2940,7 +3155,7 @@ C62xSHL_UR32_UC5_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint64_t ra    = (uint64_t) p_state->m_reg[idx_ra];
-        uint8_t shift  = constant & 0x1F;
+        uint32_t shift = constant & 0x1F;
 
         uint64_t rd    = ra << shift;
 
@@ -2971,12 +3186,12 @@ C62xSHR_SR32_UR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra     = (int32_t) p_state->m_reg[idx_ra];
-        int32_t shift  = (int32_t) p_state->m_reg[idx_rb] & 0x3F;
+        int32_t ra    = (int32_t) p_state->m_reg[idx_ra];
+        int32_t shift = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
         ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
 
-        int32_t rd     = ra >> shift;
+        int32_t rd    = ra >> shift;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -2994,7 +3209,7 @@ C62xSHR_SR40_UR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     {
         int32_t rah    = (int32_t) p_state->m_reg[idx_rah];
         int32_t ral    = (int32_t) p_state->m_reg[idx_ral];
-        int32_t shift  = (int32_t) p_state->m_reg[idx_rb] & 0x3F;
+        int32_t shift  = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
         ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
@@ -3020,7 +3235,7 @@ C62xSHR_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra    = (int32_t) p_state->m_reg[idx_ra];
-        int8_t shift  = constant & 0x1F;
+        int32_t shift = constant & 0x1F;
 
         int32_t rd    = ra >> shift;
 
@@ -3040,7 +3255,7 @@ C62xSHR_SR40_UC5_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     {
         int32_t rah    = (int32_t) p_state->m_reg[idx_rah];
         int32_t ral    = (int32_t) p_state->m_reg[idx_ral];
-        uint8_t shift  = constant & 0x1F;
+        uint32_t shift = constant & 0x1F;
 
         int64_t ra     = C6X40_TO_S64(rah, ral);
         int64_t rd     = ra >> shift;
@@ -3074,7 +3289,7 @@ C62xSHRU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra    = (uint32_t) p_state->m_reg[idx_ra];
-        uint32_t shift = (uint32_t) p_state->m_reg[idx_rb] & 0x3F;
+        uint32_t shift = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
         ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
 
@@ -3096,7 +3311,7 @@ C62xSHRU_UR40_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
     {
         uint32_t rah   = (uint32_t) p_state->m_reg[idx_rah];
         uint32_t ral   = (uint32_t) p_state->m_reg[idx_ral];
-        uint32_t shift = (uint32_t) p_state->m_reg[idx_rb] & 0x3F;
+        uint32_t shift = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
         ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
@@ -3121,10 +3336,10 @@ C62xSHRU_UR32_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
-        uint8_t shift = constant & 0x1F;
+        uint32_t ra    = (uint32_t) p_state->m_reg[idx_ra];
+        uint32_t shift = constant & 0x1F;
 
-        uint32_t rd   = ra >> shift;
+        uint32_t rd    = ra >> shift;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
 
@@ -3142,7 +3357,7 @@ C62xSHRU_UR40_UC5_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     {
         uint32_t rah   = (uint32_t) p_state->m_reg[idx_rah];
         uint32_t ral   = (uint32_t) p_state->m_reg[idx_ral];
-        uint8_t shift  = constant & 0x1F;
+        uint32_t shift = constant & 0x1F;
 
         uint64_t ra    = C6X40_TO_U64(rah, ral);
         uint64_t rd    = ra >> shift;
@@ -3173,8 +3388,8 @@ C62xSMPY_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t) p_state->m_reg[idx_ra];
-        int16_t rb = (int16_t) p_state->m_reg[idx_rb];
+        int16_t ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        int16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t sflag = 0;
 
         int32_t rd = (ra * rb) << 1;
@@ -3206,8 +3421,8 @@ C62xSMPYH_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t) (p_state->m_reg[idx_ra] >> 16);
-        int16_t rb = (int16_t) (p_state->m_reg[idx_rb] >> 16);
+        int16_t ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        int16_t rb = GET_MSB16(p_state->m_reg[idx_rb]);
         int32_t sflag = 0;
 
         int32_t rd = (ra * rb) << 1;
@@ -3239,8 +3454,8 @@ C62xSMPYHL_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t) (p_state->m_reg[idx_ra] >> 16);
-        int16_t rb = (int16_t)  p_state->m_reg[idx_rb];
+        int16_t ra = GET_MSB16(p_state->m_reg[idx_ra]);
+        int16_t rb = GET_LSB16(p_state->m_reg[idx_rb]);
         int32_t sflag = 0;
 
         int32_t rd = (ra * rb) << 1;
@@ -3272,8 +3487,8 @@ C62xSMPYLH_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int16_t ra = (int16_t)  p_state->m_reg[idx_ra];
-        int16_t rb = (int16_t) (p_state->m_reg[idx_rb] >> 16);
+        int16_t ra = GET_LSB16(p_state->m_reg[idx_ra]);
+        int16_t rb = GET_MSB16(p_state->m_reg[idx_rb]);
         int32_t sflag = 0;
 
         int32_t rd = (ra * rb) << 1;
@@ -3500,7 +3715,8 @@ ReturnStatus_t
 C62xSSUB_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                        uint32_t constant, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
 {
-    ASSERT(1, "Test Again");
+    TEST_AGAIN();
+
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int64_t ra    = C6XSC5_TO_S64(constant);
@@ -3509,9 +3725,7 @@ C62xSSUB_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         int32_t sflag = 0;
 
         int64_t rb = C6X40_TO_S64(rbh, rbl);
-
         int64_t rd = ra - rb;
-        rd         = ((rd & 0x8000000000) ? (rd | 0xFFFFFF0000000000) : (rd & 0x000000FFFFFFFFFF));  /// ???? 
 
         if((ra < 0) && (rb > 0) && (rd > 0))
         {
@@ -3542,6 +3756,7 @@ C62xSSUB_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     }
     return OK;
 }
+
 /*  For SSUB
     constant = 0x1E; // -2; With -1 we will still remain in range
     p_state->m_reg[idx_rbh] = 0x7F;
@@ -3558,8 +3773,8 @@ C62xSTB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     {
         uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3570,7 +3785,6 @@ C62xSTB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if(EnQ_MWB(p_state, MWB_BYTE, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTB       %s,%s,%s\n",
@@ -3586,8 +3800,8 @@ C62xSTB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3598,7 +3812,6 @@ C62xSTB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
         if(EnQ_MWB(p_state, MWB_BYTE, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\n",
@@ -3614,8 +3827,8 @@ C62xSTB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3626,7 +3839,6 @@ C62xSTB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if(EnQ_MWB(p_state, MWB_BYTE, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\n",
@@ -3644,8 +3856,8 @@ C62xSTH_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     {
         uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3656,7 +3868,6 @@ C62xSTH_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if(EnQ_MWB(p_state, MWB_HWORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTH       %s,%s,%s\n",
@@ -3672,8 +3883,8 @@ C62xSTH_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3684,7 +3895,6 @@ C62xSTH_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
         if(EnQ_MWB(p_state, MWB_HWORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTH       0x%x,%s,%s\n",
@@ -3700,8 +3910,8 @@ C62xSTH_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3712,7 +3922,6 @@ C62xSTH_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if(EnQ_MWB(p_state, MWB_HWORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTH       0x%x,%s,%s\n",
@@ -3730,8 +3939,8 @@ C62xSTW_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     {
         uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3742,7 +3951,6 @@ C62xSTW_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if(EnQ_MWB(p_state, MWB_WORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTW       %s,%s,%s\n",
@@ -3758,8 +3966,8 @@ C62xSTW_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3770,7 +3978,6 @@ C62xSTW_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
         if(EnQ_MWB(p_state, MWB_WORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTW       0x%x,%s,%s\n",
@@ -3786,8 +3993,8 @@ C62xSTW_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t rb   = (uint32_t) p_state->m_reg[idx_rb];
-        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
         uint32_t src  = (uint32_t) p_state->m_reg[idx_rd];
+        uint32_t amr  = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
@@ -3798,7 +4005,6 @@ C62xSTW_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if(EnQ_MWB(p_state, MWB_WORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
-           return (ERROR);
         }
 
         TRACE_PRINT("%08x\tSTW       0x%x,%s,%s\n",
@@ -3916,7 +4122,7 @@ C62xSUB_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
-        uint8_t rb  = (uint8_t) (constant & 0x1F);
+        uint32_t rb = (uint32_t) constant & 0x1F;
         int32_t rd  = ra - rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -3935,9 +4141,8 @@ C62xSUB_SR40_SC5_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
     {
         int32_t rah = (int32_t) p_state->m_reg[idx_rah];
         int32_t ral = (int32_t) p_state->m_reg[idx_ral];
-        int64_t rb  = C6XSC5_TO_S64(constant);
-
         int64_t ra  = C6X40_TO_S64(rah, ral);
+        int64_t rb  = C6XSC5_TO_S64(constant);
 
         int64_t rd  = ra - rb;
 
@@ -3983,7 +4188,7 @@ C62xSUBAB_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
-        uint8_t rb   = (int8_t) constant & 0x1F;
+        uint32_t rb  = constant & 0x1F;
         uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
@@ -4028,7 +4233,7 @@ C62xSUBAH_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
-        uint8_t rb   = (int8_t) constant & 0x1F;
+        uint32_t rb  = constant & 0x1F;
         uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
@@ -4072,8 +4277,8 @@ C62xSUBAW_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra   = (int32_t) p_state->m_reg[idx_ra];
-        uint8_t rb   = (int8_t) constant & 0x1F;
+        int32_t  ra  = (int32_t) p_state->m_reg[idx_ra];
+        uint32_t rb  = constant & 0x1F;
         uint32_t amr = (uint32_t) p_state->m_reg[REG_AMR_INDEX];
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
@@ -4130,7 +4335,7 @@ C62xSUBU_UR32_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         uint32_t rb = (uint32_t) p_state->m_reg[idx_rb];
 
         uint64_t rd = ra - rb;
-        
+
         uint32_t rdh = U64_TO_C6XMSB12(rd);
         uint32_t rdl = U64_TO_C6XLSB32(rd);
 
@@ -4160,10 +4365,10 @@ C62xSUB2_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         uint32_t ra = (int32_t) p_state->m_reg[idx_ra];
         uint32_t rb = (int32_t) p_state->m_reg[idx_rb];
 
-        uint16_t rah = ra >> 16;
-        uint16_t ral = ra & 0xFFFF;
-        uint16_t rbh = rb >> 16;
-        uint16_t rbl = rb & 0xFFFF;
+        uint16_t rah = GET_MSB16(ra);
+        uint16_t ral = GET_LSB16(ra);
+        uint16_t rbh = GET_MSB16(rb);
+        uint16_t rbl = GET_LSB16(rb);
 
         uint32_t rd = ((rah - rbh) << 16) | (ral - rbl);
 
@@ -4223,9 +4428,7 @@ C62xZERO_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint1
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t rd = 0x0;
-
-        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
+        EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) 0x0, delay);
 
         TRACE_PRINT("%08x\tZERO      %s\n", Get_DSP_PC(p_state), REG(idx_rd));
     }
@@ -4238,11 +4441,8 @@ C62xZERO_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint1
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t rdh = 0x0;
-        int32_t rdl = 0x0;
-
-        EnQ_Delay_Reg(p_state, idx_rdh, (uint32_t) rdh, delay);
-        EnQ_Delay_Reg(p_state, idx_rdl, (uint32_t) rdl, delay);
+        EnQ_Delay_Reg(p_state, idx_rdh, (uint32_t) 0x0, delay);
+        EnQ_Delay_Reg(p_state, idx_rdl, (uint32_t) 0x0, delay);
 
         TRACE_PRINT("%08x\tZERO      %s:%s\n", Get_DSP_PC(p_state), REG(idx_rdh), REG(idx_rdl));
     }

@@ -1361,7 +1361,8 @@ namespace native
 
         int32_t scst21 = (((instr >> 7) & 0x001fffff) << 11) >> 11;
         scst21         = (scst21 << 2) + packet_address;
-        scst21         = scst21 & 0x7fffff;              // Discard bits higher than 23rd bit.
+        //scst21         = (scst21 & 0x7fffff);    // Discard bits higher than 23rd bit
+        scst21         = scst21 >> 2;    // Convert to 21 bits again.
 
         switch(dec_instr->GetOpcode())
         {
@@ -1664,31 +1665,21 @@ namespace native
             }
             break;
 
+            case 0x32 :
+            {
+                /*ADDAB Add Byte with Addressing ucst5, sint, sint; {+baseR[offset], dst}*/
+                C62xOperand * src1_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc2());
+                C62xOperand * src2_opr = new C62xConstant(false, 5, dh->GetUIntConst1());
+                C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
+                dec_instr_eu = new C62xADDABInstr(dec_instr, dest_reg, src1_opr, src2_opr);
+            }
+            break;
+
             case 0x34 :
             {
                 /*ADDAH Add Byte with Addressing sint, sint, sint; {+baseR[offsetR], dst}*/
                 C62xOperand * src1_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc2());
                 C62xOperand * src2_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc1());
-                C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
-                dec_instr_eu = new C62xADDAHInstr(dec_instr, dest_reg, src1_opr, src2_opr);
-            }
-            break;
-
-            case 0x38 :
-            {
-                /*ADDAW Add Byte with Addressing sint, sint, sint; {+baseR[offsetR], dst}*/
-                C62xOperand * src1_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc2());
-                C62xOperand * src2_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc1());
-                C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
-                dec_instr_eu = new C62xADDAWInstr(dec_instr, dest_reg, src1_opr, src2_opr);
-            }
-            break;
-
-            case 0x32 :
-            {
-                /*ADDAB Add Byte with Addressing ucsut5, sint, sint; {+baseR[offset], dst}*/
-                C62xOperand * src1_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc2());
-                C62xOperand * src2_opr = new C62xConstant(false, 5, dh->GetUIntConst1());
                 C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
                 dec_instr_eu = new C62xADDAHInstr(dec_instr, dest_reg, src1_opr, src2_opr);
             }
@@ -1701,6 +1692,16 @@ namespace native
                 C62xOperand * src2_opr = new C62xConstant(false, 5, dh->GetUIntConst1());
                 C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
                 dec_instr_eu = new C62xADDAHInstr(dec_instr, dest_reg, src1_opr, src2_opr);
+            }
+            break;
+
+            case 0x38 :
+            {
+                /*ADDAW Add Byte with Addressing sint, sint, sint; {+baseR[offsetR], dst}*/
+                C62xOperand * src1_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc2());
+                C62xOperand * src2_opr = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetSrc1());
+                C62xOperand * dest_reg = new C62xRegister(true, 32, dh->GetDestBankId(), dh->GetDest());
+                dec_instr_eu = new C62xADDAWInstr(dec_instr, dest_reg, src1_opr, src2_opr);
             }
             break;
 
