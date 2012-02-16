@@ -66,7 +66,6 @@ else
 fi
 
 ln -sf ${TARGET_BIN_WRITER}/instructions.bin ${GENERATED_APP}/instructions.bin
-ln -sf /home/hamayun/examples/matmult/matmult.coff ${GENERATED_APP}/matmult.coff
 
 if [ "$1" = "kvm" ]; then
 print_step "Building Bootstrap(s) ... "
