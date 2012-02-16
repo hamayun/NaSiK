@@ -89,7 +89,7 @@ namespace native
 
         virtual string GetName() const
         {
-            std::string ep_name = "EP";
+            std::string ep_name = "EP_";
             std::stringstream addr_string;
 
             if(GetSize())

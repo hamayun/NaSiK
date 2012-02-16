@@ -87,7 +87,7 @@ namespace native
 
         llvm::PointerType       * p_proc_state_type;    // Pointer type to the Processor State. i.e. "Proc_State_t *"
         llvm::Value             * p_proc_state;         // Pointer to Processor State argument that is passed to the current function
-        llvm::Function          * p_increment_pc;
+        llvm::Function          * p_update_pc;
         llvm::Function          * p_get_pc;
         llvm::Function          * p_set_pc;
         llvm::Function          * p_inc_cycles;

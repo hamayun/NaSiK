@@ -84,18 +84,18 @@ namespace native
         AddOptimizationPasses(3);
 
         // TODO: Remove the following Hard-Coded Processor State Type
-        const Type * proc_state_type = p_out_module->getTypeByName("struct.C62x_Proc_State_t");
+        const Type * proc_state_type = p_out_module->getTypeByName("struct.C62x_DSPState_t");
         ASSERT(proc_state_type, "Could Not Get Processor State Type from Module");
 
         p_proc_state_type = llvm::PointerType::getUnqual(proc_state_type);
         ASSERT(proc_state_type, "Could Not Get Processor State Type Pointer");
 
         // Some common Processor State Manipulation Functions
-        p_increment_pc = p_out_module->getFunction("IncrementPC"); ASSERT(p_increment_pc, "Could Not Get IncrementPC");
-        p_get_pc       = p_out_module->getFunction("GetPC"); ASSERT(p_get_pc, "Could Not Get GetPC");
-        p_set_pc       = p_out_module->getFunction("SetPC"); ASSERT(p_set_pc, "Could Not Get SetPC");
-        p_inc_cycles   = p_out_module->getFunction("IncrementCycles"); ASSERT(p_inc_cycles, "Could Not Get IncrementCycles");
-        p_get_cycles   = p_out_module->getFunction("GetCycles"); ASSERT(p_get_cycles, "Could Not Get GetCycles");
+        p_update_pc    = p_out_module->getFunction("Update_PC"); ASSERT(p_update_pc, "Could Not Get Update_PC");
+        p_get_pc       = p_out_module->getFunction("Get_DSP_PC"); ASSERT(p_get_pc, "Could Not Get Get_DSP_PC");
+        p_set_pc       = p_out_module->getFunction("Set_DSP_PC"); ASSERT(p_set_pc, "Could Not Get Set_DSP_PC");
+        p_inc_cycles   = p_out_module->getFunction("Inc_DSP_Cycles"); ASSERT(p_inc_cycles, "Could Not Get Inc_DSP_Cycles");
+        p_get_cycles   = p_out_module->getFunction("Get_DSP_Cycles"); ASSERT(p_get_cycles, "Could Not Get Get_DSP_Cycles");
     }
 
     tool_output_file * LLVMGenerator :: GetOutputStream(const char *FileName)
@@ -143,8 +143,8 @@ namespace native
 
         // Add an instruction that returns if the PC update is indicated by the above function call;
         //GetIRBuilder().CreateICmpEQ(pc_updated, Geti1Value(1), "");
-        //CreateCallByName("ShowProcessorState");
-        CreateCallByName("UpdateMemory");
+        //CreateCallByName("Print_DSP_State");
+        CreateCallByName("Do_Memory_Writebacks");
 
         exec_packet->ResetInstrIterator();
 
@@ -157,15 +157,15 @@ namespace native
 #ifdef FUNC_CALL_ERROR_CHECK
             ASSERT(func_value, "Error: In Creating Function Call");
 #endif
-            //CreateCallByName("ShowProcessorState");
+            //CreateCallByName("Print_DSP_State");
         }
 
-        CreateCallByName("ShowProcessorState");
+        CreateCallByName("Print_DSP_State");
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
-        GetIRBuilder().CreateCall2(p_increment_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
+        GetIRBuilder().CreateCall2(p_update_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
         GetIRBuilder().CreateCall(p_inc_cycles, p_proc_state);
-        pc_updated = CreateCallByName("UpdateRegisters");
+        pc_updated = CreateCallByName("Update_Registers");
         return (0);
     }
 
@@ -178,7 +178,7 @@ namespace native
 
         SetCurrentFunction(function);
         GetIRBuilder().SetInsertPoint(gen_block);
-        CreateCallByName("InitProcessorState");
+        CreateCallByName("Init_DSP_State");
         //GetIRBuilder().CreateCall2(p_set_pc, p_proc_state, Geti32Value(0x100));
 
         for (uint32_t index = 0; index < input_bb->GetSize(); index++)
@@ -198,7 +198,7 @@ namespace native
                 switch(exec_packet->GetSpecialFlags())
                 {
                     case BRANCH_TAKEN:
-                        CreateCallByName("ShowProcessorState");
+                        CreateCallByName("Print_DSP_State");
                         GetIRBuilder().CreateRet(Geti32Value(0));
                         break;
                     case POSSIBLE_BRANCH:
@@ -219,7 +219,7 @@ namespace native
         Instruction        * instr         = NULL;
         DecodedInstruction * dec_instr     = NULL;
         llvm::Value        * pc_updated    = NULL;
-        string               function_name = "Simulate_" + exec_packet->GetName();
+        string               function_name = "Sim" + exec_packet->GetName();
 
         const Type * return_type = Type::getInt32Ty(GetContext());
         std::vector<const Type*> params;
@@ -228,18 +228,18 @@ namespace native
         llvm::Function     * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_out_module);
         llvm::BasicBlock   * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
 
-        INFO << "Function ... " << function_name << "(proc_state_t *)" << endl;
+        INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
 
         SetCurrentFunction(function);
         // Here we get the Processor State Pointer from the Currently Generating Function.
         // The Processor State is passed to the Generated Function as a pointer.
         Function::arg_iterator curr_gen_func_args = function->arg_begin();
         p_proc_state = curr_gen_func_args++;          // We know that its the only single parameter; but increment anyways
-        p_proc_state->setName("proc_state");
+        p_proc_state->setName("p_state");
 
         GetIRBuilder().SetInsertPoint(gen_block);
 
-        CreateCallByName("UpdateMemory");
+        CreateCallByName("Do_Memory_Writebacks");
 
         exec_packet->ResetInstrIterator();
         while((instr = exec_packet->GetNextInstruction()))
@@ -253,17 +253,17 @@ namespace native
 #endif
         }
 
-        CreateCallByName("ShowProcessorState");
+        CreateCallByName("Print_DSP_State");
 
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
-        INFO << "    Call to: " << "IncrementPC" << "(...)" << endl;
-        GetIRBuilder().CreateCall2(p_increment_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
+        INFO << "    Call to: " << "Update_PC" << "(...)" << endl;
+        GetIRBuilder().CreateCall2(p_update_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
 
-        INFO << "    Call to: " << "IncrementCycles" << "(...)" << endl;
+        INFO << "    Call to: " << "Inc_DSP_Cycles" << "(...)" << endl;
         GetIRBuilder().CreateCall(p_inc_cycles, p_proc_state);
 
-        pc_updated = CreateCallByName("UpdateRegisters");
+        pc_updated = CreateCallByName("Update_Registers");
         INFO << endl;
 
         GetIRBuilder().CreateRet(Geti32Value(0));

@@ -84,15 +84,15 @@ typedef struct C62x_MWB_Queue
     uint32_t                      m_is_empty;
 } C62x_MWB_Queue_t;
 
-typedef struct C62x_Processor_State
+typedef struct C62x_DSPState
 {
-    uint64_t                      m_curr_cpu_cycle;
+    uint64_t                      m_curr_cycle;
     uint32_t                    * p_pc;
-    uint32_t                      m_register[C62X_REG_BANKS * C62X_REGS_PER_BANK];
+    uint32_t                      m_reg[C62X_REG_BANKS * C62X_REGS_PER_BANK];
     C62x_Delay_Queue_t            m_delay_q[C62X_MAX_DELAY_SLOTS + 1];
     C62x_MWB_Queue_t              m_mwback_q[C62X_MAX_DELAY_SLOTS + 1];
-} C62x_Proc_State_t;
-/* LLVM Type ... { i64, i32*, [48 x i32], [6 x { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 }] } */
+} C62x_DSPState_t;
+/* LLVM Type ... { i64, i32*, [48 x i32], [6 x { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 } ... ] } */
 
 typedef enum ReturnStatus
 {
