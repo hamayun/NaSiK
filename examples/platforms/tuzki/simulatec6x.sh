@@ -67,7 +67,7 @@ fi
 
 ln -sf ${TARGET_BIN_WRITER}/instructions.bin ${GENERATED_APP}/instructions.bin
 
-if [ $1 = "kvm" ]; then
+if [ "$1" = "kvm" ]; then
 print_step "Building Bootstrap(s) ... "
 cd ${LIBKVM_HOME}/user
 make 
@@ -93,7 +93,7 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-if [ $1 = "kvm" ]; then
+if [ "$1" = "kvm" ]; then
 print_step "Compiling the LIBKVM"
 cd ${LIBKVM_HOME}
 ./configure --arch=i386 --prefix=${LIBKVM_PREFIX}

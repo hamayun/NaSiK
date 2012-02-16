@@ -22,6 +22,9 @@
 #include "C62xISABehavior.h"
 #include "stdio.h"
 
+char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
+                       "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
+
 char * REG(uint16_t idx)
 {
     /* In order to support multiple calls to this function

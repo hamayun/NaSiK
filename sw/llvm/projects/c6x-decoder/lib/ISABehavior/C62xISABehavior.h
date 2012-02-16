@@ -135,7 +135,4 @@ char BANKS[C62X_REG_BANKS];
 #define MAX_REG_PER_INSTR     10
 #define MAX_REG_NAME_LEN      3
 
-char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
-                       "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
-
 #endif	/* C62X_PROCESSOR_H */

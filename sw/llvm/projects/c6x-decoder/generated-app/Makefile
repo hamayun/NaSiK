@@ -15,8 +15,9 @@ LLVMDIS   = llvm-dis
 LD        = i386-pc-baremetal-gcc
 AS        = i386-pc-baremetal-as
 
-INCDIR    =-I/home/hamayun/workspace/NaSiK/sw/apes-components/KVMx86Processor/Headers/Public/
-INCDIR   +=-I/home/hamayun/workspace/NaSiK/sw/llvm/projects/c6x-decoder/lib/ISABehavior
+INCDIR    =-I${NASIK_HOME}/sw/apes-components/KVMx86Processor/Headers/Public/
+INCDIR   +=-I${C6XDEC_SOURCE}/lib/ISABehavior
+INCDIR   +=-I${C6XDEC_SOURCE}/include
 INCDIR   +=-I${TOOLCHAIN}/i386-pc-baremetal/include
 INCDIR   +=-I${TOOLCHAIN}/lib/gcc/i386-pc-baremetal/4.5.0/include
 
