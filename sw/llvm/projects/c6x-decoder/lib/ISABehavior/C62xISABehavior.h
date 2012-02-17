@@ -94,6 +94,12 @@ typedef struct C62x_DSPState
 } C62x_DSPState_t;
 /* LLVM Type ... { i64, i32*, [48 x i32], [6 x { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 } ... ] } */
 
+typedef struct address_entry
+{
+    uint32_t m_address;
+    int (*func_address)(C62x_DSPState_t * p_state);
+} address_entry_t;
+
 typedef enum ReturnStatus
 {
     OK = 0,

@@ -493,6 +493,7 @@ C62xADD_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     {
         int32_t ra = (int32_t) p_state->m_reg[idx_ra];
         int32_t rb = (int32_t) p_state->m_reg[idx_rb];
+
         int32_t rd = ra + rb;
 
         EnQ_Delay_Reg(p_state, idx_rd, (uint32_t) rd, delay);
@@ -502,6 +503,22 @@ C62xADD_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     }
     return OK;
 }
+
+#if 0
+ReturnStatus_t
+C62xADD_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    int32_t ra = (int32_t) p_state->m_reg[idx_ra];
+    int32_t rb = (int32_t) p_state->m_reg[idx_rb];
+
+    int32_t rd = ra + rb;
+
+    p_state->m_reg[idx_rd] = rd;
+
+    return OK;
+}
+#endif
 
 ReturnStatus_t
 C62xADD_SR32_SR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
@@ -2090,6 +2107,22 @@ C62xMPY_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     }
     return OK;
 }
+
+#if 0
+ReturnStatus_t
+C62xMPY_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    int16_t ra = p_state->m_reg[idx_ra];
+    int16_t rb = p_state->m_reg[idx_rb];
+
+    int32_t rd = ra * rb;
+
+    p_state->m_reg[idx_rd] = rd;
+
+    return OK;
+}
+#endif
 
 /// MPY - Multiply Signed 16 LSB x Signed 16 LSB.
 ReturnStatus_t
@@ -4049,6 +4082,23 @@ C62xSUB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     }
     return OK;
 }
+
+#if 0
+ReturnStatus_t
+C62xSUB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
+{
+    int32_t ra = p_state->m_reg[idx_ra];
+    int32_t rb = p_state->m_reg[idx_rb];
+    
+    int32_t rd = ra - rb;
+
+    p_state->m_reg[idx_rd] = rd;
+
+    return OK;
+}
+#endif
+
 
 ReturnStatus_t
 C62xSUB_SR32_SR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,

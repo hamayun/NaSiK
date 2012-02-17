@@ -24,12 +24,13 @@
 
 namespace native
 {
-    LLVMGenerator :: LLVMGenerator(string input_bcfile, string output_bcfile) :
+    LLVMGenerator :: LLVMGenerator(string input_bcfile, string output_bcfile, uint32_t addr_tbl_size) :
         p_module(NULL), m_context(getGlobalContext()), m_irbuilder(m_context), m_curr_function(NULL),
         p_pass_manager(NULL), p_func_pass_manager(NULL),
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
         i32(IntegerType::get(m_context, 32)), iptr(IntegerType::get(m_context, 8 * sizeof(intptr_t))),
-        p_output_stream(GetOutputStream(output_bcfile.c_str()))
+        p_outs_gen_mod(GetOutputStream(output_bcfile.c_str())),
+        p_outs_addr_mod(GetOutputStream("gen_addresses.bc"))
     {
         string error;
 
@@ -72,10 +73,15 @@ namespace native
         }
 
         // Create a clone of the input module
-        p_out_module   = CloneModule(p_module);
+        p_gen_mod   = CloneModule(p_module);
+        p_addr_mod  = CloneModule(p_module);
 
+        // Create the Addressing Table object
+        p_addr_table = new native::AddressingTable(addr_tbl_size);
+
+        // Create Module and Function Pass Managers.
         p_pass_manager = new llvm::PassManager();
-        p_func_pass_manager = new llvm::FunctionPassManager(p_out_module);
+        p_func_pass_manager = new llvm::FunctionPassManager(p_gen_mod);
 
         p_pass_manager->add(new TargetData(p_module));
         p_func_pass_manager->add(new TargetData(p_module));
@@ -84,18 +90,18 @@ namespace native
         AddOptimizationPasses(3);
 
         // TODO: Remove the following Hard-Coded Processor State Type
-        const Type * proc_state_type = p_out_module->getTypeByName("struct.C62x_DSPState_t");
+        const Type * proc_state_type = p_gen_mod->getTypeByName("struct.C62x_DSPState_t");
         ASSERT(proc_state_type, "Could Not Get Processor State Type from Module");
 
         p_proc_state_type = llvm::PointerType::getUnqual(proc_state_type);
         ASSERT(proc_state_type, "Could Not Get Processor State Type Pointer");
 
         // Some common Processor State Manipulation Functions
-        p_update_pc    = p_out_module->getFunction("Update_PC"); ASSERT(p_update_pc, "Could Not Get Update_PC");
-        p_get_pc       = p_out_module->getFunction("Get_DSP_PC"); ASSERT(p_get_pc, "Could Not Get Get_DSP_PC");
-        p_set_pc       = p_out_module->getFunction("Set_DSP_PC"); ASSERT(p_set_pc, "Could Not Get Set_DSP_PC");
-        p_inc_cycles   = p_out_module->getFunction("Inc_DSP_Cycles"); ASSERT(p_inc_cycles, "Could Not Get Inc_DSP_Cycles");
-        p_get_cycles   = p_out_module->getFunction("Get_DSP_Cycles"); ASSERT(p_get_cycles, "Could Not Get Get_DSP_Cycles");
+        p_update_pc    = p_gen_mod->getFunction("Update_PC"); ASSERT(p_update_pc, "Could Not Get Update_PC");
+        p_get_pc       = p_gen_mod->getFunction("Get_DSP_PC"); ASSERT(p_get_pc, "Could Not Get Get_DSP_PC");
+        p_set_pc       = p_gen_mod->getFunction("Set_DSP_PC"); ASSERT(p_set_pc, "Could Not Get Set_DSP_PC");
+        p_inc_cycles   = p_gen_mod->getFunction("Inc_DSP_Cycles"); ASSERT(p_inc_cycles, "Could Not Get Inc_DSP_Cycles");
+        p_get_cycles   = p_gen_mod->getFunction("Get_DSP_Cycles"); ASSERT(p_get_cycles, "Could Not Get Get_DSP_Cycles");
     }
 
     tool_output_file * LLVMGenerator :: GetOutputStream(const char *FileName)
@@ -122,7 +128,7 @@ namespace native
 
         args.push_back(p_proc_state);
 
-        func_ptr = p_out_module->getFunction(StringRef(func_name));
+        func_ptr = p_gen_mod->getFunction(StringRef(func_name));
         if(!func_ptr)
         {
           COUT << "Could not Get Function Call for: "  << func_name << endl;
@@ -153,10 +159,9 @@ namespace native
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
-            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_out_module);
-#ifdef FUNC_CALL_ERROR_CHECK
+            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod);
             ASSERT(func_value, "Error: In Creating Function Call");
-#endif
+
             //CreateCallByName("Print_DSP_State");
         }
 
@@ -172,8 +177,8 @@ namespace native
     int32_t LLVMGenerator :: GenerateLLVMBBLevel(native::BasicBlock * input_bb)
     {
         llvm::FunctionType * func_type = llvm::FunctionType::get(Type::getInt32Ty(GetContext()), /*not vararg*/false);
-        //llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "GenFunc" + input_bb->GetName(), p_out_module);
-        llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "simulated_bb", p_out_module);
+        //llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "GenFunc" + input_bb->GetName(), p_gen_mod);
+        llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "simulated_bb", p_gen_mod);
         llvm::BasicBlock * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
 
         SetCurrentFunction(function);
@@ -210,7 +215,7 @@ namespace native
             }
         }
 
-        llvm::verifyModule(*p_out_module, PrintMessageAction);
+        llvm::verifyModule(*p_gen_mod, PrintMessageAction);
         return (0);
     }
 
@@ -225,10 +230,13 @@ namespace native
         std::vector<const Type*> params;
         params.push_back(p_proc_state_type);
         llvm::FunctionType * func_type = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
-        llvm::Function     * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_out_module);
+        llvm::Function     * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
         llvm::BasicBlock   * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
 
         INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
+
+        // Add Addressing Table Entry
+        p_addr_table->AddAddressEntry(exec_packet->GetTargetAddress(), function);
 
         SetCurrentFunction(function);
         // Here we get the Processor State Pointer from the Currently Generating Function.
@@ -247,10 +255,8 @@ namespace native
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
-            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_out_module);
-#ifdef FUNC_CALL_ERROR_CHECK
+            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod);
             ASSERT(func_value, "Error: In Creating Function Call");
-#endif
         }
 
         CreateCallByName("Print_DSP_State");
@@ -268,12 +274,31 @@ namespace native
 
         GetIRBuilder().CreateRet(Geti32Value(0));
 
-        llvm::verifyModule(*p_out_module, PrintMessageAction);
+        llvm::verifyModule(*p_gen_mod, PrintMessageAction);
 
         return (0);
     }
 
+    // NOTE: Current the Addressing Module Bitcode File is NOT Written
+    // You can enable it by un-commenting the p_outs_addr_mod->keep() line in WriteBitcodeFile() Method
+    int32_t LLVMGenerator :: WriteAddressingTable()
+    {
+        AddrTableEntry_t * p_entry = NULL;
+        uint32_t         tablesize = p_addr_table->GetCurrSize();
+        uint32_t             index = 0;
 
+        while(index < tablesize)
+        {
+            p_entry = p_addr_table->GetAddressEntry(index++);
+            cout << "Target Address: " << setw(8) << setfill('0') << hex << p_entry->m_target_addr << "  "
+                 << "Function : " << setw(8) << setfill('0') << hex << p_entry->p_native_func << endl;
+
+            llvm::Function  * fptr = p_entry->p_native_func;
+            fptr->dump();
+        }
+
+        return (0);
+    }
 
     /// AddOptimizationPasses - This routine adds optimization passes
     /// based on selected optimization level, OptLevel. This routine
@@ -310,22 +335,29 @@ namespace native
 
     int32_t LLVMGenerator :: OptimizeModule()
     {
-        p_pass_manager->run(*p_out_module);
+        p_pass_manager->run(*p_gen_mod);
+        p_pass_manager->run(*p_addr_mod);
         return (0);
     }
 
     int32_t LLVMGenerator :: OptimizeFunction(llvm::Function * func)
     {
-        p_func_pass_manager->run(* func);
+        p_func_pass_manager->run(*func);
         return (0);
     }
 
     int32_t LLVMGenerator :: WriteBitcodeFile()
     {
-        WriteBitcodeToFile(p_out_module, p_output_stream->os());
-        p_output_stream->keep();
-        delete p_out_module;
-        delete p_output_stream;
+        WriteBitcodeToFile(p_gen_mod, p_outs_gen_mod->os());
+        p_outs_gen_mod->keep();
+        delete p_gen_mod;
+        delete p_outs_gen_mod;
+
+        WriteBitcodeToFile(p_addr_mod, p_outs_addr_mod->os());
+        //p_outs_addr_mod->keep();
+        delete p_addr_mod;
+        delete p_outs_addr_mod;
+
         return (0);
     }
 }

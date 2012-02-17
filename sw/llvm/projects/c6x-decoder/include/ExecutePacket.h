@@ -87,6 +87,8 @@ namespace native
 
         virtual uint32_t GetSize() const { return (m_instr_list.size()); }
 
+        virtual uint32_t GetTargetAddress() const { return (GetInstrByIndex(0)->GetAddress()); }
+
         virtual string GetName() const
         {
             std::string ep_name = "EP_";
@@ -94,7 +96,7 @@ namespace native
 
             if(GetSize())
             {
-                addr_string << setw(8) << setfill('0') << hex << GetInstrByIndex(0)->GetAddress();
+                addr_string << setw(8) << setfill('0') << hex << GetTargetAddress();
                 ep_name += addr_string.str();
             }
             return (ep_name);

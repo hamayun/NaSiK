@@ -317,22 +317,14 @@ namespace native
         args.push_back(argument);
 
         func_ptr = out_mod->getFunction(StringRef(func_name));
-#ifdef FUNC_CALL_ERROR_CHECK
         if(!func_ptr)
         {
           COUT << "Could not Get Function Call for: "  << func_name << endl;
           return NULL;
         }
-#endif
-        if(func_ptr)
-        {
-            INFO << "    Call to: " << func_name << "(...)" << endl;
-            func_value = irbuilder.CreateCall(func_ptr, args.begin(), args.end(), GetMnemonic());
-        }
-        else
-        {
-            COUT << "Function Not Found: " << func_name << endl;
-        }
+
+        INFO << "    Call to: " << func_name << "(...)" << endl;
+        func_value = irbuilder.CreateCall(func_ptr, args.begin(), args.end(), GetMnemonic());
 
         return (func_value);
     }

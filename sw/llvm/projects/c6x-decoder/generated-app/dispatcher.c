@@ -18,13 +18,7 @@ extern int SimEP_00000014 (C62x_DSPState_t * p_state);
 extern int SimEP_00000018 (C62x_DSPState_t * p_state);
 extern int SimEP_0000001c (C62x_DSPState_t * p_state);
 
-typedef struct func_table_entry
-{
-    uint32_t m_address;
-    int (*func_address)(C62x_DSPState_t * p_state);
-} func_table_entry_t;
-
-func_table_entry_t func_table [8] =
+address_entry_t addr_table [8] =
 {
     { 0x00000000, SimEP_00000000 },
     { 0x00000004, SimEP_00000004 },
@@ -46,7 +40,7 @@ int main(int argc, char **argv, char **environ)
 
     for(int index = 0; index < 8; index++)
     {
-       curr_func = func_table[index].func_address;
+       curr_func = addr_table[index].func_address;
        curr_func(& p_state);
     }
 

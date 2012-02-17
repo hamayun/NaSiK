@@ -23,7 +23,7 @@
 
 using namespace native;
 
-#define COFF_INPUT_FILE
+//#define COFF_INPUT_FILE
 #define GENERATE_CODE
 //#define BASIC_BLOCK_LEVEL_CODE
 
@@ -105,7 +105,7 @@ int main (int argc, char ** argv)
     basic_block_list.Print(p_output);
 
 #ifdef GENERATE_CODE
-    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "GeneratedModule.bc");
+    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "gen_code.bc", 8);
 
 #ifdef BASIC_BLOCK_LEVEL_CODE
     const BasicBlockList_t * bb_list = basic_block_list.GetBasicBlockList();
@@ -140,6 +140,9 @@ int main (int argc, char ** argv)
 
     COUT << "Optimizing LLVM Instructions ..." << endl;
     llvm_gen->OptimizeModule();
+
+    COUT << "Writing Addressing Table ... " << endl;
+    llvm_gen->WriteAddressingTable();
 
     COUT << "Writing Output Bitcode ..." << endl;
     llvm_gen->WriteBitcodeFile();
