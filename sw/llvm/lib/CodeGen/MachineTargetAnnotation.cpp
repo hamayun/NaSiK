@@ -495,7 +495,7 @@ bool MachineTargetAnnotation::annotateLLVMBasicBlock(TargetAnnotationDB *MBBinfo
   const_ptr_7_indices.push_back(const_int32_8);
   Constant* GEP = ConstantExpr::getGetElementPtr(DumpVar, &const_ptr_7_indices[0], const_ptr_7_indices.size() );
 
-  // Get the first valide instruction for the insertion of the call; Skip the Phi Instructions
+  // Get the first valid instruction for the insertion of the call; Skip the Phi Instructions
   // A phi instruction is used to select appropriate version of a given variable in SSA form.
   // And usually this is done using grouping those variables togather and telling to compiler to use
   // the same register for storing them.

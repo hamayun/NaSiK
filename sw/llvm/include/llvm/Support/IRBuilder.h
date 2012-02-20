@@ -203,7 +203,7 @@ public:
     return Type::getInt16Ty(Context);
   }
   
-  /// getInt32Ty - Fetch the type resepresenting a 32-bit integer.
+  /// getInt32Ty - Fetch the type representing a 32-bit integer.
   const IntegerType *getInt32Ty() {
     return Type::getInt32Ty(Context);
   }

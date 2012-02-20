@@ -138,12 +138,12 @@ int main (int argc, char ** argv)
     }
 #endif
 
-    COUT << "Optimizing LLVM Instructions ..." << endl;
-    llvm_gen->OptimizeModule();
-
     COUT << "Writing Addressing Table ... " << endl;
     llvm_gen->WriteAddressingTable();
 
+    COUT << "Optimizing LLVM Instructions ..." << endl;
+    llvm_gen->OptimizeModule();
+    
     COUT << "Writing Output Bitcode ..." << endl;
     llvm_gen->WriteBitcodeFile();
 #endif

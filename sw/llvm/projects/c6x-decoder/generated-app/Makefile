@@ -11,6 +11,7 @@ GEN_ASMS  = $(GEN_SRCS:.bc=.ll)
 
 CC        = i386-pc-baremetal-gcc
 LLC       = llc
+LLVMGCC   = llvm-gcc
 LLVMDIS   = llvm-dis
 LD        = i386-pc-baremetal-gcc
 AS        = i386-pc-baremetal-as
@@ -21,7 +22,7 @@ INCDIR   +=-I${C6XDEC_SOURCE}/include
 INCDIR   +=-I${TOOLCHAIN}/i386-pc-baremetal/include
 INCDIR   +=-I${TOOLCHAIN}/lib/gcc/i386-pc-baremetal/4.5.0/include
 
-CFLAGS    = -Wall -Wno-format -std=c99 -g -O3 -nostdinc
+CFLAGS    = -Wall -Wno-format -std=c99 -g -O3 -nostdinc --emit-llvm
 LDFLAGS   =${CRT0} ${KVMSTART} -Wl,-T,ldscript.kvm -nostdlib -L${TOOLCHAIN}/i386-pc-baremetal/lib -lc -lgcc
 
 TARGET    = APPLICATION.X
@@ -44,7 +45,9 @@ all :  $(GEN_ASMS) $(TARGET)
 
 %.o : %.c
 	@echo "  Compiling   ... " $<
-	@$(CC) $(CFLAGS) $(INCDIR) -c $<
+	@$(LLVMGCC) $(CFLAGS) $(INCDIR) -c $< -o $(basename $<).bc
+	@$(LLC) $(basename $<).bc -o $(basename $<).s
+	@$(AS) $(basename $<).s -o $@
 
 $(TARGET) : $(OBJS) $(GEN_OBJS)
 	@echo "  Linking     ... " $@

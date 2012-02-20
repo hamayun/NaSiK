@@ -811,6 +811,7 @@ projects/llvm-test
 projects/poolalloc
 projects/llvm-poolalloc
 projects/sample
+projects/c6x-decoder
 projects/privbracket
 projects/llvm-stacker
 projects/llvm-reopt
@@ -1984,6 +1985,8 @@ do
   if test -d ${srcdir}/projects/${i} ; then
     case ${i} in
       sample)       subdirs="$subdirs projects/sample"
+    ;;
+      c6x-decoder)  subdirs="$subdirs projects/c6x-decoder"
     ;;
       privbracket)  subdirs="$subdirs projects/privbracket"
  ;;

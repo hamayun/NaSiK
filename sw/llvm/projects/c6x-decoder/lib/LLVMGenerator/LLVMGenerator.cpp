@@ -74,7 +74,11 @@ namespace native
 
         // Create a clone of the input module
         p_gen_mod   = CloneModule(p_module);
-        p_addr_mod  = CloneModule(p_module);
+
+        //p_addr_mod  = CloneModule(p_module);
+        p_addr_mod = new Module("gen_addresses.bc", GetContext());
+        p_addr_mod->setDataLayout(p_module->getDataLayout());
+        p_addr_mod->setTargetTriple(p_module->getTargetTriple());
 
         // Create the Addressing Table object
         p_addr_table = new native::AddressingTable(addr_tbl_size);
@@ -279,23 +283,75 @@ namespace native
         return (0);
     }
 
-    // NOTE: Current the Addressing Module Bitcode File is NOT Written
-    // You can enable it by un-commenting the p_outs_addr_mod->keep() line in WriteBitcodeFile() Method
+#if 0 // The following function creates something like this ...
+    %struct.address_entry_t = type { i32, i32 (%struct.C62x_DSPState_t*)* }
+
+    @AddressingTable = global [8 x %struct.address_entry_t] [
+            %struct.address_entry_t { i32 0, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000000 },
+            %struct.address_entry_t { i32 4, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000004 },
+            %struct.address_entry_t { i32 8, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000008 },
+            %struct.address_entry_t { i32 12, i32 (%struct.C62x_DSPState_t*)* @SimEP_0000000c },
+            %struct.address_entry_t { i32 16, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000010 },
+            %struct.address_entry_t { i32 20, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000014 },
+            %struct.address_entry_t { i32 24, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000018 },
+            %struct.address_entry_t { i32 28, i32 (%struct.C62x_DSPState_t*)* @SimEP_0000001c }], align 32
+#endif
+
     int32_t LLVMGenerator :: WriteAddressingTable()
     {
-        AddrTableEntry_t * p_entry = NULL;
-        uint32_t         tablesize = p_addr_table->GetCurrSize();
-        uint32_t             index = 0;
+        AddrTableEntry_t * p_entry  = p_addr_table->GetAddressEntry(0);
+        uint32_t         tablesize  = p_addr_table->GetCurrSize();
+        llvm::Function * nativefptr = p_entry->p_native_func;
 
-        while(index < tablesize)
+        // Type Definitions
+        std::vector<const Type*> gen_struct_elems;
+        gen_struct_elems.push_back(GetIRBuilder().getInt32Ty());
+        gen_struct_elems.push_back(nativefptr->getType());
+
+        llvm::StructType * gen_addr_entry_ty = llvm::StructType::get(GetContext(), gen_struct_elems, false);
+        ASSERT(gen_addr_entry_ty, "Failed to Create Address Entry Structure Type");
+        //gen_addr_entry_ty->dump();
+
+        llvm::ArrayType * gen_addr_table_ty = llvm::ArrayType::get(gen_addr_entry_ty, p_addr_table->GetCurrSize());
+        ASSERT(gen_addr_table_ty, "Failed to Create Address Table Array Type");
+        //gen_addr_table_ty->dump();
+
+        GlobalVariable* gen_addr_table = new GlobalVariable(*p_addr_mod,
+            /*Type=*/gen_addr_table_ty,
+            /*isConstant=*/false,
+            /*Linkage=*/GlobalValue::ExternalLinkage,
+            /*Initializer=*/0, // has initializer, specified below
+            /*Name=*/"AddressingTable");
+        gen_addr_table->setAlignment(32);
+
+        std::vector<Constant*> const_array_elems;
+        for(uint32_t index = 0 ; index < tablesize ; index++)
         {
-            p_entry = p_addr_table->GetAddressEntry(index++);
-            cout << "Target Address: " << setw(8) << setfill('0') << hex << p_entry->m_target_addr << "  "
-                 << "Function : " << setw(8) << setfill('0') << hex << p_entry->p_native_func << endl;
+            p_entry = p_addr_table->GetAddressEntry(index);
+            ConstantInt* const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, p_entry->m_target_addr));
 
-            llvm::Function  * fptr = p_entry->p_native_func;
-            fptr->dump();
+            // Add External Function Declarations
+            llvm::Function* func_ptr = p_entry->p_native_func;
+            llvm::Function* func_decl = Function::Create(
+                /*Type=*/func_ptr->getFunctionType(),
+                /*Linkage=*/GlobalValue::ExternalLinkage,
+                /*Name=*/func_ptr->getNameStr(), p_addr_mod); // (external, no body)
+            func_decl->setCallingConv(CallingConv::C);
+            AttrListPtr func_decl_PAL;
+            func_decl->setAttributes(func_decl_PAL);
+
+            // Create Addressing Table Entry (Target Address, Native Function Pointer)
+            std::vector<Constant*> const_struct_fields;
+            const_struct_fields.push_back(const_target_addr);
+            const_struct_fields.push_back(func_decl);
+
+            Constant* const_gen_entry = ConstantStruct::get(gen_addr_entry_ty, const_struct_fields);
+            const_array_elems.push_back(const_gen_entry);
         }
+
+        // Now Actually Initialize the Addressing Table
+        Constant* const_array = ConstantArray::get(gen_addr_table_ty, const_array_elems);
+        gen_addr_table->setInitializer(const_array);
 
         return (0);
     }
@@ -354,7 +410,7 @@ namespace native
         delete p_outs_gen_mod;
 
         WriteBitcodeToFile(p_addr_mod, p_outs_addr_mod->os());
-        //p_outs_addr_mod->keep();
+        p_outs_addr_mod->keep();
         delete p_addr_mod;
         delete p_outs_addr_mod;
 
