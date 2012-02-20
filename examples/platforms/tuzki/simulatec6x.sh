@@ -86,6 +86,8 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
+#exit
+
 print_step "Generating Simulator ... "
 make clean 
 make -s

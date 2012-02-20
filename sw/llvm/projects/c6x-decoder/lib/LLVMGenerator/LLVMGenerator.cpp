@@ -263,7 +263,7 @@ namespace native
             ASSERT(func_value, "Error: In Creating Function Call");
         }
 
-        CreateCallByName("Print_DSP_State");
+        //CreateCallByName("Print_DSP_State");
 
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
