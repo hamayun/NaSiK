@@ -131,19 +131,25 @@ C62x_Delay_Node_t * __DeQ_Delay_Reg(C62x_Delay_Queue_t * delay_queue)
     return (NULL);
 }
 
-int32_t Update_Registers(C62x_DSPState_t * p_state)
+uint32_t Update_Registers(C62x_DSPState_t * p_state)
 {
     C62x_Delay_Queue_t * delay_queue = & p_state->m_delay_q[p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1)];
     C62x_Delay_Node_t  * delay_reg = NULL;
+    uint32_t                new_pc = 0;
 
     while((delay_reg = __DeQ_Delay_Reg(delay_queue)) != NULL)
     {
         //printf("Updating: [%02d]=%04x\n", delay_reg->m_reg_id, delay_reg->m_value);
         p_state->m_reg[delay_reg->m_reg_id] = delay_reg->m_value;
+
+        if(delay_reg->m_reg_id == REG_PC_INDEX)
+        {
+            new_pc = delay_reg->m_value;
+        }
     }
 
-    // TODO: If PC is Updated; Return Something Special Here
-    return (0);
+    // This will return the new PC if it has been update; else return zero;
+    return (new_pc);
 }
 
 int32_t EnQ_Delay_Reg(C62x_DSPState_t * p_state, uint16_t reg_id, uint32_t value, uint8_t delay_slots)
@@ -4090,7 +4096,7 @@ C62xSUB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     int32_t ra = p_state->m_reg[idx_ra];
     int32_t rb = p_state->m_reg[idx_rb];
-    
+
     int32_t rd = ra - rb;
 
     p_state->m_reg[idx_rd] = rd;

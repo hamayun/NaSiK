@@ -43,6 +43,7 @@ int main(int argc, char **argv, char **environ)
 {
 //    CPU_PROFILE_VERIFY_MEMORY();
     sim_func_t curr_func = NULL;
+    uint32_t ret_val = 0;
 
     C62x_DSPState_t p_state;
     Init_DSP_State(& p_state);
@@ -50,13 +51,15 @@ int main(int argc, char **argv, char **environ)
     while(1)
     {
         curr_func = find_sim_func(*p_state.p_pc);
-        if(curr_func) 
-            curr_func(& p_state);
+        if(curr_func)
+        {
+            ret_val = curr_func(& p_state);
+            printf("Return Value = 0x%x\n", ret_val);
+            Print_DSP_State(& p_state);
+        }
         else
             ASSERT(0, "Native Simulation Functin Not Found");
     }
-
-    // Print_DSP_State(& p_state);
     
     return 0;
 }

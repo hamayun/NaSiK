@@ -227,7 +227,7 @@ namespace native
     {
         Instruction        * instr         = NULL;
         DecodedInstruction * dec_instr     = NULL;
-        llvm::Value        * pc_updated    = NULL;
+        llvm::Value        * updated_pc    = NULL;
         string               function_name = "Sim" + exec_packet->GetName();
 
         const Type * return_type = Type::getInt32Ty(GetContext());
@@ -273,10 +273,10 @@ namespace native
         INFO << "    Call to: " << "Inc_DSP_Cycles" << "(...)" << endl;
         GetIRBuilder().CreateCall(p_inc_cycles, p_proc_state);
 
-        pc_updated = CreateCallByName("Update_Registers");
+        updated_pc = CreateCallByName("Update_Registers");
         INFO << endl;
 
-        GetIRBuilder().CreateRet(Geti32Value(0));
+        GetIRBuilder().CreateRet(updated_pc);
 
         llvm::verifyModule(*p_gen_mod, PrintMessageAction);
 
