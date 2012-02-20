@@ -324,6 +324,15 @@ namespace native
             /*Name=*/"AddressingTable");
         gen_addr_table->setAlignment(32);
 
+        Constant *const_addr_table_size = GetIRBuilder().getInt32(p_addr_table->GetCurrSize());
+        GlobalVariable* gen_addr_table_sz = new GlobalVariable(*p_addr_mod,
+            /*Type=*/GetIRBuilder().getInt32Ty(),
+            /*isConstant=*/false,
+            /*Linkage=*/GlobalValue::ExternalLinkage,
+            /*Initializer=*/const_addr_table_size,
+            /*Name=*/"AddressingTableSize");
+        gen_addr_table_sz->setAlignment(32);
+
         std::vector<Constant*> const_array_elems;
         for(uint32_t index = 0 ; index < tablesize ; index++)
         {

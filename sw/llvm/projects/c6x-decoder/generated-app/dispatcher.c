@@ -10,6 +10,7 @@ extern int Init_DSP_State(C62x_DSPState_t * p_state);
 extern int Print_DSP_State(C62x_DSPState_t * p_state);
 
 extern address_entry_t AddressingTable[];
+extern uint32_t AddressingTableSize;
 
 int main(int argc, char **argv, char **environ)
 {
@@ -19,7 +20,7 @@ int main(int argc, char **argv, char **environ)
     C62x_DSPState_t p_state;
     Init_DSP_State(& p_state);
 
-    for(int index = 0; index < 8; index++)
+    for(int index = 0; index < AddressingTableSize; index++)
     {
        curr_func = AddressingTable[index].func_address;
        curr_func(& p_state);
