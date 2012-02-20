@@ -17,18 +17,27 @@ typedef int (*sim_func_t)(C62x_DSPState_t * p_state);
 sim_func_t find_sim_func(uint32_t target_pc)
 {
     sim_func_t sim_func = NULL;
+    uint32_t low = 0, high = AddressingTableSize - 1;
 
-    for(int index = 0; index < AddressingTableSize; index++)
+    while(low <= high)
     {
-        if(AddressingTable[index].m_address == target_pc)
+        uint32_t mid_index = (low + high) / 2;
+        uint32_t mid_addr  = AddressingTable[mid_index].m_address;
+
+        if(mid_addr == target_pc)
         {
-            sim_func = AddressingTable[index].func_address;
+            sim_func = AddressingTable[mid_index].func_address;
             break;
         }
+        else if(mid_addr < target_pc)
+            low = mid_index + 1;
+        else
+            high = mid_index - 1;
     }
 
     return (sim_func);
 }
+
 
 int main(int argc, char **argv, char **environ)
 {
