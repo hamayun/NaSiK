@@ -70,7 +70,7 @@ int main (int argc, char ** argv)
         instr_address += 4;
     }
 
-#ifndef COFF_INPUT_FILE
+#if 0
     // Dump the different sections of input binary to files for loading to KVM Memory
     COUT << "Dumping .text section ..." << endl;
     reader->DumpSection(argv[1], argv[1], ".text");

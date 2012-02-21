@@ -339,10 +339,8 @@ namespace native
             // Move the Insert Point to Early Exit BB
             irbuilder.SetInsertPoint(early_exit_bb);
             irbuilder.CreateRet(func_value);
-        }
-        else
-        {
-            irbuilder.CreateBr(update_exit_bb);
+            // Set the Early Exit Flag; So we don't insert redundant branch instruction(s)
+            llvm_gen->m_earlyexit_bb_flag = 1;
         }
 
         return (func_value);

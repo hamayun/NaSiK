@@ -254,6 +254,7 @@ namespace native
         irbuilder.SetInsertPoint(entry_bb);
 
         exec_packet->ResetInstrIterator();
+        m_earlyexit_bb_flag = 0;
         while((instr = exec_packet->GetNextInstruction()))
         {
             dec_instr = instr->GetDecodedInstruction();
@@ -261,6 +262,17 @@ namespace native
 
             Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, update_exit_bb);
             ASSERT(func_value, "Error: In Creating Function Call");
+
+            if(m_earlyexit_bb_flag)
+            {
+                irbuilder.SetInsertPoint(update_exit_bb);
+            }
+        }
+
+        if(!m_earlyexit_bb_flag)
+        {
+            irbuilder.SetInsertPoint(entry_bb);
+            irbuilder.CreateBr(update_exit_bb);
         }
 
         irbuilder.SetInsertPoint(update_exit_bb);

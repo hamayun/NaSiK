@@ -133,6 +133,8 @@ namespace native
         const llvm::IntegerType * const i32;
         const llvm::IntegerType * const iptr;
 
+        uint32_t m_earlyexit_bb_flag;
+
         llvm::Module * p_gen_mod;         // The output module that contains the generated code
         llvm::Module * p_addr_mod;        // The output module that contains the Addressing Table
 
