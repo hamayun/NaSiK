@@ -132,8 +132,8 @@ typedef enum ReturnStatus
 #define C6XSC5_TO_S16(scst5)                                                   \
     ((int16_t)((scst5 & 0x10) ? (scst5 | 0xFFE0) : (scst5 & 0x1F)))
 
-#define C6XSCST21_TO_S32(scst21)                                               \
-    ((int32_t)((scst21 & 0x100000) ? (scst21 | 0xFFE00000) : (scst21 & 0x1FFFFF)))
+#define C6XSCST23_TO_S32(scst23)                                               \
+    ((int32_t)((scst23 & 0x400000) ? (scst23 | 0xFF800000) : (scst23 & 0x7FFFFF)))
 
 #define GET_BITS_5_TO_9(u32) ((u32 & 0x3E0) >> 5)
 #define GET_BITS_0_TO_4(u32) (u32 & 0x1F)

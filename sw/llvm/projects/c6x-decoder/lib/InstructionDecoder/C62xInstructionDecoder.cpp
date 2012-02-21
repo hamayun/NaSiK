@@ -1359,16 +1359,17 @@ namespace native
             packet_address = fetch_packet->GetInstrByIndex(0)->GetAddress();
         }
 
-        int32_t scst21 = (instr >> 7) & 0x001FFFFF;
-        scst21         = (scst21 << 2) + packet_address;
-        scst21         = scst21 >> 2;    // Convert to 21 bits again.
+        // We Explicity Calculate 23 bit address here;
+        // Firstly for Assembly Prints to reflect 'What' will be the final Constant Offset
+        // Secondly in ISA, we will use this offset as such;
+        uint32_t scst23 = (((instr >> 7) & 0x1FFFFF) << 2) + packet_address;
 
         switch(dec_instr->GetOpcode())
         {
             case 0x00:
             {
                 /*Branch Using a Displacement; {scst21}*/
-                C62xOperand * src1_opr = new C62xConstant(true, 21, scst21);
+                C62xOperand * src1_opr = new C62xConstant(true, 23, scst23);
                 dec_instr_eu = new C62xBranchInstr(dec_instr, src1_opr);
             }
             break;

@@ -216,7 +216,7 @@ namespace native
             return;
         }
 
-        char * symbol = symbol_table->GetSymbol((uint32_t) cst_operand->GetValue() << 2);
+        char * symbol = symbol_table->GetSymbol((uint32_t) cst_operand->GetValue());
 
         if(symbol)
         {

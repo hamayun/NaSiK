@@ -431,9 +431,6 @@ uint8_t Check_Predicate(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
             do_execute = (rc == 0 ? 1 : 0);
         else
             do_execute = (rc != 0 ? 1 : 0);
-
-//        printf("%s: On Reg: %d, Value = 0x%X, do_execute = %d\n",
-//               __func__, idx_rc, p_state->m_reg[idx_rc], do_execute);
     }
     return (do_execute);
 }
@@ -930,16 +927,16 @@ C62xAND_SC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
  */
 
 ReturnStatus_t
-C62xB_SC21(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
+C62xB_SC23(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint8_t delay)
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t  rd = C6XSCST21_TO_S32(constant) << 2;
+        int32_t  rd = C6XSCST23_TO_S32(constant);
 
         EnQ_Delay_Reg(p_state, REG_PC_INDEX, (uint32_t) rd, delay);
 
-        TRACE_PRINT("%08x\t[%s]B       0x%x\n", REG(idx_rc), Get_DSP_PC(p_state), rd);
+        TRACE_PRINT("%08x\t[%s] B       0x%x\n", Get_DSP_PC(p_state), REG(idx_rc), rd);
     }
     return OK;
 }

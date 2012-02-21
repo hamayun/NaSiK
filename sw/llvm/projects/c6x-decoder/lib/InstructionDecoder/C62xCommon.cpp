@@ -34,6 +34,17 @@ namespace native
         {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP", "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"}
     };
 
+    uint64_t BitsMask[40] = { 0x0000000000ULL, 0x0000000001ULL, 0x0000000003ULL, 0x0000000007ULL,
+                              0x000000000FULL, 0x000000001FULL, 0x000000003FULL, 0x000000007FULL,
+                              0x00000000FFULL, 0x00000001FFULL, 0x00000003FFULL, 0x00000007FFULL,
+                              0x0000000FFFULL, 0x0000001FFFULL, 0x0000003FFFULL, 0x0000007FFFULL,
+                              0x000000FFFFULL, 0x000001FFFFULL, 0x000003FFFFULL, 0x000007FFFFULL,
+                              0x00000FFFFFULL, 0x00001FFFFFULL, 0x00003FFFFFULL, 0x00007FFFFFULL,
+                              0x0000FFFFFFULL, 0x0001FFFFFFULL, 0x0003FFFFFFULL, 0x0007FFFFFFULL,
+                              0x000FFFFFFFULL, 0x001FFFFFFFULL, 0x003FFFFFFFULL, 0x007FFFFFFFULL,
+                              0x00FFFFFFFFULL, 0x01FFFFFFFFULL, 0x03FFFFFFFFULL, 0x07FFFFFFFFULL,
+                              0x0FFFFFFFFFULL, 0x1FFFFFFFFFULL, 0x3FFFFFFFFFULL, 0x7FFFFFFFFFULL };
+
     void C62xRegister :: Print(ostream *out) const
     {
         (*out) << RegisterName[m_bank_id][m_reg_id];
@@ -60,38 +71,13 @@ namespace native
 
             case MODE_HEX:
             {
-                uint32_t nbits    = GetSizeBits();
-                uint64_t mask     = 0xFFFFFFFFFFFFFFFFULL;
-                uint32_t mask_len = 16;
+                uint32_t nbits   = GetSizeBits();
+                ASSERT(nbits <= 39, "Too Big Constant");
 
-                if(nbits <= 5)
-                {
-                    // Important: Mask and Mask Lengths don't correspond in this case
-                    // This is done, just to match the assembly printing with reference disassembler
-                    mask = 0xFFULL; mask_len = 1;
-                }
-                else if(nbits <= 8)
-                {
-                    mask = 0xFFULL; mask_len = 2;
-                }
-                else if(nbits <= 16)
-                {
-                    mask = 0xFFFFFFFFULL; mask_len = 4;
-                }
-                else if(nbits <= 24)
-                {
-                    mask = 0xFFFFFFFFULL; mask_len = 6;
-                }
-                else if(nbits <= 32)
-                {
-                    mask = 0xFFFFFFFFULL; mask_len = 8;
-                }
-                else if(nbits <= 40)
-                {
-                    mask = 0xFFFFFFFFFFULL; mask_len = 10;
-                }
+                uint64_t mask    = BitsMask[nbits];
+                uint32_t nibbles = (nbits + 3) / 4;
 
-                (*out) << "0x" << hex << setw(mask_len) << setfill('0') << (mask & m_value);
+                (*out) << "0x" << hex << setw(nibbles) << setfill('0') << (mask & m_value);
             }
             break;
         }
