@@ -351,7 +351,6 @@ namespace native
         {
             SetMnemonic("ADDAB");
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
-            DOUT << "Un-tested Instruction: " << GetMnemonic() << endl;
         }
 
         virtual ~C62xADDABInstr() {}
@@ -1186,7 +1185,6 @@ namespace native
         {
             SetMnemonic("LDH"); SetDelaySlots((uint8_t) C62X_LOAD_DELAY);
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
-            DOUT << "Un-Tested Instruction !!!";
         }
 
         virtual ~C62xLDHInstr() {}

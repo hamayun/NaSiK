@@ -208,22 +208,27 @@ namespace native
         uint8_t            m_reg_id;
         uint16_t           m_reg_uid;      // Registers Unique ID
 
+        void UpdateRegUID()
+        {
+            m_reg_uid = ((uint16_t) m_bank_id * C62X_REGS_PER_BANK) + m_reg_id;
+        }
+
     public:
         C62xRegister() : C62xOperand(true, 32, REGISTER_OPERAND), m_bank_id(REG_BANK_A), m_reg_id(0)
         {
-            m_reg_uid = ((uint16_t) m_bank_id * C62X_REGS_PER_BANK) + m_reg_id;
+            UpdateRegUID();
         }
 
         C62xRegister(bool is_signed, uint8_t size_bits, C62xRegisterBank_t bank_id, uint8_t reg_id) :
             C62xOperand(is_signed, size_bits, REGISTER_OPERAND), m_bank_id (bank_id), m_reg_id (reg_id)
         {
-            m_reg_uid = ((uint16_t) m_bank_id * C62X_REGS_PER_BANK) + m_reg_id;
+            UpdateRegUID();
         }
 
-        virtual void SetBankId(C62xRegisterBank_t bank_id) { m_bank_id = bank_id; }
+        virtual void SetBankId(C62xRegisterBank_t bank_id) { m_bank_id = bank_id; UpdateRegUID(); }
         virtual C62xRegisterBank_t GetBankId() const { return (m_bank_id); }
 
-        virtual void SetRegId(uint8_t reg_id) { m_reg_id = reg_id; }
+        virtual void SetRegId(uint8_t reg_id) { m_reg_id = reg_id; UpdateRegUID(); }
         virtual uint8_t GetRegId() const { return (m_reg_id); }
 
         virtual uint16_t GetRegUID() const { return (m_reg_uid); }

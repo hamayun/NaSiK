@@ -54,11 +54,14 @@ int main(int argc, char **argv, char **environ)
         if(curr_func)
         {
             ret_val = curr_func(& p_state);
-            printf("Return Value = 0x%x\n", ret_val);
+            //printf("Return Value = 0x%x\n", ret_val);
             Print_DSP_State(& p_state);
         }
         else
+        {
+            printf("Target Program Counter = 0x%X\n", *p_state.p_pc);
             ASSERT(0, "Native Simulation Functin Not Found");
+        }
     }
     
     return 0;

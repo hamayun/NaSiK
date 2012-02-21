@@ -105,9 +105,9 @@ int main (int argc, char ** argv)
     basic_block_list.Print(p_output);
 
 #ifdef GENERATE_CODE
-    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "gen_code.bc", 8);
 
 #ifdef BASIC_BLOCK_LEVEL_CODE
+    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "gen_code.bc", basic_block_list.GetSize());
     const BasicBlockList_t * bb_list = basic_block_list.GetBasicBlockList();
 
     COUT << "Generating LLVM Instructions (Basic Block Level) ..." << endl;
@@ -121,6 +121,7 @@ int main (int argc, char ** argv)
         }
     }
 #else
+    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "gen_code.bc", execute_packet_list.GetSize());
     ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
 
     COUT << "Generating LLVM Instructions (Execute Packet Level) ..." << endl;

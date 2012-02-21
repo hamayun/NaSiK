@@ -1352,16 +1352,15 @@ namespace native
         uint32_t      packet_address      = NULL;
 
         // TODO: Enable this Assertion
-        //ASSERT(fetch_packet != NULL, "Fetch Packet Not Found, Please make sure that Fetch Packet List has been created");
-        //packet_address = fetch_packet->GetInstrByIndex(0)->GetAddress();
+        ASSERT(fetch_packet != NULL, "Fetch Packet Not Found, Please make sure that Fetch Packet List has been created");
+        packet_address = fetch_packet->GetInstrByIndex(0)->GetAddress();
         if(fetch_packet)
         {
             packet_address = fetch_packet->GetInstrByIndex(0)->GetAddress();
         }
 
-        int32_t scst21 = (((instr >> 7) & 0x001fffff) << 11) >> 11;
+        int32_t scst21 = (instr >> 7) & 0x001FFFFF;
         scst21         = (scst21 << 2) + packet_address;
-        //scst21         = (scst21 & 0x7fffff);    // Discard bits higher than 23rd bit
         scst21         = scst21 >> 2;    // Convert to 21 bits again.
 
         switch(dec_instr->GetOpcode())
