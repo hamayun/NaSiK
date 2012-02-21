@@ -148,7 +148,7 @@ uint32_t Update_Registers(C62x_DSPState_t * p_state)
         }
     }
 
-    // This will return the new PC if it has been update; else return zero;
+    // This will return the new PC if it has been updated; else return zero;
     return (new_pc);
 }
 
@@ -2653,9 +2653,22 @@ C62xNOP_UC4(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        TEST_AGAIN();
+        uint32_t nop_count = GET_BITS_0_TO_3(constant) - 1;
+        uint32_t new_pc = 0;
 
         TRACE_PRINT("%08x\tNOP       0x%x\n", Get_DSP_PC(p_state), constant);
+        for(uint32_t i = 0; i < nop_count; i++)
+        {
+            printf("Multi-Cycle NOP; i = %d\n", i);
+            Inc_DSP_Cycles(p_state);
+            Do_Memory_Writebacks(p_state);
+            new_pc = Update_Registers(p_state);
+            if(new_pc)
+            {
+                TRACE_PRINT("Multi-Cycle NOP Early Termination [i=%d]; PC Updated\n", i);
+                return new_pc;
+            }
+        }
     }
     return OK;
 }

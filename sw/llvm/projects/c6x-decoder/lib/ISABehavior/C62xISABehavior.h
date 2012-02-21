@@ -136,6 +136,7 @@ typedef enum ReturnStatus
     ((int32_t)((scst23 & 0x400000) ? (scst23 | 0xFF800000) : (scst23 & 0x7FFFFF)))
 
 #define GET_BITS_5_TO_9(u32) ((u32 & 0x3E0) >> 5)
+#define GET_BITS_0_TO_3(u32) (u32 & 0xF)
 #define GET_BITS_0_TO_4(u32) (u32 & 0x1F)
 #define GET_BITS_0_TO_5(u32) (u32 & 0x3F)
 
@@ -157,6 +158,6 @@ char BANKS[C62X_REG_BANKS];
 #define MAX_REG_PER_INSTR     10
 #define MAX_REG_NAME_LEN      3
 
-#define TEST_AGAIN() ASSERT(1, "Test This Instruction Again\n")
+#define TEST_AGAIN() ASSERT(0, "Test This Instruction Again\n")
 
 #endif	/* C62X_PROCESSOR_H */

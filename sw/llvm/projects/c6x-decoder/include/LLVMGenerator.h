@@ -174,6 +174,8 @@ namespace native
         virtual int32_t GenerateLLVMBBLevel(native::BasicBlock * input_bb);     // Using Basic Block Level Granularity
         virtual int32_t GenerateLLVMBBLevel(ExecutePacket * exec_packet);
 
+        virtual int32_t VerifyGeneratedModule();
+
         virtual void AddOptimizationPasses(unsigned OptLevel);
         virtual int32_t OptimizeModule();
         virtual int32_t OptimizeFunction(llvm::Function * func);

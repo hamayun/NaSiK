@@ -241,7 +241,8 @@ namespace native
     }
 
     /* Generic Function Call Implementation for All Instructions */
-    llvm::Value * C62xDecodedInstruction :: CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod) const
+    llvm::Value * C62xDecodedInstruction :: CreateLLVMFunctionCall(LLVMGenerator * llvm_gen,
+        Module * out_mod, llvm::BasicBlock * update_exit_bb) const
     {
         string              func_name    = GetFunctionBaseName();
         llvm::IRBuilder<> & irbuilder    = llvm_gen->GetIRBuilder();
@@ -325,6 +326,24 @@ namespace native
 
         INFO << "    Call to: " << func_name << "(...)" << endl;
         func_value = irbuilder.CreateCall(func_ptr, args.begin(), args.end(), GetMnemonic());
+
+        // Optional PC Updated Check in Case of Multi-Cycle NOPs
+        if(IsNOPInstruction() && GetNOPCount() > 1)
+        {
+            llvm::BasicBlock * early_exit_bb = llvm::BasicBlock::Create(llvm_gen->GetContext(), "EarlyExitBB", llvm_gen->GetCurrentFunction());
+            llvm::Value * pc_updated = irbuilder.CreateICmp(CmpInst::ICMP_NE, func_value, llvm_gen->Geti32Value(0), "pc_updated");
+
+            ASSERT(update_exit_bb != NULL, "Update Exit BB is NULL");
+            llvm::BranchInst::Create(early_exit_bb, update_exit_bb, pc_updated, irbuilder.GetInsertBlock());
+
+            // Move the Insert Point to Early Exit BB
+            irbuilder.SetInsertPoint(early_exit_bb);
+            irbuilder.CreateRet(func_value);
+        }
+        else
+        {
+            irbuilder.CreateBr(update_exit_bb);
+        }
 
         return (func_value);
     }

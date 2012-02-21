@@ -139,6 +139,9 @@ int main (int argc, char ** argv)
     }
 #endif
 
+    COUT << "Verifying Module ... " << endl;
+    llvm_gen->VerifyGeneratedModule();
+
     COUT << "Writing Addressing Table ... " << endl;
     llvm_gen->WriteAddressingTable();
 

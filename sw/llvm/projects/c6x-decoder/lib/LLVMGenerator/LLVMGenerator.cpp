@@ -163,7 +163,7 @@ namespace native
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
-            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod);
+            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, NULL);
             ASSERT(func_value, "Error: In Creating Function Call");
 
             //CreateCallByName("Print_DSP_State");
@@ -229,13 +229,15 @@ namespace native
         DecodedInstruction * dec_instr     = NULL;
         llvm::Value        * updated_pc    = NULL;
         string               function_name = "Sim" + exec_packet->GetName();
+        llvm::IRBuilder<>  & irbuilder     = GetIRBuilder();
 
         const Type * return_type = Type::getInt32Ty(GetContext());
         std::vector<const Type*> params;
         params.push_back(p_proc_state_type);
-        llvm::FunctionType * func_type = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
-        llvm::Function     * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
-        llvm::BasicBlock   * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
+        llvm::FunctionType * func_type      = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
+        llvm::Function     * function       = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
+        llvm::BasicBlock   * entry_bb       = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
+        llvm::BasicBlock   * update_exit_bb = llvm::BasicBlock::Create(GetContext(), "UpdateExitBB", function);
 
         INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
 
@@ -249,9 +251,7 @@ namespace native
         p_proc_state = curr_gen_func_args++;          // We know that its the only single parameter; but increment anyways
         p_proc_state->setName("p_state");
 
-        GetIRBuilder().SetInsertPoint(gen_block);
-
-        CreateCallByName("Do_Memory_Writebacks");
+        irbuilder.SetInsertPoint(entry_bb);
 
         exec_packet->ResetInstrIterator();
         while((instr = exec_packet->GetNextInstruction()))
@@ -259,27 +259,33 @@ namespace native
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
-            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod);
+            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, update_exit_bb);
             ASSERT(func_value, "Error: In Creating Function Call");
         }
 
+        irbuilder.SetInsertPoint(update_exit_bb);
         //CreateCallByName("Print_DSP_State");
 
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
         INFO << "    Call to: " << "Update_PC" << "(...)" << endl;
-        GetIRBuilder().CreateCall2(p_update_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
-
+        irbuilder.CreateCall2(p_update_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
         INFO << "    Call to: " << "Inc_DSP_Cycles" << "(...)" << endl;
-        GetIRBuilder().CreateCall(p_inc_cycles, p_proc_state);
+        irbuilder.CreateCall(p_inc_cycles, p_proc_state);
 
-        updated_pc = CreateCallByName("Update_Registers");
-        INFO << endl;
+        CreateCallByName("Do_Memory_Writebacks");
+        updated_pc = CreateCallByName("Update_Registers"); INFO << endl;
+        irbuilder.CreateRet(updated_pc);
 
-        GetIRBuilder().CreateRet(updated_pc);
+        // Dump the Current Function
+        // function->dump();
 
+        return (0);
+    }
+
+    int32_t LLVMGenerator :: VerifyGeneratedModule()
+    {
         llvm::verifyModule(*p_gen_mod, PrintMessageAction);
-
         return (0);
     }
 
