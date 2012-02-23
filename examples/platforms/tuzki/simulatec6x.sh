@@ -129,7 +129,7 @@ fi
 
 print_step "Updating Links ... "
 ln -sf ${NASIK_HOME}/hw/kvm-85/user/test/x86/kvm_c6x_bootstrap ${PFORM_DIR}/kvm_c6x_bootstrap
-ln -sf ${GENERATED_APP}/instructions.bin.text ${PFORM_DIR}/target_binary_text
+#ln -sf ${GENERATED_APP}/instructions.bin.text ${PFORM_DIR}/target_binary_text
 
 print_step "Running the Simulation ... "
 rm -f tty100

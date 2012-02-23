@@ -37,6 +37,7 @@
 #define TRACE_PRINT(fmt, args...) do {} while(0)
 #endif
 
+#ifdef QUEUE_BASED_DREGS
 typedef struct C62x_Delay_Node
 {
     uint16_t                 m_reg_id;
@@ -51,6 +52,21 @@ typedef struct C62x_Delay_Queue
     C62x_Delay_Node_t      * m_tail_node;
 } C62x_Delay_Queue_t;
 /* LLVM Type ... { { i16, i32, \2 }*, { i16, i32, \2 }*} */
+#else
+#define DELAY_QUEUE_SIZE (C62X_MAX_DELAY_SLOTS * FETCH_PACKET_SIZE * 2)
+typedef struct C62x_Delay_Node
+{
+    uint16_t m_reg_id;
+    uint32_t m_value;
+} C62x_Delay_Node_t;
+
+typedef struct C62x_Delay_Queue
+{
+    uint32_t m_head_idx;
+    uint32_t m_tail_idx;
+    C62x_Delay_Node_t m_nodes[DELAY_QUEUE_SIZE];
+} C62x_Delay_Queue_t;
+#endif
 
 typedef enum C62xAlignment
 {

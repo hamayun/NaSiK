@@ -60,12 +60,13 @@ int32_t Init_DSP_State(C62x_DSPState_t * p_state)
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
+#ifdef QUEUE_BASED_DREGS
         if(Init_Delay_Reg_Queue(& p_state->m_delay_q[index]))
         {
             printf("Error: Initializing Delay Queue [%d]\n", index);
             return (-1);
         }
-
+#endif
         if(Init_MWB_Queue(& p_state->m_mwback_q[index]))
         {
             printf("Error: Initializing Write Back Queue [%d]\n", index);
@@ -92,6 +93,7 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
         if((reg_id + 1) % (C62X_REGS_PER_BANK/2) == 0) printf("\n");
     }
 
+#ifdef QUEUE_BASED_DREGS
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
         C62x_Delay_Queue_t * delay_queue = & p_state->m_delay_q[index];
@@ -110,6 +112,27 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
         }
         printf("}\n");
     }
+#else
+    for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
+    {
+        C62x_Delay_Queue_t * delay_queue = & p_state->m_delay_q[index];
+        uint32_t              curr_index = delay_queue->m_head_idx;
+        uint32_t              tail_index = delay_queue->m_tail_idx;
+
+        if(p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1) == index)
+            printf("->");
+        else
+            printf("  ");
+
+        printf("DRegQ[%d]: { ", index);
+        while(curr_index != tail_index)
+        {
+            printf("%4s=%08x ", REG(delay_queue->m_nodes[curr_index].m_reg_id), delay_queue->m_nodes[curr_index].m_value);
+            curr_index = (curr_index + 1) % DELAY_QUEUE_SIZE;
+        }
+        printf("}\n");
+    }
+#endif
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
@@ -153,7 +176,7 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
     printf("\n");
     return (0);
 }
-
+#ifdef QUEUE_BASED_DREGS
 int32_t Init_Delay_Reg_Queue(C62x_Delay_Queue_t * delay_queue)
 {
     C62x_Delay_Node_t * curr_node = NULL;
@@ -189,6 +212,7 @@ int32_t Init_Delay_Reg_Queue(C62x_Delay_Queue_t * delay_queue)
     delay_queue->m_tail_node = delay_queue->m_head_node;
     return(0);
 }
+#endif
 
 int32_t Init_MWB_Queue(C62x_MWB_Queue_t * mwb_queue)
 {

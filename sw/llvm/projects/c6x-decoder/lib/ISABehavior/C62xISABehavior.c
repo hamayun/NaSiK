@@ -24,6 +24,7 @@
 
 extern char * BANKC_REGS[];
 
+#ifdef QUEUE_BASED_DREGS
 int32_t EnQ_Delay_Reg(C62x_DSPState_t * p_state, uint16_t reg_id, uint32_t value, uint8_t delay_slots)
 {
     uint32_t             queue_id = (p_state->m_curr_cycle + delay_slots + 1) % (C62X_MAX_DELAY_SLOTS + 1);
@@ -66,6 +67,47 @@ uint32_t Update_Registers(C62x_DSPState_t * p_state)
 
     return new_pc;
 }
+
+#else
+int32_t EnQ_Delay_Reg(C62x_DSPState_t * p_state, uint16_t reg_id, uint32_t value, uint8_t delay_slots)
+{
+    uint32_t  queue_id = (p_state->m_curr_cycle + delay_slots + 1) % (C62X_MAX_DELAY_SLOTS + 1);
+    uint32_t  tail_idx = p_state->m_delay_q[queue_id].m_tail_idx;
+
+    p_state->m_delay_q[queue_id].m_nodes[tail_idx].m_reg_id = reg_id;
+    p_state->m_delay_q[queue_id].m_nodes[tail_idx].m_value = value;
+
+    p_state->m_delay_q[queue_id].m_tail_idx = (tail_idx + 1) % DELAY_QUEUE_SIZE;
+
+    return 0;
+}
+
+uint32_t Update_Registers(C62x_DSPState_t * p_state)
+{
+    uint32_t  queue_id = p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1);
+    uint32_t  head_idx = p_state->m_delay_q[queue_id].m_head_idx;
+    uint32_t  tail_idx = p_state->m_delay_q[queue_id].m_tail_idx;
+    uint32_t    new_pc = 0;
+    uint16_t    reg_id = 0;
+    uint32_t reg_value = 0;
+
+    while(head_idx != tail_idx)
+    {
+        //printf("%s:%d: head_idx = %d, tail_idx = %d\n", __func__, __LINE__, head_idx, tail_idx);
+        reg_id    = p_state->m_delay_q[queue_id].m_nodes[head_idx].m_reg_id;
+        reg_value = p_state->m_delay_q[queue_id].m_nodes[head_idx].m_value;
+
+        // Update Processor State
+        p_state->m_reg[reg_id] = reg_value;
+        if(reg_id == REG_PC_INDEX) new_pc = reg_value;
+
+        head_idx = (head_idx + 1) % DELAY_QUEUE_SIZE;
+        p_state->m_delay_q[queue_id].m_head_idx = head_idx;
+    }
+
+    return new_pc;
+}
+#endif
 
 int32_t __EnQ_MWB(C62x_MWB_Queue_t * mwb_queue, C62xMWB_Size_t size, uint32_t addr, uint32_t value)
 {
