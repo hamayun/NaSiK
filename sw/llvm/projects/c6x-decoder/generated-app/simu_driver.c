@@ -6,9 +6,6 @@
 
 #include "C62xISABehavior.h"
 
-extern int Init_DSP_State(C62x_DSPState_t * p_state);
-extern int Print_DSP_State(C62x_DSPState_t * p_state);
-
 extern address_entry_t AddressingTable[];
 extern uint32_t AddressingTableSize;
 

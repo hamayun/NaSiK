@@ -49,10 +49,8 @@ typedef struct C62x_Delay_Queue
 {
     C62x_Delay_Node_t      * m_head_node;
     C62x_Delay_Node_t      * m_tail_node;
-    uint32_t                 m_num_busy_nodes;
-    uint32_t                 m_max_busy_nodes;
 } C62x_Delay_Queue_t;
-/* LLVM Type ... { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 } */
+/* LLVM Type ... { { i16, i32, \2 }*, { i16, i32, \2 }*} */
 
 typedef enum C62xAlignment
 {
@@ -150,6 +148,7 @@ typedef enum ReturnStatus
 #define S16_TO_S32(s16) ((int32_t) (s16 & 0x8000) ? (s16 | 0xFFFF0000) : s16)
 
 char BANKS[C62X_REG_BANKS];
+char * REG(uint16_t idx);
 
 #define BANKINDEX(idx) idx / C62X_REGS_PER_BANK
 #define BANKNAME(idx)  BANKS[BANKINDEX(idx)]
@@ -159,5 +158,10 @@ char BANKS[C62X_REG_BANKS];
 #define MAX_REG_NAME_LEN      3
 
 #define TEST_AGAIN() ASSERT(0, "Test This Instruction Again\n")
+
+int32_t Init_DSP_State(C62x_DSPState_t * p_state);
+int32_t Print_DSP_State(C62x_DSPState_t * p_state);
+int32_t Init_Delay_Reg_Queue(C62x_Delay_Queue_t * delay_queue);
+int32_t Init_MWB_Queue(C62x_MWB_Queue_t * mwb_queue);
 
 #endif	/* C62X_PROCESSOR_H */

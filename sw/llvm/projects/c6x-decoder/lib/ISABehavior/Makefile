@@ -1,4 +1,7 @@
-OBJS 	  = $(SRCS:.c=.o)
+
+SRCS      = $(wildcard *.c)
+OBJS 	  = $(SRCS:.c=.bc)
+ASMS 	  = $(SRCS:.c=.ll)
 DEPS 	  = $(SRCS:.c=.dep)
 
 CC        = llvm-gcc
@@ -8,11 +11,7 @@ INCDIR    =-I. -I../../include/
 INCDIR   +=-I/opt/toolchains/i386-pc-baremetal/i386-pc-baremetal/include
 INCDIR   +=-I/opt/toolchains/i386-pc-baremetal/lib/gcc/i386-pc-baremetal/4.5.0/include
 
-CFILES    = C62xISABehavior.c
-TARGET    = C62xISABehavior.bc
-ASM       = C62xISABehavior.ll
-
-all : $(TARGET) $(ASM)
+all : $(OBJS) $(ASMS)
 
 .PHONY  : clean
 
@@ -26,5 +25,5 @@ all : $(TARGET) $(ASM)
 
 clean:
 	@echo "  Clean ..."
-	@rm -f $(TARGET) $(ASM) *~ *.o *.bin
+	@rm -f $(OBJS) $(ASMS) *~ *.o *.bin
 

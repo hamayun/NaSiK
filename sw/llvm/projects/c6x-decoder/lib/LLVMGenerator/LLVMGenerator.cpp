@@ -67,7 +67,7 @@ namespace native
             Function *F = cast<Function>(I);
             if (!I->isDeclaration())
             {
-                //F->setLinkage(GlobalValue::InternalLinkage);
+                F->setLinkage(GlobalValue::InternalLinkage);
                 F->addFnAttr(llvm::Attribute::AlwaysInline);
             }
         }
@@ -278,6 +278,7 @@ namespace native
         irbuilder.SetInsertPoint(update_exit_bb);
         //CreateCallByName("Print_DSP_State");
 
+#ifndef JUST_ADD_ISA
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
         INFO << "    Call to: " << "Update_PC" << "(...)" << endl;
@@ -285,13 +286,12 @@ namespace native
         INFO << "    Call to: " << "Inc_DSP_Cycles" << "(...)" << endl;
         irbuilder.CreateCall(p_inc_cycles, p_proc_state);
 
-        CreateCallByName("Do_Memory_Writebacks");
+        //CreateCallByName("Do_Memory_Writebacks");
         updated_pc = CreateCallByName("Update_Registers"); INFO << endl;
         irbuilder.CreateRet(updated_pc);
-
-        // Dump the Current Function
-        // function->dump();
-
+#else
+        irbuilder.CreateRet(Geti32Value(0));
+#endif
         return (0);
     }
 
@@ -409,7 +409,6 @@ namespace native
             p_pass_manager->add(AlwaysInliningPass);
         }
 #endif
-
         p_func_pass_manager->add(createGVNPass());
         p_func_pass_manager->add(createInstructionCombiningPass());
         p_func_pass_manager->add(createCFGSimplificationPass());
@@ -420,6 +419,16 @@ namespace native
     {
         p_pass_manager->run(*p_gen_mod);
         p_pass_manager->run(*p_addr_mod);
+
+#ifdef OPTIMIZE_FUNCTIONS
+        for(llvm::Module::iterator FI = p_gen_mod->getFunctionList().begin(),
+            FIE = p_gen_mod->getFunctionList().end(); FI != FIE; FI++)
+        {
+            //FI->dump();
+            COUT << "Optimizing Function ..." << FI->getNameStr() << endl;
+            OptimizeFunction(&(*FI));
+        }
+#endif
         return (0);
     }
 

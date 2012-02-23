@@ -22,184 +22,49 @@
 #include "C62xISABehavior.h"
 #include "stdio.h"
 
-char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
-                       "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
+extern char * BANKC_REGS[];
 
-char * REG(uint16_t idx)
+int32_t EnQ_Delay_Reg(C62x_DSPState_t * p_state, uint16_t reg_id, uint32_t value, uint8_t delay_slots)
 {
-    /* In order to support multiple calls to this function
-     * And to return a different char pointer for each call we use last_idx
-     */
-    static char name[MAX_REG_PER_INSTR][MAX_REG_NAME_LEN + 1];
-    static uint16_t last_idx = 0;
-    char * str = & name[last_idx][0];
+    uint32_t             queue_id = (p_state->m_curr_cycle + delay_slots + 1) % (C62X_MAX_DELAY_SLOTS + 1);
+    C62x_Delay_Node_t * tail_node = p_state->m_delay_q[queue_id].m_tail_node;
 
-    memset(str, 0x0, MAX_REG_NAME_LEN + 1);
+    tail_node->m_reg_id = reg_id;
+    tail_node->m_value = value;
+    p_state->m_delay_q[queue_id].m_tail_node = tail_node->m_next_node;
 
-    if(BANKINDEX(idx) == REG_BANK_C)
-    {
-        sprintf(str, "%s", BANKC_REGS[RNUM(idx)]);
-    }
-    else
-    {
-        sprintf(str, "%c%d", BANKNAME(idx), RNUM(idx));
-    }
-
-    last_idx = (last_idx + 1) % MAX_REG_PER_INSTR;
-    return (str);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-int32_t Init_Delay_Reg_Queue(C62x_Delay_Queue_t * delay_queue)
-{
-    C62x_Delay_Node_t * curr_node = NULL;
-    C62x_Delay_Node_t * prev_node = NULL;
-    uint32_t          nodes_count = 0;
-
-    delay_queue->m_head_node = NULL;
-    delay_queue->m_tail_node = NULL;
-    delay_queue->m_num_busy_nodes = 0;
-    delay_queue->m_max_busy_nodes = 0;
-
-    // Because Destination can be a Long Register in C62x: So 2 Times
-    while(nodes_count < (C62X_MAX_DELAY_SLOTS * FETCH_PACKET_SIZE * 2))
-    {
-        curr_node = malloc(sizeof(C62x_Delay_Node_t));
-        if(!curr_node)
-        {
-            printf("Error: Allocating Memory for Delay Node\n");
-            return (-1);
-        }
-
-        if(!delay_queue->m_head_node)
-        {
-            delay_queue->m_head_node = curr_node;
-            prev_node   = curr_node;
-        }
-
-        curr_node->m_next_node = delay_queue->m_head_node;
-        prev_node->m_next_node = curr_node;
-        prev_node = curr_node;
-        curr_node = NULL;
-        nodes_count++;
-    }
-
-    delay_queue->m_tail_node = delay_queue->m_head_node;
-    return(0);
-}
-
-int32_t __EnQ_Delay_Reg(C62x_Delay_Queue_t * delay_queue, uint16_t reg_id, uint32_t value)
-{
-    if(delay_queue->m_tail_node->m_next_node == delay_queue->m_head_node)
-    {
-        printf("Error: Delay Node Queue is Full\n");
-        return (-1);
-    }
-
-    delay_queue->m_tail_node->m_reg_id = reg_id;
-    delay_queue->m_tail_node->m_value = value;
-
-    delay_queue->m_tail_node = delay_queue->m_tail_node->m_next_node;
-    delay_queue->m_num_busy_nodes++;
-
-    if(delay_queue->m_num_busy_nodes > delay_queue->m_max_busy_nodes)
-        delay_queue->m_max_busy_nodes = delay_queue->m_num_busy_nodes;
-
-    ASSERT(delay_queue->m_max_busy_nodes < (C62X_MAX_DELAY_SLOTS * FETCH_PACKET_SIZE * 2), "Maximum Busy Nodes Limit Crossed !!!");
-
-    return (0);
-}
-
-C62x_Delay_Node_t * __DeQ_Delay_Reg(C62x_Delay_Queue_t * delay_queue)
-{
-    if(delay_queue->m_num_busy_nodes > 0)
-    {
-        if(delay_queue->m_tail_node == delay_queue->m_head_node)
-        {
-            printf("Delay Node Queue Counter vs Pointers Mismatch !!!\n");
-            return (NULL);
-        }
-
-        C62x_Delay_Node_t * delay_register = delay_queue->m_head_node;
-        delay_queue->m_head_node = delay_queue->m_head_node->m_next_node;
-        delay_queue->m_num_busy_nodes--;
-
-        return (delay_register);
-    }
-
-    return (NULL);
+    return 0;
 }
 
 uint32_t Update_Registers(C62x_DSPState_t * p_state)
 {
-    C62x_Delay_Queue_t * delay_queue = & p_state->m_delay_q[p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1)];
-    C62x_Delay_Node_t  * delay_reg = NULL;
-    uint32_t                new_pc = 0;
+    uint32_t                queue_id = p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1);
+    C62x_Delay_Queue_t * delay_queue = & p_state->m_delay_q[queue_id];
+    C62x_Delay_Node_t  *   delay_reg = NULL;
+    uint32_t                  new_pc = 0;
+    uint16_t                  reg_id = 0;
+    uint32_t               reg_value = 0;
 
-    while((delay_reg = __DeQ_Delay_Reg(delay_queue)) != NULL)
+    do
     {
-        //printf("Updating: [%02d]=%04x\n", delay_reg->m_reg_id, delay_reg->m_value);
-        p_state->m_reg[delay_reg->m_reg_id] = delay_reg->m_value;
+        if(delay_queue->m_tail_node == delay_queue->m_head_node)
+            break;
 
-        if(delay_reg->m_reg_id == REG_PC_INDEX)
-        {
-            new_pc = delay_reg->m_value;
-        }
-    }
+        delay_reg = delay_queue->m_head_node;
+        delay_queue->m_head_node = delay_reg->m_next_node;
 
-    // This will return the new PC if it has been updated; else return zero;
-    return (new_pc);
-}
+        reg_id    = delay_reg->m_reg_id;
+        reg_value = delay_reg->m_value;
 
-int32_t EnQ_Delay_Reg(C62x_DSPState_t * p_state, uint16_t reg_id, uint32_t value, uint8_t delay_slots)
-{
-    uint32_t           delay_queue_id = (p_state->m_curr_cycle + delay_slots + 1) % (C62X_MAX_DELAY_SLOTS + 1);
-    C62x_Delay_Queue_t  * delay_queue = & p_state->m_delay_q[delay_queue_id];
+        // Update Processor State
+        p_state->m_reg[reg_id] = reg_value;
 
-    //printf("EnQ_Delay_Reg: [%4s]=%08x, +%d\n\n", REG(reg_id), value, delay_slots);
-    __EnQ_Delay_Reg(delay_queue, reg_id, value);
+        if(reg_id == REG_PC_INDEX)
+            new_pc = reg_value;
 
-    return (0);
-}
+    } while(1);
 
-////////////////////////////////////////////////////////////////////////////////
-
-int32_t Init_MWB_Queue(C62x_MWB_Queue_t * mwb_queue)
-{
-    C62x_MWBack_Node_t * curr_node   = NULL;
-    C62x_MWBack_Node_t * prev_node   = NULL;
-    uint32_t             nodes_count = 0;
-
-    mwb_queue->m_head_node = NULL;
-    mwb_queue->m_tail_node = NULL;
-
-    // Supposing that We can have a max of FETCH_PACKET_SIZE Memory Writes in each cycle
-    while(nodes_count < FETCH_PACKET_SIZE)
-    {
-        curr_node = malloc(sizeof(C62x_MWBack_Node_t));
-        if(!curr_node)
-        {
-            printf("Error: Allocating Memory for Write Back Node\n");
-            return (-1);
-        }
-
-        if(!mwb_queue->m_head_node)
-        {
-            mwb_queue->m_head_node = curr_node;
-            prev_node   = curr_node;
-        }
-
-        curr_node->m_next_node = mwb_queue->m_head_node;
-        prev_node->m_next_node = curr_node;
-        prev_node = curr_node;
-        curr_node = NULL;
-        nodes_count++;
-    }
-
-    mwb_queue->m_tail_node = mwb_queue->m_head_node;
-    mwb_queue->m_is_empty = 1;
-    return(0);
+    return new_pc;
 }
 
 int32_t __EnQ_MWB(C62x_MWB_Queue_t * mwb_queue, C62xMWB_Size_t size, uint32_t addr, uint32_t value)
@@ -283,142 +148,34 @@ int32_t Do_Memory_Writebacks(C62x_DSPState_t * p_state)
 
     return (0);
 }
-////////////////////////////////////////////////////////////////////////////////
 
-int32_t Init_DSP_State(C62x_DSPState_t * p_state)
+void Update_PC(C62x_DSPState_t * p_state, int32_t offset)
 {
-    uint32_t index;
-
-    p_state->m_curr_cycle = 0;
-    p_state->p_pc = & p_state->m_reg[REG_PC_INDEX];
-
-    memset((void *) & p_state->m_reg[0], 0x0, sizeof(p_state->m_reg));
-
-    for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
-    {
-        if(Init_Delay_Reg_Queue(& p_state->m_delay_q[index]))
-        {
-            printf("Error: Initializing Delay Queue [%d]\n", index);
-            return (-1);
-        }
-
-        if(Init_MWB_Queue(& p_state->m_mwback_q[index]))
-        {
-            printf("Error: Initializing Write Back Queue [%d]\n", index);
-            return (-1);
-        }
-    }
-
-    for(index = 0; index < C62X_REG_BANKS; index++)
-        BANKS[index] = 'A' + index;
-
-    //printf("(Parameterized) Processor State Initialized\n");
-    return (0);
+    p_state->m_reg[REG_PC_INDEX] += offset;
+    return;
 }
 
-int32_t Update_PC(C62x_DSPState_t * p_state, int32_t offset)
+void Set_DSP_PC(C62x_DSPState_t * p_state, int32_t abs_addr)
 {
-    * p_state->p_pc += offset;
-    return(* p_state->p_pc);
+    p_state->m_reg[REG_PC_INDEX] = abs_addr;
+    return;
 }
 
-int32_t Set_DSP_PC(C62x_DSPState_t * p_state, int32_t abs_addr)
+uint32_t Get_DSP_PC(C62x_DSPState_t * p_state)
 {
-    * p_state->p_pc = abs_addr;
-    return(* p_state->p_pc);
+    return(p_state->m_reg[REG_PC_INDEX]);
 }
 
-int32_t Get_DSP_PC(C62x_DSPState_t * p_state)
-{
-    return(* p_state->p_pc);
-}
-
-uint64_t Inc_DSP_Cycles(C62x_DSPState_t * p_state)
+void Inc_DSP_Cycles(C62x_DSPState_t * p_state)
 {
     p_state->m_curr_cycle++;
-    return(p_state->m_curr_cycle);
+    return;
 }
 
 uint64_t Get_DSP_Cycles(C62x_DSPState_t * p_state)
 {
     return(p_state->m_curr_cycle);
 }
-
-int32_t Print_DSP_State(C62x_DSPState_t * p_state)
-{
-    uint32_t reg_id, index;
-
-    printf("Cycle: %016lld      ", p_state->m_curr_cycle);
-    printf("PC =%08x  ", *p_state->p_pc);
-    printf("Registers:\n");
-    for(reg_id = 0; reg_id < (C62X_REG_BANKS * C62X_REGS_PER_BANK); reg_id++)
-    {
-        printf("%4s=%08x ", REG(reg_id), p_state->m_reg[reg_id]);
-        if((reg_id + 1) % (C62X_REGS_PER_BANK/2) == 0) printf("\n");
-    }
-
-    for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
-    {
-        C62x_Delay_Queue_t * delay_queue = & p_state->m_delay_q[index];
-        C62x_Delay_Node_t    * curr_node = delay_queue->m_head_node;
-
-        if(p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1) == index)
-            printf("->");
-        else
-            printf("  ");
-
-        printf("DRegQ[%d(%02d)]: { ", index, delay_queue->m_max_busy_nodes);
-        while(curr_node != delay_queue->m_tail_node)
-        {
-            printf("%4s=%08x ", REG(curr_node->m_reg_id), curr_node->m_value);
-            curr_node = curr_node->m_next_node;
-        }
-        printf("}\n");
-    }
-
-    for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
-    {
-        C62x_MWB_Queue_t   * mwb_queue = & p_state->m_mwback_q[index];
-        C62x_MWBack_Node_t * curr_node = mwb_queue->m_head_node;
-
-        if(p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1) == index)
-            printf("->");
-        else
-            printf("  ");
-
-        printf("MWB-Q[%d]: { ", index);
-        while(curr_node != mwb_queue->m_tail_node)
-        {
-            switch(curr_node->m_size)
-            {
-                case MWB_BYTE:
-                    *((uint8_t *) curr_node->m_addr) = (uint8_t) curr_node->m_value;
-                    printf("Mem[%08X]=%02X ", curr_node->m_addr, (uint8_t) curr_node->m_value);
-                    break;
-
-                case MWB_HWORD:
-                    *((uint16_t *) curr_node->m_addr) = (uint16_t) curr_node->m_value;
-                    printf("Mem[%08X]=%04X ", curr_node->m_addr, (uint16_t) curr_node->m_value);
-                    break;
-
-                case MWB_WORD:
-                    *((uint32_t *) curr_node->m_addr) = (uint32_t) curr_node->m_value;
-                    printf("Mem[%08X]=%08X ", curr_node->m_addr, (uint32_t) curr_node->m_value);
-                    break;
-
-                default:
-                    ASSERT(1, "Unknown Memory Write-Back Size");
-            }
-
-            curr_node = curr_node->m_next_node;
-        }
-        printf("}\n");
-    }
-
-    printf("\n");
-    return (0);
-}
-////////////////////////////////////////////////////////////////////////////////
 
 uint8_t Check_Predicate(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc)
 {
@@ -509,22 +266,6 @@ C62xADD_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     }
     return OK;
 }
-
-#if 0
-ReturnStatus_t
-C62xADD_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
-{
-    int32_t ra = (int32_t) p_state->m_reg[idx_ra];
-    int32_t rb = (int32_t) p_state->m_reg[idx_rb];
-
-    int32_t rd = ra + rb;
-
-    p_state->m_reg[idx_rd] = rd;
-
-    return OK;
-}
-#endif
 
 ReturnStatus_t
 C62xADD_SR32_SR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
@@ -787,7 +528,7 @@ C62xADDK_SC16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, 
     return OK;
 }
 
-/// ADDU - Add two unsinged integers without saturation.
+/// ADDU - Add two unsigned integers without saturation.
 ReturnStatus_t
 C62xADDU_UR32_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay)
@@ -2113,22 +1854,6 @@ C62xMPY_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     }
     return OK;
 }
-
-#if 0
-ReturnStatus_t
-C62xMPY_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                       uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
-{
-    int16_t ra = p_state->m_reg[idx_ra];
-    int16_t rb = p_state->m_reg[idx_rb];
-
-    int32_t rd = ra * rb;
-
-    p_state->m_reg[idx_rd] = rd;
-
-    return OK;
-}
-#endif
 
 /// MPY - Multiply Signed 16 LSB x Signed 16 LSB.
 ReturnStatus_t
@@ -4101,23 +3826,6 @@ C62xSUB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
     }
     return OK;
 }
-
-#if 0
-ReturnStatus_t
-C62xSUB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
-                        uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay)
-{
-    int32_t ra = p_state->m_reg[idx_ra];
-    int32_t rb = p_state->m_reg[idx_rb];
-
-    int32_t rd = ra - rb;
-
-    p_state->m_reg[idx_rd] = rd;
-
-    return OK;
-}
-#endif
-
 
 ReturnStatus_t
 C62xSUB_SR32_SR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
