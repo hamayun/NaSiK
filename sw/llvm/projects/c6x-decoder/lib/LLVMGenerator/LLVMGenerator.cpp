@@ -101,11 +101,25 @@ namespace native
         ASSERT(proc_state_type, "Could Not Get Processor State Type Pointer");
 
         // Some common Processor State Manipulation Functions
-        p_update_pc    = p_gen_mod->getFunction("Update_PC"); ASSERT(p_update_pc, "Could Not Get Update_PC");
-        p_get_pc       = p_gen_mod->getFunction("Get_DSP_PC"); ASSERT(p_get_pc, "Could Not Get Get_DSP_PC");
-        p_set_pc       = p_gen_mod->getFunction("Set_DSP_PC"); ASSERT(p_set_pc, "Could Not Get Set_DSP_PC");
-        p_inc_cycles   = p_gen_mod->getFunction("Inc_DSP_Cycles"); ASSERT(p_inc_cycles, "Could Not Get Inc_DSP_Cycles");
-        p_get_cycles   = p_gen_mod->getFunction("Get_DSP_Cycles"); ASSERT(p_get_cycles, "Could Not Get Get_DSP_Cycles");
+        p_update_pc    = p_gen_mod->getFunction("Update_PC");           ASSERT(p_update_pc, "Could Not Get Update_PC");
+        p_get_pc       = p_gen_mod->getFunction("Get_DSP_PC");          ASSERT(p_get_pc, "Could Not Get Get_DSP_PC");
+        p_set_pc       = p_gen_mod->getFunction("Set_DSP_PC");          ASSERT(p_set_pc, "Could Not Get Set_DSP_PC");
+        p_inc_cycles   = p_gen_mod->getFunction("Inc_DSP_Cycles");      ASSERT(p_inc_cycles, "Could Not Get Inc_DSP_Cycles");
+        p_get_cycles   = p_gen_mod->getFunction("Get_DSP_Cycles");      ASSERT(p_get_cycles, "Could Not Get Get_DSP_Cycles");
+
+#ifdef C62x_ISA_VER2
+        // Get the "C62x_Result_t" from our Module.
+        p_result_type = p_gen_mod->getTypeByName("struct.C62x_Result_t");
+        ASSERT(p_result_type, "Could Not Get Result Type from Module");
+        //p_result_type->dump();
+
+        p_result_type_ptr = llvm::PointerType::getUnqual(p_result_type);
+        ASSERT(p_result_type_ptr, "Could Not Get Result Type Pointer");
+        //p_result_type_ptr->dump();
+
+        p_enq_result   = p_gen_mod->getFunction("EnQ_Delay_Result");    ASSERT(p_enq_result, "Could Not Get EnQ_Delay_Result");
+        p_update_immed = p_gen_mod->getFunction("Update_Immediate");    ASSERT(p_update_immed, "Could Not Get Update_Immediate");
+#endif
     }
 
     tool_output_file * LLVMGenerator :: GetOutputStream(const char *FileName)
@@ -163,7 +177,11 @@ namespace native
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
+#ifdef C62x_ISA_VER2
+            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, NULL, NULL);
+#else
             Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, NULL);
+#endif
             ASSERT(func_value, "Error: In Creating Function Call");
 
             //CreateCallByName("Print_DSP_State");
@@ -230,6 +248,7 @@ namespace native
         llvm::Value        * updated_pc    = NULL;
         string               function_name = "Sim" + exec_packet->GetName();
         llvm::IRBuilder<>  & irbuilder     = GetIRBuilder();
+        uint32_t             instr_index   = 0;
 
         const Type * return_type = Type::getInt32Ty(GetContext());
         std::vector<const Type*> params;
@@ -253,6 +272,11 @@ namespace native
 
         irbuilder.SetInsertPoint(entry_bb);
 
+#ifdef C62x_ISA_VER2
+        // Create the "C62x_Result_t" typed result nodes in this function.
+        Value * instr_results = irbuilder.CreateAlloca(p_result_type, Geti32Value(exec_packet->GetSize()), "instr_results");
+#endif
+
         exec_packet->ResetInstrIterator();
         m_earlyexit_bb_flag = 0;
         while((instr = exec_packet->GetNextInstruction()))
@@ -260,14 +284,49 @@ namespace native
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
+#ifdef C62x_ISA_VER2
+            // Get Pointer to the corresponding "C62x_Result_t *" type node in the generated function.
+            Value * result = irbuilder.CreateGEP(instr_results, Geti32Value(instr_index));
+            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, update_exit_bb, result);
+            ASSERT(func_value, "Error: In Creating Function Call");
+#else
             Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, update_exit_bb);
             ASSERT(func_value, "Error: In Creating Function Call");
-
+#endif
             if(m_earlyexit_bb_flag)
             {
                 irbuilder.SetInsertPoint(update_exit_bb);
             }
+
+            instr_index++;
         }
+
+#ifdef C62x_ISA_VER2
+        // Now decide what to do with the results. Update Now or Put them in Buffer.
+        exec_packet->ResetInstrIterator();
+        instr_index = 0;
+        while((instr = exec_packet->GetNextInstruction()))
+        {
+            dec_instr = instr->GetDecodedInstruction();
+            ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
+
+            // Get Pointer to the "C62x_Result_t *" type node in the generated function.
+            Value * result = irbuilder.CreateGEP(instr_results, Geti32Value(instr_index));
+
+            if(dec_instr->GetDelaySlots())
+            {
+                // Add to Delay Buffer; Will be Updated Later
+                irbuilder.CreateCall3(p_enq_result, p_proc_state, result, Geti8Value(dec_instr->GetDelaySlots()));
+            }
+            else
+            {
+                // Immediate Update;
+                irbuilder.CreateCall2(p_update_immed, p_proc_state, result);
+            }
+
+            instr_index++;
+        }
+#endif
 
         if(!m_earlyexit_bb_flag)
         {
@@ -276,7 +335,6 @@ namespace native
         }
 
         irbuilder.SetInsertPoint(update_exit_bb);
-        //CreateCallByName("Print_DSP_State");
 
 #ifndef JUST_ADD_ISA
         // TODO: Verify the Program Counter Update Method;
@@ -292,6 +350,7 @@ namespace native
 #else
         irbuilder.CreateRet(Geti32Value(0));
 #endif
+        function->dump();
         return (0);
     }
 

@@ -4,7 +4,11 @@
 #include <Processor/IO.h>
 #include <Processor/Profile.h>
 
+#ifdef C62x_ISA_VER2
+#include "C62xISABehavior_v2.h"
+#else
 #include "C62xISABehavior.h"
+#endif
 
 extern address_entry_t AddressingTable[];
 extern uint32_t AddressingTableSize;

@@ -16,6 +16,8 @@ export C6XDEC_SOURCE=${NASIK_HOME}/sw/llvm/projects/c6x-decoder
 export C6XDEC_BUILD=${HOME}/workspace/Build/llvm-2.8/projects/c6x-decoder
 
 export C6XISA_BEHAVIOR=${C6XDEC_SOURCE}/lib/ISABehavior
+#export C6XISA_VERSION=C62x_ISA_OLD
+export C6XISA_VERSION=C62x_ISA_VER2
 export GENERATED_APP=${C6XDEC_SOURCE}/generated-app
 export APP_DIR=${GENERATED_APP}
 
@@ -40,6 +42,7 @@ echo "TARGET_BIN_WRITER       = $TARGET_BIN_WRITER"
 echo "C6XDEC_SOURCE           = $C6XDEC_SOURCE"
 echo "C6XDEC_BUILD            = $C6XDEC_BUILD"
 echo "C6XISA_BEHAVIOR         = $C6XISA_BEHAVIOR"
+echo "C6XISA_VERSION          = $C6XISA_VERSION"
 echo "GENERATED_APP           = $GENERATED_APP"
 echo "PLATFORM                = $PFORM_DIR"
 echo "=============================================================================="

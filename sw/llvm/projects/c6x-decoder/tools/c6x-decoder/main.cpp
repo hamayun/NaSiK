@@ -121,7 +121,11 @@ int main (int argc, char ** argv)
         }
     }
 #else
+#ifdef C62x_ISA_VER2
+    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior_v2.bc", "gen_code.bc", execute_packet_list.GetSize());
+#else
     LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "gen_code.bc", execute_packet_list.GetSize());
+#endif
     ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
 
     COUT << "Generating LLVM Instructions (Execute Packet Level) ..." << endl;

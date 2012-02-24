@@ -104,8 +104,13 @@ namespace native
         virtual void Print (ostream *out) const = 0;
 
         // This function will Insert a call to LLVM IR Function using details provided by LLVMGenerator Object
-        virtual llvm::Value * CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod, llvm::BasicBlock * update_exit_bb) const = 0;
-
+#ifdef C62x_ISA_VER2
+        virtual llvm::Value * CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod,
+                                                     llvm::BasicBlock * update_exit_bb, llvm::Value * result) const = 0;
+#else
+        virtual llvm::Value * CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod,
+                                                     llvm::BasicBlock * update_exit_bb) const = 0;
+#endif
         virtual ~DecodedInstruction() {}
     };
 }

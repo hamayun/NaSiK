@@ -19,7 +19,12 @@
  *
  *************************************************************************************/
 
+#ifdef C62x_ISA_VER2
+#include "C62xISABehavior_v2.h"
+#else
 #include "C62xISABehavior.h"
+#endif
+
 #include "stdio.h"
 
 char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
