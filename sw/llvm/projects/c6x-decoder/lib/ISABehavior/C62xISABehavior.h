@@ -29,6 +29,7 @@
 #include "C62xCommon.h"
 
 #define ENABLE_TRACE
+#define QUEUE_BASED_DREGS
 
 #ifdef ENABLE_TRACE
 #define TRACE_PRINT(fmt, args...)                               \

@@ -72,12 +72,14 @@ uint32_t Update_Registers(C62x_DSPState_t * p_state)
 int32_t EnQ_Delay_Reg(C62x_DSPState_t * p_state, uint16_t reg_id, uint32_t value, uint8_t delay_slots)
 {
     uint32_t  queue_id = (p_state->m_curr_cycle + delay_slots + 1) % (C62X_MAX_DELAY_SLOTS + 1);
-    uint32_t  tail_idx = p_state->m_delay_q[queue_id].m_tail_idx;
+    C62x_Delay_Queue_t * delay_queue = & p_state->m_delay_q[queue_id];
 
-    p_state->m_delay_q[queue_id].m_nodes[tail_idx].m_reg_id = reg_id;
-    p_state->m_delay_q[queue_id].m_nodes[tail_idx].m_value = value;
+    uint32_t  tail_idx = delay_queue->m_tail_idx;
 
-    p_state->m_delay_q[queue_id].m_tail_idx = (tail_idx + 1) % DELAY_QUEUE_SIZE;
+    delay_queue->m_nodes[tail_idx].m_reg_id = reg_id;
+    delay_queue->m_nodes[tail_idx].m_value = value;
+
+    delay_queue->m_tail_idx = (tail_idx + 1) % DELAY_QUEUE_SIZE;
 
     return 0;
 }
@@ -85,8 +87,10 @@ int32_t EnQ_Delay_Reg(C62x_DSPState_t * p_state, uint16_t reg_id, uint32_t value
 uint32_t Update_Registers(C62x_DSPState_t * p_state)
 {
     uint32_t  queue_id = p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1);
-    uint32_t  head_idx = p_state->m_delay_q[queue_id].m_head_idx;
-    uint32_t  tail_idx = p_state->m_delay_q[queue_id].m_tail_idx;
+    C62x_Delay_Queue_t * delay_queue = & p_state->m_delay_q[queue_id];
+
+    uint32_t  head_idx = delay_queue->m_head_idx;
+    uint32_t  tail_idx = delay_queue->m_tail_idx;
     uint32_t    new_pc = 0;
     uint16_t    reg_id = 0;
     uint32_t reg_value = 0;
@@ -94,15 +98,15 @@ uint32_t Update_Registers(C62x_DSPState_t * p_state)
     while(head_idx != tail_idx)
     {
         //printf("%s:%d: head_idx = %d, tail_idx = %d\n", __func__, __LINE__, head_idx, tail_idx);
-        reg_id    = p_state->m_delay_q[queue_id].m_nodes[head_idx].m_reg_id;
-        reg_value = p_state->m_delay_q[queue_id].m_nodes[head_idx].m_value;
+        reg_id    = delay_queue->m_nodes[head_idx].m_reg_id;
+        reg_value = delay_queue->m_nodes[head_idx].m_value;
 
         // Update Processor State
         p_state->m_reg[reg_id] = reg_value;
         if(reg_id == REG_PC_INDEX) new_pc = reg_value;
 
         head_idx = (head_idx + 1) % DELAY_QUEUE_SIZE;
-        p_state->m_delay_q[queue_id].m_head_idx = head_idx;
+        delay_queue->m_head_idx = head_idx;
     }
 
     return new_pc;

@@ -343,6 +343,11 @@ namespace native
             llvm_gen->m_earlyexit_bb_flag = 1;
         }
 
+        if(GetDelaySlots() == 0)
+        {
+            COUT << "I would like to by-pass the buffering .... SVP !!!" << endl;
+        }
+
         return (func_value);
     }
 }

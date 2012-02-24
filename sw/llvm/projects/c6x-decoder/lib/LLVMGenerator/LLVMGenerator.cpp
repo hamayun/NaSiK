@@ -424,9 +424,28 @@ namespace native
         for(llvm::Module::iterator FI = p_gen_mod->getFunctionList().begin(),
             FIE = p_gen_mod->getFunctionList().end(); FI != FIE; FI++)
         {
-            //FI->dump();
             COUT << "Optimizing Function ..." << FI->getNameStr() << endl;
             OptimizeFunction(&(*FI));
+
+            if(strncmp("SimEP_00000000", FI->getNameStr().c_str(), 14) == 0)
+            {
+                //FI->dump();
+                for(llvm::Function::iterator BBI = FI->getBasicBlockList().begin(),
+                    BBE = FI->getBasicBlockList().end(); BBI != BBE; BBI++)
+                {
+                    cout << "Basic Block:" << BBI->getNameStr() << endl;
+
+                    for(llvm::BasicBlock::iterator II = BBI->getInstList().begin(),
+                        IE = BBI->getInstList().end(); II != IE; II++)
+                    {
+                        //cout << "[Used " << II->getNumUses() << " Times]: ";
+                        if(II->mayReadFromMemory() || II->mayWriteToMemory())
+                        {
+                            II->dump();
+                        }
+                    }
+                }
+            }
         }
 #endif
         return (0);
