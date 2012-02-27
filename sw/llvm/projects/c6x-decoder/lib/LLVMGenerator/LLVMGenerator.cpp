@@ -257,6 +257,7 @@ namespace native
         llvm::Function     * function       = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
         llvm::BasicBlock   * entry_bb       = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
         llvm::BasicBlock   * update_exit_bb = llvm::BasicBlock::Create(GetContext(), "UpdateExitBB", function);
+        ConstantInt        * const_int32_zero = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
 
         INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
 
@@ -274,11 +275,14 @@ namespace native
 
 #ifdef C62x_ISA_VER2
         // Create the "C62x_Result_t" typed result nodes in this function.
-        Value * instr_results = irbuilder.CreateAlloca(p_result_type, Geti32Value(exec_packet->GetSize()), "instr_results");
+        llvm::AllocaInst * instr_results = irbuilder.CreateAlloca(p_result_type, Geti32Value(exec_packet->GetSize()), "instr_results");
+        instr_results->setAlignment(8);
+        //instr_results->dump();
 #endif
 
         exec_packet->ResetInstrIterator();
         m_earlyexit_bb_flag = 0;
+
         while((instr = exec_packet->GetNextInstruction()))
         {
             dec_instr = instr->GetDecodedInstruction();
@@ -286,7 +290,19 @@ namespace native
 
 #ifdef C62x_ISA_VER2
             // Get Pointer to the corresponding "C62x_Result_t *" type node in the generated function.
-            Value * result = irbuilder.CreateGEP(instr_results, Geti32Value(instr_index));
+            llvm::Value * result = irbuilder.CreateGEP(instr_results, Geti32Value(instr_index));
+            //result->dump();
+
+            // Get Pointer to the m_type in the above C62x_Result_t
+            std::vector<Value*> index_vector;
+            index_vector.push_back(const_int32_zero);
+            index_vector.push_back(const_int32_zero);
+            llvm::Value * result_type = irbuilder.CreateGEP(result, index_vector.begin(), index_vector.end());
+            //result_type->dump();
+
+            // Create a Store Instruction to m_type; So we Put Zero in Result Type before Calling the ISA
+            irbuilder.CreateStore(const_int32_zero, result_type, false);
+
             Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, update_exit_bb, result);
             ASSERT(func_value, "Error: In Creating Function Call");
 #else

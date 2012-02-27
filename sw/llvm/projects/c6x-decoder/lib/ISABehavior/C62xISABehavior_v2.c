@@ -43,8 +43,8 @@ int32_t EnQ_Delay_Result(C62x_DSPState_t * p_state, C62x_Result_t * result, uint
     uint32_t             queue_id = (p_state->m_curr_cycle + delay_slots + 1) % (C62X_MAX_DELAY_SLOTS + 1);
     C62x_Delay_Node_t * tail_node = p_state->m_delay_q[queue_id].m_tail_node;
 
-    TRACE_PRINT("%s: Type = 0x%X, Reg-ID[0] = 0x%02X, Value[0] = 0x%08X, Reg-ID[1] = 0x%02X, Value[1] = 0x%08X, Delay = %d\n",
-            __func__, result->m_type, result->m_reg_id[0], result->m_value[0], result->m_reg_id[1], result->m_value[1], delay_slots);
+    //TRACE_PRINT("%s: Type = 0x%X, Reg-ID[0] = 0x%02X, Value[0] = 0x%08X, Reg-ID[1] = 0x%02X, Value[1] = 0x%08X, Delay = %d\n",
+    //        __func__, result->m_type, result->m_reg_id[0], result->m_value[0], result->m_reg_id[1], result->m_value[1], delay_slots);
 
     switch(result->m_type)
     {
@@ -75,6 +75,9 @@ int32_t EnQ_Delay_Result(C62x_DSPState_t * p_state, C62x_Result_t * result, uint
 
 int32_t Update_Immediate(C62x_DSPState_t * p_state, C62x_Result_t * result)
 {
+    //TRACE_PRINT("%s: Type = 0x%X, Reg-ID[0] = 0x%02X, Value[0] = 0x%08X, Reg-ID[1] = 0x%02X, Value[1] = 0x%08X\n",
+    //        __func__, result->m_type, result->m_reg_id[0], result->m_value[0], result->m_reg_id[1], result->m_value[1]);
+
     switch(result->m_type)
     {
         case C62X_NO_RESULT:
@@ -88,6 +91,9 @@ int32_t Update_Immediate(C62x_DSPState_t * p_state, C62x_Result_t * result)
             p_state->m_reg[result->m_reg_id[0]] = result->m_value[0];
             p_state->m_reg[result->m_reg_id[1]] = result->m_value[1];
             break;
+
+        default:
+            TRACE_PRINT("%s: Unknown Type !!!\n");
     }
     return 0;
 }
@@ -766,20 +772,13 @@ ReturnStatus_t
 C62xB_SC23(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint32_t constant, uint8_t delay, C62x_Result_t * result)
 {
-    TEST_AGAIN();
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t  rd = C6XSCST23_TO_S32(constant);
 
         SAVE_REGISTER_RESULT(result, REG_PC_INDEX, rd);
         
-        //EnQ_Delay_Reg(p_state, REG_PC_INDEX, rd, delay);
-
         TRACE_PRINT("%08x\t[%s] B       0x%x\n", Get_DSP_PC(p_state), REG(idx_rc), rd);
-    }
-    else
-    {
-        result->m_type = C62X_NO_RESULT;
     }
     return OK;
 }
