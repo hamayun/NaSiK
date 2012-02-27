@@ -360,13 +360,13 @@ namespace native
         INFO << "    Call to: " << "Inc_DSP_Cycles" << "(...)" << endl;
         irbuilder.CreateCall(p_inc_cycles, p_proc_state);
 
-        //CreateCallByName("Do_Memory_Writebacks");
+        CreateCallByName("Do_Memory_Writebacks");
         updated_pc = CreateCallByName("Update_Registers"); INFO << endl;
         irbuilder.CreateRet(updated_pc);
 #else
         irbuilder.CreateRet(Geti32Value(0));
 #endif
-        function->dump();
+        //function->dump();
         return (0);
     }
 
