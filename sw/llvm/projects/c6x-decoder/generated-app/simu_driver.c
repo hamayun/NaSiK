@@ -51,7 +51,7 @@ int main(int argc, char **argv, char **environ)
 
     while(1)
     {
-        curr_func = find_sim_func(*p_state.p_pc);
+        curr_func = find_sim_func(p_state.m_reg[REG_PC_INDEX]);
         if(curr_func)
         {
             ret_val = curr_func(& p_state);
@@ -60,7 +60,7 @@ int main(int argc, char **argv, char **environ)
         }
         else
         {
-            printf("Target Program Counter = 0x%X\n", *p_state.p_pc);
+            printf("Target Program Counter = 0x%X\n", p_state.m_reg[REG_PC_INDEX]);
             ASSERT(0, "Native Simulation Functin Not Found");
         }
     }

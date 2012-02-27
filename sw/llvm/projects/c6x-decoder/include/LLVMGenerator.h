@@ -53,6 +53,7 @@ using namespace llvm;
 
 //#define INLINE_FUNCTIONS
 #define OPTIMIZE_MODULE
+
 //#define JUST_ADD_ISA
 //#define OPTIMIZE_FUNCTIONS
 
@@ -113,6 +114,16 @@ namespace native
             p_addr_table = NULL;
             m_curr_size = m_max_size = 0;
         }
+    };
+
+    class BinaryConfigs
+    {
+    private:
+        uint32_t           m_startup_pc;
+
+    public:
+        BinaryConfigs(uint32_t startup_pc): m_startup_pc(startup_pc){}
+        uint32_t GetStartupPC(){ return m_startup_pc; }
     };
 
     // The class responsible for generating LLVM Code
@@ -193,6 +204,7 @@ namespace native
         virtual int32_t OptimizeFunction(llvm::Function * func);
 
         virtual int32_t WriteAddressingTable();
+        virtual int32_t WriteBinaryConfigs(BinaryConfigs * pconfigs);
         virtual int32_t WriteBitcodeFile();
 
         virtual ~LLVMGenerator() {}

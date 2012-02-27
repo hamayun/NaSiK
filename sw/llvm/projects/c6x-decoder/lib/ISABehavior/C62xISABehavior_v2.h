@@ -129,7 +129,6 @@ typedef struct C62x_MWB_Queue
 typedef struct C62x_DSPState
 {
     uint64_t                      m_curr_cycle;
-    uint32_t                    * p_pc;
     uint32_t                      m_reg[C62X_REG_BANKS * C62X_REGS_PER_BANK];
     C62x_Delay_Queue_t            m_delay_q[C62X_MAX_DELAY_SLOTS + 1];
     C62x_MWB_Queue_t              m_mwback_q[C62X_MAX_DELAY_SLOTS + 1];

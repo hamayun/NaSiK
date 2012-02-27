@@ -23,7 +23,7 @@
 
 using namespace native;
 
-//#define COFF_INPUT_FILE
+#define COFF_INPUT_FILE
 #define GENERATE_CODE
 //#define BASIC_BLOCK_LEVEL_CODE
 
@@ -49,6 +49,8 @@ int main (int argc, char ** argv)
 
     uint32_t *section_handle = reader->GetSectionHandle(".text");
     uint32_t  instr_address  = reader->GetSectionEntryAddress(section_handle);
+
+    BinaryConfigs binary_configs(instr_address);
 
     // cout << "Text Section Handle: " << section_handle << endl;
     // cout << "Entry Point Address: " << FMT_INT << instr_address << endl;
@@ -151,7 +153,10 @@ int main (int argc, char ** argv)
 
     COUT << "Optimizing LLVM Instructions ..." << endl;
     llvm_gen->OptimizeModule();
-    
+
+    COUT << "Writing Binary Configurations ... " << endl;
+    llvm_gen->WriteBinaryConfigs(& binary_configs);
+
     COUT << "Writing Output Bitcode ..." << endl;
     llvm_gen->WriteBitcodeFile();
 #endif

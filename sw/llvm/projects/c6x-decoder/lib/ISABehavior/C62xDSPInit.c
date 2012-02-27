@@ -27,6 +27,8 @@
 
 #include "stdio.h"
 
+extern uint32_t STARTUP_PC;
+
 char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
                        "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
 
@@ -58,10 +60,11 @@ int32_t Init_DSP_State(C62x_DSPState_t * p_state)
 {
     uint32_t index;
 
-    p_state->m_curr_cycle = 0;
-    p_state->p_pc = & p_state->m_reg[REG_PC_INDEX];
-
     memset((void *) & p_state->m_reg[0], 0x0, sizeof(p_state->m_reg));
+
+    // Setup Start Program Counter & Cycle Counter
+    p_state->m_curr_cycle = 0;
+    p_state->m_reg[REG_PC_INDEX] = STARTUP_PC;
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
@@ -90,7 +93,7 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
     uint32_t reg_id, index;
 
     printf("Cycle: %016lld      ", p_state->m_curr_cycle);
-    printf("PC =%08x  ", *p_state->p_pc);
+    printf("PC =%08x  ", p_state->m_reg[REG_PC_INDEX]);
     printf("Registers:\n");
     for(reg_id = 0; reg_id < (C62X_REG_BANKS * C62X_REGS_PER_BANK); reg_id++)
     {

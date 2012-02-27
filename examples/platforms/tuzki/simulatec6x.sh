@@ -79,8 +79,8 @@ fi
 
 print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
-./c6x-decoder instructions.bin instructions.asm
-#./c6x-decoder matmult.coff matmult.asm
+#./c6x-decoder instructions.bin instructions.asm
+./c6x-decoder matmult.coff matmult.asm
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "
     exit 1

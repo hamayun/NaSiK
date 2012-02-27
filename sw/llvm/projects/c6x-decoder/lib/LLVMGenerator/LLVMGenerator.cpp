@@ -21,6 +21,8 @@
 
 #include "LLVMGenerator.h"
 #include "BasicBlock.h"
+// TODO: Remove the following include and make it Target Independent
+#include "C62xDecodedInstruction.h"
 
 namespace native
 {
@@ -319,10 +321,13 @@ namespace native
 
 #ifdef C62x_ISA_VER2
         // Now decide what to do with the results. Update Now or Put them in Buffer.
+        // Caution No Updates for Store Instructions.
         exec_packet->ResetInstrIterator();
         instr_index = 0;
         while((instr = exec_packet->GetNextInstruction()))
         {
+            uint32_t skip_enq_call = 0;
+
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
@@ -331,8 +336,21 @@ namespace native
 
             if(dec_instr->GetDelaySlots())
             {
-                // Add to Delay Buffer; Will be Updated Later
-                irbuilder.CreateCall3(p_enq_result, p_proc_state, result, Geti8Value(dec_instr->GetDelaySlots()));
+                if(dec_instr->IsLoadStoreInstruction())
+                {
+                    // TODO: Make It independent of Target Arch.
+                    C62xLDSTInstr * ldst_instr = (C62xLDSTInstr *) dec_instr;
+                    if(ldst_instr->GetLoadStoreType() == STORE_INSTR)
+                    {
+                        skip_enq_call = 1;
+                    }
+                }
+
+                if(!skip_enq_call)
+                {
+                    // Add to Delay Buffer; Will be Updated Later
+                    irbuilder.CreateCall3(p_enq_result, p_proc_state, result, Geti8Value(dec_instr->GetDelaySlots()));
+                }
             }
             else
             {
@@ -392,13 +410,14 @@ namespace native
 
     int32_t LLVMGenerator :: WriteAddressingTable()
     {
-        AddrTableEntry_t * p_entry  = p_addr_table->GetAddressEntry(0);
-        uint32_t         tablesize  = p_addr_table->GetCurrSize();
-        llvm::Function * nativefptr = p_entry->p_native_func;
+        AddrTableEntry_t * p_entry     = p_addr_table->GetAddressEntry(0);
+        uint32_t         tablesize     = p_addr_table->GetCurrSize();
+        llvm::Function * nativefptr    = p_entry->p_native_func;
+        llvm::IRBuilder<>  & irbuilder = GetIRBuilder();
 
         // Type Definitions
         std::vector<const Type*> gen_struct_elems;
-        gen_struct_elems.push_back(GetIRBuilder().getInt32Ty());
+        gen_struct_elems.push_back(irbuilder.getInt32Ty());
         gen_struct_elems.push_back(nativefptr->getType());
 
         llvm::StructType * gen_addr_entry_ty = llvm::StructType::get(GetContext(), gen_struct_elems, false);
@@ -417,9 +436,9 @@ namespace native
             /*Name=*/"AddressingTable");
         gen_addr_table->setAlignment(32);
 
-        Constant *const_addr_table_size = GetIRBuilder().getInt32(p_addr_table->GetCurrSize());
+        Constant *const_addr_table_size = irbuilder.getInt32(p_addr_table->GetCurrSize());
         GlobalVariable* gen_addr_table_sz = new GlobalVariable(*p_addr_mod,
-            /*Type=*/GetIRBuilder().getInt32Ty(),
+            /*Type=*/irbuilder.getInt32Ty(),
             /*isConstant=*/false,
             /*Linkage=*/GlobalValue::ExternalLinkage,
             /*Initializer=*/const_addr_table_size,
@@ -456,6 +475,23 @@ namespace native
         gen_addr_table->setInitializer(const_array);
 
         return (0);
+    }
+
+    int32_t LLVMGenerator :: WriteBinaryConfigs(BinaryConfigs * pconfigs)
+    {
+        llvm::IRBuilder<>  & irbuilder = GetIRBuilder();
+
+        // Write the Startup Program Counter Address
+        Constant * startup_pc = irbuilder.getInt32(pconfigs->GetStartupPC()); /// TODO ???
+        GlobalVariable* gen_startup_pc = new GlobalVariable(*p_addr_mod,
+            /*Type=*/irbuilder.getInt32Ty(),
+            /*isConstant=*/true,
+            /*Linkage=*/GlobalValue::ExternalLinkage,
+            /*Initializer=*/startup_pc,
+            /*Name=*/"STARTUP_PC");
+        gen_startup_pc->setAlignment(32);
+
+        return 0;
     }
 
     /// AddOptimizationPasses - This routine adds optimization passes
