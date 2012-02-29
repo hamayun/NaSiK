@@ -211,7 +211,7 @@ namespace native
         return (NULL);
     }
 
-    uint32_t COFFBinaryReader :: GetSectionEntryAddress(uint32_t * section_handle)
+    uint32_t COFFBinaryReader :: GetSectionStartAddress(uint32_t * section_handle)
     {
         coff_section * p_section = (coff_section *) section_handle;
 
@@ -221,6 +221,11 @@ namespace native
         }
 
         return (NULL);
+    }
+
+    uint32_t COFFBinaryReader :: GetEntryPoint()
+    {
+        return(p_opt_file_header->get_entry_point());
     }
 
     Instruction * COFFBinaryReader :: Read(uint32_t * section_handle, uint32_t address)

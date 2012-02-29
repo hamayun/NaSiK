@@ -48,12 +48,11 @@ int main (int argc, char ** argv)
 #endif
 
     uint32_t *section_handle = reader->GetSectionHandle(".text");
-    uint32_t  instr_address  = reader->GetSectionEntryAddress(section_handle);
-
-    BinaryConfigs binary_configs(instr_address);
+    uint32_t  instr_address  = reader->GetSectionStartAddress(section_handle);
 
     // cout << "Text Section Handle: " << section_handle << endl;
-    // cout << "Entry Point Address: " << FMT_INT << instr_address << endl;
+    cout << "Entry Point Address: " << FMT_INT << reader->GetEntryPoint() << endl;
+    BinaryConfigs binary_configs(reader->GetEntryPoint());
 
     ofstream  *p_output = new ofstream(argv[2], ios::out);
     if(!p_output->is_open()){
@@ -72,13 +71,13 @@ int main (int argc, char ** argv)
         instr_address += 4;
     }
 
-#if 0
     // Dump the different sections of input binary to files for loading to KVM Memory
+/*
     COUT << "Dumping .text section ..." << endl;
     reader->DumpSection(argv[1], argv[1], ".text");
     COUT << "Dumping .data section ..." << endl;
     reader->DumpSection(argv[1], argv[1], ".data");
-#endif
+*/
 
     FetchPacketList fetch_packet_list(&instruction_list);
     ExecutePacketList execute_packet_list(&instruction_list);
@@ -103,8 +102,8 @@ int main (int argc, char ** argv)
 
     //instruction_list.Print(p_output);
     //fetch_packet_list.Print(p_output);
-    //execute_packet_list.Print(p_output);
-    basic_block_list.Print(p_output);
+    execute_packet_list.Print(p_output);
+    //basic_block_list.Print(p_output);
 
 #ifdef GENERATE_CODE
 

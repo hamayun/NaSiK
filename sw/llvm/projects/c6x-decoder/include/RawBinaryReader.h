@@ -47,7 +47,10 @@ namespace native
         virtual uint32_t * GetSectionHandle(string section_name) { return (NULL); }
 
         // To find the Virtual Address (of the input binary) of the first instruction/data entry.
-        virtual uint32_t GetSectionEntryAddress(uint32_t * section_handle) { return (0x0); }
+        virtual uint32_t GetSectionStartAddress(uint32_t * section_handle) { return (0x0); }
+
+        // To find the Virtual Entry Point Address of the input binary; From where to Start Execution !!!
+        virtual uint32_t GetEntryPoint() { return (0x0); }
 
         // Every subclass must implement its own Read function.
         virtual Instruction * Read(uint32_t * section_handle, uint32_t address);

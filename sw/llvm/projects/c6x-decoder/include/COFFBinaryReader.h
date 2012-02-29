@@ -64,7 +64,8 @@ namespace native
         COFFBinaryReader(string input_binary_name);
         virtual ~COFFBinaryReader();
         virtual uint32_t *GetSectionHandle(string section_name);
-        virtual uint32_t  GetSectionEntryAddress(uint32_t * section_handle);
+        virtual uint32_t  GetSectionStartAddress(uint32_t * section_handle);
+        virtual uint32_t  GetEntryPoint();
         virtual Instruction * Read(uint32_t * section_handle, uint32_t address);
 
         coff2_section_header * get_section_header(char * name);

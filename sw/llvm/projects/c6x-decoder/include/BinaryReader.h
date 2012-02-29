@@ -52,7 +52,10 @@ namespace native
         virtual uint32_t *GetSectionHandle(string section_name) = 0;
 
         // To find the Virtual Address (of the input binary) of the first instruction/data entry.
-        virtual uint32_t GetSectionEntryAddress(uint32_t * section_handle) = 0;
+        virtual uint32_t GetSectionStartAddress(uint32_t * section_handle) = 0;
+
+        // To find the Virtual Entry Point Address of the input binary; From where to Start Execution !!!
+        virtual uint32_t GetEntryPoint() = 0;
 
         virtual SymbolTable * GetSymbolTable() { return (p_symbol_table); }
 
@@ -61,7 +64,7 @@ namespace native
 
         // Dump A Given Section to file.
         virtual int32_t DumpSection(string infile, string outfile, string section_name)
-                { cout << "Not Implemented" << endl; return (0); }
+                { ASSERT(0, "Not Implemented"); }
 
         virtual ~BinaryReader();
     };

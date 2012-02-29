@@ -845,13 +845,13 @@ int soc_load_target_section(char * section_file, char * section_name)
 
 int soc_load_target_binary()
 {
-    if(soc_load_target_section("target_binary_text", ".text"))
+    if(soc_load_target_section("target_text", ".text"))
     {
         fprintf(stderr, "Error Loading Target .text Section\n");
         return (-1);
     }
 
-    if(soc_load_target_section("target_binary_data", ".data"))
+    if(soc_load_target_section("target_data", ".data"))
     {
         fprintf(stderr, "Error Loading Target .data Section\n");
         return (-1);
