@@ -303,4 +303,72 @@ namespace native
 
         return(ptr_text_section->get_nm_entries());
     }
+
+    int32_t COFFBinaryReader :: DumpSection(string infile, string outfile, string section_name)
+    {
+        uint32_t        binary_value     = 0;
+        uint32_t        binary_address   = 0x0;         // Where this section should be loaded in KVM Memory?
+        uint32_t        binary_size      = 0;
+        string          output_file_name = outfile + section_name;
+
+        coff_section  * p_section = (coff_section *) GetSectionHandle(section_name);
+        if(!p_section)
+        {
+            DOUT << "Error: Section " << section_name << " Not Found !!!" << endl;
+            return (-1);
+        }
+
+        if(p_section->get_nm_entries() == 0)
+        {
+            DOUT << "Warning: Section " << section_name << " Found But Contains No Entries" << endl;
+            return (0);
+        }
+
+        ofstream * output_binary = new ofstream(output_file_name.c_str(), ios::out | ios::binary);
+        if(! output_binary->is_open())
+        {
+            DOUT << "Error: Opening Output File: " << output_file_name.c_str() << endl;
+            return (-1);
+        }
+
+        // First Four Bytes indicate the Address where this Section should be loaded in KVM Memory
+        binary_address = p_section->get_sect_entry(0)->get_vir_addrs();
+        output_binary->write((char *) & binary_address, sizeof(uint32_t));
+        if(output_binary->fail())
+        {
+            DOUT << "Error: Writing to Output File: " << output_file_name.c_str() << endl;
+            return (-1);
+        }
+
+        // The Next Four Bytes indicate the Size of this section;
+        binary_value = p_section->get_nm_entries() * sizeof(uint32_t);
+        output_binary->write((char *) & binary_value, sizeof(uint32_t));
+        if(output_binary->fail())
+        {
+            DOUT << "Error: Writing to Output File: " << output_file_name.c_str() << endl;
+            return (-1);
+        }
+
+        for(uint32_t i = 0; i < p_section->get_nm_entries(); i++)
+        {
+            binary_value = p_section->get_sect_entry(i)->get_value();
+            binary_size += sizeof(uint32_t);
+
+            output_binary->write((char *) & binary_value, sizeof(uint32_t));
+            if(output_binary->fail())
+                break;
+        }
+
+        ASSERT(binary_size == (p_section->get_nm_entries() * sizeof(uint32_t)), "Section Size Mismatch !!!");
+
+        if(output_binary)
+        {
+            output_binary->close();
+            delete output_binary;
+            output_binary = NULL;
+        }
+
+        return (0);
+    }
+
 }

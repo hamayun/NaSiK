@@ -1316,8 +1316,6 @@ ReturnStatus_t
 C62xEXT_UR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay, C62x_Result_t * result)
 {
-    TEST_AGAIN();
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra    = (int32_t) p_state->m_reg[idx_ra];
@@ -1340,8 +1338,6 @@ ReturnStatus_t
 C62xEXT_SR32_UC5_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint32_t constanta, uint32_t constantb, uint16_t idx_rd, uint8_t delay, C62x_Result_t * result)
 {
-    TEST_AGAIN();
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra    = (int32_t) p_state->m_reg[idx_ra];
@@ -1364,8 +1360,6 @@ ReturnStatus_t
 C62xEXTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rb, uint16_t idx_rd, uint8_t delay, C62x_Result_t * result)
 {
-    TEST_AGAIN();
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra   = (uint32_t) p_state->m_reg[idx_ra];
@@ -1388,8 +1382,6 @@ ReturnStatus_t
 C62xEXTU_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint32_t constanta, uint32_t constantb, uint16_t idx_rd, uint8_t delay, C62x_Result_t * result)
 {
-    TEST_AGAIN();
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         uint32_t ra    = (uint32_t) p_state->m_reg[idx_ra];
@@ -2385,7 +2377,7 @@ C62xMVKH_UC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, 
     {
         int32_t rd = (int32_t) p_state->m_reg[idx_rd];
 
-        rd = (rd & 0x0000FFFF) | (constant << 16);
+        rd = (rd & 0xFFFF) | (constant << 16);
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
@@ -2484,7 +2476,7 @@ C62xNOP_UC4(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_
         TRACE_PRINT("%08x\tNOP       0x%x\n", Get_DSP_PC(p_state), constant);
         for(uint32_t i = 0; i < nop_count; i++)
         {
-            printf("Multi-Cycle NOP; i = %d\n", i);
+            //printf("Multi-Cycle NOP; i = %d\n", i);
             Inc_DSP_Cycles(p_state);
             Do_Memory_Writebacks(p_state);
             new_pc = Update_Registers(p_state);
@@ -2660,8 +2652,6 @@ ReturnStatus_t
 C62xSADD_SR32_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                         uint16_t idx_ra, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay, C62x_Result_t * result)
 {
-    TEST_AGAIN();
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int32_t ra  = (int32_t) p_state->m_reg[idx_ra];
@@ -2743,8 +2733,6 @@ ReturnStatus_t
 C62xSADD_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                        uint32_t constant, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay, C62x_Result_t * result)
 {
-    TEST_AGAIN();
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int64_t ra    = C6XSC5_TO_S64(constant);
@@ -3600,8 +3588,6 @@ ReturnStatus_t
 C62xSSUB_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
                        uint32_t constant, uint16_t idx_rbh, uint16_t idx_rbl, uint16_t idx_rdh, uint16_t idx_rdl, uint8_t delay, C62x_Result_t * result)
 {
-    TEST_AGAIN();
-
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
         int64_t ra    = C6XSC5_TO_S64(constant);

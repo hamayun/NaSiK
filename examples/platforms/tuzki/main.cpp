@@ -50,6 +50,8 @@ extern "C" {
     int soc_kvm_init(char *bootstrap, char *elf_file);
 
     void *p_kvm_cpu_adaptor[MAX_VCPUS] = {NULL};
+
+	char *p_target_binary = {NULL};
 }
 
 
@@ -71,7 +73,7 @@ void simulation_stop(int signo)
 
 void usage_and_exit(char * name)
 {
-    cerr << "usage : " << name << "  <bootstrap_file> <application_path>" << endl;
+    cerr << "usage : " << name << "  <bootstrap_file> <application_path> [target_binary_path]" << endl;
     exit(EXIT_FAILURE);
 }
 
@@ -96,6 +98,13 @@ int sc_main (int argc, char ** argv)
       fb_res_stat.fb_mode   = YV16;
       fb_res_stat.fb_display_on_wrap = 1;
     }
+
+	if(argc == 4)
+	{
+		// The 4th Argument is optional; and is used for specifying the target binary file name;
+		// Useful in case of C6x Simulation.
+		p_target_binary = argv[3];
+	}
 
     /* Initialize the kvm. */
     retVal = soc_kvm_init(argv[1], argv[2]);

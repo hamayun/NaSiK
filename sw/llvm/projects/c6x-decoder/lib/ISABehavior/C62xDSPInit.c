@@ -65,6 +65,7 @@ int32_t Init_DSP_State(C62x_DSPState_t * p_state)
     // Setup Start Program Counter & Cycle Counter
     p_state->m_curr_cycle = 0;
     p_state->m_reg[REG_PC_INDEX] = STARTUP_PC;
+    p_state->m_reg[REG_CSR_INDEX] = 0x40010100;         // Taken From C6x Simulator
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
@@ -92,13 +93,11 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
 {
     uint32_t reg_id, index;
 
-    printf("Cycle: %016lld      ", p_state->m_curr_cycle);
-    printf("PC =%08x  ", p_state->m_reg[REG_PC_INDEX]);
-    printf("Registers:\n");
     for(reg_id = 0; reg_id < (C62X_REG_BANKS * C62X_REGS_PER_BANK); reg_id++)
     {
-        printf("%4s=%08x ", REG(reg_id), p_state->m_reg[reg_id]);
-        if((reg_id + 1) % (C62X_REGS_PER_BANK/2) == 0) printf("\n");
+        printf("%5s=0x%08x", REG(reg_id), p_state->m_reg[reg_id]);
+        if((reg_id + 1) % 4 == 0) printf("\n");
+        if((reg_id + 1) % C62X_REGS_PER_BANK == 0) printf("\n");
     }
 
 #ifdef QUEUE_BASED_DREGS
@@ -181,7 +180,9 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
         printf("}\n");
     }
 
-    printf("\n");
+    printf("TRACE PCE1 [%08x] ", p_state->m_reg[REG_PC_INDEX]);
+    printf("%7s Cycles Completed: %016lld\n\n", "", p_state->m_curr_cycle);
+
     return (0);
 }
 #ifdef QUEUE_BASED_DREGS

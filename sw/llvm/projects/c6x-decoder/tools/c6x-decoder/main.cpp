@@ -71,13 +71,13 @@ int main (int argc, char ** argv)
         instr_address += 4;
     }
 
+    string sections_to_dump[] = {".text", ".far", ".stack", ".sysmem", ".cinit", ".const", ".cio", ""};
+
     // Dump the different sections of input binary to files for loading to KVM Memory
-/*
-    COUT << "Dumping .text section ..." << endl;
-    reader->DumpSection(argv[1], argv[1], ".text");
-    COUT << "Dumping .data section ..." << endl;
-    reader->DumpSection(argv[1], argv[1], ".data");
-*/
+    for(int i = 0; strcmp(sections_to_dump[i].c_str(), "") != 0; i++)
+    {
+        reader->DumpSection(argv[1], argv[1], sections_to_dump[i]);
+    }
 
     FetchPacketList fetch_packet_list(&instruction_list);
     ExecutePacketList execute_packet_list(&instruction_list);

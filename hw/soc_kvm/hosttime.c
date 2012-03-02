@@ -340,9 +340,9 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             soc_erase_memory(64 * 1024 * 1024);
             //soc_fill_memory_pattern(1 * 1024 * 1024, 0x0A8B0C8D);
             //soc_fill_memory_pattern(1 * 1024 * 1024, 0x0);
-            //soc_memory_dump(0x0, 0x100);
 
             soc_load_target_binary();
+            //soc_memory_dump(0x9BF0, 0x100);
             break;
 
         case HOSTTIME_VERIFY_MEMORY:

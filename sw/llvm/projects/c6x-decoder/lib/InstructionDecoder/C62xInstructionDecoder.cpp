@@ -1219,8 +1219,8 @@ namespace native
         uint32_t instr = dec_instr->GetParentInstruction()->GetValue();
 
         uint8_t  mvk_type = (instr >> 6 & 0x01);
-        uint32_t uscst16  = (((instr >> 7) & 0x0000ffff) << 16);
-        int32_t  scst16   = ((((int32_t) instr >> 7) & 0x0000ffff) << 16) >> 16;
+        uint32_t uscst16  = ((instr >> 7) & 0xFFFF);
+        int32_t  scst16   = ((((int32_t) instr >> 7) & 0xFFFF) << 16) >> 16;
 
         switch(dec_instr->GetOpcode())
         {

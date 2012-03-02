@@ -80,7 +80,8 @@ fi
 print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
 #./c6x-decoder instructions.bin instructions.asm
-./c6x-decoder matmult.coff matmult.asm
+#./c6x-decoder matmult.coff matmult.asm
+./c6x-decoder /home/hamayun/workspace_ccs/factorial/Debug/factorial.out /home/hamayun/workspace_ccs/factorial/Debug/factorial.asm
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "
     exit 1
@@ -134,6 +135,6 @@ ln -sf ${NASIK_HOME}/hw/kvm-85/user/test/x86/kvm_c6x_bootstrap ${PFORM_DIR}/kvm_
 print_step "Running the Simulation ... "
 rm -f tty100
 export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
-./arch.x kvm_c6x_bootstrap APPLICATION.X
+./arch.x kvm_c6x_bootstrap APPLICATION.X /home/hamayun/workspace_ccs/factorial/Debug/factorial.out
 cat tty100 | less
 

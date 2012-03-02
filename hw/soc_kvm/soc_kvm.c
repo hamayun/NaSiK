@@ -790,34 +790,40 @@ void soc_kvm_run()
     printf("%s Exited; Return Value = %d\n", __func__, ret);
 }
 
-int soc_load_target_section(char * section_file, char * section_name)
+int soc_load_target_section(char * target_binary, char * section_name)
 {
-    uint32_t * kvm_mem_base_addr = (uint32_t *) soc_kvm_init_data.vm_mem;
+    uint8_t  * kvm_mem_base_addr = (uint8_t *) soc_kvm_init_data.vm_mem;
     uint32_t   binary_load_addr  = 0x0;         // Where this section should be loaded ?
     uint32_t   binary_size       = 0;
     uint32_t   binary_value      = 0;
     uint32_t   bytes_loaded      = 0;
 
-    FILE * target_sect_file = fopen(section_file, "r");
+    char section_file_path[256] = {0};
+    strncpy(section_file_path, target_binary, 256);
+    strcat(section_file_path, section_name);
+
+    fprintf(stdout, "Loading %s ... ", section_file_path);
+
+    FILE * target_sect_file = fopen(section_file_path, "r");
     if(! target_sect_file)
     {
-        fprintf(stderr, "Error Opening the Target Section File: %s\n", section_file);
+        fprintf(stderr, "\nError! Opening the Target Section File: %s\n", target_binary);
         return (-1);
     }
 
     if(fread((void *) & binary_load_addr, sizeof(uint32_t), 1, target_sect_file) != 1)
     {
-        fprintf(stderr, "Error Reading from target section file\n");
+        fprintf(stderr, "\nError! Reading from target section file\n");
         return (-1);
     }
 
     if(fread((void *) & binary_size, sizeof(uint32_t), 1, target_sect_file) != 1)
     {
-        fprintf(stderr, "Error Reading from target section file\n");
+        fprintf(stderr, "\nError! Reading from target section file\n");
         return (-1);
     }
 
-    fprintf(stdout, "Loading Target Binary (%s) at 0x%x, Size %d bytes\n", section_name, binary_load_addr, binary_size);
+    fprintf(stdout, " at 0x%08x [0x%x bytes]\n", binary_load_addr, binary_size);
 
     while(bytes_loaded < binary_size)
     {
@@ -830,7 +836,14 @@ int soc_load_target_section(char * section_file, char * section_name)
         // Write to KVM Memory
         *((uint32_t *)(kvm_mem_base_addr + binary_load_addr)) = binary_value;
 
-        binary_load_addr ++;
+#if 0
+        if(strcmp(section_name, ".cinit") == 0)
+        {
+            fprintf(stdout, "[0x%08x] = 0x%08x\n", (uint32_t *)(binary_load_addr),
+                    *(uint32_t *)(kvm_mem_base_addr + binary_load_addr));
+        }
+#endif
+        binary_load_addr += sizeof(uint32_t);
         bytes_loaded += sizeof(uint32_t);
     }
 
@@ -843,18 +856,27 @@ int soc_load_target_section(char * section_file, char * section_name)
     return (0);
 }
 
+// The target binary path; specified in platform's main.cpp (tuzki)
+extern char *p_target_binary;
+
 int soc_load_target_binary()
 {
-    if(soc_load_target_section("target_text", ".text"))
+    char * sections_to_load[] = {".text", ".far", ".stack", ".sysmem", ".cinit", ".const", ".cio", ""};
+    uint32_t i = 0;
+
+    if(!p_target_binary)
     {
-        fprintf(stderr, "Error Loading Target .text Section\n");
+        fprintf(stderr, "Error! Missing Path for Target Binary\n");
         return (-1);
     }
 
-    if(soc_load_target_section("target_data", ".data"))
+    for(i = 0; strcmp(sections_to_load[i], "") != 0; i++)
     {
-        fprintf(stderr, "Error Loading Target .data Section\n");
-        return (-1);
+        if(soc_load_target_section(p_target_binary, sections_to_load[i]))
+        {
+            fprintf(stderr, "Error Loading Target .text Section\n");
+            return (-1);
+        }
     }
 
     return (0);
@@ -874,7 +896,7 @@ int soc_fill_memory_pattern(uint32_t size, uint32_t pattern)
             *curr_ptr = pattern;
         else
             *curr_ptr = (uint32_t) kvm_phy_addr + 0x56341200;
-        
+
         curr_ptr++;
         kvm_phy_addr++;
     }
@@ -903,7 +925,8 @@ void soc_memory_dump(unsigned long addr, unsigned long size)
                addr + n, p[n + 0], p[n + 1], p[n + 2], p[n + 3], p[n + 4], p[n + 5], p[n + 6], p[n + 7],
                          p[n + 8], p[n + 9], p[n + 10], p[n + 11], p[n + 12], p[n + 13], p[n + 14], p[n + 15]);
     }
-    return 0;
+
+    return;
 }
 
 int soc_erase_memory(int size)

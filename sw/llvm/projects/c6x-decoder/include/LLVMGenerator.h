@@ -57,6 +57,8 @@ using namespace llvm;
 //#define JUST_ADD_ISA
 //#define OPTIMIZE_FUNCTIONS
 
+#define C62x_ISA_VER2
+
 namespace native
 {
     typedef struct AddrTableEntry
