@@ -331,7 +331,7 @@ namespace native
         if(!func_ptr)
         {
           COUT << "Could not Get Function Call for: "  << func_name << endl;
-          return NULL;
+          ASSERT(func_ptr != NULL, "Failed to Get Function Call");
         }
 
         INFO << "    Call to: " << func_name << "(...)" << endl;

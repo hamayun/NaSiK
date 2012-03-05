@@ -13,6 +13,9 @@
 extern address_entry_t AddressingTable[];
 extern uint32_t AddressingTableSize;
 
+extern void Print_DSP_Stack(C62x_DSPState_t * p_state, uint32_t stack_start);
+extern void DSP_Dump_Memory(uint32_t start_addr, uint32_t size);
+
 typedef int (*sim_func_t)(C62x_DSPState_t * p_state);
 
 sim_func_t find_sim_func(uint32_t target_pc)
@@ -48,6 +51,7 @@ int main(int argc, char **argv, char **environ)
 
     C62x_DSPState_t p_state;
     Init_DSP_State(& p_state);
+    //DSP_Dump_Memory(0x8EC0, 0x530);
 
     while(1)
     {
@@ -63,6 +67,23 @@ int main(int argc, char **argv, char **environ)
             printf("Target Program Counter = 0x%X\n", p_state.m_reg[REG_PC_INDEX]);
             ASSERT(0, "Native Simulation Functin Not Found");
         }
+
+        if(p_state.m_reg[REG_PC_INDEX] == 0x00008e84)
+        {
+            printf("Target Program Counter = 0x%X\n", p_state.m_reg[REG_PC_INDEX]);
+            ASSERT(0, "Fell into infinite loop ... Quitting!!!");
+        }
+
+#if 1
+        if(p_state.m_curr_cycle == 4171)
+        {
+            //Print_DSP_Stack(& p_state, 0x97EC);
+            DSP_Dump_Memory(0x9E90, 0x120);
+
+            printf("Target Program Counter = 0x%X\n", p_state.m_reg[REG_PC_INDEX]);
+            ASSERT(0, "Custom Break ... Quitting!!!");
+        }
+#endif
     }
     
     return 0;

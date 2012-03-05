@@ -11,7 +11,7 @@ importPackage(Packages.java.io);
 var kvm_regs_val = new Array();
 var cur_trace_line = 0;
 
-function getNextTrace(reader) 
+function getNextTrace(reader)
 {
     var str = reader.readLine();
     var addr = null;
@@ -29,7 +29,7 @@ function getNextTrace(reader)
     return addr;
 }
 
-function getNextRegister(reader, mod) 
+function getNextRegister(reader, mod)
 {
     var str = null;
     var reg_val = null;
@@ -64,7 +64,7 @@ function getNextRegister(reader, mod)
 
 }
 
-function readNextEntry(reader) 
+function readNextEntry(reader)
 {
     for(ibank = 'A'.charCodeAt(0); ibank < 'C'.charCodeAt(0); ibank++) {
         bank = String.fromCharCode(ibank);
@@ -77,6 +77,50 @@ function readNextEntry(reader)
     }
 
     return getNextTrace(reader);
+}
+
+function printCcsStack(debugSession, stack_start)
+{
+    var stack_ptr = debugSession.memory.readRegister("B15");
+    var stack_val = null;
+    var stack_size = 0;
+    var n_page = null;
+
+    stack_size = stack_start - stack_ptr + 4;
+    script.traceWrite("Stack Start: 0x" + Long.toHexString(stack_start) +
+                      " Pointer: 0x" + Long.toHexString(stack_ptr) +
+                      " Size: 0x" + Long.toHexString(stack_size));
+
+    while(stack_ptr <= stack_start)
+    {
+        n_page = debugSession.memory.getPage(0);
+        stack_val = debugSession.memory.readWord(n_page, stack_ptr);
+        script.traceWrite("[" + Long.toHexString(stack_ptr) + "] = 0x" + Long.toHexString(stack_val));
+
+        stack_ptr += 4;
+    }
+    return;
+}
+
+function printCcsMemory(start_addr, size)
+{
+    var curr_addr = start_addr;
+    var end_addr = start_addr + size;
+    var mem_val = null;
+    var n_page = 0x0;
+
+    script.traceWrite("Memory Dump: From 0x" + Long.toHexString(start_addr) +
+                              " To: 0x" +  Long.toHexString(end_addr));
+
+    while(curr_addr <= end_addr)
+    {
+        n_page = debugSession.memory.getPage(0);
+        mem_val = debugSession.memory.readWord(n_page, curr_addr);
+
+        script.traceWrite("[" + Long.toHexString(curr_addr) + "] = 0x" + Long.toHexString(mem_val));
+        curr_addr += 4;
+    }
+    return;
 }
 
 /* Zeros all GPR of the simulator */
@@ -151,6 +195,7 @@ debugSession.breakpoint.removeAll();
 // Get the first trace addr
 var trace = readNextEntry(reader);
 var is_started = false;
+var ccs_stack_start = null;
 
 if(trace == null) {
     script.traceWrite("No trace found in " + kvm_trace_file);
@@ -167,7 +212,7 @@ while(trace != null) {
     err_encountered = false;
     bp_id = debugSession.breakpoint.add(trace);
 
-    script.traceWrite("Comparing .... 0x" + Integer.toHexString(trace));
+    script.traceWrite("TRACE PCE1 [" + Integer.toHexString(trace) + "]");
 
     if(is_started)
         debugSession.target.run();
@@ -180,10 +225,16 @@ while(trace != null) {
     // If we not, it's probably that KVM's gone wild
     var css_stop_addr = debugSession.expression.evaluate("PC");
     if(css_stop_addr != trace) {
-        script.traceWrite("CCS did not stop at 0x" + Integer.toHexString(trace) + " but at 0x" + 
+        script.traceWrite("CCS did not stop at 0x" + Integer.toHexString(trace) + " but at 0x" +
                           Integer.toHexString(css_stop_addr) + "!");
         script.traceEnd();
         java.lang.System.exit(1);
+    }
+
+    if(!ccs_stack_start || (ccs_stack_start & 0x80000000))
+    {
+        ccs_stack_start = debugSession.memory.readRegister("B15");
+        //script.traceWrite("Stack Start: 0x" + Long.toHexString(ccs_stack_start));
     }
 
     // Registers value comparison
@@ -207,6 +258,9 @@ while(trace != null) {
                                   " (" + kvm_trace_file + ":" + new Integer(cur_trace_line).toString() + ")" +
                                   ": kvm " + reg_name + "=" + Long.toHexString(kvm_regs_val[reg_name]) +
                                   ", ccs " + reg_name + "=" + Long.toHexString(ccs_reg_val));
+
+                //printCcsStack(debugSession, ccs_stack_start);
+                printCcsMemory(0x9E90, 0x120);
             }
         }
     }

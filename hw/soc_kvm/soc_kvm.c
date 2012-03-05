@@ -842,7 +842,14 @@ int soc_load_target_section(char * target_binary, char * section_name)
             fprintf(stdout, "[0x%08x] = 0x%08x\n", (uint32_t *)(binary_load_addr),
                     *(uint32_t *)(kvm_mem_base_addr + binary_load_addr));
         }
+
+        if(strcmp(section_name, ".far") == 0)
+        {
+            fprintf(stdout, "[%x] = %x\n", (uint32_t *)(binary_load_addr),
+                    *(uint32_t *)(kvm_mem_base_addr + binary_load_addr));
+        }
 #endif
+
         binary_load_addr += sizeof(uint32_t);
         bytes_loaded += sizeof(uint32_t);
     }
@@ -861,7 +868,8 @@ extern char *p_target_binary;
 
 int soc_load_target_binary()
 {
-    char * sections_to_load[] = {".text", ".far", ".stack", ".sysmem", ".cinit", ".const", ".cio", ""};
+    //char * sections_to_load[] = {".text", ".far", ".stack", ".sysmem", ".cinit", ".const", ".cio", ""};
+    char * sections_to_load[] = {".text", ".sysmem", ".cinit", ".const", ""};
     uint32_t i = 0;
 
     if(!p_target_binary)

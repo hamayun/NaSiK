@@ -80,7 +80,7 @@ namespace native
             p_addr_table = new AddrTableEntry_t[max_size];
             ASSERT(p_addr_table, "Allocating Memory for Addressing Table");
 
-            INFO << "Addressing Table Created for " << max_size << " Entries" << endl;
+            INFO << "Addressing Table Created for " << dec << max_size << " Entries" << endl;
         }
 
         virtual uint32_t GetMaxSize()

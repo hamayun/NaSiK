@@ -30,6 +30,7 @@
 
 #define ENABLE_TRACE
 #define QUEUE_BASED_DREGS
+//#define DELAYED_MWBS
 
 #ifdef ENABLE_TRACE
 #define TRACE_PRINT(fmt, args...)                               \
@@ -148,6 +149,7 @@ typedef enum ReturnStatus
     WAIT_FOR_INTERRUPT = 2
 } ReturnStatus_t;
 
+#define REG_SP_INDEX   (REG_BANK_B * C62X_REGS_PER_BANK) + 15
 #define REG_AMR_INDEX  (REG_BANK_C * C62X_REGS_PER_BANK) + REG_AMR
 #define REG_CSR_INDEX  (REG_BANK_C * C62X_REGS_PER_BANK) + REG_CSR
 #define REG_ISR_INDEX  (REG_BANK_C * C62X_REGS_PER_BANK) + REG_ISR

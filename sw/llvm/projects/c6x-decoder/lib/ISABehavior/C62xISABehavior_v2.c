@@ -174,6 +174,7 @@ uint32_t Update_Registers(C62x_DSPState_t * p_state)
 }
 #endif
 
+#ifdef DELAYED_MWBS
 int32_t __EnQ_MWB(C62x_MWB_Queue_t * mwb_queue, C62xMWB_Size_t size, uint32_t addr, uint32_t value)
 {
     if(mwb_queue->m_tail_node->m_next_node == mwb_queue->m_head_node)
@@ -255,6 +256,7 @@ int32_t Do_Memory_Writebacks(C62x_DSPState_t * p_state)
 
     return (0);
 }
+#endif
 
 void Update_PC(C62x_DSPState_t * p_state, int32_t offset)
 {
@@ -1491,7 +1493,7 @@ C62xLDB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       %s,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+        TRACE_PRINT("%08x\tLDB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -1517,7 +1519,7 @@ C62xLDB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -1543,7 +1545,7 @@ C62xLDB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -1563,14 +1565,14 @@ C62xLDBU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        int8_t * ptr  = FindMemoryAddress(p_state, rb, idx_rb, ra, mode, BYTE_ALIGN);
+        uint8_t * ptr  = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, BYTE_ALIGN);
 
         // Now we should have a valid address (mode-wise).
-        rd = * ((int8_t *) ptr);
+        rd = * ((uint8_t *) ptr);
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      %s,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+        TRACE_PRINT("%08x\tLDBU      %s,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -1588,14 +1590,14 @@ C62xLDBU_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        int8_t * ptr  = FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
+        uint8_t * ptr  = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
 
         // Now we should have a valid address (mode-wise).
-        rd = * ((int8_t *) ptr);
+        rd = * ((uint8_t *) ptr);
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -1613,14 +1615,14 @@ C62xLDBU_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        int8_t * ptr  = FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
+        uint8_t * ptr  = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
 
         // Now we should have a valid address (mode-wise).
-        rd = * ((int8_t *) ptr);
+        rd = * ((uint8_t *) ptr);
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%02X\n",
+        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -2478,7 +2480,9 @@ C62xNOP_UC4(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_
         {
             //printf("Multi-Cycle NOP; i = %d\n", i);
             Inc_DSP_Cycles(p_state);
+#ifdef DELAYED_MWBS
             Do_Memory_Writebacks(p_state);
+#endif
             new_pc = Update_Registers(p_state);
             if(new_pc)
             {
@@ -2921,7 +2925,7 @@ C62xSHL_SR32_UR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         int32_t ra     = (int32_t) p_state->m_reg[idx_ra];
         int32_t shift  = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
-        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+        //ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
 
         int32_t rd     = ra << shift;
 
@@ -3648,17 +3652,21 @@ C62xSTB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, BYTE_ALIGN);
+        uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, BYTE_ALIGN);
+
+        TRACE_PRINT("%08x\tSTB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_BYTE, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTB       %s,%s,%s\n",
-                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint8_t) src;
+#endif
     }
     return OK;
 }
@@ -3675,17 +3683,21 @@ C62xSTB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
+        uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
+
+        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_BYTE, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint8_t) src;
+#endif
     }
     return OK;
 }
@@ -3702,17 +3714,21 @@ C62xSTB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
+        uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
+
+        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_BYTE, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint8_t) src;
+#endif
     }
     return OK;
 }
@@ -3731,17 +3747,21 @@ C62xSTH_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, HWORD_ALIGN);
+        uint16_t *ptr = (uint16_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, HWORD_ALIGN);
+
+        TRACE_PRINT("%08x\tSTH       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint16_t) src);
 
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_HWORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTH       %s,%s,%s\n",
-                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint16_t) src;
+#endif
     }
     return OK;
 }
@@ -3758,17 +3778,21 @@ C62xSTH_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
+        uint16_t *ptr = (uint16_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
+
+        TRACE_PRINT("%08x\tSTH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint16_t) src);
 
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_HWORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTH       0x%x,%s,%s\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint16_t) src;
+#endif
     }
     return OK;
 }
@@ -3785,17 +3809,21 @@ C62xSTH_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         ASSERT(amr == 0x0, "AMR Register Indicates Circular Addressing Mode");
 
-        uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
+        uint16_t *ptr = (uint16_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, HWORD_ALIGN);
+
+        TRACE_PRINT("%08x\tSTH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint16_t) src);
 
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_HWORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTH       0x%x,%s,%s\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint16_t) src;
+#endif
     }
     return OK;
 }
@@ -3816,15 +3844,19 @@ C62xSTW_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, WORD_ALIGN);
 
+        TRACE_PRINT("%08x\tSTW       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint32_t) src);
+
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_WORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTW       %s,%s,%s\n",
-                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint32_t) src;
+#endif
     }
     return OK;
 }
@@ -3843,15 +3875,19 @@ C62xSTW_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, WORD_ALIGN);
 
+        TRACE_PRINT("%08x\tSTW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint32_t) src);
+
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_WORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTW       0x%x,%s,%s\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint32_t) src;
+#endif
     }
     return OK;
 }
@@ -3870,15 +3906,19 @@ C62xSTW_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, WORD_ALIGN);
 
+        TRACE_PRINT("%08x\tSTW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint32_t) src);
+
         // Now we should have a valid address (mode-wise).
+#ifdef DELAYED_MWBS
         // Put Value in the Write Back Buffer.
         if(EnQ_MWB(p_state, MWB_WORD, (uint32_t) ptr, src, delay))
         {
            ASSERT(1, "Error in Add Memory Write Back\n");
         }
-
-        TRACE_PRINT("%08x\tSTW       0x%x,%s,%s\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
+#else
+        * ptr = (uint32_t) src;
+#endif
     }
     return OK;
 }

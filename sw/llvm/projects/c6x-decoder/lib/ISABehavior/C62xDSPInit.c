@@ -76,11 +76,14 @@ int32_t Init_DSP_State(C62x_DSPState_t * p_state)
             return (-1);
         }
 #endif
+
+#ifdef DELAYED_MWBS
         if(Init_MWB_Queue(& p_state->m_mwback_q[index]))
         {
             printf("Error: Initializing Write Back Queue [%d]\n", index);
             return (-1);
         }
+#endif
     }
 
     for(index = 0; index < C62X_REG_BANKS; index++)
@@ -141,6 +144,7 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
     }
 #endif
 
+#ifdef DELAYED_MWBS
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
         C62x_MWB_Queue_t   * mwb_queue = & p_state->m_mwback_q[index];
@@ -179,12 +183,14 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
         }
         printf("}\n");
     }
+#endif
 
     printf("TRACE PCE1 [%08x] ", p_state->m_reg[REG_PC_INDEX]);
     printf("%7s Cycles Completed: %016lld\n\n", "", p_state->m_curr_cycle);
 
     return (0);
 }
+
 #ifdef QUEUE_BASED_DREGS
 int32_t Init_Delay_Reg_Queue(C62x_Delay_Queue_t * delay_queue)
 {
@@ -223,6 +229,7 @@ int32_t Init_Delay_Reg_Queue(C62x_Delay_Queue_t * delay_queue)
 }
 #endif
 
+#ifdef DELAYED_MWBS
 int32_t Init_MWB_Queue(C62x_MWB_Queue_t * mwb_queue)
 {
     C62x_MWBack_Node_t * curr_node   = NULL;
@@ -258,4 +265,38 @@ int32_t Init_MWB_Queue(C62x_MWB_Queue_t * mwb_queue)
     mwb_queue->m_tail_node = mwb_queue->m_head_node;
     mwb_queue->m_is_empty = 1;
     return(0);
+}
+#endif
+
+void Print_DSP_Stack(C62x_DSPState_t * p_state, uint32_t stack_start)
+{
+    uint32_t stack_ptr  = p_state->m_reg[REG_SP_INDEX];
+    uint32_t stack_size = stack_start - stack_ptr + 4;
+    uint32_t stack_val  = 0x0;
+
+    printf("Stack Start: 0x%x Pointer: 0x%x Size: 0x%x\n", stack_start, stack_ptr, stack_size);
+
+    while(stack_ptr <= stack_start)
+    {
+        stack_val =  *((uint32_t *) stack_ptr);
+        printf("[%x] = 0x%x\n", stack_ptr, stack_val);
+
+        stack_ptr += 4;
+    }
+    return;
+}
+
+void DSP_Dump_Memory(uint32_t start_addr, uint32_t size)
+{
+    uint32_t curr_addr = start_addr;
+    uint32_t end_addr = start_addr + size;
+
+    printf("Memory Dump: From 0x%x To: 0x%x\n", start_addr, end_addr);
+
+    while(curr_addr <= end_addr)
+    {
+        printf("[%x] = 0x%x\n", curr_addr, *((uint32_t *) curr_addr));
+        curr_addr += 4;
+    }
+    return;
 }

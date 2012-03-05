@@ -152,7 +152,7 @@ namespace native
         if(!func_ptr)
         {
           COUT << "Could not Get Function Call for: "  << func_name << endl;
-          return NULL;
+          ASSERT(func_ptr != NULL, "Failed to Get Function Call");
         }
 
         INFO << "    Call to: " << func_name << "(...)" << endl;
@@ -185,8 +185,6 @@ namespace native
             Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, NULL);
 #endif
             ASSERT(func_value, "Error: In Creating Function Call");
-
-            //CreateCallByName("Print_DSP_State");
         }
 
         CreateCallByName("Print_DSP_State");
@@ -378,7 +376,7 @@ namespace native
         INFO << "    Call to: " << "Inc_DSP_Cycles" << "(...)" << endl;
         irbuilder.CreateCall(p_inc_cycles, p_proc_state);
 
-        CreateCallByName("Do_Memory_Writebacks");
+        //CreateCallByName("Do_Memory_Writebacks");
         updated_pc = CreateCallByName("Update_Registers"); INFO << endl;
         irbuilder.CreateRet(updated_pc);
 #else
