@@ -39,6 +39,15 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
+print_step "Compiling Coff Binary ...${CCS_EXAMPLE_OUTFILE}"
+cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
+gmake clean
+gmake -k all
+if [ $? != 0 ]; then
+    print_error "Error! Compiling Coff Binary ..."
+    exit 1
+fi
+
 print_step "Building the C6x Decoder ... "
 cd ${C6XDEC_BUILD}
 make -s
@@ -80,13 +89,11 @@ fi
 print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
 #./c6x-decoder instructions.bin instructions.asm
-#./c6x-decoder matmult.coff matmult.asm
-./c6x-decoder /home/hamayun/workspace_ccs/factorial/Debug/factorial.out /home/hamayun/workspace_ccs/factorial/Debug/factorial.asm
+./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "
     exit 1
 fi
-
 
 if [ "$1" = "dec" ]; then
 	exit 2
@@ -135,6 +142,6 @@ ln -sf ${NASIK_HOME}/hw/kvm-85/user/test/x86/kvm_c6x_bootstrap ${PFORM_DIR}/kvm_
 print_step "Running the Simulation ... "
 rm -f tty100
 export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
-./arch.x kvm_c6x_bootstrap APPLICATION.X /home/hamayun/workspace_ccs/factorial/Debug/factorial.out
+./arch.x kvm_c6x_bootstrap APPLICATION.X ${CCS_EXAMPLE_PATH}
 #cat tty100 | less
 

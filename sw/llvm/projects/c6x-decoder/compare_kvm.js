@@ -151,6 +151,17 @@ function printCcsMemory(start_addr, size)
     return;
 }
 
+function getFileLinesCount(filename)
+{
+    lineReader = new LineNumberReader(new FileReader(filename));
+    var cnt = 0;
+    lineRead = "";
+    while ((lineRead = lineReader.readLine()) != null) {}
+    cnt = lineReader.getLineNumber();
+    lineReader.close();
+    return cnt;
+}
+
 /* Zeros all GPR of the simulator */
 function setCssIntialState(debugSession)
 {
@@ -172,7 +183,7 @@ var script = ScriptingEnvironment.instance();
 script.traceBegin("BreakpointsTestLog.xml", "DefaultStylesheet.xsl");
 
 // Set our TimeOut
-script.setScriptTimeout(15000);
+script.setScriptTimeout(50000);
 
 // Log everything
 script.traceSetConsoleLevel(TraceLevel.INFO);
@@ -185,9 +196,12 @@ debugSession = debugServer.openSession(".*");
 
 // I don't want to loose time to search how to read command line arguments for the moment
 var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";
+//var c6x_coff_binary = "/home/hamayun/workspace_ccs/matmult/Debug/matmult.out";
 var kvm_trace_file  = "/home/hamayun/workspace/NaSiK/examples/platforms/tuzki/tty100";
 var stop_on_first_err = true;
 var mem_dump_flag = false;
+var trace_lines_total = getFileLinesCount(kvm_trace_file);
+var trace_progress = 0;
 
 var fstream;
 var fin;
@@ -271,7 +285,8 @@ while(trace != null) {
         printCcsRegisters(debugSession);
     }*/
 
-    script.traceWrite("TRACE PCE1 [" + Integer.toHexString(trace) + "]");
+    trace_progress = (cur_trace_line / trace_lines_total) * 100;
+    script.traceWrite("[" + Integer(Math.floor(trace_progress)).toString() + "%]: TRACE PCE1 [" + Integer.toHexString(trace) + "]");
 
     // Registers value comparison
     var bank, reg;

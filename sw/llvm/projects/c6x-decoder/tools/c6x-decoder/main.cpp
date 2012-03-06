@@ -75,7 +75,7 @@ int main (int argc, char ** argv)
         instr_address += 4;
     }
 
-    string sections_to_dump[] = {".text", ".cinit", ".const", ""};
+    string sections_to_dump[] = {".text", ".data", ".cinit", ".const", ""};
 
     // Dump the different sections of input binary to files for loading to KVM Memory
     for(int i = 0; strcmp(sections_to_dump[i].c_str(), "") != 0; i++)

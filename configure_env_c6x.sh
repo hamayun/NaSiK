@@ -12,6 +12,13 @@ export BAREMETAL_TOOLCHAIN=/opt/toolchains/i386-pc-baremetal
 
 export TARGET_BIN_WRITER=/home/hamayun/examples/binary-file-writer
 
+export CCS_WORKSPACE_PATH=/home/hamayun/workspace_ccs
+export CCS_EXAMPLE_NAME=factorial
+export CCS_EXAMPLE_BUILD=Debug
+export CCS_EXAMPLE_OUTFILE=${CCS_EXAMPLE_NAME}.out
+export CCS_EXAMPLE_PATH=${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}/${CCS_EXAMPLE_OUTFILE}
+source ${CCS_WORKSPACE_PATH}/install.sh
+
 export C6XDEC_SOURCE=${NASIK_HOME}/sw/llvm/projects/c6x-decoder
 export C6XDEC_BUILD=${HOME}/workspace/Build/llvm-2.8/projects/c6x-decoder
 
@@ -39,6 +46,8 @@ echo "BAREMETAL_TOOLCHAIN     = $BAREMETAL_TOOLCHAIN"
 echo "LIBKVM_HOME             = $LIBKVM_HOME"
 echo "LIBKVM_PREFIX           = $LIBKVM_PREFIX"
 echo "TARGET_BIN_WRITER       = $TARGET_BIN_WRITER"
+echo "CCS_WORKSPACE_PATH      = $CCS_WORKSPACE_PATH"
+echo "CCS_EXAMPLE_PATH        = $CCS_EXAMPLE_PATH"
 echo "C6XDEC_SOURCE           = $C6XDEC_SOURCE"
 echo "C6XDEC_BUILD            = $C6XDEC_BUILD"
 echo "C6XISA_BEHAVIOR         = $C6XISA_BEHAVIOR"

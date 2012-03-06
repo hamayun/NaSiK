@@ -27,6 +27,10 @@ print_step "Cleaning Binary File Writer ... "
 cd ${TARGET_BIN_WRITER}
 make clean
 
+print_step "Cleaning Coff Binary ...${CCS_EXAMPLE_OUTFILE}"
+cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
+gmake clean
+
 print_step "Cleaning the C6x Decoder ... "
 cd ${C6XDEC_BUILD}
 make clean
@@ -60,5 +64,6 @@ rm -f ${PFORM_DIR}/kvm_c6x_bootstrap
 rm -f ${PFORM_DIR}/target_binary_text
 rm -f ${GENERATED_APP}/c6x-decoder
 rm -f ${GENERATED_APP}/instructions.bin
+rm -f ${CCS_EXAMPLE_PATH}.*
 
 

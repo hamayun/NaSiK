@@ -868,7 +868,7 @@ extern char *p_target_binary;
 
 int soc_load_target_binary()
 {
-    char * sections_to_load[] = {".text", ".cinit", ".const", ""};
+    char * sections_to_load[] = {".text", ".data", ".cinit", ".const", ""};
     uint32_t i = 0;
 
     if(!p_target_binary)
