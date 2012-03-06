@@ -657,6 +657,16 @@ namespace native
             return(NULL);
         }
 
+        uint32_t FindSymbolAddr(string sym_name) const
+        {
+            for(int i=0; i < m_nm_entries; i++)
+            {
+                if(strcmp(p_symtab[i].get_name_str(), sym_name.c_str()) == 0)
+                    return (p_symtab[i].get_sym_val());
+            }
+            return 0x0;
+        }
+
         virtual char * GetRawSymbol(uint32_t address) const
         {
             coff_symtab_entry * ptr_symtab_entry = get_symtab_entry_byval(address);

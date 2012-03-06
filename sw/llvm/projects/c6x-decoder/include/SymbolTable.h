@@ -45,6 +45,8 @@ namespace native
         // The following function returns the symbol but return null for hidden symbols
         virtual char * GetSymbol(uint32_t address) const { DOUT << "Not Implemented !!!"; return (NULL); }
 
+        virtual uint32_t FindSymbolAddr(string sym_name) const { DOUT << "Not Implemented !!!"; return (0); }
+
         // The following function does not hide any symbol; except for .debug ones
         virtual char * GetRawSymbol(uint32_t address) const { DOUT << "Not Implemented !!!"; return (NULL); }
 

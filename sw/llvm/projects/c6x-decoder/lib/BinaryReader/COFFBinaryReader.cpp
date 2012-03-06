@@ -228,6 +228,22 @@ namespace native
         return(p_opt_file_header->get_entry_point());
     }
 
+    uint32_t COFFBinaryReader :: GetExitPoint()
+    {
+        uint32_t abort_addr = p_symbol_table->FindSymbolAddr("C$$EXIT");
+
+        if(!abort_addr)
+        {
+            abort_addr = p_symbol_table->FindSymbolAddr("_abort");
+            if(!abort_addr)
+            {
+                WARN << "Exit Point Not Found" << endl;
+            }
+        }
+
+        return(abort_addr);
+    }
+
     Instruction * COFFBinaryReader :: Read(uint32_t * section_handle, uint32_t address)
     {
         coff_section * p_section   = (coff_section * ) section_handle;
@@ -318,17 +334,22 @@ namespace native
             return (-1);
         }
 
-        if(p_section->get_nm_entries() == 0)
-        {
-            DOUT << "Warning: Section " << section_name << " Found But Contains No Entries" << endl;
-            return (0);
-        }
-
         ofstream * output_binary = new ofstream(output_file_name.c_str(), ios::out | ios::binary);
         if(! output_binary->is_open())
         {
             DOUT << "Error: Opening Output File: " << output_file_name.c_str() << endl;
             return (-1);
+        }
+
+        if(p_section->get_nm_entries() == 0)
+        {
+            DOUT << "Warning: Section " << section_name << " Found But Contains No Entries" << endl;
+            output_binary->write((char *) & binary_value, sizeof(uint32_t));
+            output_binary->write((char *) & binary_value, sizeof(uint32_t));
+            output_binary->close();
+            delete output_binary;
+            output_binary = NULL;
+            return (0);
         }
 
         // First Four Bytes indicate the Address where this Section should be loaded in KVM Memory

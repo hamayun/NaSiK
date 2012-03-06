@@ -57,6 +57,9 @@ namespace native
         // To find the Virtual Entry Point Address of the input binary; From where to Start Execution !!!
         virtual uint32_t GetEntryPoint() = 0;
 
+        // If this Address (Abort Point) is Reached ... the Simulator Should Stop.
+        virtual uint32_t GetExitPoint() { ASSERT(0, "Not Implemented"); }
+
         virtual SymbolTable * GetSymbolTable() { return (p_symbol_table); }
 
         // Every subclass must implement its own Read function.

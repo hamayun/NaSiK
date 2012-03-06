@@ -489,6 +489,15 @@ namespace native
             /*Name=*/"STARTUP_PC");
         gen_startup_pc->setAlignment(32);
 
+        Constant * exit_pc = irbuilder.getInt32(pconfigs->GetExitPC()); /// TODO ???
+        GlobalVariable* gen_exit_pc = new GlobalVariable(*p_addr_mod,
+            /*Type=*/irbuilder.getInt32Ty(),
+            /*isConstant=*/true,
+            /*Linkage=*/GlobalValue::ExternalLinkage,
+            /*Initializer=*/exit_pc,
+            /*Name=*/"EXIT_PC");
+        gen_exit_pc->setAlignment(32);
+
         return 0;
     }
 

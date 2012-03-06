@@ -79,6 +79,34 @@ function readNextEntry(reader)
     return getNextTrace(reader);
 }
 
+var pad_str = new Array("", "0", "00", "000", "0000", "00000", "000000", "0000000", "0000000");
+
+function printCcsRegisters(debugSession)
+{
+    var bank, reg;
+    out_str = "";
+    for(ibank = 'A'.charCodeAt(0); ibank < 'C'.charCodeAt(0); ibank++) {
+        bank = String.fromCharCode(ibank);
+
+        for(reg = 0; reg < 16; reg++) {
+            reg_name = bank + new Integer(reg).toString();
+            var reg_val = debugSession.memory.readRegister(reg_name);
+            var pad_cnt = Math.floor((Long.numberOfLeadingZeros(reg_val) - 32) / 4);
+
+            if(reg < 10) out_str += " ";
+            out_str += "  " + reg_name + "=0x" + pad_str[pad_cnt] + Long.toHexString(reg_val);
+
+            if(reg % 4 == 3)
+            {
+                script.traceWrite(out_str);
+                out_str = "";
+            }
+        }
+        out_str = "\n";
+    }
+    return;
+}
+
 function printCcsStack(debugSession, stack_start)
 {
     var stack_ptr = debugSession.memory.readRegister("B15");
@@ -112,7 +140,7 @@ function printCcsMemory(start_addr, size)
     script.traceWrite("Memory Dump: From 0x" + Long.toHexString(start_addr) +
                               " To: 0x" +  Long.toHexString(end_addr));
 
-    while(curr_addr <= end_addr)
+    while(curr_addr < end_addr)
     {
         n_page = debugSession.memory.getPage(0);
         mem_val = debugSession.memory.readWord(n_page, curr_addr);
@@ -159,6 +187,7 @@ debugSession = debugServer.openSession(".*");
 var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";
 var kvm_trace_file  = "/home/hamayun/workspace/NaSiK/examples/platforms/tuzki/tty100";
 var stop_on_first_err = true;
+var mem_dump_flag = false;
 
 var fstream;
 var fin;
@@ -212,8 +241,6 @@ while(trace != null) {
     err_encountered = false;
     bp_id = debugSession.breakpoint.add(trace);
 
-    script.traceWrite("TRACE PCE1 [" + Integer.toHexString(trace) + "]");
-
     if(is_started)
         debugSession.target.run();
     else {
@@ -236,6 +263,15 @@ while(trace != null) {
         ccs_stack_start = debugSession.memory.readRegister("B15");
         //script.traceWrite("Stack Start: 0x" + Long.toHexString(ccs_stack_start));
     }
+
+    /*
+    if(trace == 0x89b4 || mem_dump_flag)
+    {
+        mem_dump_flag = true;
+        printCcsRegisters(debugSession);
+    }*/
+
+    script.traceWrite("TRACE PCE1 [" + Integer.toHexString(trace) + "]");
 
     // Registers value comparison
     var bank, reg;
@@ -260,9 +296,14 @@ while(trace != null) {
                                   ", ccs " + reg_name + "=" + Long.toHexString(ccs_reg_val));
 
                 //printCcsStack(debugSession, ccs_stack_start);
-                printCcsMemory(0x9E90, 0x120);
+                //printCcsMemory(0x9E90, 0x120);
             }
         }
+    }
+
+    if(mem_dump_flag)
+    {
+        printCcsMemory(0x9E90, 36);
     }
 
     if(err_encountered && stop_on_first_err) {

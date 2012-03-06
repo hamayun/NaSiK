@@ -66,6 +66,7 @@ namespace native
         virtual uint32_t *GetSectionHandle(string section_name);
         virtual uint32_t  GetSectionStartAddress(uint32_t * section_handle);
         virtual uint32_t  GetEntryPoint();
+        virtual uint32_t  GetExitPoint();
         virtual Instruction * Read(uint32_t * section_handle, uint32_t address);
         // Dump A Given Section to file.
         virtual int32_t DumpSection(string infile, string outfile, string section_name);

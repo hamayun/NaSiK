@@ -50,9 +50,13 @@ int main (int argc, char ** argv)
     uint32_t *section_handle = reader->GetSectionHandle(".text");
     uint32_t  instr_address  = reader->GetSectionStartAddress(section_handle);
 
-    // cout << "Text Section Handle: " << section_handle << endl;
-    cout << "Entry Point Address: " << FMT_INT << reader->GetEntryPoint() << endl;
-    BinaryConfigs binary_configs(reader->GetEntryPoint());
+
+    uint32_t entry_point = reader->GetEntryPoint();
+    uint32_t exit_point  = reader->GetExitPoint();
+
+    cout << "Entry Point Address: " << FMT_INT << entry_point << endl;
+    cout << "Exit Point Address: " << FMT_INT << exit_point << endl;
+    BinaryConfigs binary_configs(entry_point, exit_point);
 
     ofstream  *p_output = new ofstream(argv[2], ios::out);
     if(!p_output->is_open()){
@@ -71,7 +75,7 @@ int main (int argc, char ** argv)
         instr_address += 4;
     }
 
-    string sections_to_dump[] = {".text", ".far", ".stack", ".sysmem", ".cinit", ".const", ".cio", ""};
+    string sections_to_dump[] = {".text", ".cinit", ".const", ""};
 
     // Dump the different sections of input binary to files for loading to KVM Memory
     for(int i = 0; strcmp(sections_to_dump[i].c_str(), "") != 0; i++)

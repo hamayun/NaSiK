@@ -186,7 +186,11 @@ int32_t Print_DSP_State(C62x_DSPState_t * p_state)
 #endif
 
     printf("TRACE PCE1 [%08x] ", p_state->m_reg[REG_PC_INDEX]);
+#ifdef PRINT_CYCLES
     printf("%7s Cycles Completed: %016lld\n\n", "", p_state->m_curr_cycle);
+#else
+    printf("\n\n");
+#endif
 
     return (0);
 }
@@ -293,7 +297,7 @@ void DSP_Dump_Memory(uint32_t start_addr, uint32_t size)
 
     printf("Memory Dump: From 0x%x To: 0x%x\n", start_addr, end_addr);
 
-    while(curr_addr <= end_addr)
+    while(curr_addr < end_addr)
     {
         printf("[%x] = 0x%x\n", curr_addr, *((uint32_t *) curr_addr));
         curr_addr += 4;
