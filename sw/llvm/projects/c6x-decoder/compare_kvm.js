@@ -331,6 +331,8 @@ while(trace != null) {
     trace = readNextEntry(reader);
 }
 
+script.traceWrite("[100%]: TRACE PCE1 [NULL]");
+
 // All done
 fin.close();
 debugSession.terminate();
