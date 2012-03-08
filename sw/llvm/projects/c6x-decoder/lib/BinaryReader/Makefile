@@ -10,6 +10,7 @@ LEVEL=../..
 #
 LIBRARYNAME=BinaryReader
 
+CXXFLAGS += -fno-strict-aliasing
 #
 # Include Makefile.common so we know what to do.
 #
