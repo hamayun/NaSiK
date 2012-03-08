@@ -1,5 +1,6 @@
 
 #include <Processor/IO.h>
+
 extern char * PLATFORM_DEBUG_CHARPORT;
 
 void platform_debug_puts (char * string)

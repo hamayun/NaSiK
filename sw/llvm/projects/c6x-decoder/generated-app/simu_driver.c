@@ -46,24 +46,22 @@ sim_func_t find_sim_func(uint32_t target_pc)
     return (sim_func);
 }
 
-
 int main(int argc, char **argv, char **environ)
 {
-//    CPU_PROFILE_VERIFY_MEMORY();
     sim_func_t curr_func = NULL;
     uint32_t ret_val = 0;
 
     C62x_DSPState_t p_state;
     Init_DSP_State(& p_state);
-    //DSP_Dump_Memory(0x8EC0, 0x530);
 
+    CPU_PROFILE_COMP_START();
     while(1)
     {
         curr_func = find_sim_func(p_state.m_reg[REG_PC_INDEX]);
         if(curr_func)
         {
             ret_val = curr_func(& p_state);
-            //Print_DSP_State(& p_state);
+            Print_DSP_State(& p_state);
         }
         else
         {
@@ -78,6 +76,8 @@ int main(int argc, char **argv, char **environ)
 
         if(p_state.m_reg[REG_PC_INDEX] == EXIT_POINT_PC)
         {
+            CPU_PROFILE_COMP_END();
+            CPU_PROFILE_FLUSH_DATA();
             printf("EXIT_POINT_PC (0x%08X) Reached\n", EXIT_POINT_PC);
             ASSERT(0, "Simulation Stopped ... !!!");
         }

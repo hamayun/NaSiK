@@ -197,7 +197,7 @@ debugSession = debugServer.openSession(".*");
 // I don't want to loose time to search how to read command line arguments for the moment
 var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";
 //var c6x_coff_binary = "/home/hamayun/workspace_ccs/matmult/Debug/matmult.out";
-var kvm_trace_file  = "/home/hamayun/workspace/NaSiK/examples/platforms/tuzki/tty100";
+var kvm_trace_file  = "/home/hamayun/workspace/NaSiK/examples/platforms/tuzki/tty_debug_00";
 var stop_on_first_err = true;
 var mem_dump_flag = false;
 var trace_lines_total = getFileLinesCount(kvm_trace_file);

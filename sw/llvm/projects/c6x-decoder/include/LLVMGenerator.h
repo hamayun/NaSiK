@@ -57,7 +57,9 @@ using namespace llvm;
 //#define JUST_ADD_ISA
 //#define OPTIMIZE_FUNCTIONS
 
+#ifndef C62x_ISA_VER2
 #define C62x_ISA_VER2
+#endif
 
 namespace native
 {

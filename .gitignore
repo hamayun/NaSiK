@@ -11,8 +11,11 @@ examples/platforms/tuzki/arch.x
 examples/platforms/tuzki/hosttime_kvm.txt
 examples/platforms/tuzki/objs/
 examples/platforms/tuzki/output_data
-examples/platforms/tuzki/tty100
 sw/llvm/projects/c6x-decoder/generated-app/input_data
 sw/llvm/projects/c6x-decoder/generated-app/*.asm
 sw/llvm/projects/c6x-decoder/generated-app/*.text
 hw/kvm-85/user/test/x86/kvm_c6x_bootstrap
+examples/platforms/tuzki/tty_*
+examples/platforms/tuzki/log*
+sw/llvm/projects/c6x-decoder/generated-app/gen_*
+sw/llvm/projects/c6x-decoder/generated-app/header_tables.txt

@@ -128,7 +128,7 @@ int main (int argc, char ** argv)
     uint32_t curr_pkt = 0;
     uint32_t progress = 0;
 
-    COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets" << endl;
+    COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets ... ";
     for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
         EPLI != EPLE; ++EPLI)
     {
@@ -142,7 +142,7 @@ int main (int argc, char ** argv)
         }
 
         progress = ++curr_pkt / total_pkts * 100;
-        cout << "[" << setw(3) << setfill(' ') << progress << "%]\r";
+        cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
     }
     cout << "\n";
 #endif

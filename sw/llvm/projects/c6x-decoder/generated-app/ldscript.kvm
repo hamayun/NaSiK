@@ -44,7 +44,7 @@ SECTIONS
     } > mem :data
 
     .hal ALIGN(0x8): {
-        PLATFORM_DEBUG_CHARPORT = .; LONG(0xC0000000)
+        PLATFORM_DEBUG_CHARPORT = .; LONG(0xC0000100)
 
         CPU_BSS_START    = .; LONG(__bss_start)
         CPU_BSS_END      = .; LONG(__bss_end)

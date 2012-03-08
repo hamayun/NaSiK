@@ -32,7 +32,7 @@ namespace native
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
         i32(IntegerType::get(m_context, 32)), iptr(IntegerType::get(m_context, 8 * sizeof(intptr_t))),
         p_outs_gen_mod(GetOutputStream(output_bcfile.c_str())),
-        p_outs_addr_mod(GetOutputStream("gen_addresses.bc"))
+        p_outs_addr_mod(GetOutputStream("gen_addr.bc"))
     {
         string error;
 

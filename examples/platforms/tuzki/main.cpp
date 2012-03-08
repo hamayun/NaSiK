@@ -127,20 +127,22 @@ int sc_main (int argc, char ** argv)
 
     mem_device         *ram = new mem_device("ram", soc_kvm_init_data.memory_size, soc_kvm_init_data.vm_mem);
     mem_device  *shared_ram = new mem_device("shared_ram", 0x10000);
-    sl_tty_device     *tty0 = new sl_tty_device ("tty1", 1);
+    sl_tty_device *tty_cons = new sl_tty_device ("tty_console_", 1);
+    sl_tty_device *tty_dbgs = new sl_tty_device ("tty_debug_", 1);
     sl_tg_device        *tg = new sl_tg_device ("tg", "fdaccess.0.0");
     fb_device           *fb = new fb_device("framebuffer", 0, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
 
     slaves[nslaves++] = ram;			 // 0	0x00000000 - 0x08000000
     slaves[nslaves++] = shared_ram;		 // 1	0xAF000000 - 0xAFF00000
-    slaves[nslaves++] = tty0;			 // 2	0xC0000000 - 0xC0000040
-    slaves[nslaves++] = tg;			 // 3	0xC3000000 - 0xC3001000
-    slaves[nslaves++] = fb->get_slave();         // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
-    slaves[nslaves++] = sem;			 // 5	0xC5000000 - 0xC5100000
-    slaves[nslaves++] = bl1->get_slave();        // 6	0xC6000000 - 0xC6100000
-    slaves[nslaves++] = bl2->get_slave();        // 7	0xC6500000 - 0xC6600000
-    slaves[nslaves++] = bl3->get_slave();        // 8	0xC6A00000 - 0xC6B00000
+    slaves[nslaves++] = tty_cons;                // 2	0xC0000000 - 0xC0000040 /* Output Consoles */
+    slaves[nslaves++] = tty_dbgs;       	 // 3	0xC0000100 - 0xC0000140 /* Debug Consoles */
+    slaves[nslaves++] = tg;			 // 4	0xC3000000 - 0xC3001000
+    slaves[nslaves++] = fb->get_slave();         // 5	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
+    slaves[nslaves++] = sem;			 // 6	0xC5000000 - 0xC5100000
+    slaves[nslaves++] = bl1->get_slave();        // 7	0xC6000000 - 0xC6100000
+    slaves[nslaves++] = bl2->get_slave();        // 8	0xC6500000 - 0xC6600000
+    slaves[nslaves++] = bl3->get_slave();        // 9	0xC6A00000 - 0xC6B00000
 
     timer_device	*timers[3 + /*kvm_nb_cpu*/ 1];
     int       ntimers = sizeof (timers) / sizeof (timer_device *);   // Why we divide by pointer size here ???

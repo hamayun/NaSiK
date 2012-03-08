@@ -23,22 +23,6 @@ if [ -z $NASIK_HOME ] ; then
     exit 1 
 fi
 
-print_step "Compiling Binary File Writer ... "
-cd ${TARGET_BIN_WRITER}
-make clean
-make -s
-if [ $? != 0 ]; then
-    print_error "Error! Compiling Binary File Writer ..."
-    exit 1
-fi
-
-print_step "Generating Target Binary ... "
-./BFW.X
-if [ $? != 0 ]; then
-    print_error "Error! Generating Target Binary ..."
-    exit 1
-fi
-
 print_step "Compiling Coff Binary ... ${CCS_EXAMPLE_OUTFILE}"
 cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
 gmake -k all
@@ -87,7 +71,6 @@ fi
 
 print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
-#./c6x-decoder instructions.bin instructions.asm
 ./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "
@@ -136,11 +119,12 @@ fi
 
 print_step "Updating Links ... "
 ln -sf ${NASIK_HOME}/hw/kvm-85/user/test/x86/kvm_c6x_bootstrap ${PFORM_DIR}/kvm_c6x_bootstrap
-#ln -sf ${GENERATED_APP}/instructions.bin.text ${PFORM_DIR}/target_binary_text
+
+rm -f tty_console_00
+rm -f tty_debug_00
 
 print_step "Running the Simulation ... "
-rm -f tty100
+
 export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
 ./arch.x kvm_c6x_bootstrap APPLICATION.X ${CCS_EXAMPLE_PATH}
-#cat tty100 | less
 

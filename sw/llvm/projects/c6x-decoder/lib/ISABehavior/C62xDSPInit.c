@@ -29,7 +29,7 @@
 
 extern uint32_t ENTRY_POINT_PC;
 extern uint32_t CIOBUFF_ADDR;
-extern void platform_debug_puts_len (char * string, int len);
+extern void platform_console_puts_len (char * string, int len);
 
 char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
                        "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
@@ -314,7 +314,7 @@ void DSP_Flush_CIO()
 
     if(io_len)
     {
-        platform_debug_puts_len(io_str, io_len);
+        platform_console_puts_len(io_str, io_len);
         *((uint32_t *)(CIOBUFF_ADDR + 0x4)) = io_len;
     }
     else
