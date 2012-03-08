@@ -279,11 +279,13 @@ while(trace != null) {
     }
 
     /*
-    if(trace == 0x89b4 || mem_dump_flag)
+    if(trace == 0x89ac || mem_dump_flag)
     {
         mem_dump_flag = true;
         printCcsRegisters(debugSession);
     }*/
+
+    //var ccs_clock_cycles = debugSession.memory.readRegister("CLK");
 
     trace_progress = (cur_trace_line / trace_lines_total) * 100;
     script.traceWrite("[" + Integer(Math.floor(trace_progress)).toString() + "%]: TRACE PCE1 [" + Integer.toHexString(trace) + "]");
@@ -311,14 +313,13 @@ while(trace != null) {
                                   ", ccs " + reg_name + "=" + Long.toHexString(ccs_reg_val));
 
                 //printCcsStack(debugSession, ccs_stack_start);
-                //printCcsMemory(0x9E90, 0x120);
             }
         }
     }
 
     if(mem_dump_flag)
     {
-        printCcsMemory(0x9E90, 36);
+        printCcsMemory(0x9E68, 36);
     }
 
     if(err_encountered && stop_on_first_err) {

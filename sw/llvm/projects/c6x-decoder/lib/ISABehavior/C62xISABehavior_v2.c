@@ -1493,8 +1493,8 @@ C62xLDB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X\n",
-                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd);
+        TRACE_PRINT("%08x\tLDB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd, (int8_t) rd);
     }
     return OK;
 }
@@ -1519,8 +1519,8 @@ C62xLDB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd);
+        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd, (int8_t) rd);
     }
     return OK;
 }
@@ -1545,8 +1545,8 @@ C62xLDB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd);
+        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd, (int8_t) rd);
     }
     return OK;
 }
@@ -1572,8 +1572,8 @@ C62xLDBU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X\n",
-                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd);
+        TRACE_PRINT("%08x\tLDBU      %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd, (uint8_t) rd);
     }
     return OK;
 }
@@ -1597,8 +1597,8 @@ C62xLDBU_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd);
+        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd, (uint8_t) rd);
     }
     return OK;
 }
@@ -1622,8 +1622,8 @@ C62xLDBU_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd);
+        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd, (uint8_t) rd);
     }
     return OK;
 }
@@ -3654,8 +3654,8 @@ C62xSTB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, BYTE_ALIGN);
 
-        TRACE_PRINT("%08x\tSTB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X\n",
-                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src);
+        TRACE_PRINT("%08x\tSTB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src, (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
 #ifdef DELAYED_MWBS
@@ -3685,8 +3685,8 @@ C62xSTB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
 
-        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src);
+        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src, (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
 #ifdef DELAYED_MWBS
@@ -3716,8 +3716,8 @@ C62xSTB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN);
 
-        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X\n",
-                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src);
+        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
+                Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src, (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
 #ifdef DELAYED_MWBS

@@ -118,18 +118,6 @@ namespace native
         }
     };
 
-    class BinaryConfigs
-    {
-    private:
-        uint32_t           m_startup_pc;
-        uint32_t           m_exit_pc;
-
-    public:
-        BinaryConfigs(uint32_t startup_pc, uint32_t exit_pc): m_startup_pc(startup_pc), m_exit_pc(exit_pc) {}
-        uint32_t GetStartupPC(){ return m_startup_pc; }
-        uint32_t GetExitPC(){ return m_exit_pc; }
-    };
-
     // The class responsible for generating LLVM Code
     class LLVMGenerator
     {
@@ -208,7 +196,7 @@ namespace native
         virtual int32_t OptimizeFunction(llvm::Function * func);
 
         virtual int32_t WriteAddressingTable();
-        virtual int32_t WriteBinaryConfigs(BinaryConfigs * pconfigs);
+        virtual int32_t WriteBinaryConfigs(BinaryReader * reader);
         virtual int32_t WriteBitcodeFile();
 
         virtual ~LLVMGenerator() {}

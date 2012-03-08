@@ -60,6 +60,13 @@ namespace native
         // If this Address (Abort Point) is Reached ... the Simulator Should Stop.
         virtual uint32_t GetExitPoint() { ASSERT(0, "Not Implemented"); }
 
+        // If this Address (CIO Flush Point) is Reached ... We Should Flush the CIO Buffer
+        virtual uint32_t GetCIOFlushPoint() { ASSERT(0, "Not Implemented"); }
+
+        // This should give us the I/O Buffer Address in Target Memory. 
+        // Like _CIOBUF_ or .cio section address in COFF Binary Format or equivalent
+        virtual uint32_t GetCIOBufferAddr() { ASSERT(0, "Not Implemented"); }
+
         virtual SymbolTable * GetSymbolTable() { return (p_symbol_table); }
 
         // Every subclass must implement its own Read function.

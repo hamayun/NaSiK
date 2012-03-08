@@ -63,10 +63,17 @@ namespace native
     public:
         COFFBinaryReader(string input_binary_name);
         virtual ~COFFBinaryReader();
+
         virtual uint32_t *GetSectionHandle(string section_name);
         virtual uint32_t  GetSectionStartAddress(uint32_t * section_handle);
         virtual uint32_t  GetEntryPoint();
         virtual uint32_t  GetExitPoint();
+        virtual uint32_t  GetCIOFlushPoint();
+
+        // This should give us the I/O Buffer Address in Target Memory.
+        // Like _CIOBUF_ or .cio section address in COFF Binary Format or equivalent
+        virtual uint32_t GetCIOBufferAddr();
+
         virtual Instruction * Read(uint32_t * section_handle, uint32_t address);
         // Dump A Given Section to file.
         virtual int32_t DumpSection(string infile, string outfile, string section_name);

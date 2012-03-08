@@ -39,9 +39,8 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-print_step "Compiling Coff Binary ...${CCS_EXAMPLE_OUTFILE}"
+print_step "Compiling Coff Binary ... ${CCS_EXAMPLE_OUTFILE}"
 cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
-gmake clean
 gmake -k all
 if [ $? != 0 ]; then
     print_error "Error! Compiling Coff Binary ..."

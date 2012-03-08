@@ -50,14 +50,6 @@ int main (int argc, char ** argv)
     uint32_t *section_handle = reader->GetSectionHandle(".text");
     uint32_t  instr_address  = reader->GetSectionStartAddress(section_handle);
 
-
-    uint32_t entry_point = reader->GetEntryPoint();
-    uint32_t exit_point  = reader->GetExitPoint();
-
-    cout << "Entry Point Address: " << FMT_INT << entry_point << endl;
-    cout << "Exit Point Address: " << FMT_INT << exit_point << endl;
-    BinaryConfigs binary_configs(entry_point, exit_point);
-
     ofstream  *p_output = new ofstream(argv[2], ios::out);
     if(!p_output->is_open()){
         DOUT << "Error: Opening Output File: " << argv[2] << endl;
@@ -132,8 +124,11 @@ int main (int argc, char ** argv)
     LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "gen_code.bc", execute_packet_list.GetSize());
 #endif
     ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
+    uint32_t total_pkts = exec_list->size();
+    uint32_t curr_pkt = 0;
+    uint32_t progress = 0;
 
-    COUT << "Generating LLVM Instructions (Execute Packet Level) ..." << endl;
+    COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets" << endl;
     for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
         EPLI != EPLE; ++EPLI)
     {
@@ -145,7 +140,11 @@ int main (int argc, char ** argv)
                 return (-1);
             }
         }
+
+        progress = ++curr_pkt / total_pkts * 100;
+        cout << "[" << setw(3) << setfill(' ') << progress << "%]\r";
     }
+    cout << "\n";
 #endif
 
     COUT << "Verifying Module ... " << endl;
@@ -158,7 +157,7 @@ int main (int argc, char ** argv)
     llvm_gen->OptimizeModule();
 
     COUT << "Writing Binary Configurations ... " << endl;
-    llvm_gen->WriteBinaryConfigs(& binary_configs);
+    llvm_gen->WriteBinaryConfigs(reader);
 
     COUT << "Writing Output Bitcode ..." << endl;
     llvm_gen->WriteBitcodeFile();

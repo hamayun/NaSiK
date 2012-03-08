@@ -12,10 +12,13 @@
 
 extern address_entry_t AddressingTable[];
 extern uint32_t AddressingTableSize;
-extern uint32_t EXIT_PC;
+extern uint32_t EXIT_POINT_PC;
+extern uint32_t CIOFLUSH_POINT_PC;
+extern uint32_t CIOBUFF_ADDR;
 
 extern void Print_DSP_Stack(C62x_DSPState_t * p_state, uint32_t stack_start);
 extern void DSP_Dump_Memory(uint32_t start_addr, uint32_t size);
+extern void DSP_Flush_CIO();
 
 typedef int (*sim_func_t)(C62x_DSPState_t * p_state);
 
@@ -60,35 +63,29 @@ int main(int argc, char **argv, char **environ)
         if(curr_func)
         {
             ret_val = curr_func(& p_state);
-            //printf("Return Value = 0x%x\n", ret_val);
-            Print_DSP_State(& p_state);
+            //Print_DSP_State(& p_state);
         }
         else
         {
             printf("Target Program Counter = 0x%X\n", p_state.m_reg[REG_PC_INDEX]);
-            ASSERT(0, "Native Simulation Functin Not Found");
+            ASSERT(0, "Native Simulation Function Not Found");
         }
 
-        if(p_state.m_reg[REG_PC_INDEX] == EXIT_PC)
+        if(p_state.m_reg[REG_PC_INDEX] == CIOFLUSH_POINT_PC)
         {
-            printf("EXIT_PC (0x%08X) Reached\n", EXIT_PC);
+            DSP_Flush_CIO();
+        }
+
+        if(p_state.m_reg[REG_PC_INDEX] == EXIT_POINT_PC)
+        {
+            printf("EXIT_POINT_PC (0x%08X) Reached\n", EXIT_POINT_PC);
             ASSERT(0, "Simulation Stopped ... !!!");
         }
 
 #if 0
-        //if(p_state.m_reg[REG_PC_INDEX] == 0x00006f60)
-        if(p_state.m_curr_cycle >= 4063)
+        if(p_state.m_curr_cycle >= 4100)
         {
-            DSP_Dump_Memory(0x9E90, 36);
-        }
-
-        if(p_state.m_curr_cycle == 4171)
-        {
-            //Print_DSP_Stack(& p_state, 0x97EC);
-            //DSP_Dump_Memory(0x9E90, 0x120);
-
-            printf("Target Program Counter = 0x%X\n", p_state.m_reg[REG_PC_INDEX]);
-            ASSERT(0, "Custom Break ... Quitting!!!");
+            DSP_Dump_Memory(CIOBUFF_ADDR, 36);
         }
 #endif
     }

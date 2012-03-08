@@ -475,28 +475,46 @@ namespace native
         return (0);
     }
 
-    int32_t LLVMGenerator :: WriteBinaryConfigs(BinaryConfigs * pconfigs)
+    int32_t LLVMGenerator :: WriteBinaryConfigs(BinaryReader * reader)
     {
         llvm::IRBuilder<>  & irbuilder = GetIRBuilder();
 
         // Write the Startup Program Counter Address
-        Constant * startup_pc = irbuilder.getInt32(pconfigs->GetStartupPC()); /// TODO ???
-        GlobalVariable* gen_startup_pc = new GlobalVariable(*p_addr_mod,
+        Constant * entry_point = irbuilder.getInt32(reader->GetEntryPoint());
+        GlobalVariable* gen_entry_point = new GlobalVariable(*p_addr_mod,
             /*Type=*/irbuilder.getInt32Ty(),
             /*isConstant=*/true,
             /*Linkage=*/GlobalValue::ExternalLinkage,
-            /*Initializer=*/startup_pc,
-            /*Name=*/"STARTUP_PC");
-        gen_startup_pc->setAlignment(32);
+            /*Initializer=*/entry_point,
+            /*Name=*/"ENTRY_POINT_PC");
+        gen_entry_point->setAlignment(32);
 
-        Constant * exit_pc = irbuilder.getInt32(pconfigs->GetExitPC()); /// TODO ???
-        GlobalVariable* gen_exit_pc = new GlobalVariable(*p_addr_mod,
+        Constant * exit_point = irbuilder.getInt32(reader->GetExitPoint());
+        GlobalVariable* gen_exit_point = new GlobalVariable(*p_addr_mod,
             /*Type=*/irbuilder.getInt32Ty(),
             /*isConstant=*/true,
             /*Linkage=*/GlobalValue::ExternalLinkage,
-            /*Initializer=*/exit_pc,
-            /*Name=*/"EXIT_PC");
-        gen_exit_pc->setAlignment(32);
+            /*Initializer=*/exit_point,
+            /*Name=*/"EXIT_POINT_PC");
+        gen_exit_point->setAlignment(32);
+
+        Constant * cioflush_point = irbuilder.getInt32(reader->GetCIOFlushPoint());
+        GlobalVariable* gen_cioflush_point = new GlobalVariable(*p_addr_mod,
+            /*Type=*/irbuilder.getInt32Ty(),
+            /*isConstant=*/true,
+            /*Linkage=*/GlobalValue::ExternalLinkage,
+            /*Initializer=*/cioflush_point,
+            /*Name=*/"CIOFLUSH_POINT_PC");
+        gen_cioflush_point->setAlignment(32);
+
+        Constant * ciobuff_addr = irbuilder.getInt32(reader->GetCIOBufferAddr());
+        GlobalVariable* gen_ciobuff_addr = new GlobalVariable(*p_addr_mod,
+            /*Type=*/irbuilder.getInt32Ty(),
+            /*isConstant=*/true,
+            /*Linkage=*/GlobalValue::ExternalLinkage,
+            /*Initializer=*/ciobuff_addr,
+            /*Name=*/"CIOBUFF_ADDR");
+        gen_ciobuff_addr->setAlignment(32);
 
         return 0;
     }

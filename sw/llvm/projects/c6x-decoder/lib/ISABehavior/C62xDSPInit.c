@@ -27,7 +27,9 @@
 
 #include "stdio.h"
 
-extern uint32_t STARTUP_PC;
+extern uint32_t ENTRY_POINT_PC;
+extern uint32_t CIOBUFF_ADDR;
+extern void platform_debug_puts_len (char * string, int len);
 
 char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
                        "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
@@ -64,7 +66,7 @@ int32_t Init_DSP_State(C62x_DSPState_t * p_state)
 
     // Setup Start Program Counter & Cycle Counter
     p_state->m_curr_cycle = 0;
-    p_state->m_reg[REG_PC_INDEX] = STARTUP_PC;
+    p_state->m_reg[REG_PC_INDEX] = ENTRY_POINT_PC;
     p_state->m_reg[REG_CSR_INDEX] = 0x40010100;         // Taken From C6x Simulator
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
@@ -304,3 +306,24 @@ void DSP_Dump_Memory(uint32_t start_addr, uint32_t size)
     }
     return;
 }
+
+void DSP_Flush_CIO()
+{
+    uint32_t io_len = *((uint32_t *) CIOBUFF_ADDR);
+    char * io_str = ((char *) CIOBUFF_ADDR) + 0xD;
+
+    if(io_len)
+    {
+        platform_debug_puts_len(io_str, io_len);
+        *((uint32_t *)(CIOBUFF_ADDR + 0x4)) = io_len;
+    }
+    else
+    {
+        *((uint32_t *)(CIOBUFF_ADDR + 0x4)) = 0xFFFFFFFF;
+    }
+
+    *((uint32_t *)(CIOBUFF_ADDR + 0x0)) = 0x0;
+    *((uint32_t *)(CIOBUFF_ADDR + 0x8)) = 0x0;
+    return;
+}
+

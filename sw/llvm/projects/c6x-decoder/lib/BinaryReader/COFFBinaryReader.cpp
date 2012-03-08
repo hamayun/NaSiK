@@ -244,6 +244,24 @@ namespace native
         return(abort_addr);
     }
 
+    uint32_t COFFBinaryReader :: GetCIOFlushPoint()
+    {
+        uint32_t cio_flush_addr = p_symbol_table->FindSymbolAddr("C$$IO$$");
+        if(!cio_flush_addr)
+        {
+            WARN << "CIO Flush Point Not Found" << endl;
+        }
+        return(cio_flush_addr);
+    }
+
+    uint32_t COFFBinaryReader :: GetCIOBufferAddr()
+    {
+        uint32_t * section_handle = GetSectionHandle(".cio");
+        uint32_t      iobuff_addr = GetSectionStartAddress(section_handle);
+
+        return(iobuff_addr);
+    }
+
     Instruction * COFFBinaryReader :: Read(uint32_t * section_handle, uint32_t address)
     {
         coff_section * p_section   = (coff_section * ) section_handle;
