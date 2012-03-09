@@ -92,22 +92,23 @@ int main (int argc, char ** argv)
     }
 
 #ifdef COFF_INPUT_FILE
-    //instruction_list.MarkBranchTargets();
+    instruction_list.MarkBranchTargets();
 #endif
     BasicBlockList basic_block_list (& execute_packet_list);
 
     //instruction_list.Print(p_output);
     //fetch_packet_list.Print(p_output);
-    execute_packet_list.Print(p_output);
-    //basic_block_list.Print(p_output);
-
-#ifdef GENERATE_CODE
+    //execute_packet_list.Print(p_output);
+    basic_block_list.Print(p_output);
 
 #ifdef BASIC_BLOCK_LEVEL_CODE
-    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "gen_code.bc", basic_block_list.GetSize());
+    uint32_t total_bbs = basic_block_list.GetSize();
+
+    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior_v2.bc", "gen_code_bb.bc", total_bbs);
+
     const BasicBlockList_t * bb_list = basic_block_list.GetBasicBlockList();
 
-    COUT << "Generating LLVM Instructions (Basic Block Level) ..." << endl;
+    COUT << "Generating LLVM Instructions (BB Level) ..." << total_bbs << " Basic Blocks" << endl;
     for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end();
         BBLCI != BBLCE; ++BBLCI)
     {
@@ -161,30 +162,6 @@ int main (int argc, char ** argv)
 
     COUT << "Writing Output Bitcode ..." << endl;
     llvm_gen->WriteBitcodeFile();
-#endif
-
-    /*
-    ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
-    for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
-        EPLI != EPLE; ++EPLI)
-    {
-        if(llvm_gen->GenerateLLVM(*EPLI))
-        {
-            DOUT << "Error: Generating LLVM Code" << endl;
-            return (-1);
-        }
-    }
-    */
-    /*
-    for(InstructionList_ConstIterator_t ILI = instruction_list.GetInstructionList()->begin(),
-        ILE = instruction_list.GetInstructionList()->end(); ILI != ILE; ++ILI)
-    {
-        if(llvm_gen->GenerateLLVM(*ILI))
-        {
-            DOUT << "Error: Generating LLVM Code" << endl;
-            return (-1);
-        }
-    }*/
 
     return (EXIT_SUCCESS);
 }

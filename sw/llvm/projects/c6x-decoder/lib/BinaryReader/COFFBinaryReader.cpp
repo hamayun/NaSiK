@@ -361,7 +361,7 @@ namespace native
 
         if(p_section->get_nm_entries() == 0)
         {
-            DOUT << "Warning: Section " << section_name << " Found But Contains No Entries" << endl;
+            DOUT << "Warning: Section " << section_name << " With Zero Entries" << endl;
             output_binary->write((char *) & binary_value, sizeof(uint32_t));
             output_binary->write((char *) & binary_value, sizeof(uint32_t));
             output_binary->close();
