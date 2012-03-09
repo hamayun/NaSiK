@@ -183,7 +183,8 @@ var script = ScriptingEnvironment.instance();
 script.traceBegin("BreakpointsTestLog.xml", "DefaultStylesheet.xsl");
 
 // Set our TimeOut
-script.setScriptTimeout(50000);
+// script.setScriptTimeout(50000);
+script.setScriptTimeout(-1);
 
 // Log everything
 script.traceSetConsoleLevel(TraceLevel.INFO);
