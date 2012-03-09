@@ -1353,7 +1353,6 @@ namespace native
 
         // TODO: Enable this Assertion
         ASSERT(fetch_packet != NULL, "Fetch Packet Not Found, Please make sure that Fetch Packet List has been created");
-        packet_address = fetch_packet->GetInstrByIndex(0)->GetAddress();
         if(fetch_packet)
         {
             packet_address = fetch_packet->GetInstrByIndex(0)->GetAddress();

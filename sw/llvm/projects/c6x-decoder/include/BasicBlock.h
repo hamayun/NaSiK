@@ -123,9 +123,16 @@ namespace native
             return (m_bb_id);
         }
 
+        virtual uint32_t GetTargetAddress() const
+        {
+            ExecutePacket * exec_pkt = GetExecutePacketByIndex(0);
+
+            return (exec_pkt->GetInstrByIndex(0)->GetAddress());
+        }
+
         virtual string GetName() const
         {
-            std::string bb_name = "BB";
+            std::string bb_name = "BB_";
             std::stringstream addr_string;
 
             if(GetSize())

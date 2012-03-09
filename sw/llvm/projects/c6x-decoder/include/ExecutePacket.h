@@ -50,7 +50,7 @@ namespace native
 
     typedef enum SpecialPacketFlags
     {
-        BRANCH_TAKEN = 0,             /* Indicates that a Branch is Taken; Must Return to Function Dispatcher */
+        BRANCH_TAKEN = 0,             /* Indicates that a Branch is Taken; Must Return to Simulation Driver */
         POSSIBLE_BRANCH = 1           /* A Branch May be Taken Here. Check If PC has been updated in the last execute packet */
     } SpecialPacketFlags_t;
 

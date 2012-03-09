@@ -52,14 +52,10 @@
 using namespace llvm;
 
 //#define INLINE_FUNCTIONS
-#define OPTIMIZE_MODULE
+//#define OPTIMIZE_MODULE
 
 //#define JUST_ADD_ISA
 //#define OPTIMIZE_FUNCTIONS
-
-#ifndef C62x_ISA_VER2
-#define C62x_ISA_VER2
-#endif
 
 namespace native
 {
@@ -163,12 +159,10 @@ namespace native
         llvm::Function          * p_inc_cycles;
         llvm::Function          * p_get_cycles;
 
-#ifdef C62x_ISA_VER2
         const llvm::Type        * p_result_type;        // Type of the Instruction Result. i.e. "C62x_Result_t"
         llvm::PointerType       * p_result_type_ptr;    // Pointer type to the Instruction Result. i.e. "C62x_Result_t *"
         llvm::Function          * p_enq_result;
         llvm::Function          * p_update_immed;
-#endif
 
         LLVMGenerator(string input_bcfile, string output_bcfile, uint32_t addr_tbl_size);
 
@@ -186,10 +180,10 @@ namespace native
 
         virtual llvm::Value * CreateCallByName(string func_name);
 
-        virtual int32_t GenerateLLVMEPLevel(ExecutePacket * exec_packet);       // Using Execute Packet Level Granularity
+        virtual int32_t GenerateLLVM_EPLevel(ExecutePacket * exec_packet);       // Using Execute Packet Level Granularity
 
-        virtual int32_t GenerateLLVMBBLevel(native::BasicBlock * input_bb);     // Using Basic Block Level Granularity
-        virtual int32_t GenerateLLVMBBLevel(ExecutePacket * exec_packet);
+        //virtual int32_t GenerateLLVM_BBLevel(native::BasicBlock * input_bb);     // Using Basic Block Level Granularity
+        //virtual int32_t GenerateLLVM_BBLevel(ExecutePacket * exec_packet, llvm::Function * function);
 
         virtual int32_t VerifyGeneratedModule();
 

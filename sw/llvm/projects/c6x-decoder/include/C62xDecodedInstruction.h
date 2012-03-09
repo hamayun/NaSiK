@@ -85,15 +85,15 @@ namespace native
         virtual void AddOperand(C62xOperand * operand);
         virtual C62xOperand * GetOperand(uint32_t index) const;
 
+        virtual void SetBranchConstAddress(uint32_t branch_cst_addr)
+                { DecodedInstruction :: SetBranchConstAddress(branch_cst_addr); }
+        virtual uint32_t GetBranchConstAddress() const
+                { return (DecodedInstruction :: GetBranchConstAddress() & 0x7FFFFF ); }
+
         virtual void Print (ostream *out) const;
 
-#ifdef C62x_ISA_VER2
         virtual llvm::Value * CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod,
                                                      llvm::BasicBlock * update_exit_bb, llvm::Value * result) const;
-#else
-        virtual llvm::Value * CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod,
-                                                     llvm::BasicBlock * update_exit_bb) const;
-#endif
         virtual ~C62xDecodedInstruction() {}
     };
 
@@ -1282,7 +1282,7 @@ namespace native
             }
         }
 
-        void PrintOperands (ostream *out) const;
+        virtual void PrintOperands (ostream *out) const;
 
         virtual ~C62xBranchInstr() {}
     };

@@ -109,7 +109,6 @@ namespace native
         p_inc_cycles   = p_gen_mod->getFunction("Inc_DSP_Cycles");      ASSERT(p_inc_cycles, "Could Not Get Inc_DSP_Cycles");
         p_get_cycles   = p_gen_mod->getFunction("Get_DSP_Cycles");      ASSERT(p_get_cycles, "Could Not Get Get_DSP_Cycles");
 
-#ifdef C62x_ISA_VER2
         // Get the "C62x_Result_t" from our Module.
         p_result_type = p_gen_mod->getTypeByName("struct.C62x_Result_t");
         ASSERT(p_result_type, "Could Not Get Result Type from Module");
@@ -121,7 +120,6 @@ namespace native
 
         p_enq_result   = p_gen_mod->getFunction("EnQ_Delay_Result");    ASSERT(p_enq_result, "Could Not Get EnQ_Delay_Result");
         p_update_immed = p_gen_mod->getFunction("Update_Immediate");    ASSERT(p_update_immed, "Could Not Get Update_Immediate");
-#endif
     }
 
     tool_output_file * LLVMGenerator :: GetOutputStream(const char *FileName)
@@ -161,124 +159,30 @@ namespace native
         return (func_value);
     }
 
-    int32_t LLVMGenerator :: GenerateLLVMBBLevel(ExecutePacket * exec_packet)
-    {
-        Instruction        * instr      = NULL;
-        DecodedInstruction * dec_instr  = NULL;
-        llvm::Value        * pc_updated = NULL;
-
-        // Add an instruction that returns if the PC update is indicated by the above function call;
-        //GetIRBuilder().CreateICmpEQ(pc_updated, Geti1Value(1), "");
-        //CreateCallByName("Print_DSP_State");
-        CreateCallByName("Do_Memory_Writebacks");
-
-        exec_packet->ResetInstrIterator();
-
-        while((instr = exec_packet->GetNextInstruction()))
-        {
-            dec_instr = instr->GetDecodedInstruction();
-            ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
-
-#ifdef C62x_ISA_VER2
-            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, NULL, NULL);
-#else
-            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, NULL);
-#endif
-            ASSERT(func_value, "Error: In Creating Function Call");
-        }
-
-        CreateCallByName("Print_DSP_State");
-        // TODO: Verify the Program Counter Update Method;
-        // This is the immediate update; Branch Updates will be done through delay buffer method.
-        GetIRBuilder().CreateCall2(p_update_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
-        GetIRBuilder().CreateCall(p_inc_cycles, p_proc_state);
-        pc_updated = CreateCallByName("Update_Registers");
-        return (0);
-    }
-
-    int32_t LLVMGenerator :: GenerateLLVMBBLevel(native::BasicBlock * input_bb)
-    {
-        llvm::FunctionType * func_type = llvm::FunctionType::get(Type::getInt32Ty(GetContext()), /*not vararg*/false);
-        //llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "GenFunc" + input_bb->GetName(), p_gen_mod);
-        llvm::Function   * function  = llvm::Function::Create(func_type, Function::ExternalLinkage, "simulated_bb", p_gen_mod);
-        llvm::BasicBlock * gen_block = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
-
-        SetCurrentFunction(function);
-        GetIRBuilder().SetInsertPoint(gen_block);
-        CreateCallByName("Init_DSP_State");
-        //GetIRBuilder().CreateCall2(p_set_pc, p_proc_state, Geti32Value(0x100));
-
-        for (uint32_t index = 0; index < input_bb->GetSize(); index++)
-        {
-            ExecutePacket * exec_packet = input_bb->GetExecutePacketByIndex(index);
-            if(exec_packet->GetPacketType() == NORMAL_EXEC_PACKET)
-            {
-                exec_packet->ResetInstrIterator();
-                if(GenerateLLVMBBLevel(exec_packet))
-                {
-                    COUT << "Error: In Generating LLVM" << endl;
-                    return (-1);
-                }
-            }
-            else if (exec_packet->GetPacketType() == SPECIAL_EXEC_PACKET)
-            {
-                switch(exec_packet->GetSpecialFlags())
-                {
-                    case BRANCH_TAKEN:
-                        CreateCallByName("Print_DSP_State");
-                        GetIRBuilder().CreateRet(Geti32Value(0));
-                        break;
-                    case POSSIBLE_BRANCH:
-                        /* Create instructions to check whether the PC has been
-                         * updated in the previous cycle or not?
-                         * And Create a Conditional Return Instruction */
-                        break;
-                }
-            }
-        }
-
-        llvm::verifyModule(*p_gen_mod, PrintMessageAction);
-        return (0);
-    }
-
-    int32_t LLVMGenerator :: GenerateLLVMEPLevel(ExecutePacket * exec_packet)
+#if 0
+    int32_t LLVMGenerator :: GenerateLLVM_BBLevel(llvm::Function * function,
+        ExecutePacket * exec_packet, llvm::BasicBlock * next_bb, llvm::BasicBlock * return_bb)
     {
         Instruction        * instr         = NULL;
         DecodedInstruction * dec_instr     = NULL;
         llvm::Value        * updated_pc    = NULL;
-        string               function_name = "Sim" + exec_packet->GetName();
         llvm::IRBuilder<>  & irbuilder     = GetIRBuilder();
         uint32_t             instr_index   = 0;
+        string               main_bbname   = "BB_Core_" + exec_packet->GetName();
+        string               update_bbname = "BB_Update_" + exec_packet->GetName();
 
-        const Type * return_type = Type::getInt32Ty(GetContext());
-        std::vector<const Type*> params;
-        params.push_back(p_proc_state_type);
-        llvm::FunctionType * func_type      = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
-        llvm::Function     * function       = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
-        llvm::BasicBlock   * entry_bb       = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
-        llvm::BasicBlock   * update_exit_bb = llvm::BasicBlock::Create(GetContext(), "UpdateExitBB", function);
-        ConstantInt        * const_int32_zero = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
+        llvm::BasicBlock         * main_bb = llvm::BasicBlock::Create(GetContext(), main_bbname, function);
+        llvm::BasicBlock       * update_bb = llvm::BasicBlock::Create(GetContext(), update_bbname, function);
+        ConstantInt     * const_int32_zero = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
+        llvm::Value         * func_ret_val = new llvm::Value[exec_packet->GetSize()];
+        llvm::Value     * should_exit_early, * should_exit_func;
 
-        INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
+        irbuilder.SetInsertPoint(main_bb);
 
-        // Add Addressing Table Entry
-        p_addr_table->AddAddressEntry(exec_packet->GetTargetAddress(), function);
-
-        SetCurrentFunction(function);
-        // Here we get the Processor State Pointer from the Currently Generating Function.
-        // The Processor State is passed to the Generated Function as a pointer.
-        Function::arg_iterator curr_gen_func_args = function->arg_begin();
-        p_proc_state = curr_gen_func_args++;          // We know that its the only single parameter; but increment anyways
-        p_proc_state->setName("p_state");
-
-        irbuilder.SetInsertPoint(entry_bb);
-
-#ifdef C62x_ISA_VER2
-        // Create the "C62x_Result_t" typed result nodes in this function.
+        // Create the "C62x_Result_t" typed result nodes before the beginning of this exec_packet code.
         llvm::AllocaInst * instr_results = irbuilder.CreateAlloca(p_result_type, Geti32Value(exec_packet->GetSize()), "instr_results");
         instr_results->setAlignment(8);
         //instr_results->dump();
-#endif
 
         exec_packet->ResetInstrIterator();
         m_earlyexit_bb_flag = 0;
@@ -288,7 +192,6 @@ namespace native
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
-#ifdef C62x_ISA_VER2
             // Get Pointer to the corresponding "C62x_Result_t *" type node in the generated function.
             llvm::Value * result = irbuilder.CreateGEP(instr_results, Geti32Value(instr_index));
             //result->dump();
@@ -299,25 +202,15 @@ namespace native
             index_vector.push_back(const_int32_zero);
             llvm::Value * result_type = irbuilder.CreateGEP(result, index_vector.begin(), index_vector.end());
             //result_type->dump();
-
             // Create a Store Instruction to m_type; So we Put Zero in Result Type before Calling the ISA
             irbuilder.CreateStore(const_int32_zero, result_type, false);
 
-            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, update_exit_bb, result);
-            ASSERT(func_value, "Error: In Creating Function Call");
-#else
-            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, update_exit_bb);
-            ASSERT(func_value, "Error: In Creating Function Call");
-#endif
-            if(m_earlyexit_bb_flag)
-            {
-                irbuilder.SetInsertPoint(update_exit_bb);
-            }
+            func_ret_val[instr_index] = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, return_bb, result);
+            ASSERT(func_ret_val[instr_index], "Error: In Creating Function Call");
 
             instr_index++;
         }
 
-#ifdef C62x_ISA_VER2
         // Now decide what to do with the results. Update Now or Put them in Buffer.
         // Caution No Updates for Store Instructions.
         exec_packet->ResetInstrIterator();
@@ -356,9 +249,201 @@ namespace native
                 irbuilder.CreateCall2(p_update_immed, p_proc_state, result);
             }
 
+
+            // Check if this instruction updated the PC
+            should_exit_early = irbuilder.CreateOr(func_ret_val[instr_index], should_exit_early);
             instr_index++;
         }
+
+        llvm::BranchInst::Create(return_bb, update_bb, should_exit_early, main_bb);
+
+        // Now we Fill the Update BB
+        irbuilder.SetInsertPoint(update_bb);
+
+        INFO << "    Call to: " << "Update_PC" << "(...)" << endl;
+        irbuilder.CreateCall2(p_update_pc, p_proc_state, Geti32Value(exec_packet->GetSize() * 4));
+        INFO << "    Call to: " << "Inc_DSP_Cycles" << "(...)" << endl;
+        irbuilder.CreateCall(p_inc_cycles, p_proc_state);
+        //CreateCallByName("Do_Memory_Writebacks");
+        updated_pc = CreateCallByName("Update_Registers"); INFO << endl;
+        should_exit_func = irbuilder.CreateOr(updated_pc, const_int32_zero);
+        llvm::BranchInst::Create(return_bb, )
+        
+        return (updated_pc);
+    }
+
+    int32_t LLVMGenerator :: GenerateLLVM_BBLevel(native::BasicBlock * basic_block)
+    {
+        string           function_name      = "Sim" + basic_block->GetName();
+        llvm::IRBuilder<>  & irbuilder      = GetIRBuilder();
+
+        const Type * return_type            = Type::getInt32Ty(GetContext());
+        std::vector<const Type*> params;
+        params.push_back(p_proc_state_type);
+
+        llvm::FunctionType * func_type      = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
+        llvm::Function     * function       = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
+        llvm::BasicBlock   * entry_bb       = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
+        llvm::BasicBlock   * return_bb      = llvm::BasicBlock::Create(GetContext(), "ReturnBB", function);
+        llvm::BasicBlock   * next_bb        = NULL;
+
+        INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
+
+        // Add Addressing Table Entry
+        p_addr_table->AddAddressEntry(basic_block->GetTargetAddress(), function);
+
+        SetCurrentFunction(function);
+
+        // Here we get the Processor State Pointer from the Currently Generating Function.
+        // The Processor State is passed to the Generated Function as a pointer.
+        Function::arg_iterator curr_gen_func_args = function->arg_begin();
+        p_proc_state = curr_gen_func_args++;          // We know that its the only single parameter; but increment anyways
+        p_proc_state->setName("p_state");
+
+        prev_bb = return_bb;
+        for (uint32_t index = 0; index < basic_block->GetSize(); index++)
+        {
+            ExecutePacket * exec_packet = basic_block->GetExecutePacketByIndex(index);
+            if(exec_packet->GetPacketType() == NORMAL_EXEC_PACKET)
+            {
+                prev_bb = GenerateLLVM_BBLevel(function, exec_packet, prev_bb, return_bb);
+                if(!prev_bb)
+                {
+                    COUT << "Error: Generating LLVM for ... " << exec_packet->GetName() << endl;
+                    return (-1);
+                }
+            }
+            else if (exec_packet->GetPacketType() == SPECIAL_EXEC_PACKET)
+            {
+                switch(exec_packet->GetSpecialFlags())
+                {
+                    case BRANCH_TAKEN:
+                        //CreateCallByName("Print_DSP_State");
+                        irbuilder.CreateRet(Geti32Value(0));
+                        break;
+                    case POSSIBLE_BRANCH:
+                        /* Create instructions to check whether the PC has been
+                         * updated in the previous cycle or not?
+                         * And Create a Conditional Return Instruction */
+                        break;
+                }
+            }
+        }
+
+        return (0);
+    }
 #endif
+
+    int32_t LLVMGenerator :: GenerateLLVM_EPLevel(ExecutePacket * exec_packet)
+    {
+        Instruction        * instr         = NULL;
+        DecodedInstruction * dec_instr     = NULL;
+        llvm::Value        * updated_pc    = NULL;
+        string               function_name = "Sim" + exec_packet->GetName();
+        llvm::IRBuilder<>  & irbuilder     = GetIRBuilder();
+        uint32_t             instr_index   = 0;
+
+        const Type * return_type           = Type::getInt32Ty(GetContext());
+        std::vector<const Type*> params;
+        params.push_back(p_proc_state_type);
+
+        llvm::FunctionType * func_type      = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
+        llvm::Function     * function       = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
+        llvm::BasicBlock   * entry_bb       = llvm::BasicBlock::Create(GetContext(), "EntryBB", function);
+        llvm::BasicBlock   * update_exit_bb = llvm::BasicBlock::Create(GetContext(), "UpdateExitBB", function);
+        ConstantInt        * const_int32_zero = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
+
+        INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
+
+        // Add Addressing Table Entry
+        p_addr_table->AddAddressEntry(exec_packet->GetTargetAddress(), function);
+
+        SetCurrentFunction(function);
+        // Here we get the Processor State Pointer from the Currently Generating Function.
+        // The Processor State is passed to the Generated Function as a pointer.
+        Function::arg_iterator curr_gen_func_args = function->arg_begin();
+        p_proc_state = curr_gen_func_args++;          // We know that its the only single parameter; but increment anyways
+        p_proc_state->setName("p_state");
+
+        irbuilder.SetInsertPoint(entry_bb);
+
+        // Create the "C62x_Result_t" typed result nodes in this function.
+        llvm::AllocaInst * instr_results = irbuilder.CreateAlloca(p_result_type, Geti32Value(exec_packet->GetSize()), "instr_results");
+        instr_results->setAlignment(8);
+        //instr_results->dump();
+
+        exec_packet->ResetInstrIterator();
+        m_earlyexit_bb_flag = 0;
+
+        while((instr = exec_packet->GetNextInstruction()))
+        {
+            dec_instr = instr->GetDecodedInstruction();
+            ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
+
+            // Get Pointer to the corresponding "C62x_Result_t *" type node in the generated function.
+            llvm::Value * result = irbuilder.CreateGEP(instr_results, Geti32Value(instr_index));
+            //result->dump();
+
+            // Get Pointer to the m_type in the above C62x_Result_t
+            std::vector<Value*> index_vector;
+            index_vector.push_back(const_int32_zero);
+            index_vector.push_back(const_int32_zero);
+            llvm::Value * result_type = irbuilder.CreateGEP(result, index_vector.begin(), index_vector.end());
+            //result_type->dump();
+
+            // Create a Store Instruction to m_type; So we Put Zero in Result Type before Calling the ISA
+            irbuilder.CreateStore(const_int32_zero, result_type, false);
+
+            Value * func_value = dec_instr->CreateLLVMFunctionCall(this, p_gen_mod, update_exit_bb, result);
+            ASSERT(func_value, "Error: In Creating Function Call");
+
+            if(m_earlyexit_bb_flag)
+            {
+                irbuilder.SetInsertPoint(update_exit_bb);
+            }
+
+            instr_index++;
+        }
+
+        // Now decide what to do with the results. Update Now or Put them in Buffer.
+        // Caution No Updates for Store Instructions.
+        exec_packet->ResetInstrIterator();
+        instr_index = 0;
+        while((instr = exec_packet->GetNextInstruction()))
+        {
+            uint32_t skip_enq_call = 0;
+
+            dec_instr = instr->GetDecodedInstruction();
+            ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
+
+            // Get Pointer to the "C62x_Result_t *" type node in the generated function.
+            Value * result = irbuilder.CreateGEP(instr_results, Geti32Value(instr_index));
+
+            if(dec_instr->GetDelaySlots())
+            {
+                if(dec_instr->IsLoadStoreInstruction())
+                {
+                    // TODO: Make It independent of Target Arch.
+                    C62xLDSTInstr * ldst_instr = (C62xLDSTInstr *) dec_instr;
+                    if(ldst_instr->GetLoadStoreType() == STORE_INSTR)
+                    {
+                        skip_enq_call = 1;
+                    }
+                }
+
+                if(!skip_enq_call)
+                {
+                    // Add to Delay Buffer; Will be Updated Later
+                    irbuilder.CreateCall3(p_enq_result, p_proc_state, result, Geti8Value(dec_instr->GetDelaySlots()));
+                }
+            }
+            else
+            {
+                // Immediate Update;
+                irbuilder.CreateCall2(p_update_immed, p_proc_state, result);
+            }
+            instr_index++;
+        }
 
         if(!m_earlyexit_bb_flag)
         {
@@ -368,7 +453,6 @@ namespace native
 
         irbuilder.SetInsertPoint(update_exit_bb);
 
-#ifndef JUST_ADD_ISA
         // TODO: Verify the Program Counter Update Method;
         // This is the immediate update; Branch Updates will be done through delay buffer method.
         INFO << "    Call to: " << "Update_PC" << "(...)" << endl;
@@ -379,10 +463,6 @@ namespace native
         //CreateCallByName("Do_Memory_Writebacks");
         updated_pc = CreateCallByName("Update_Registers"); INFO << endl;
         irbuilder.CreateRet(updated_pc);
-#else
-        irbuilder.CreateRet(Geti32Value(0));
-#endif
-        //function->dump();
         return (0);
     }
 

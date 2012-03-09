@@ -89,6 +89,8 @@ namespace native
 
         virtual int32_t MarkBranchTargets()
         {
+            COUT << "Marking Branch Targets ... " << endl;
+
             for(InstructionList_ConstIterator_t ILI = m_instr_list.begin(),
                 ILE = m_instr_list.end(); ILI != ILE; ++ILI)
             {
@@ -103,6 +105,7 @@ namespace native
                     if(branch_target_addr)
                     {
                         Instruction * target_instr = GetInstructionByAddress(branch_target_addr);
+                        ASSERT(target_instr != NULL, "Target Instruction Not Found");
 
                         DecodedInstruction * target_dec_instr = target_instr->GetDecodedInstruction();
                         ASSERT(target_dec_instr != NULL, "Instructions need to be Decoded First, For Marking Branch Targets");
