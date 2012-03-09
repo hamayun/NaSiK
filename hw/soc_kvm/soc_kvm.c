@@ -871,21 +871,17 @@ int soc_load_target_binary()
     char * sections_to_load[] = {".text", ".data", ".cinit", ".const", ""};
     uint32_t i = 0;
 
-    if(!p_target_binary)
+    if(p_target_binary)
     {
-        fprintf(stderr, "Error! Missing Path for Target Binary\n");
-        return (-1);
-    }
-
-    for(i = 0; strcmp(sections_to_load[i], "") != 0; i++)
-    {
-        if(soc_load_target_section(p_target_binary, sections_to_load[i]))
+        for(i = 0; strcmp(sections_to_load[i], "") != 0; i++)
         {
-            fprintf(stderr, "Error Loading Target .text Section\n");
-            return (-1);
+            if(soc_load_target_section(p_target_binary, sections_to_load[i]))
+            {
+                fprintf(stderr, "Error Loading Target .text Section\n");
+                return (-1);
+            }
         }
     }
-
     return (0);
 }
 

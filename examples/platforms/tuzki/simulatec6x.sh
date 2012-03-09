@@ -23,7 +23,23 @@ if [ -z $NASIK_HOME ] ; then
     exit 1 
 fi
 
-print_step "Compiling Coff Binary ... ${CCS_EXAMPLE_OUTFILE}"
+print_step "Compiling Target Raw Binary Writer ..."
+cd ${TARGET_BIN_WRITER}
+make clean
+make
+if [ $? != 0 ]; then
+    print_error "Error! Compiling Target Raw Binary Writer ..."
+    exit 1
+fi
+
+print_step "Writting Raw Binary ..."
+./BFW.X
+if [ $? != 0 ]; then
+    print_error "Error! Writting Raw Binary ..."
+    exit 1
+fi
+
+print_step "Compiling Target Coff Binary ... ${CCS_EXAMPLE_OUTFILE}"
 cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
 gmake -k all
 if [ $? != 0 ]; then
@@ -71,7 +87,10 @@ fi
 
 print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
-./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm
+rm -f gen_*
+
+#./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm
+./c6x-decoder instructions.bin instructions.asm
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "
     exit 1
@@ -126,5 +145,6 @@ rm -f tty_debug_00
 print_step "Running the Simulation ... "
 
 export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
-./arch.x kvm_c6x_bootstrap APPLICATION.X ${CCS_EXAMPLE_PATH}
+#./arch.x kvm_c6x_bootstrap APPLICATION.X ${CCS_EXAMPLE_PATH}
+./arch.x kvm_c6x_bootstrap APPLICATION.X
 

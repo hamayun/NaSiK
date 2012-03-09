@@ -241,13 +241,8 @@ namespace native
     }
 
     /* Generic Function Call Implementation for All Instructions */
-#ifdef C62x_ISA_VER2
     llvm::Value * C62xDecodedInstruction :: CreateLLVMFunctionCall(LLVMGenerator * llvm_gen,
         Module * out_mod, llvm::BasicBlock * update_exit_bb, llvm::Value * result) const
-#else
-    llvm::Value * C62xDecodedInstruction :: CreateLLVMFunctionCall(LLVMGenerator * llvm_gen,
-        Module * out_mod, llvm::BasicBlock * update_exit_bb) const
-#endif
     {
         string              func_name    = GetFunctionBaseName();
         llvm::IRBuilder<> & irbuilder    = llvm_gen->GetIRBuilder();
@@ -322,10 +317,8 @@ namespace native
         argument = llvm_gen->Geti8Value(GetDelaySlots());
         args.push_back(argument);
 
-#ifdef C62x_ISA_VER2
         /* Push the Result Node Pointer; Which will be filled by ISA */
         args.push_back(result);
-#endif
 
         func_ptr = out_mod->getFunction(StringRef(func_name));
         if(!func_ptr)

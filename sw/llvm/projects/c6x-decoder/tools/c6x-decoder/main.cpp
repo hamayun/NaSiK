@@ -23,7 +23,7 @@
 
 using namespace native;
 
-#define COFF_INPUT_FILE
+//#define COFF_INPUT_FILE
 #define GENERATE_CODE
 //#define BASIC_BLOCK_LEVEL_CODE
 
@@ -67,6 +67,7 @@ int main (int argc, char ** argv)
         instr_address += 4;
     }
 
+#ifdef COFF_INPUT_FILE
     string sections_to_dump[] = {".text", ".data", ".cinit", ".const", ""};
 
     // Dump the different sections of input binary to files for loading to KVM Memory
@@ -74,6 +75,7 @@ int main (int argc, char ** argv)
     {
         reader->DumpSection(argv[1], argv[1], sections_to_dump[i]);
     }
+#endif
 
     FetchPacketList fetch_packet_list(&instruction_list);
     ExecutePacketList execute_packet_list(&instruction_list);
@@ -103,47 +105,53 @@ int main (int argc, char ** argv)
 
 #ifdef BASIC_BLOCK_LEVEL_CODE
     uint32_t total_bbs = basic_block_list.GetSize();
+    uint32_t curr_bb = 0;
+    uint32_t progress = 0;
 
     LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior_v2.bc", "gen_code_bb.bc", total_bbs);
 
     const BasicBlockList_t * bb_list = basic_block_list.GetBasicBlockList();
 
-    COUT << "Generating LLVM Instructions (BB Level) ..." << total_bbs << " Basic Blocks" << endl;
+    COUT << "Generating LLVM (BB Level) ... " << total_bbs << " Basic Blocks ... " << endl;
+
     for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end();
         BBLCI != BBLCE; ++BBLCI)
     {
-        if(llvm_gen->GenerateLLVMBBLevel(*BBLCI))
+        if(llvm_gen->GenerateLLVM_BBLevel(*BBLCI))
         {
             DOUT << "Error: Generating LLVM Code" << endl;
             return (-1);
         }
+
+        progress = ++curr_bb / total_bbs * 100;
+        //cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
     }
+    //cout << "\n";
+
+
 #else
-#ifdef C62x_ISA_VER2
-    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior_v2.bc", "gen_code.bc", execute_packet_list.GetSize());
-#else
-    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior.bc", "gen_code.bc", execute_packet_list.GetSize());
-#endif
+    LLVMGenerator * llvm_gen = new LLVMGenerator("../lib/ISABehavior/C62xISABehavior_v2.bc", "gen_code_ep.bc", execute_packet_list.GetSize());
+
     ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
     uint32_t total_pkts = exec_list->size();
     uint32_t curr_pkt = 0;
     uint32_t progress = 0;
 
-    COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets ... ";
+    COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets ... " << endl;
     for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
         EPLI != EPLE; ++EPLI)
     {
         if((*EPLI)->GetPacketType() == NORMAL_EXEC_PACKET)
         {
-            if(llvm_gen->GenerateLLVMEPLevel(*EPLI))
+            if(llvm_gen->GenerateLLVM_EPLevel(*EPLI))
             {
                 DOUT << "Error: Generating LLVM Code" << endl;
                 return (-1);
             }
         }
 
-        progress = ++curr_pkt / total_pkts * 100;
-        cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
+        //progress = ++curr_pkt / total_pkts * 100;
+        //cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
     }
     cout << "\n";
 #endif

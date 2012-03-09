@@ -39,7 +39,7 @@ using namespace std;
 //#define PRINT_INSTR_OPCODE
 //#define PRINT_DELAY_SLOTS
 #define PRINT_BRANCH_TARGET_HINTS
-#define ENABLE_FUNC_BUILD_INFO 0
+#define ENABLE_FUNC_BUILD_INFO 1
 
 //#define DOUT            cerr << __PRETTY_FUNCTION__ << " "
 #define DOUT            cout << "<" << __func__ << ">: "

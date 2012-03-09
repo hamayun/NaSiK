@@ -52,6 +52,16 @@ namespace native
         // To find the Virtual Entry Point Address of the input binary; From where to Start Execution !!!
         virtual uint32_t GetEntryPoint() { return (0x0); }
 
+        // If this Address (Abort Point) is Reached ... the Simulator Should Stop.
+        virtual uint32_t GetExitPoint() { return (0xFFFFFFFF); }
+
+        // If this Address (CIO Flush Point) is Reached ... We Should Flush the CIO Buffer
+        virtual uint32_t GetCIOFlushPoint() { return (0xFFFFFFFF); }
+
+        // This should give us the I/O Buffer Address in Target Memory.
+        // Like _CIOBUF_ or .cio section address in COFF Binary Format or equivalent
+        virtual uint32_t GetCIOBufferAddr() { return (0xFFFFFFFF); }
+
         // Every subclass must implement its own Read function.
         virtual Instruction * Read(uint32_t * section_handle, uint32_t address);
 
