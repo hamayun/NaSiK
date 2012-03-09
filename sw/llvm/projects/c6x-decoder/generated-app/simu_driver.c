@@ -61,7 +61,7 @@ int main(int argc, char **argv, char **environ)
         if(curr_func)
         {
             ret_val = curr_func(& p_state);
-            //Print_DSP_State(& p_state);
+            Print_DSP_State(& p_state);
         }
         else
         {

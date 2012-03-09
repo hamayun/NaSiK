@@ -28,7 +28,7 @@
 
 #include "C62xCommon.h"
 
-//#define ENABLE_TRACE
+#define ENABLE_TRACE
 #define QUEUE_BASED_DREGS
 //#define DELAYED_MWBS
 #define PRINT_CYCLES

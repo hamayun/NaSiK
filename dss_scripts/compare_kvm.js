@@ -192,12 +192,12 @@ script.traceSetFileLevel(TraceLevel.INFO);
 
 // Get the Debug Server and start a Debug Session
 debugServer = script.getServer("DebugServer.1");
-debugServer.setConfig("../C64/tisim_c64xple.ccxml");
+//debugServer.setConfig("../C64/tisim_c64xple.ccxml");
+debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64x_LE_CycleAccurate.ccxml");
 debugSession = debugServer.openSession(".*");
 
 // I don't want to loose time to search how to read command line arguments for the moment
-var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";
-//var c6x_coff_binary = "/home/hamayun/workspace_ccs/matmult/Debug/matmult.out";
+var c6x_coff_binary = "/home/hamayun/workspace_ccs/matmult/Debug/matmult.out";
 var kvm_trace_file  = "/home/hamayun/workspace/NaSiK/examples/platforms/tuzki/tty_debug_00";
 var stop_on_first_err = true;
 var mem_dump_flag = false;
