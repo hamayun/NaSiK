@@ -543,6 +543,7 @@ static void usage(const char *progname)
 static void sig_ignore(int sig)
 {
     write(1, "boo\n", 4);
+    return;
 }
 
 

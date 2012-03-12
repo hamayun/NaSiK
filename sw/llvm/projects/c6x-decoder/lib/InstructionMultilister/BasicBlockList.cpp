@@ -105,7 +105,7 @@ namespace native
 
         /*
          * This means that the Last Basic Block hasn't been pushed to the basic block list.
-         * Due to the fact that it does not contain any branch instructions. Should be discareded !!!
+         * Due to the fact that it does not contain any branch instructions. Should be discarded !!!
          * But we push it on the Basic Block List; To be on the safe side
          */
         if(basic_block)

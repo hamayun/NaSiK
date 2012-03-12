@@ -92,8 +92,10 @@ namespace native
 
         virtual void Print (ostream *out) const;
 
-        virtual llvm::Value * CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod,
-                                                     llvm::BasicBlock * update_exit_bb, llvm::Value * result) const;
+//        virtual llvm::Value * CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod,
+//                                                     llvm::BasicBlock * update_exit_bb, llvm::Value * result) const;
+        virtual llvm::Value * CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod, llvm::Value * result) const;
+
         virtual ~C62xDecodedInstruction() {}
     };
 

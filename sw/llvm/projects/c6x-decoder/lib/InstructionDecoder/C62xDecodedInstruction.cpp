@@ -241,8 +241,7 @@ namespace native
     }
 
     /* Generic Function Call Implementation for All Instructions */
-    llvm::Value * C62xDecodedInstruction :: CreateLLVMFunctionCall(LLVMGenerator * llvm_gen,
-        Module * out_mod, llvm::BasicBlock * update_exit_bb, llvm::Value * result) const
+    llvm::Value * C62xDecodedInstruction :: CreateLLVMFunctionCall(LLVMGenerator * llvm_gen, Module * out_mod, llvm::Value * result) const
     {
         string              func_name    = GetFunctionBaseName();
         llvm::IRBuilder<> & irbuilder    = llvm_gen->GetIRBuilder();
@@ -318,6 +317,7 @@ namespace native
         args.push_back(argument);
 
         /* Push the Result Node Pointer; Which will be filled by ISA */
+        ASSERT(result != NULL, "Result Node Pointer is NULL");
         args.push_back(result);
 
         func_ptr = out_mod->getFunction(StringRef(func_name));
@@ -328,23 +328,7 @@ namespace native
         }
 
         INFO << "    Call to: " << func_name << "(...)" << endl;
-        func_value = irbuilder.CreateCall(func_ptr, args.begin(), args.end(), GetMnemonic());
-
-        // Optional PC Updated Check in Case of Multi-Cycle NOPs
-        if(IsNOPInstruction() && GetNOPCount() > 1)
-        {
-            llvm::BasicBlock * early_exit_bb = llvm::BasicBlock::Create(llvm_gen->GetContext(), "EarlyExitBB", llvm_gen->GetCurrentFunction());
-            llvm::Value * pc_updated = irbuilder.CreateICmp(CmpInst::ICMP_NE, func_value, llvm_gen->Geti32Value(0), "pc_updated");
-
-            ASSERT(update_exit_bb != NULL, "Update Exit BB is NULL");
-            llvm::BranchInst::Create(early_exit_bb, update_exit_bb, pc_updated, irbuilder.GetInsertBlock());
-
-            // Move the Insert Point to Early Exit BB
-            irbuilder.SetInsertPoint(early_exit_bb);
-            irbuilder.CreateRet(func_value);
-            // Set the Early Exit Flag; So we don't insert redundant branch instruction(s)
-            llvm_gen->m_earlyexit_bb_flag = 1;
-        }
+        func_value = irbuilder.CreateCall(func_ptr, args.begin(), args.end(), "rval" + GetMnemonic());
 
         return (func_value);
     }

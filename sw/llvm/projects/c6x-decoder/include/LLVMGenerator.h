@@ -180,10 +180,13 @@ namespace native
 
         virtual llvm::Value * CreateCallByName(string func_name);
 
-        virtual int32_t GenerateLLVM_EPLevel(ExecutePacket * exec_packet);       // Using Execute Packet Level Granularity
+        virtual uint32_t Gen_LLVM_Immed_or_Buff_Updates(ExecutePacket * exec_pkt,
+                        llvm::AllocaInst * instr_results, llvm::BasicBlock * llvm_bb);
+        virtual llvm::Value * GenerateLLVM_Exec_Packet(llvm::Function * function, ExecutePacket * exec_packet,
+                        llvm::BasicBlock * llvm_bb_core, llvm::BasicBlock * llvm_bb_update, llvm::BasicBlock * llvm_bb_return);
 
-        //virtual int32_t GenerateLLVM_BBLevel(native::BasicBlock * input_bb);     // Using Basic Block Level Granularity
-        //virtual int32_t GenerateLLVM_BBLevel(ExecutePacket * exec_packet, llvm::Function * function);
+        virtual int32_t GenerateLLVM_EPLevel(ExecutePacket * exec_packet);   // Using Execute Packet Level Granularity
+        virtual int32_t GenerateLLVM_BBLevel(native::BasicBlock * input_bb);         // Using Basic Block Level Granularity
 
         virtual int32_t VerifyGeneratedModule();
 

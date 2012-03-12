@@ -23,7 +23,7 @@
 
 using namespace native;
 
-//#define COFF_INPUT_FILE
+#define COFF_INPUT_FILE
 #define GENERATE_CODE
 //#define BASIC_BLOCK_LEVEL_CODE
 

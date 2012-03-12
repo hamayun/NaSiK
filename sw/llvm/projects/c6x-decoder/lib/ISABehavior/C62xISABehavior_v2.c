@@ -2487,7 +2487,7 @@ C62xNOP_UC4(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_
             if(new_pc)
             {
                 TRACE_PRINT("Multi-Cycle NOP Early Termination [i=%d]; PC Updated\n", i);
-                return new_pc;
+                return PC_UPDATED;
             }
         }
     }

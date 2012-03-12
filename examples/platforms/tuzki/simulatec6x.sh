@@ -89,8 +89,8 @@ print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
 rm -f gen_*
 
-#./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm
-./c6x-decoder instructions.bin instructions.asm
+./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm
+#./c6x-decoder instructions.bin instructions.asm
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "
     exit 1
@@ -145,6 +145,6 @@ rm -f tty_debug_00
 print_step "Running the Simulation ... "
 
 export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
-#./arch.x kvm_c6x_bootstrap APPLICATION.X ${CCS_EXAMPLE_PATH}
-./arch.x kvm_c6x_bootstrap APPLICATION.X
+./arch.x kvm_c6x_bootstrap APPLICATION.X ${CCS_EXAMPLE_PATH}
+#./arch.x kvm_c6x_bootstrap APPLICATION.X
 

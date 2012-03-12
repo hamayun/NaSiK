@@ -143,12 +143,23 @@ typedef struct address_entry
     int (*func_address)(C62x_DSPState_t * p_state);
 } address_entry_t;
 
+#if 0
 typedef enum ReturnStatus
 {
     OK = 0,
     ERROR = 1,
-    WAIT_FOR_INTERRUPT = 2
+    WAIT_FOR_INTERRUPT = 2,
+    PC_UPDATED = 4,
 } ReturnStatus_t;
+#endif
+
+// Return Type and Codes for ISA Functions
+typedef uint32_t ReturnStatus_t;
+
+#define OK 0
+#define ERROR 1
+#define WAIT_FOR_INTERRUPT 2
+#define PC_UPDATED 4
 
 #define REG_SP_INDEX   (REG_BANK_B * C62X_REGS_PER_BANK) + 15
 #define REG_AMR_INDEX  (REG_BANK_C * C62X_REGS_PER_BANK) + REG_AMR
