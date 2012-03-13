@@ -31,6 +31,119 @@ namespace native
         BasicBlock * basic_block        = NULL;
         uint32_t     basic_block_id     = 0;
         int32_t      delay_slot_count   = 0;
+        int32_t      branch_count       = 0;
+        bool         branch_flag        = false;
+        DecodedInstruction * dec_instr  = NULL;
+
+        // Traverse through all the Execute Packets
+        for(ExecutePacketList_Iterator_t EPLI = exec_packets_list->GetExecutePacketList()->begin(),
+            EPLE = exec_packets_list->GetExecutePacketList()->end(); EPLI != EPLE; ++EPLI)
+        {
+            ExecutePacketList_Iterator_t NEPI = EPLI; NEPI++;       // Next Execute Packet Iterator
+            // See if the next execute packet is not the last one and contains a branch target?
+            if((NEPI != EPLE) && (*NEPI)->GetBranchTargetInstructionCount() && bookmark_flag == false)
+            {
+                // We will build the next Basic Block Starting at this Execute Packet
+                bookmark_flag = true; BEPI = NEPI;
+            }
+
+            if(!basic_block)
+            {
+                basic_block = new BasicBlock(basic_block_id++);
+                ASSERT(basic_block, "Allocating Memory for Basic Block");
+            }
+
+            // Add the current Execute Packet to Basic Block
+            basic_block->PushBack(*EPLI);
+
+            /* If the current execute packet contains at-least one Branch Instruction;
+             * Then start counting Branch Delay Slots to find the end of the current Basic Block.
+             * Attention: We can have multiple branch instructions within the Delay Slot Range,
+             * of the previous Branch Instruction. This will be handled in LLVM Code Generation,
+             * where we will check for Program Counter Modification in the Update_Registers Calls.
+             */
+            //branch_count = (*EPLI)->GetUnconditionalBranchInstructionsCount();
+            branch_count = (*EPLI)->GetBranchInstructionsCount();
+            if(branch_count)
+            {
+                branch_flag = true; delay_slot_count = 0;
+            }
+
+            if(branch_flag)
+            {
+                // Check if this Execute Packet Contains Any Multi-Cycle NOP Instruction.
+                dec_instr = (*EPLI)->GetMutiCycleNOPInstr();
+                if(dec_instr)
+                    delay_slot_count += dec_instr->GetNOPCount();
+                else
+                    delay_slot_count++;
+            }
+
+            if(delay_slot_count > C62X_BRANCH_DELAY)
+            {
+                m_basic_blocks_list.push_back(basic_block);
+
+                // Reset for processing the Next Basic Block
+                basic_block = NULL; branch_flag = false; delay_slot_count = 0;
+
+                if(bookmark_flag)
+                {
+                    bookmark_flag = false;
+                    EPLI = --BEPI;  // Because we did an increment in the loop above
+                }
+            }
+        }
+
+        /*
+         * This means that the Last Basic Block hasn't been pushed to the basic block list.
+         * Due to the fact that it does not contain any branch instructions. Should be discarded !!!
+         * But we push it on the Basic Block List, anyways.
+         */
+        if(basic_block)
+        {
+            m_basic_blocks_list.push_back(basic_block);
+            basic_block = NULL;
+            WARN << "Sink Basic Block Found" << endl;
+        }
+
+        //ASSERT(!AddMarkerExecutePackets(), "Failed to Add Marker Execute Packets");
+    }
+
+    uint32_t BasicBlockList :: RemoveRedundantEPs(ExecutePacketList * exec_pkts_list)
+    {
+        for(BasicBlockList_ConstIterator_t BBLCI = m_basic_blocks_list.begin(),
+            BBLCE = m_basic_blocks_list.end(); BBLCI != BBLCE; ++BBLCI)
+        {
+            ExecutePacket * exec_pkt = (*BBLCI)->GetFirstExecPacket();
+            exec_pkts_list->Remove(exec_pkt);
+            //exec_pkt->Print(&cout);
+        }
+
+        return (0);
+    }
+
+    int32_t BasicBlockList :: AddMarkerExecutePackets()
+    {
+        for(BasicBlockList_Iterator_t BBLI = m_basic_blocks_list.begin(),
+            BBLE = m_basic_blocks_list.end(); BBLI != BBLE; ++BBLI)
+        {
+            if((*BBLI)->AddMarkerExecutePackets())
+            {
+                return (-1);
+            }
+        }
+        return(0);
+    }
+}
+
+#if 0 /// Basic Block List Creation with Marker Packets
+    BasicBlockList :: BasicBlockList(ExecutePacketList * exec_packets_list)
+    {
+        ExecutePacketList_Iterator_t BEPI;        // Book Marked Execute Packet Iterator.
+        bool         bookmark_flag      = false;  // Tells us whether we have a bookmarked execute packet or not
+        BasicBlock * basic_block        = NULL;
+        uint32_t     basic_block_id     = 0;
+        int32_t      delay_slot_count   = 0;
         int32_t      taken_branch_count = 0;
         bool         taken_branch_flag  = false;
         DecodedInstruction * dec_instr  = NULL;
@@ -117,20 +230,8 @@ namespace native
 
         ASSERT(!AddMarkerExecutePackets(), "Failed to Add Marker Execute Packets");
     }
+#endif
 
-    int32_t BasicBlockList :: AddMarkerExecutePackets()
-    {
-        for(BasicBlockList_Iterator_t BBLI = m_basic_blocks_list.begin(),
-            BBLE = m_basic_blocks_list.end(); BBLI != BBLE; ++BBLI)
-        {
-            if((*BBLI)->AddMarkerExecutePackets())
-            {
-                return (-1);
-            }
-        }
-        return(0);
-    }
-}
 
 #if 0
 class basic_block

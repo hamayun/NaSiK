@@ -116,6 +116,12 @@ namespace native
         }
     };
 
+    typedef enum LLVMCodeGenLevel
+    {
+        LLVM_CG_EP_LVL = 0,
+        LLVM_CG_BB_LVL = 1
+    } LLVMCodeGenLevel_t;
+
     // The class responsible for generating LLVM Code
     class LLVMGenerator
     {
@@ -126,7 +132,9 @@ namespace native
         llvm::Function *     m_curr_function;    // The current function that we are building
 
         llvm::PassManager          * p_pass_manager;
-        llvm::FunctionPassManager  * p_func_pass_manager;       /* Would be suitable for Functions Generated at Runtime */
+        llvm::FunctionPassManager  * p_func_pass_manager;       /* Would be suitable for Functions Generated at Runtime; if any */
+
+        LLVMCodeGenLevel_t   m_code_gen_lvl;
 
         tool_output_file *GetOutputStream(const char *FileName);
     public:
@@ -164,14 +172,17 @@ namespace native
         llvm::Function          * p_enq_result;
         llvm::Function          * p_update_immed;
 
-        LLVMGenerator(string input_bcfile, string output_bcfile, uint32_t addr_tbl_size);
+        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, uint32_t table_size);
 
-        virtual llvm::Module * GetModule() { return (p_module); }
-        virtual llvm::LLVMContext & GetContext() { return (m_context); }
+        virtual llvm::Module *      GetModule()    { return (p_module); }
+        virtual llvm::LLVMContext & GetContext()   { return (m_context); }
         virtual llvm::IRBuilder<> & GetIRBuilder() { return (m_irbuilder); }
 
         virtual void SetCurrentFunction(llvm::Function * curr_function) { m_curr_function = curr_function; }
         virtual llvm::Function * GetCurrentFunction() { return (m_curr_function); }
+
+        virtual void SetLLVMCodeGenLevel(LLVMCodeGenLevel_t code_gen_lvl) { m_code_gen_lvl = code_gen_lvl; }
+        virtual LLVMCodeGenLevel_t GetLLVMCodeGenLevel() { return (m_code_gen_lvl); }
 
         virtual llvm::Value * Geti1Value (bool    value) { return(llvm::ConstantInt::get(i1,  value)); }
         virtual llvm::Value * Geti8Value (int8_t  value) { return(llvm::ConstantInt::get(i8,  value)); }
@@ -190,7 +201,7 @@ namespace native
 
         virtual int32_t VerifyGeneratedModule();
 
-        virtual void AddOptimizationPasses(unsigned OptLevel);
+        virtual void    AddOptimizationPasses(unsigned OptLevel);
         virtual int32_t OptimizeModule();
         virtual int32_t OptimizeFunction(llvm::Function * func);
 

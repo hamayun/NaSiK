@@ -123,10 +123,9 @@ namespace native
             return (m_bb_id);
         }
 
-        virtual uint32_t GetTargetAddress() const
+        virtual uint32_t GetTargetAddress()
         {
-            ExecutePacket * exec_pkt = GetExecutePacketByIndex(0);
-
+            ExecutePacket * exec_pkt = GetFirstExecPacket();
             return (exec_pkt->GetInstrByIndex(0)->GetAddress());
         }
 
@@ -164,6 +163,17 @@ namespace native
                 curr_index++;
             }
             return (NULL);
+        }
+
+        virtual ExecutePacket * GetFirstExecPacket()
+        {
+            ExecutePacketList_Iterator_t EPI = m_exec_packets_list.begin();
+            ExecutePacketList_Iterator_t EPE = m_exec_packets_list.end();
+
+            if(EPI == EPE)
+                return (NULL);
+            else
+                return (*EPI);
         }
     };
 }

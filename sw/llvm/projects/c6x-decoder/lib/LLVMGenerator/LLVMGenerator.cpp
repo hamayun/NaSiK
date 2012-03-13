@@ -28,18 +28,18 @@
 
 namespace native
 {
-    LLVMGenerator :: LLVMGenerator(string input_bcfile, string output_bcfile, uint32_t addr_tbl_size) :
+    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, uint32_t table_size) :
         p_module(NULL), m_context(getGlobalContext()), m_irbuilder(m_context), m_curr_function(NULL),
-        p_pass_manager(NULL), p_func_pass_manager(NULL),
+        p_pass_manager(NULL), p_func_pass_manager(NULL), m_code_gen_lvl(code_gen_lvl),
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
         i32(IntegerType::get(m_context, 32)), iptr(IntegerType::get(m_context, 8 * sizeof(intptr_t))),
-        p_outs_gen_mod(GetOutputStream(output_bcfile.c_str())),
+        p_outs_gen_mod(GetOutputStream("gen_code.bc")),
         p_outs_addr_mod(GetOutputStream("gen_addr.bc"))
     {
         string error;
 
         // Load in the bitcode file containing this module.
-        if(MemoryBuffer* buffer = MemoryBuffer::getFile(input_bcfile, &error))
+        if(MemoryBuffer* buffer = MemoryBuffer::getFile(input_isa, &error))
         {
             if (isBitcode((const unsigned char *)buffer->getBufferStart(),
                (const unsigned char *)buffer->getBufferEnd()))
@@ -79,13 +79,12 @@ namespace native
         // Create a clone of the input module
         p_gen_mod   = CloneModule(p_module);
 
-        //p_addr_mod  = CloneModule(p_module);
-        p_addr_mod = new Module("gen_addresses.bc", GetContext());
+        p_addr_mod = new Module("gen_addr.bc", GetContext());
         p_addr_mod->setDataLayout(p_module->getDataLayout());
         p_addr_mod->setTargetTriple(p_module->getTargetTriple());
 
         // Create the Addressing Table object
-        p_addr_table = new native::AddressingTable(addr_tbl_size);
+        p_addr_table = new native::AddressingTable(table_size);
 
         // Create Module and Function Pass Managers.
         p_pass_manager = new llvm::PassManager();

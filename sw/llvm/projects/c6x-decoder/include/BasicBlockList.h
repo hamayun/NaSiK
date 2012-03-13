@@ -78,6 +78,8 @@ namespace native
             }
             return (NULL);
         }
+
+        virtual uint32_t RemoveRedundantEPs(ExecutePacketList * exec_pkts_list);
     };
 }
 

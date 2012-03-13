@@ -55,6 +55,11 @@ namespace native
             return (m_exec_packets_list.size());
         }
 
+        virtual void Remove(ExecutePacket * exec_pkt)
+        {
+            m_exec_packets_list.remove(exec_pkt);
+        }
+
         virtual ExecutePacketList_t * GetExecutePacketList()
         {
             return (&m_exec_packets_list);

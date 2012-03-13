@@ -169,6 +169,25 @@ namespace native
             return(uncond_branch_count);
         }
 
+        virtual DecodedInstruction * GetMutiCycleNOPInstr() const
+        {
+            DecodedInstruction * dec_instr = NULL;
+
+            for(InstructionList_ConstIterator_t ILCI = m_instr_list.begin(),
+                ILCE = m_instr_list.end(); ILCI != ILCE; ++ILCI)
+            {
+                dec_instr = (*ILCI)->GetDecodedInstruction();
+                ASSERT(dec_instr != NULL, "Instructions need to be decoded first.");
+
+                if(dec_instr->IsNOPInstruction())
+                {
+                    if(dec_instr->GetNOPCount() > 0)
+                        return(dec_instr);
+                }
+            }
+            return(NULL);
+        }
+
         virtual void Print(ostream *out) const
         {
             if(GetPacketType() == NORMAL_EXEC_PACKET)

@@ -33,7 +33,7 @@ void print_usage(char **argv)
 
 int main (int argc, char ** argv)
 {
-    string input_binary, output_asm, input_format, gen_code_level, isa_path;
+    string input_binary, output_asm, input_format, cg_lvl_str, isa_path;
 
     if(argc != 6)
     {
@@ -44,8 +44,17 @@ int main (int argc, char ** argv)
     input_binary   = argv[1];
     output_asm     = argv[2];
     input_format   = argv[3];
-    gen_code_level = argv[4];
+    cg_lvl_str     = argv[4];
     isa_path       = argv[5];
+
+    LLVMCodeGenLevel_t code_gen_lvl;
+
+    if(cg_lvl_str.compare("EP") == 0)
+        code_gen_lvl = LLVM_CG_EP_LVL;
+    else if (cg_lvl_str.compare("BB") == 0)
+        code_gen_lvl = LLVM_CG_BB_LVL;
+    else
+        ASSERT(0, "Unknown Code Generation Level");
 
     BinaryReader * reader = NULL;
     if(input_format.compare("coff") == 0)
@@ -96,33 +105,39 @@ int main (int argc, char ** argv)
     InstructionDecoder * decoder = new C62xInstructionDecoder();
 
     COUT << "Decoding Binary Instructions ..." << endl;
-    // Decode all instructions present in the list
     for(InstructionList_Iterator_t ILI = instruction_list.GetInstructionList()->begin(),
         ILE = instruction_list.GetInstructionList()->end(); ILI != ILE; ++ILI)
     {
         DecodedInstruction * dec_instr = decoder->DecodeInstruction(*ILI);
         ASSERT(dec_instr != NULL, "Instruction Decoding Failed !!!")
-        //dec_instr->Print(& cout);
     }
 
-    if(input_format.compare("coff") == 0)
-        instruction_list.MarkBranchTargets();
+    // Mark All Statically Known Branch Target Instructions.
+    instruction_list.MarkBranchTargets();
 
     BasicBlockList basic_block_list (& execute_packet_list);
+    uint32_t total_bbs = basic_block_list.GetSize();
 
-    //instruction_list.Print(p_output);
-    //fetch_packet_list.Print(p_output);
-    //execute_packet_list.Print(p_output);
-    basic_block_list.Print(p_output);
-
-    LLVMGenerator * llvm_gen = NULL;
-    if(gen_code_level.compare("BB") == 0)
+    if(code_gen_lvl == LLVM_CG_BB_LVL)
     {
-        uint32_t total_bbs = basic_block_list.GetSize();
-        uint32_t curr_bb = 0;
-        uint32_t progress = 0;
+        // Here We Filter out the BasicBlock First Packets from the Execute Packet List;
+        // So there are not duplications of Target Addresses
+        basic_block_list.RemoveRedundantEPs(& execute_packet_list);
+        basic_block_list.Print(p_output);
+        //execute_packet_list.Print(& cout);
+    }
 
-        llvm_gen = new LLVMGenerator(isa_path, "gen_code_bb.bc", total_bbs);
+    ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
+    uint32_t total_pkts = exec_list->size();
+    uint32_t progress   = 0;
+    LLVMGenerator * llvm_gen = NULL;
+
+    if(code_gen_lvl == LLVM_CG_BB_LVL)
+    {
+        uint32_t table_size = total_bbs + total_pkts;
+        uint32_t curr_bb    = 0;
+
+        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl, table_size);
 
         const BasicBlockList_t * bb_list = basic_block_list.GetBasicBlockList();
         COUT << "Generating LLVM (BB Level) ... " << total_bbs << " Basic Blocks ... " << endl;
@@ -141,33 +156,29 @@ int main (int argc, char ** argv)
         }
         //cout << "\n";
     }
-    else if(gen_code_level.compare("EP") == 0)
+
+    //uint32_t curr_pkt = 0;
+
+    if(!llvm_gen)
     {
-        ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
-        uint32_t total_pkts = exec_list->size();
-        //uint32_t curr_pkt = 0;
-        //uint32_t progress = 0;
-
-        llvm_gen = new LLVMGenerator(isa_path, "gen_code_ep.bc", execute_packet_list.GetSize());
-
-        COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets ... " << endl;
-        for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
-            EPLI != EPLE; ++EPLI)
-        {
-            if((*EPLI)->GetPacketType() == NORMAL_EXEC_PACKET)
-            {
-                if(llvm_gen->GenerateLLVM_EPLevel(*EPLI))
-                {
-                    DOUT << "Error: Generating LLVM Code" << endl;
-                    return (-1);
-                }
-            }
-
-            //progress = ++curr_pkt / total_pkts * 100;
-            //cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
-        }
-        cout << "\n";
+        uint32_t table_size = total_pkts;
+        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl, table_size);
     }
+
+    COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets ... " << endl;
+    for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
+        EPLI != EPLE; ++EPLI)
+    {
+        if(llvm_gen->GenerateLLVM_EPLevel(*EPLI))
+        {
+            DOUT << "Error: Generating LLVM Code" << endl;
+            return (-1);
+        }
+
+        //progress = ++curr_pkt / total_pkts * 100;
+        //cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
+    }
+    cout << "\n";
 
     ASSERT(llvm_gen != NULL, "Unknown Code Generation Level !!!");
 
