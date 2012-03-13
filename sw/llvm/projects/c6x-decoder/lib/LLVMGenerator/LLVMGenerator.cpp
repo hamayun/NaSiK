@@ -21,6 +21,8 @@
 
 #include "LLVMGenerator.h"
 #include "BasicBlock.h"
+#include "llvm/Analysis/CFGPrinter.h"
+
 // TODO: Remove the following include and make it Target Independent
 #include "C62xDecodedInstruction.h"
 
@@ -417,6 +419,7 @@ namespace native
 
         llvm::FunctionType * func_type      = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
         llvm::Function     * function       = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
+        ConstantInt     * const_int32_zero  = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
 
         INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
         SetCurrentFunction(function);
@@ -451,8 +454,11 @@ namespace native
 
         // We create an unconditional branch instruction in the update bb to return bb.
         llvm_bb_update->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_return));
-        // We return the return reason to Dispatcher; If it needs to use it.
-        llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), pc_updated));
+
+        llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), const_int32_zero));
+        // TODO: We can return the reason to Dispatcher; If it needs to use it.
+        //llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), pc_updated));
+
         //function->dump();
         return (0);
     }
@@ -616,10 +622,15 @@ namespace native
             p_pass_manager->add(AlwaysInliningPass);
         }
 #endif
+        p_func_pass_manager->add(createCFGOnlyPrinterPass("_0"));
         p_func_pass_manager->add(createGVNPass());
+        //p_func_pass_manager->add(createCFGOnlyPrinterPass("_1"));
         p_func_pass_manager->add(createInstructionCombiningPass());
+        //p_func_pass_manager->add(createCFGOnlyPrinterPass("_2"));
         p_func_pass_manager->add(createCFGSimplificationPass());
+        //p_func_pass_manager->add(createCFGOnlyPrinterPass("_3"));
         p_func_pass_manager->add(createDeadStoreEliminationPass());
+        //p_func_pass_manager->add(createCFGOnlyPrinterPass("_4"));
     }
 
     int32_t LLVMGenerator :: OptimizeModule()
@@ -631,9 +642,15 @@ namespace native
         for(llvm::Module::iterator FI = p_gen_mod->getFunctionList().begin(),
             FIE = p_gen_mod->getFunctionList().end(); FI != FIE; FI++)
         {
-            COUT << "Optimizing Function ..." << FI->getNameStr() << endl;
-            OptimizeFunction(&(*FI));
+            if(strncmp("Sim", FI->getNameStr().c_str(), 3) == 0)
+            {
+                cout << "Optimizing Function ... " << FI->getNameStr() << endl;
+                OptimizeFunction(&(*FI));
+            }
+        }
+#endif
 
+#if 0
             if(strncmp("SimEP_00000000", FI->getNameStr().c_str(), 14) == 0)
             {
                 //FI->dump();
