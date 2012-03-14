@@ -36,8 +36,8 @@ namespace native
         DecodedInstruction * dec_instr  = NULL;
 
         // Traverse through all the Execute Packets
-        for(ExecutePacketList_Iterator_t EPLI = exec_packets_list->GetExecutePacketList()->begin(),
-            EPLE = exec_packets_list->GetExecutePacketList()->end(); EPLI != EPLE; ++EPLI)
+        for(ExecutePacketList_Iterator_t EPLI = exec_packets_list->GetList()->begin(),
+            EPLE = exec_packets_list->GetList()->end(); EPLI != EPLE; ++EPLI)
         {
             ExecutePacketList_Iterator_t NEPI = EPLI; NEPI++;       // Next Execute Packet Iterator
             // See if the next execute packet is not the last one and contains a branch target?
@@ -149,8 +149,8 @@ namespace native
         DecodedInstruction * dec_instr  = NULL;
 
         // Traverse through all instructions in the instruction list
-        for(ExecutePacketList_Iterator_t EPLI = exec_packets_list->GetExecutePacketList()->begin(),
-            EPLE = exec_packets_list->GetExecutePacketList()->end(); EPLI != EPLE; ++EPLI)
+        for(ExecutePacketList_Iterator_t EPLI = exec_packets_list->GetList()->begin(),
+            EPLE = exec_packets_list->GetList()->end(); EPLI != EPLE; ++EPLI)
         {
             ExecutePacketList_Iterator_t NEPI = EPLI; NEPI++;       // Next Execute Packet Iterator
             // See if the next execute packet is not the last one and contains a branch target?

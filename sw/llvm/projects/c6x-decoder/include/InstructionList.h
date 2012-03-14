@@ -49,9 +49,9 @@ namespace native
         }
 
         virtual uint32_t GetSize() const { return (m_instr_list.size()); }
-        virtual InstructionList_t * GetInstructionList() { return (&m_instr_list); }
+        virtual InstructionList_t * GetList() { return (&m_instr_list); }
 
-        virtual Instruction * GetInstructionByAddress (uint32_t address)
+        virtual Instruction * GetInstrByAddress (uint32_t address)
         {
             for(InstructionList_Iterator_t ILI = m_instr_list.begin(),
                 ILE = m_instr_list.end(); ILI != ILE; ++ILI)
@@ -104,7 +104,7 @@ namespace native
                     // If the address is a valid one
                     if(branch_target_addr)
                     {
-                        Instruction * target_instr = GetInstructionByAddress(branch_target_addr);
+                        Instruction * target_instr = GetInstrByAddress(branch_target_addr);
                         ASSERT(target_instr != NULL, "Target Instruction Not Found");
 
                         DecodedInstruction * target_dec_instr = target_instr->GetDecodedInstruction();

@@ -25,7 +25,7 @@ namespace native
 {
     ExecutePacketList :: ExecutePacketList(InstructionList * instr_list)
     {
-        InstructionList_t * list = instr_list->GetInstructionList();
+        InstructionList_t * list = instr_list->GetList();
         ExecutePacket     * exec_packet = NULL;
 
         for(InstructionList_Iterator_t ILI = list->begin(), ILE = list->end(); ILI != ILE; ++ILI)

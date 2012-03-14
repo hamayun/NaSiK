@@ -79,11 +79,11 @@ int main (int argc, char ** argv)
     }
 
     COUT << "Reading Input Binary ..." << endl;
-    InstructionList instruction_list;
-    native :: Instruction * instruction = NULL;
-    while ((instruction = reader->Read(section_handle, instr_address)))
+    InstructionList iList;
+    native :: Instruction * pInstr = NULL;
+    while ((pInstr = reader->Read(section_handle, instr_address)))
     {
-        instruction_list.PushBack(instruction);
+        iList.PushBack(pInstr);
         instr_address += 4;
     }
 
@@ -98,48 +98,49 @@ int main (int argc, char ** argv)
         }
     }
 
-    FetchPacketList fetch_packet_list(&instruction_list);
-    ExecutePacketList execute_packet_list(&instruction_list);
+    FetchPacketList fpList(& iList);
+    ExecutePacketList epList(& iList);
 
     // Create a New Decoder Object.
     InstructionDecoder * decoder = new C62xInstructionDecoder();
 
     COUT << "Decoding Binary Instructions ..." << endl;
-    for(InstructionList_Iterator_t ILI = instruction_list.GetInstructionList()->begin(),
-        ILE = instruction_list.GetInstructionList()->end(); ILI != ILE; ++ILI)
+    for(InstructionList_Iterator_t ILI = iList.GetList()->begin(),
+        ILE = iList.GetList()->end(); ILI != ILE; ++ILI)
     {
         DecodedInstruction * dec_instr = decoder->DecodeInstruction(*ILI);
         ASSERT(dec_instr != NULL, "Instruction Decoding Failed !!!")
     }
 
     // Mark All Statically Known Branch Target Instructions.
-    instruction_list.MarkBranchTargets();
+    iList.MarkBranchTargets();
 
-    BasicBlockList basic_block_list (& execute_packet_list);
-    uint32_t total_bbs = basic_block_list.GetSize();
+    BasicBlockList bbList (& epList);
+    uint32_t total_bbs = bbList.GetSize();
 
     if(code_gen_lvl == LLVM_CG_BB_LVL)
     {
         // Here We Filter out the BasicBlock First Packets from the Execute Packet List;
         // So there are not duplications of Target Addresses
-        basic_block_list.RemoveRedundantEPs(& execute_packet_list);
-        basic_block_list.Print(p_output);
-        //execute_packet_list.Print(& cout);
+        bbList.RemoveRedundantEPs(& epList);
+        bbList.Print(p_output);
+    }
+    else if(code_gen_lvl == LLVM_CG_EP_LVL)
+    {
+        epList.Print(p_output);
     }
 
-    ExecutePacketList_t * exec_list = execute_packet_list.GetExecutePacketList();
+    ExecutePacketList_t * exec_list = epList.GetList();
     uint32_t total_pkts = exec_list->size();
     uint32_t progress   = 0;
     LLVMGenerator * llvm_gen = NULL;
 
     if(code_gen_lvl == LLVM_CG_BB_LVL)
     {
-        uint32_t table_size = total_bbs + total_pkts;
         uint32_t curr_bb    = 0;
+        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl);
 
-        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl, table_size);
-
-        const BasicBlockList_t * bb_list = basic_block_list.GetBasicBlockList();
+        const BasicBlockList_t * bb_list = bbList.GetList();
         COUT << "Generating LLVM (BB Level) ... " << total_bbs << " Basic Blocks ... " << endl;
 
         for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end();
@@ -161,8 +162,7 @@ int main (int argc, char ** argv)
 
     if(!llvm_gen)
     {
-        uint32_t table_size = total_pkts;
-        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl, table_size);
+        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl);
     }
 
     COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets ... " << endl;

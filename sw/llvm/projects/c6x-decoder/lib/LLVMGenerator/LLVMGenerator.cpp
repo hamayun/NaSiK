@@ -28,7 +28,7 @@
 
 namespace native
 {
-    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, uint32_t table_size) :
+    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl) :
         p_module(NULL), m_context(getGlobalContext()), m_irbuilder(m_context), m_curr_function(NULL),
         p_pass_manager(NULL), p_func_pass_manager(NULL), m_code_gen_lvl(code_gen_lvl),
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
@@ -82,9 +82,6 @@ namespace native
         p_addr_mod = new Module("gen_addr.bc", GetContext());
         p_addr_mod->setDataLayout(p_module->getDataLayout());
         p_addr_mod->setTargetTriple(p_module->getTargetTriple());
-
-        // Create the Addressing Table object
-        p_addr_table = new native::AddressingTable(table_size);
 
         // Create Module and Function Pass Managers.
         p_pass_manager = new llvm::PassManager();
@@ -317,7 +314,7 @@ namespace native
         p_proc_state->setName("p_state");
 
         // Add Addressing Table Entry
-        p_addr_table->AddAddressEntry(basic_block->GetTargetAddress(), function);
+        m_addr_table[basic_block->GetTargetAddress()] = function;
 
         uint32_t exec_pkt_count           = basic_block->GetSize();
         llvm::BasicBlock * llvm_bb_entry  = llvm::BasicBlock::Create(GetContext(), "BB_Entry", function);
@@ -430,7 +427,7 @@ namespace native
         p_proc_state->setName("p_state");
 
         // Add Addressing Table Entry
-        p_addr_table->AddAddressEntry(exec_pkt->GetTargetAddress(), function);
+        m_addr_table[exec_pkt->GetTargetAddress()] = function;
 
         llvm::BasicBlock * llvm_bb_entry  = llvm::BasicBlock::Create(GetContext(), "BB_Entry", function);
         llvm::BasicBlock * llvm_bb_return = llvm::BasicBlock::Create(GetContext(), "BB_Return", function);
@@ -484,9 +481,8 @@ namespace native
 
     int32_t LLVMGenerator :: WriteAddressingTable()
     {
-        AddrTableEntry_t * p_entry     = p_addr_table->GetAddressEntry(0);
-        uint32_t         tablesize     = p_addr_table->GetCurrSize();
-        llvm::Function * nativefptr    = p_entry->p_native_func;
+        uint32_t         tablesize     = m_addr_table.size();
+        llvm::Function * nativefptr    = m_addr_table.begin()->second;
         llvm::IRBuilder<>  & irbuilder = GetIRBuilder();
 
         // Type Definitions
@@ -498,7 +494,7 @@ namespace native
         ASSERT(gen_addr_entry_ty, "Failed to Create Address Entry Structure Type");
         //gen_addr_entry_ty->dump();
 
-        llvm::ArrayType * gen_addr_table_ty = llvm::ArrayType::get(gen_addr_entry_ty, p_addr_table->GetCurrSize());
+        llvm::ArrayType * gen_addr_table_ty = llvm::ArrayType::get(gen_addr_entry_ty, tablesize);
         ASSERT(gen_addr_table_ty, "Failed to Create Address Table Array Type");
         //gen_addr_table_ty->dump();
 
@@ -510,7 +506,7 @@ namespace native
             /*Name=*/"AddressingTable");
         gen_addr_table->setAlignment(32);
 
-        Constant *const_addr_table_size = irbuilder.getInt32(p_addr_table->GetCurrSize());
+        Constant *const_addr_table_size = irbuilder.getInt32(tablesize);
         GlobalVariable* gen_addr_table_sz = new GlobalVariable(*p_addr_mod,
             /*Type=*/irbuilder.getInt32Ty(),
             /*isConstant=*/false,
@@ -520,13 +516,13 @@ namespace native
         gen_addr_table_sz->setAlignment(32);
 
         std::vector<Constant*> const_array_elems;
-        for(uint32_t index = 0 ; index < tablesize ; index++)
+
+        for(AddressTable_Iterator_t ATI = m_addr_table.begin(), ATE = m_addr_table.end(); ATI != ATE; ++ATI)
         {
-            p_entry = p_addr_table->GetAddressEntry(index);
-            ConstantInt* const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, p_entry->m_target_addr));
+            ConstantInt* const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, (*ATI).first));
 
             // Add External Function Declarations
-            llvm::Function* func_ptr = p_entry->p_native_func;
+            llvm::Function* func_ptr = (*ATI).second;
             llvm::Function* func_decl = Function::Create(
                 /*Type=*/func_ptr->getFunctionType(),
                 /*Linkage=*/GlobalValue::ExternalLinkage,

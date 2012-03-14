@@ -59,62 +59,8 @@ using namespace llvm;
 
 namespace native
 {
-    typedef struct AddrTableEntry
-    {
-        uint32_t         m_target_addr;
-        llvm::Function * p_native_func;
-    }AddrTableEntry_t;
-
-    class AddressingTable
-    {
-    private:
-        uint32_t           m_max_size;
-        uint32_t           m_curr_size;
-        AddrTableEntry_t * p_addr_table;
-
-    public:
-        AddressingTable(uint32_t max_size): m_max_size(max_size), m_curr_size(0)
-        {
-            p_addr_table = new AddrTableEntry_t[max_size];
-            ASSERT(p_addr_table, "Allocating Memory for Addressing Table");
-
-            INFO << "Addressing Table Created for " << dec << max_size << " Entries" << endl;
-        }
-
-        virtual uint32_t GetMaxSize()
-        {
-            return(m_max_size);
-        }
-
-        virtual uint32_t GetCurrSize()
-        {
-            return(m_curr_size);
-        }
-
-        virtual int32_t AddAddressEntry(uint32_t target_addr, llvm::Function * native_func)
-        {
-            ASSERT(m_curr_size < m_max_size, "Addressing Table Full");
-
-            p_addr_table[m_curr_size].m_target_addr = target_addr;
-            p_addr_table[m_curr_size].p_native_func = native_func;
-            m_curr_size++;
-
-            return 0;
-        }
-
-        virtual AddrTableEntry_t * GetAddressEntry(uint32_t index)
-        {
-            ASSERT(index < m_curr_size, "Invalid Entry Index");
-            return(& p_addr_table[index]);
-        }
-
-        virtual ~AddressingTable()
-        {
-            delete [] p_addr_table;
-            p_addr_table = NULL;
-            m_curr_size = m_max_size = 0;
-        }
-    };
+    typedef std::map<uint32_t, llvm::Function *>           AddressTable_t;
+    typedef std::map<uint32_t, llvm::Function *>::iterator AddressTable_Iterator_t;
 
     typedef enum LLVMCodeGenLevel
     {
@@ -156,7 +102,7 @@ namespace native
         llvm::tool_output_file  * p_outs_gen_mod;      // The output bitcode file.
         llvm::tool_output_file  * p_outs_addr_mod;      // The output bitcode file.
 
-        native::AddressingTable * p_addr_table;
+        AddressTable_t            m_addr_table;
 
         llvm::PointerType       * p_proc_state_type;    // Pointer type to the Processor State. i.e. "Proc_State_t *"
         llvm::Value             * p_proc_state;         // Pointer to Processor State argument that is passed to the current function
@@ -172,7 +118,7 @@ namespace native
         llvm::Function          * p_enq_result;
         llvm::Function          * p_update_immed;
 
-        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, uint32_t table_size);
+        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl);
 
         virtual llvm::Module *      GetModule()    { return (p_module); }
         virtual llvm::LLVMContext & GetContext()   { return (m_context); }

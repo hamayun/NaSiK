@@ -58,7 +58,7 @@ namespace native
             return (m_basic_blocks_list.size());
         }
 
-        virtual const BasicBlockList_t * GetBasicBlockList() const
+        virtual const BasicBlockList_t * GetList() const
         {
             return (&m_basic_blocks_list);
         }

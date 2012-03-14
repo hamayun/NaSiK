@@ -26,7 +26,7 @@ namespace native
 {
     FetchPacketList :: FetchPacketList(InstructionList * instr_list)
     {
-        InstructionList_t * list = instr_list->GetInstructionList();
+        InstructionList_t * list = instr_list->GetList();
         FetchPacket       * fetch_packet = NULL;
         uint32_t            instr_count  = 0;
 

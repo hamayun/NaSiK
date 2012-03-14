@@ -60,7 +60,7 @@ namespace native
             m_exec_packets_list.remove(exec_pkt);
         }
 
-        virtual ExecutePacketList_t * GetExecutePacketList()
+        virtual ExecutePacketList_t * GetList()
         {
             return (&m_exec_packets_list);
         }
