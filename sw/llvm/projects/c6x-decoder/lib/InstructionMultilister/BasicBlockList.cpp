@@ -22,8 +22,18 @@
 #include "ExecutePacketList.h"
 #include "BasicBlockList.h"
 
+// Should we limit a Basic Block if a Branch Target Execute Packet is Found.
+#define BB_END_BR_TARGET
+
 namespace native
 {
+    /*
+     * Basic Block Listing where one Execute Packet can be part of multiple basic
+     * blocks; Normally we do not end basic blocks on marked target execute packets; but instead
+     * we use the Branch Instructions to determine the end of each basic block.
+     * Exception: If BB_END_BR_TARGET is defined above, we limit basic block boundary to
+     * Marked Execute Packets
+     */
     BasicBlockList :: BasicBlockList(ExecutePacketList * exec_packets_list)
     {
         ExecutePacketList_Iterator_t BEPI;        // Book Marked Execute Packet Iterator.
@@ -79,7 +89,11 @@ namespace native
                     delay_slot_count++;
             }
 
+#ifdef BB_END_BR_TARGET
+            if(delay_slot_count > C62X_BRANCH_DELAY || bookmark_flag)
+#else
             if(delay_slot_count > C62X_BRANCH_DELAY)
+#endif
             {
                 m_basic_blocks_list.push_back(basic_block);
 
