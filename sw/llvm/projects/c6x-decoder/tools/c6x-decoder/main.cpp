@@ -23,8 +23,6 @@
 
 using namespace native;
 
-#define BASIC_BLOCK_LEVEL_CODE
-
 void print_usage(char **argv)
 {
     cout << argv[0] << " <input_binary> <output_asm> <raw/coff> <gen_code_level> <isa_path>" << endl;
@@ -157,7 +155,7 @@ int main (int argc, char ** argv)
         llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl);
     }
 
-    COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << " Packets ... ";
+    COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << " Execute Packets ... ";
     for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
         EPLI != EPLE; ++EPLI)
     {

@@ -25,8 +25,9 @@ debugServer = script.getServer("DebugServer.1");
 debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64x_LE_CycleAccurate.ccxml");
 debugSession = debugServer.openSession(".*");
 
-var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";
+//var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";
 //var c6x_coff_binary = "/home/hamayun/workspace_ccs/matmult/Debug/matmult.out";
+var c6x_coff_binary = "/home/hamayun/workspace_ccs/fibonacci/Debug/fibonacci.out";
 
 try {
     debugSession.memory.loadProgram(c6x_coff_binary);
