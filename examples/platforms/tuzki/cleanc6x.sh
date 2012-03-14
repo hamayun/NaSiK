@@ -64,6 +64,7 @@ rm -f ${PFORM_DIR}/kvm_c6x_bootstrap
 rm -f ${PFORM_DIR}/target_binary_text
 rm -f ${GENERATED_APP}/c6x-decoder
 rm -f ${GENERATED_APP}/instructions.bin
+rm -f ${GENERATED_APP}/C62xDSPInit.bc
+rm -f ${GENERATED_APP}/C62xISABehavior_v2.bc
 rm -f ${CCS_EXAMPLE_PATH}.*
-
 

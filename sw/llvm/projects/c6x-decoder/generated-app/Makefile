@@ -3,7 +3,6 @@ KVMSTART=/home/hamayun/workspace/NaSiK/hw/kvm-85/user/test/x86/kvm_kickstart.o
 CRT0=${TOOLCHAIN}/i386-pc-baremetal/lib/crt0.o
 
 SRCS      = $(wildcard *.c)
-SRCS     += ${C6XISA_BEHAVIOR}/C62xDSPInit.c
 OBJS      = $(SRCS:.c=.o)
 DEPS 	  = $(SRCS:.c=.dep)
 GEN_SRCS  = $(wildcard *.bc)
@@ -23,7 +22,7 @@ INCDIR   +=-I${C6XDEC_SOURCE}/include
 INCDIR   +=-I${TOOLCHAIN}/i386-pc-baremetal/include
 INCDIR   +=-I${TOOLCHAIN}/lib/gcc/i386-pc-baremetal/4.5.0/include
 
-CFLAGS    = -Wall -Wno-format -std=c99 -g -O3 -nostdinc -D${C6XISA_VERSION}
+CFLAGS    = -Wall -Wno-format -std=c99 -g -O3 -nostdinc
 LDFLAGS   =${CRT0} ${KVMSTART} -Wl,-T,ldscript.kvm -nostdlib -L${TOOLCHAIN}/i386-pc-baremetal/lib -lc -lgcc
 
 TARGET    = APPLICATION.X

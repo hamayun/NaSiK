@@ -6,7 +6,7 @@ DEPS 	  = $(SRCS:.c=.dep)
 
 CC        = llvm-gcc
 LLVMDIS   = llvm-dis
-CFLAGS    =-g -O3 -Wall -Wno-format -std=c99 --emit-llvm -D${C6XISA_VERSION}
+CFLAGS    =-g -O3 -Wall -Wno-format -std=c99 --emit-llvm
 INCDIR    =-I. -I../../include/
 INCDIR   +=-I/opt/toolchains/i386-pc-baremetal/i386-pc-baremetal/include
 INCDIR   +=-I/opt/toolchains/i386-pc-baremetal/lib/gcc/i386-pc-baremetal/4.5.0/include
@@ -18,6 +18,8 @@ all : $(OBJS) $(ASMS)
 %.bc : %.c
 	@echo "  Compile ... $<"
 	@$(CC) $(CFLAGS) -nostdinc $(INCDIR) -c $< -o $@
+	@echo "  Copying ... $@"
+	@cp -f $@ ${GENERATED_APP}/
 
 %.ll : %.bc
 	@echo "  Disassemble ... $<"

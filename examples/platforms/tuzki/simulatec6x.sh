@@ -162,9 +162,9 @@ cd ${GENERATED_APP}
 rm -f gen_*
 
 if [ $TARGET_BIN = "raw" ]; then
-    ./c6x-decoder instructions.bin instructions.asm raw $GEN_CODE_LEVEL $C6XISA_BEHAVIOR/C62xISABehavior_v2.bc            >& $OUTPUT_TTY
+    ./c6x-decoder instructions.bin instructions.asm raw $GEN_CODE_LEVEL C62xISABehavior_v2.bc            >& $OUTPUT_TTY
 else
-    ./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm coff $GEN_CODE_LEVEL $C6XISA_BEHAVIOR/C62xISABehavior_v2.bc >& $OUTPUT_TTY
+    ./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm coff $GEN_CODE_LEVEL C62xISABehavior_v2.bc >& $OUTPUT_TTY
 fi
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "

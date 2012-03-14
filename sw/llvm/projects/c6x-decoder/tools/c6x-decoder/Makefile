@@ -17,7 +17,7 @@ TOOLNAME=c6x-decoder
 USEDLIBS = BinaryReader.a InstructionMultilister.a InstructionDecoder.a LLVMGenerator.a
 
 LINK_COMPONENTS := bitwriter bitreader nativecodegen ipo
-CXXFLAGS += -fno-strict-aliasing -g -D${C6XISA_VERSION}
+CXXFLAGS += -fno-strict-aliasing -g
 
 #
 # Include Makefile.common so we know what to do.

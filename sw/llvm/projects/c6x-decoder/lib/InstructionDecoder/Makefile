@@ -10,7 +10,7 @@ LEVEL=../..
 #
 LIBRARYNAME=InstructionDecoder
 
-CXXFLAGS += -D${C6XISA_VERSION}
+CXXFLAGS += 
 #
 # Include Makefile.common so we know what to do.
 #
