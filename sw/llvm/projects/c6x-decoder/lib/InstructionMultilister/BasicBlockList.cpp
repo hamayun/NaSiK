@@ -117,7 +117,7 @@ namespace native
         {
             m_basic_blocks_list.push_back(basic_block);
             basic_block = NULL;
-            WARN << "Sink Basic Block Found" << endl;
+            //WARN << "Sink Basic Block Found" << endl;
         }
 
         //ASSERT(!AddMarkerExecutePackets(), "Failed to Add Marker Execute Packets");

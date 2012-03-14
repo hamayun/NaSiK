@@ -26,6 +26,7 @@ debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64x_LE_CycleAcc
 debugSession = debugServer.openSession(".*");
 
 var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";
+//var c6x_coff_binary = "/home/hamayun/workspace_ccs/matmult/Debug/matmult.out";
 
 try {
     debugSession.memory.loadProgram(c6x_coff_binary);

@@ -61,7 +61,7 @@ int main(int argc, char **argv, char **environ)
         if(curr_func)
         {
             ret_val = curr_func(& p_state);
-            Print_DSP_State(& p_state);
+            //Print_DSP_State(& p_state);
         }
         else
         {
@@ -78,7 +78,7 @@ int main(int argc, char **argv, char **environ)
         {
             CPU_PROFILE_COMP_END();
             CPU_PROFILE_FLUSH_DATA();
-            printf("EXIT_POINT_PC (0x%08X) Reached\n", EXIT_POINT_PC);
+            printf("EXIT_POINT_PC (0x%08X) Reached in %lld Cycles\n", EXIT_POINT_PC, p_state.m_curr_cycle);
             ASSERT(0, "Simulation Stopped ... !!!");
         }
 

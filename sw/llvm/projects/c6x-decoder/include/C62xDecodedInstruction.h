@@ -289,7 +289,6 @@ namespace native
         {
             SetMnemonic("SUB2");
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
-            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 
         virtual ~C62xSUB2Instr() {}
@@ -303,7 +302,6 @@ namespace native
         {
             SetMnemonic("SUBAB");
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
-            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 
         virtual ~C62xSUBABInstr() {}
@@ -317,7 +315,6 @@ namespace native
         {
             SetMnemonic("SUBAH");
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
-            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 
         virtual ~C62xSUBAHInstr() {}
@@ -332,7 +329,6 @@ namespace native
             SetMnemonic("SUBAW");
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
         }
-
 
         virtual ~C62xSUBAWInstr() {}
     };
@@ -384,7 +380,6 @@ namespace native
         {
             SetMnemonic("ADDAW");
             SetDestRegister(dst_reg); AddOperand(src1_opr); AddOperand(src2_opr);
-            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 
         virtual ~C62xADDAWInstr() {}

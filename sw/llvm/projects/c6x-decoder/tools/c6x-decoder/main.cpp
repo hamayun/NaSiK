@@ -49,23 +49,15 @@ int main (int argc, char ** argv)
 
     LLVMCodeGenLevel_t code_gen_lvl;
 
-    if(cg_lvl_str.compare("EP") == 0)
-        code_gen_lvl = LLVM_CG_EP_LVL;
-    else if (cg_lvl_str.compare("BB") == 0)
-        code_gen_lvl = LLVM_CG_BB_LVL;
-    else
-        ASSERT(0, "Unknown Code Generation Level");
+    if(cg_lvl_str.compare("EP") == 0)             code_gen_lvl = LLVM_CG_EP_LVL;
+    else if (cg_lvl_str.compare("BB") == 0)       code_gen_lvl = LLVM_CG_BB_LVL;
+    else ASSERT(0, "Unknown Code Generation Level");
 
     BinaryReader * reader = NULL;
     if(input_format.compare("coff") == 0)
-    {
         reader = new COFFBinaryReader(input_binary);
-    }
     else if(input_format.compare("raw") == 0)
-    {
         reader = new RawBinaryReader(input_binary);
-    }
-
     ASSERT(reader != NULL, "Unknown Input Binary Format Specified.");
 
     uint32_t *section_handle = reader->GetSectionHandle(".text");
@@ -78,7 +70,7 @@ int main (int argc, char ** argv)
         return (EXIT_FAILURE);
     }
 
-    COUT << "Reading Input Binary ..." << endl;
+    COUT << "Reading Input Binary ... " << endl;
     InstructionList iList;
     native :: Instruction * pInstr = NULL;
     while ((pInstr = reader->Read(section_handle, instr_address)))
@@ -141,7 +133,7 @@ int main (int argc, char ** argv)
         llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl);
 
         const BasicBlockList_t * bb_list = bbList.GetList();
-        COUT << "Generating LLVM (BB Level) ... " << total_bbs << " Basic Blocks ... " << endl;
+        COUT << "Generating LLVM (BB Level) ... " << setw(4) << total_bbs << " Basic Blocks ... ";
 
         for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end();
             BBLCI != BBLCE; ++BBLCI)
@@ -153,19 +145,19 @@ int main (int argc, char ** argv)
             }
 
             progress = ++curr_bb / total_bbs * 100;
-            //cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
+            cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
         }
-        //cout << "\n";
+        cout << "\n";
     }
 
-    //uint32_t curr_pkt = 0;
+    uint32_t curr_pkt = 0;
 
     if(!llvm_gen)
     {
         llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl);
     }
 
-    COUT << "Generating LLVM (EP Level) ... " << total_pkts << " Packets ... " << endl;
+    COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << " Packets ... ";
     for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
         EPLI != EPLE; ++EPLI)
     {
@@ -175,8 +167,8 @@ int main (int argc, char ** argv)
             return (-1);
         }
 
-        //progress = ++curr_pkt / total_pkts * 100;
-        //cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
+        progress = ++curr_pkt / total_pkts * 100;
+        cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
     }
     cout << "\n";
 
