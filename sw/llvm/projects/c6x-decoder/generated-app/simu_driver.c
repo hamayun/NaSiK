@@ -22,18 +22,40 @@ extern void DSP_Flush_CIO();
 
 typedef int (*sim_func_t)(C62x_DSPState_t * p_state);
 
+#define ENABLE_STATS
+#ifdef ENABLE_STATS
+    uint32_t sim_func_calls     = 0;
+    uint64_t total_loop_count   = 0;
+    uint32_t search_loop_min    = 0;
+    uint32_t search_loop_max    = 0;
+    uint32_t total_mem_access   = 0;
+#endif
+
 sim_func_t find_sim_func(uint32_t target_pc)
 {
     sim_func_t sim_func = NULL;
     uint32_t low = 0, high = AddressingTableSize - 1;
+
+#ifdef ENABLE_STATS
+    uint32_t curr_count = 0;
+    sim_func_calls++;
+#endif
 
     while(low <= high)
     {
         uint32_t mid_index = (low + high) / 2;
         uint32_t mid_addr  = AddressingTable[mid_index].m_address;
 
+#ifdef ENABLE_STATS
+        total_mem_access++;
+#endif
+
         if(mid_addr == target_pc)
         {
+#ifdef ENABLE_STATS
+            if(curr_count < search_loop_min) search_loop_min = curr_count;
+            if(curr_count > search_loop_max) search_loop_max = curr_count;
+#endif
             sim_func = AddressingTable[mid_index].func_address;
             break;
         }
@@ -41,6 +63,11 @@ sim_func_t find_sim_func(uint32_t target_pc)
             low = mid_index + 1;
         else
             high = mid_index - 1;
+
+#ifdef ENABLE_STATS
+        curr_count++;
+        total_loop_count++;
+#endif
     }
 
     return (sim_func);
@@ -79,7 +106,19 @@ int main(int argc, char **argv, char **environ)
             CPU_PROFILE_COMP_END();
             CPU_PROFILE_FLUSH_DATA();
             printf("EXIT_POINT_PC (0x%08X) Reached in %lld Cycles\n", EXIT_POINT_PC, p_state.m_curr_cycle);
-            ASSERT(0, "Simulation Stopped ... !!!");
+
+#ifdef ENABLE_STATS
+            printf("*----- Simulation Driver Statistics -----*\n");
+            printf("Find Function Calls     : %d times \n", sim_func_calls);
+            printf("Total Loop Count        : %ld times \n", total_loop_count);
+            printf("Search Loop Min/Max/Avg : %d/%d/%.3f times/call\n",
+                    search_loop_min, search_loop_max, ((float) total_loop_count / sim_func_calls));
+            printf("Total Mem Access Count  : %ld times \n", total_mem_access);
+            printf("Avg Mem Access Count    : %.3f times/call \n", ((float) total_mem_access/sim_func_calls));
+            printf("*-----------------------------------------*\n");
+#endif
+            // Halt the KVM CPU
+            __asm__ volatile("hlt");
         }
 
 #if 0

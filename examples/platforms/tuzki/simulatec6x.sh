@@ -37,7 +37,7 @@ OPTIONS:
    -d      Run Decoder Only
    -s      Run Simulation
    -b      Compile Bootstraps
-   -g      Generated Code Level, 'EP' or 'BB'   [Default 'EP']
+   -g      Generated Code Level, 'EP' or 'BB'   [Default 'BB']
    -v      Verbose Mode
 EOF
 }
@@ -47,7 +47,7 @@ COMPILE_KVM=
 DECODE_ONLY=
 RUN_SIMULATION=
 COMPILE_BOOTSTRAPS=
-GEN_CODE_LEVEL="EP"
+GEN_CODE_LEVEL="BB"
 VERBOSE=
 OUTPUT_TTY="/dev/null"
 

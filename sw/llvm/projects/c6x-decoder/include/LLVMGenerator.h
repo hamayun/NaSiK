@@ -52,7 +52,7 @@
 using namespace llvm;
 
 //#define INLINE_FUNCTIONS
-#define OPTIMIZE_MODULE
+//#define OPTIMIZE_MODULE
 
 //#define JUST_ADD_ISA
 //#define OPTIMIZE_FUNCTIONS
