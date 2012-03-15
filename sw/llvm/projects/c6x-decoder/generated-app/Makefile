@@ -30,6 +30,7 @@ TARGET    = APPLICATION.X
 all :  $(GEN_ASMS) $(TARGET)
 
 .PHONY  : clean
+.SECONDARY:
 
 $(TARGET) : $(OBJS) $(GEN_OBJS)
 	@echo "  Linking     ... " $@

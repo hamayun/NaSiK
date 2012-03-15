@@ -51,16 +51,15 @@
 
 using namespace llvm;
 
-//#define INLINE_FUNCTIONS
-//#define OPTIMIZE_MODULE
-
 //#define JUST_ADD_ISA
-//#define OPTIMIZE_FUNCTIONS
 
 namespace native
 {
     typedef std::map<uint32_t, llvm::Function *>           AddressTable_t;
     typedef std::map<uint32_t, llvm::Function *>::iterator AddressTable_Iterator_t;
+
+    typedef std::list<string>                   FrequentFuncList_t;
+    typedef std::list<string>::iterator         FrequentFuncList_Iterator_t;
 
     typedef enum LLVMCodeGenLevel
     {
@@ -68,21 +67,35 @@ namespace native
         LLVM_CG_BB_LVL = 1
     } LLVMCodeGenLevel_t;
 
+    typedef enum LLVMCodeGenOption
+    {
+        LLVM_CGO_NONE           = 0x0,            // No Optimization
+        LLVM_CGO_INLINE         = 0x1,            // Enable Inlining
+        LLVM_CGO_FUF_INLINE     = 0x2,            // Enable Inlining of Frequently Used Functions
+        LLVM_CGO_OPTIMIZE_MOD   = 0x4,            // Enable Module Level Optimizations
+        LLVM_CGO_OPTIMIZE_FUN   = 0x8,            // Enable Function Level Optimizations
+        LLVM_CGO_OPTIMIZE_SPEC  = 0x10            // Enable Special Optimization (If Any)
+    } LLVMCodeGenOption_t;
+
     // The class responsible for generating LLVM Code
     class LLVMGenerator
     {
     private:
-        llvm::Module        *p_module;           // The input IR module; contains the ISA Behaviour
+        llvm::Module        *p_module;           // The input IR module; contains the ISA Behavior
         llvm::LLVMContext   &m_context;
         llvm::IRBuilder<>    m_irbuilder;        // LLVM IR Builder Object
         llvm::Function *     m_curr_function;    // The current function that we are building
 
-        llvm::PassManager          * p_pass_manager;
-        llvm::FunctionPassManager  * p_func_pass_manager;       /* Would be suitable for Functions Generated at Runtime; if any */
+        llvm::PassManager          * p_pm;
+        llvm::FunctionPassManager  * p_fpm;       /* Would be suitable for Functions Generated at Runtime; if any */
 
         LLVMCodeGenLevel_t   m_code_gen_lvl;
+        LLVMCodeGenOption_t  m_code_gen_opt;
+
+        FrequentFuncList_t   m_fuf_list;         // List of Frequently Used Functions;
 
         tool_output_file *GetOutputStream(const char *FileName);
+
     public:
         const llvm::IntegerType * const i1;
         const llvm::IntegerType * const i8;
@@ -118,7 +131,7 @@ namespace native
         llvm::Function          * p_enq_result;
         llvm::Function          * p_update_immed;
 
-        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl);
+        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOption_t code_gen_opt);
 
         virtual llvm::Module *      GetModule()    { return (p_module); }
         virtual llvm::LLVMContext & GetContext()   { return (m_context); }
@@ -129,6 +142,10 @@ namespace native
 
         virtual void SetLLVMCodeGenLevel(LLVMCodeGenLevel_t code_gen_lvl) { m_code_gen_lvl = code_gen_lvl; }
         virtual LLVMCodeGenLevel_t GetLLVMCodeGenLevel() { return (m_code_gen_lvl); }
+
+        virtual void SetInliningAttribute(llvm::Function * func);
+        virtual void SetupFUFList();
+        virtual bool IsFUF(llvm::Function * func);
 
         virtual llvm::Value * Geti1Value (bool    value) { return(llvm::ConstantInt::get(i1,  value)); }
         virtual llvm::Value * Geti8Value (int8_t  value) { return(llvm::ConstantInt::get(i8,  value)); }

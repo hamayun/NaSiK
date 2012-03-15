@@ -46,6 +46,10 @@ int main (int argc, char ** argv)
     isa_path       = argv[5];
 
     LLVMCodeGenLevel_t code_gen_lvl;
+    LLVMCodeGenOption_t code_gen_opt = LLVM_CGO_NONE;
+    code_gen_opt = (LLVMCodeGenOption_t) (code_gen_opt | LLVM_CGO_OPTIMIZE_MOD);
+    code_gen_opt = (LLVMCodeGenOption_t) (code_gen_opt | LLVM_CGO_INLINE);
+    code_gen_opt = (LLVMCodeGenOption_t) (code_gen_opt | LLVM_CGO_FUF_INLINE);
 
     if(cg_lvl_str.compare("EP") == 0)             code_gen_lvl = LLVM_CG_EP_LVL;
     else if (cg_lvl_str.compare("BB") == 0)       code_gen_lvl = LLVM_CG_BB_LVL;
@@ -128,7 +132,7 @@ int main (int argc, char ** argv)
     if(code_gen_lvl == LLVM_CG_BB_LVL)
     {
         uint32_t curr_bb    = 0;
-        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl);
+        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl, code_gen_opt);
 
         const BasicBlockList_t * bb_list = bbList.GetList();
         COUT << "Generating LLVM (BB Level) ... " << setw(4) << total_bbs << " Basic Blocks ... ";
@@ -152,7 +156,7 @@ int main (int argc, char ** argv)
 
     if(!llvm_gen)
     {
-        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl);
+        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl, code_gen_opt);
     }
 
     COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << " Execute Packets ... ";

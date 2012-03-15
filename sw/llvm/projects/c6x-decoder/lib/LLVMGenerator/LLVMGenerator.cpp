@@ -28,9 +28,9 @@
 
 namespace native
 {
-    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl) :
+    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOption_t code_gen_opt) :
         p_module(NULL), m_context(getGlobalContext()), m_irbuilder(m_context), m_curr_function(NULL),
-        p_pass_manager(NULL), p_func_pass_manager(NULL), m_code_gen_lvl(code_gen_lvl),
+        p_pm(NULL), p_fpm(NULL), m_code_gen_lvl(code_gen_lvl), m_code_gen_opt(code_gen_opt),
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
         i32(IntegerType::get(m_context, 32)), iptr(IntegerType::get(m_context, 8 * sizeof(intptr_t))),
         p_outs_gen_mod(GetOutputStream("gen_code.bc")),
@@ -61,6 +61,9 @@ namespace native
             ASSERT(false, "Opening Bitcode File");
         }
 
+        // Setup Frequently Used Functions List
+        SetupFUFList();
+
         /* Modify Function Linkage to be internal;
          * So as to make the library functions invisible at link time.
          * Only explicitly externalized functions should be available for linker.
@@ -68,11 +71,11 @@ namespace native
         for (llvm::Module::FunctionListType::iterator I = p_module->getFunctionList().begin(),
              E = p_module->getFunctionList().end(); I != E; ++I)
         {
-            Function *F = cast<Function>(I);
+            llvm::Function *F = cast<Function>(I);
             if (!I->isDeclaration())
             {
                 F->setLinkage(GlobalValue::InternalLinkage);
-                F->addFnAttr(llvm::Attribute::AlwaysInline);
+                SetInliningAttribute(F);
             }
         }
 
@@ -84,11 +87,11 @@ namespace native
         p_addr_mod->setTargetTriple(p_module->getTargetTriple());
 
         // Create Module and Function Pass Managers.
-        p_pass_manager = new llvm::PassManager();
-        p_func_pass_manager = new llvm::FunctionPassManager(p_gen_mod);
+        p_pm = new llvm::PassManager();
+        p_fpm = new llvm::FunctionPassManager(p_gen_mod);
 
-        p_pass_manager->add(new TargetData(p_module));
-        p_func_pass_manager->add(new TargetData(p_module));
+        p_pm->add(new TargetData(p_module));
+        p_fpm->add(new TargetData(p_module));
 
         /* The Set of Passes that we Run on Each Module / Function */
         AddOptimizationPasses(3);
@@ -118,6 +121,44 @@ namespace native
 
         p_enq_result   = p_gen_mod->getFunction("EnQ_Delay_Result");    ASSERT(p_enq_result, "Could Not Get EnQ_Delay_Result");
         p_update_immed = p_gen_mod->getFunction("Update_Immediate");    ASSERT(p_update_immed, "Could Not Get Update_Immediate");
+    }
+
+    void LLVMGenerator :: SetInliningAttribute(llvm::Function * func)
+    {
+        bool should_inline = false;
+        bool is_freq_func  = IsFUF(func);
+
+        if(m_code_gen_opt & LLVM_CGO_INLINE)
+            should_inline = true;
+
+        if(is_freq_func && !(m_code_gen_opt & LLVM_CGO_FUF_INLINE))
+            should_inline = false;
+
+        if(should_inline)
+            func->addFnAttr(llvm::Attribute::AlwaysInline);
+
+        return;
+    }
+
+    void LLVMGenerator :: SetupFUFList()
+    {
+        m_fuf_list.push_back("Update_Registers");
+        //m_fuf_list.push_back("Update_PC");
+        //m_fuf_list.push_back("Inc_DSP_Cycles");
+        return;
+    }
+
+    bool LLVMGenerator :: IsFUF(llvm::Function * func)
+    {
+        for(FrequentFuncList_Iterator_t FFLI = m_fuf_list.begin(),
+            FFLE = m_fuf_list.end(); FFLI != FFLE; ++FFLI)
+        {
+            if(func->getNameStr().compare(*FFLI) == 0)
+            {
+                return (true);
+            }
+        }
+        return(false);
     }
 
     tool_output_file * LLVMGenerator :: GetOutputStream(const char *FileName)
@@ -503,7 +544,7 @@ namespace native
             /*isConstant=*/false,
             /*Linkage=*/GlobalValue::ExternalLinkage,
             /*Initializer=*/0, // has initializer, specified below
-            /*Name=*/"AddressingTable");
+            /*Name=*/"AddressTable");
         gen_addr_table->setAlignment(32);
 
         Constant *const_addr_table_size = irbuilder.getInt32(tablesize);
@@ -512,7 +553,7 @@ namespace native
             /*isConstant=*/false,
             /*Linkage=*/GlobalValue::ExternalLinkage,
             /*Initializer=*/const_addr_table_size,
-            /*Name=*/"AddressingTableSize");
+            /*Name=*/"AddressTableSize");
         gen_addr_table_sz->setAlignment(32);
 
         std::vector<Constant*> const_array_elems;
@@ -598,52 +639,41 @@ namespace native
     /// OptLevel - Optimization Level
     void LLVMGenerator :: AddOptimizationPasses(unsigned OptLevel)
     {
-        //unsigned Threshold = 250;
-        //llvm::Pass *InliningPass = createFunctionInliningPass(Threshold);
-#ifdef INLINE_FUNCTIONS
         llvm::Pass *AlwaysInliningPass = createAlwaysInlinerPass();
-#else
-        llvm::Pass *AlwaysInliningPass = NULL;
-#endif
 
-#ifdef OPTIMIZE_MODULE
-        createStandardModulePasses(p_pass_manager, OptLevel,
-                                   /*OptimizeSize=*/ false, /*UnitAtATime,*/true,
-                                   /*UnrollLoops=*/true, /*!DisableSimplifyLibCalls,*/true,
-                                   /*HaveExceptions=*/ true, AlwaysInliningPass);
-#else
-        if(AlwaysInliningPass)
+        if(m_code_gen_opt & LLVM_CGO_OPTIMIZE_MOD)
         {
-            p_pass_manager->add(AlwaysInliningPass);
+            createStandardModulePasses(p_pm, OptLevel,
+               /*OptimizeSize=*/ false, /*UnitAtATime,*/true,
+               /*UnrollLoops=*/true, /*!DisableSimplifyLibCalls,*/true,
+               /*HaveExceptions=*/ true, AlwaysInliningPass);
         }
-#endif
-        p_func_pass_manager->add(createCFGOnlyPrinterPass("_0"));
-        p_func_pass_manager->add(createGVNPass());
-        //p_func_pass_manager->add(createCFGOnlyPrinterPass("_1"));
-        p_func_pass_manager->add(createInstructionCombiningPass());
-        //p_func_pass_manager->add(createCFGOnlyPrinterPass("_2"));
-        p_func_pass_manager->add(createCFGSimplificationPass());
-        //p_func_pass_manager->add(createCFGOnlyPrinterPass("_3"));
-        p_func_pass_manager->add(createDeadStoreEliminationPass());
-        //p_func_pass_manager->add(createCFGOnlyPrinterPass("_4"));
+        
+        p_fpm->add(createCFGOnlyPrinterPass("_0"));
+
+        p_fpm->add(createGVNPass());
+        p_fpm->add(createInstructionCombiningPass());
+        p_fpm->add(createCFGSimplificationPass());
+        p_fpm->add(createDeadStoreEliminationPass());
     }
 
     int32_t LLVMGenerator :: OptimizeModule()
     {
-        p_pass_manager->run(*p_gen_mod);
-        p_pass_manager->run(*p_addr_mod);
+        p_pm->run(*p_gen_mod);
+        p_pm->run(*p_addr_mod);
 
-#ifdef OPTIMIZE_FUNCTIONS
-        for(llvm::Module::iterator FI = p_gen_mod->getFunctionList().begin(),
-            FIE = p_gen_mod->getFunctionList().end(); FI != FIE; FI++)
+        if(m_code_gen_opt & LLVM_CGO_OPTIMIZE_FUN)
         {
-            if(strncmp("Sim", FI->getNameStr().c_str(), 3) == 0)
+            for(llvm::Module::iterator FI = p_gen_mod->getFunctionList().begin(),
+                FIE = p_gen_mod->getFunctionList().end(); FI != FIE; FI++)
             {
-                cout << "Optimizing Function ... " << FI->getNameStr() << endl;
-                OptimizeFunction(&(*FI));
+                if(strncmp("Sim", FI->getNameStr().c_str(), 3) == 0)
+                {
+                    cout << "Optimizing Function ... " << FI->getNameStr() << endl;
+                    OptimizeFunction(&(*FI));
+                }
             }
         }
-#endif
 
 #if 0
             if(strncmp("SimEP_00000000", FI->getNameStr().c_str(), 14) == 0)
@@ -672,7 +702,7 @@ namespace native
 
     int32_t LLVMGenerator :: OptimizeFunction(llvm::Function * func)
     {
-        p_func_pass_manager->run(*func);
+        p_fpm->run(*func);
         return (0);
     }
 

@@ -6,8 +6,8 @@
 
 #include "C62xISABehavior_v2.h"
 
-extern address_entry_t AddressingTable[];
-extern uint32_t AddressingTableSize;
+extern address_entry_t AddressTable[];
+extern uint32_t AddressTableSize;
 extern uint32_t EXIT_POINT_PC;
 extern uint32_t CIOFLUSH_POINT_PC;
 extern uint32_t CIOBUFF_ADDR;
@@ -18,7 +18,7 @@ extern void DSP_Flush_CIO();
 
 typedef int (*sim_func_t)(C62x_DSPState_t * p_state);
 
-#define ENABLE_STATS
+//#define ENABLE_STATS
 #ifdef ENABLE_STATS
     uint32_t sim_func_calls     = 0;
     uint64_t total_loop_count   = 0;
@@ -30,7 +30,7 @@ typedef int (*sim_func_t)(C62x_DSPState_t * p_state);
 sim_func_t find_sim_func(uint32_t target_pc)
 {
     sim_func_t sim_func = NULL;
-    uint32_t low = 0, high = AddressingTableSize - 1;
+    uint32_t low = 0, high = AddressTableSize - 1;
 
 #ifdef ENABLE_STATS
     uint32_t curr_count = 0;
@@ -40,7 +40,7 @@ sim_func_t find_sim_func(uint32_t target_pc)
     while(low <= high)
     {
         uint32_t mid_index = (low + high) / 2;
-        uint32_t mid_addr  = AddressingTable[mid_index].m_address;
+        uint32_t mid_addr  = AddressTable[mid_index].m_address;
 
 #ifdef ENABLE_STATS
         total_mem_access++;
@@ -52,7 +52,7 @@ sim_func_t find_sim_func(uint32_t target_pc)
             if(curr_count < search_loop_min) search_loop_min = curr_count;
             if(curr_count > search_loop_max) search_loop_max = curr_count;
 #endif
-            sim_func = AddressingTable[mid_index].func_address;
+            sim_func = AddressTable[mid_index].func_address;
             break;
         }
         else if(mid_addr < target_pc)
