@@ -53,4 +53,4 @@ $(TARGET) : $(OBJS) $(GEN_OBJS)
 
 clean:
 	@echo "  Clean ... "
-	@rm -f $(OBJS) $(GEN_OBJS) $(GEN_ASMS) $(TARGET) *~
+	@rm -f $(OBJS) $(GEN_OBJS) $(GEN_ASMS) $(TARGET) *~ *.s

@@ -277,24 +277,32 @@ namespace native
         static int            str_entries_count;
 
     public:
-        COFFStringTable(int nm_str_entries){
+        COFFStringTable(int nm_str_entries)
+        {
             m_nm_str_entries = nm_str_entries;
+
             p_strtab = new coff_strtab_entry * [m_nm_str_entries];
-            if(!p_strtab){
+            if(!p_strtab)
+            {
                 DOUT << "Error: Allocating Pointers Array for String Table Entries" << endl;
                 return;
             }
+            memset(p_strtab, 0x0, sizeof(coff_strtab_entry *) * m_nm_str_entries);
         }
 
-        ~COFFStringTable(){
-            for(int i=0; i<m_nm_str_entries; i++){
-                if(p_strtab[i]){
+        ~COFFStringTable()
+        {
+            for(int i=0; i<m_nm_str_entries; i++)
+            {
+                if(p_strtab[i])
+                {
                     delete p_strtab[i];
                     p_strtab[i] = NULL;
                 }
             }
 
-            if(p_strtab){
+            if(p_strtab)
+            {
                 delete [] p_strtab;
                 p_strtab = NULL;
             }
@@ -303,24 +311,32 @@ namespace native
         int read(ifstream *file, int strtab_start_addr);
         static int coff_get_strings_count(ifstream *file, int strtab_start_addr);
 
-        int add_strtab_entry(coff_strtab_entry * strtab_entry){
-            if(str_entries_count < m_nm_str_entries && p_strtab[str_entries_count]){
+        int add_strtab_entry(coff_strtab_entry * strtab_entry)
+        {
+            ASSERT(strtab_entry != NULL, "NULL String Table Entry");
+
+            if(str_entries_count < m_nm_str_entries)
+            {
                 p_strtab[str_entries_count++] = strtab_entry;
                 return(0);
             }
             return(-1);
         }
 
-        coff_strtab_entry * get_strtab_entry(int offset){
-            for(int i=0; i<str_entries_count; i++){
-                if(p_strtab[i]->get_offset() == offset){
+        coff_strtab_entry * get_strtab_entry(int offset)
+        {
+            for(int i=0; i<str_entries_count; i++)
+            {
+                if(p_strtab[i]->get_offset() == offset)
+                {
                     return(p_strtab[i]);
                 }
             }
             return(NULL);
         }
 
-        static int get_str_entries_count(){
+        static int get_str_entries_count()
+        {
             return (str_entries_count);
         }
 

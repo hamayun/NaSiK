@@ -23,72 +23,80 @@
 
 using namespace native;
 
-void print_usage(char **argv)
-{
-    cout << argv[0] << " <input_binary> <output_asm> <raw/coff> <gen_code_level> <isa_path>" << endl;
-    return;
-}
+static string ToolDescription = "LLVM Based Static Binary Translator\n";
+
+static cl::opt<std::string> InputBinaryFilename     (cl::Positional, cl::desc("<Target Binary Name>"), cl::Required);
+static cl::opt<std::string> OutputAsmFilename       ("o", cl::desc("Output Assembly File [Target Disassembled Code]"),
+                                                     cl::value_desc("filename"), cl::init("/dev/null"));
+static cl::opt<std::string> InputBinaryFormat       ("ibf", cl::desc("Input Binary Format {COFF,RAW} [Default:COFF]"),
+                                                     cl::value_desc("format"), cl::init("COFF"));
+static cl::opt<std::string> ISAFilename             ("isa", cl::desc("ISA Behavior File [LLVM Bitcode]"),
+                                                     cl::value_desc("filename"), cl::Required);
+static cl::opt<LLVMCodeGenLevel_t> CodeGenLevel     (cl::desc("Code Generation Level:"), cl::init(LLVM_CG_BB_LVL),
+                                                     cl::values(
+                                                     clEnumValN(LLVM_CG_EP_LVL, "EP", "Execute Packet Level Code Generation"),
+                                                     clEnumValN(LLVM_CG_BB_LVL, "BB", "Basic Block Level Code Generation [Mix-mode i.e. BB + EP]"),
+                                                     clEnumValEnd));
+static cl::bits<LLVMCGOBitVector_t> CodeGenOptionsBV(cl::desc("Code Generation Options:"),
+                                                     cl::values(
+                                                     clEnumValN(LLVM_CGO_INLINE_BIT, "inline", "Inline All ISA Function During Code Generation"),
+                                                     clEnumValN(LLVM_CGO_FUF_INLINE_BIT, "finline", "Inline the Frequently Used Functions (requires the inline option)"),
+                                                     clEnumValN(LLVM_CGO_OPT_MOD_BIT, "mopt", "Enable Optimization at Module Level"),
+                                                     clEnumValN(LLVM_CGO_OPT_FUN_BIT, "fopt", "Enable Optimization at Function Level"),
+                                                     clEnumValN(LLVM_CGO_OPT_SPE_BIT, "sopt", "Enable Special Optimizations (If Any)"),
+                                                     clEnumValEnd));
 
 int main (int argc, char ** argv)
 {
-    string input_binary, output_asm, input_format, cg_lvl_str, isa_path;
+    native::InstructionList           iList;
+    native::Instruction            * pInstr = NULL;
+    native::BinaryReader           * reader = NULL;
+    native::InstructionDecoder    * decoder = NULL;
+    native::LLVMGenerator        * llvm_gen = NULL;
+    native::ExecutePacketList_t * exec_list = NULL;
+    ofstream               * p_out_asm_file = NULL;
+    uint32_t               * section_handle = NULL;
+    uint32_t                 instr_address  = 0x0;
+    uint32_t total_bbs = 0, total_pkts = 0, curr_bb = 0, curr_pkt = 0, progress = 0;
 
-    if(argc != 6)
+    cl::ParseCommandLineOptions(argc, argv, ToolDescription.c_str());
+    native::LLVMCodeGenOptions_t CodeGenOptions = (native::LLVMCodeGenOptions_t) CodeGenOptionsBV.getBits();
+
+    if(InputBinaryFormat.compare("COFF") == 0)
     {
-        print_usage(argv);
-        return (EXIT_FAILURE);
+        reader = new COFFBinaryReader(InputBinaryFilename.c_str());
     }
-
-    input_binary   = argv[1];
-    output_asm     = argv[2];
-    input_format   = argv[3];
-    cg_lvl_str     = argv[4];
-    isa_path       = argv[5];
-
-    LLVMCodeGenLevel_t code_gen_lvl;
-    LLVMCodeGenOption_t code_gen_opt = LLVM_CGO_NONE;
-    code_gen_opt = (LLVMCodeGenOption_t) (code_gen_opt | LLVM_CGO_OPTIMIZE_MOD);
-    code_gen_opt = (LLVMCodeGenOption_t) (code_gen_opt | LLVM_CGO_INLINE);
-    code_gen_opt = (LLVMCodeGenOption_t) (code_gen_opt | LLVM_CGO_FUF_INLINE);
-
-    if(cg_lvl_str.compare("EP") == 0)             code_gen_lvl = LLVM_CG_EP_LVL;
-    else if (cg_lvl_str.compare("BB") == 0)       code_gen_lvl = LLVM_CG_BB_LVL;
-    else ASSERT(0, "Unknown Code Generation Level");
-
-    BinaryReader * reader = NULL;
-    if(input_format.compare("coff") == 0)
-        reader = new COFFBinaryReader(input_binary);
-    else if(input_format.compare("raw") == 0)
-        reader = new RawBinaryReader(input_binary);
+    else if(InputBinaryFormat.compare("RAW") == 0)
+    {
+        reader = new RawBinaryReader(InputBinaryFilename.c_str());
+    }
     ASSERT(reader != NULL, "Unknown Input Binary Format Specified.");
 
-    uint32_t *section_handle = reader->GetSectionHandle(".text");
-    uint32_t  instr_address  = reader->GetSectionStartAddress(section_handle);
-
-    ofstream  *p_output = new ofstream(output_asm.c_str(), ios::out);
-    if(!p_output->is_open())
+    p_out_asm_file = new ofstream(OutputAsmFilename.c_str(), ios::out);
+    if(!p_out_asm_file->is_open())
     {
-        DOUT << "Error: Opening Output File: " << output_asm << endl;
+        DOUT << "Error: Opening Output File: " << OutputAsmFilename << endl;
         return (EXIT_FAILURE);
     }
 
+    section_handle = reader->GetSectionHandle(".text");
+    instr_address  = reader->GetSectionStartAddress(section_handle);
+
     COUT << "Reading Input Binary ... " << endl;
-    InstructionList iList;
-    native :: Instruction * pInstr = NULL;
     while ((pInstr = reader->Read(section_handle, instr_address)))
     {
         iList.PushBack(pInstr);
         instr_address += 4;
     }
 
-    if(input_format.compare("coff") == 0)
+    if(InputBinaryFormat.compare("COFF") == 0)
     {
         string sections_to_dump[] = {".text", ".data", ".cinit", ".const", ""};
 
         // Dump the different sections of input binary to files for loading to KVM Memory
         for(int i = 0; strcmp(sections_to_dump[i].c_str(), "") != 0; i++)
         {
-            reader->DumpSection(input_binary, input_binary, sections_to_dump[i]);
+            reader->DumpSection(InputBinaryFilename, InputBinaryFilename, sections_to_dump[i]);
         }
     }
 
@@ -96,49 +104,48 @@ int main (int argc, char ** argv)
     ExecutePacketList epList(& iList);
 
     // Create a New Decoder Object.
-    InstructionDecoder * decoder = new C62xInstructionDecoder();
+    // Depending upon the Type of Input Binary; (For the moment C62x only)
+    decoder = new C62xInstructionDecoder();
 
     COUT << "Decoding Binary Instructions ..." << endl;
-    for(InstructionList_Iterator_t ILI = iList.GetList()->begin(),
-        ILE = iList.GetList()->end(); ILI != ILE; ++ILI)
+    for(InstructionList_Iterator_t ILI = iList.GetList()->begin(), ILE = iList.GetList()->end(); ILI != ILE; ++ILI)
     {
         DecodedInstruction * dec_instr = decoder->DecodeInstruction(*ILI);
         ASSERT(dec_instr != NULL, "Instruction Decoding Failed !!!")
     }
 
-    // Mark All Statically Known Branch Target Instructions.
+    // Mark All Statically Known Branch Target Execute Packets.
     iList.MarkBranchTargets();
 
     BasicBlockList bbList (& epList);
-    uint32_t total_bbs = bbList.GetSize();
+    total_bbs = bbList.GetSize();
 
-    if(code_gen_lvl == LLVM_CG_BB_LVL)
+    if(CodeGenLevel == LLVM_CG_BB_LVL)
     {
         // Here We Filter out the BasicBlock First Packets from the Execute Packet List;
         // So there are not duplications of Target Addresses
         bbList.RemoveRedundantEPs(& epList);
-        bbList.Print(p_output);
+        bbList.Print(p_out_asm_file);
     }
-    else if(code_gen_lvl == LLVM_CG_EP_LVL)
+    else if(CodeGenLevel == LLVM_CG_EP_LVL)
     {
-        epList.Print(p_output);
+        epList.Print(p_out_asm_file);
     }
 
-    ExecutePacketList_t * exec_list = epList.GetList();
-    uint32_t total_pkts = exec_list->size();
-    uint32_t progress   = 0;
-    LLVMGenerator * llvm_gen = NULL;
+    exec_list = epList.GetList();
+    total_pkts = exec_list->size();
+    progress   = 0;
 
-    if(code_gen_lvl == LLVM_CG_BB_LVL)
+    if(CodeGenLevel == LLVM_CG_BB_LVL)
     {
-        uint32_t curr_bb    = 0;
-        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl, code_gen_opt);
+        llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions);
+        ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
 
         const BasicBlockList_t * bb_list = bbList.GetList();
         COUT << "Generating LLVM (BB Level) ... " << setw(4) << total_bbs << " Basic Blocks ... ";
 
-        for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end();
-            BBLCI != BBLCE; ++BBLCI)
+        curr_bb  = 0;
+        for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end(); BBLCI != BBLCE; ++BBLCI)
         {
             if(llvm_gen->GenerateLLVM_BBLevel(*BBLCI))
             {
@@ -152,16 +159,12 @@ int main (int argc, char ** argv)
         cout << "\n";
     }
 
-    uint32_t curr_pkt = 0;
-
-    if(!llvm_gen)
-    {
-        llvm_gen = new LLVMGenerator(isa_path, code_gen_lvl, code_gen_opt);
-    }
+    curr_pkt = 0;
+    if(!llvm_gen) llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions);
+    ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
 
     COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << " Execute Packets ... ";
-    for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end();
-        EPLI != EPLE; ++EPLI)
+    for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end(); EPLI != EPLE; ++EPLI)
     {
         if(llvm_gen->GenerateLLVM_EPLevel(*EPLI))
         {
@@ -174,23 +177,11 @@ int main (int argc, char ** argv)
     }
     cout << "\n";
 
-    ASSERT(llvm_gen != NULL, "Unknown Code Generation Level !!!");
-
-    COUT << "Verifying Module ... " << endl;
-    llvm_gen->VerifyGeneratedModule();
-
-    COUT << "Writing Addressing Table ... " << endl;
-    llvm_gen->WriteAddressingTable();
-
-    COUT << "Optimizing LLVM Instructions ..." << endl;
-    llvm_gen->OptimizeModule();
-
-    COUT << "Writing Binary Configurations ... " << endl;
-    llvm_gen->WriteBinaryConfigs(reader);
-
-    COUT << "Writing Output Bitcode ..." << endl;
-    llvm_gen->WriteBitcodeFile();
+    COUT << "Verifying Module ... " << endl;              llvm_gen->VerifyGeneratedModule();
+    COUT << "Writing Addressing Table ... " << endl;      llvm_gen->WriteAddressingTable();
+    COUT << "Optimizing LLVM Instructions ..." << endl;   llvm_gen->OptimizeModule();
+    COUT << "Writing Binary Configurations ... " << endl; llvm_gen->WriteBinaryConfigs(reader);
+    COUT << "Writing Output Bitcode ..." << endl;         llvm_gen->WriteBitcodeFile();
 
     return (EXIT_SUCCESS);
 }
-

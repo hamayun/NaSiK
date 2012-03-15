@@ -28,7 +28,7 @@
 
 namespace native
 {
-    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOption_t code_gen_opt) :
+    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOptions_t code_gen_opt) :
         p_module(NULL), m_context(getGlobalContext()), m_irbuilder(m_context), m_curr_function(NULL),
         p_pm(NULL), p_fpm(NULL), m_code_gen_lvl(code_gen_lvl), m_code_gen_opt(code_gen_opt),
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
@@ -641,7 +641,7 @@ namespace native
     {
         llvm::Pass *AlwaysInliningPass = createAlwaysInlinerPass();
 
-        if(m_code_gen_opt & LLVM_CGO_OPTIMIZE_MOD)
+        if(m_code_gen_opt & LLVM_CGO_OPT_MOD)
         {
             createStandardModulePasses(p_pm, OptLevel,
                /*OptimizeSize=*/ false, /*UnitAtATime,*/true,
@@ -662,7 +662,7 @@ namespace native
         p_pm->run(*p_gen_mod);
         p_pm->run(*p_addr_mod);
 
-        if(m_code_gen_opt & LLVM_CGO_OPTIMIZE_FUN)
+        if(m_code_gen_opt & LLVM_CGO_OPT_FUN)
         {
             for(llvm::Module::iterator FI = p_gen_mod->getFunctionList().begin(),
                 FIE = p_gen_mod->getFunctionList().end(); FI != FIE; FI++)

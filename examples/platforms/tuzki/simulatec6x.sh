@@ -28,21 +28,26 @@ usage()
 cat << EOF
 usage: $0 options
 
-This script Compiles, Decodes and Simulates a Given Target Binary.
+This script Compiles, Translates and Simulates a Given Target Binary.
 
 OPTIONS:
-   -h      Show this message
-   -t      Target Binary Type, 'raw' or 'coff'  [Default 'coff']
-   -k      Compile KVM Libraries
-   -d      Run Decoder Only
-   -s      Run Simulation
    -b      Compile Bootstraps
+   -d      Run Decoder Only
+   -f      Enable Function Level Optimization
    -g      Generated Code Level, 'EP' or 'BB'   [Default 'BB']
+   -h      Show this help message
+   -i      Enable Inline Code Generation
+   -j      Enable Frequently Used Function Inline Code Generation
+   -k      Compile KVM Libraries
+   -m      Enable Module Level Optimization
+   -p      Enable Special Optimizations (If Any)
+   -s      Run Simulation
+   -t      Target Binary Type, 'RAW' or 'COFF'  [Default 'COFF']
    -v      Verbose Mode
 EOF
 }
 
-TARGET_BIN="coff"
+TARGET_BIN="COFF"
 COMPILE_KVM=
 DECODE_ONLY=
 RUN_SIMULATION=
@@ -50,31 +55,47 @@ COMPILE_BOOTSTRAPS=
 GEN_CODE_LEVEL="BB"
 VERBOSE=
 OUTPUT_TTY="/dev/null"
+CODEGEN_OPT=""
 
-while getopts “ht:kdsbg:v” OPTION
+while getopts “bdfg:hijkmpst:v” OPTION
 do
      case $OPTION in
-         h)
-             usage
-             exit 1
-             ;;
-         t)
-             TARGET_BIN=$OPTARG
-             ;;
-         k)
-             COMPILE_KVM=1
+         b)
+             COMPILE_BOOTSTRAPS=1
              ;;
          d)
              DECODE_ONLY=1
              ;;
-         s)
-             RUN_SIMULATION=1
-             ;;
-         b)
-             COMPILE_BOOTSTRAPS=1
+         f)
+             CODEGEN_OPT+="-fopt "
              ;;
          g)
              GEN_CODE_LEVEL=$OPTARG
+             ;;
+         h)
+             usage
+             exit 1
+             ;;
+         i)
+             CODEGEN_OPT+="-inline "
+             ;;
+         j)
+             CODEGEN_OPT+="-finline "
+             ;;
+         k)
+             COMPILE_KVM=1
+             ;;
+         m)
+             CODEGEN_OPT+="-mopt "
+             ;;
+         p)
+             CODEGEN_OPT+="-sopt "
+             ;;
+         s)
+             RUN_SIMULATION=1
+             ;;
+         t)
+             TARGET_BIN=$OPTARG
              ;;
          v)
              VERBOSE=1
@@ -87,30 +108,30 @@ do
      esac
 done
 #------------------------------------------------------------------------------#
-if [ $TARGET_BIN = "raw" ]; then
-    print_step "Compiling Target Raw Binary Writer ..."
+if [ $TARGET_BIN = "RAW" ]; then
+    print_step "Compiling Target RAW Binary Writer ..."
     cd ${TARGET_BIN_WRITER}
     make clean                                                    >& $OUTPUT_TTY
     make                                                          >& $OUTPUT_TTY
     if [ $? != 0 ]; then
-        print_error "Error! Compiling Target Raw Binary Writer ..."
+        print_error "Error! Compiling Target RAW Binary Writer ..."
         exit 1
     fi
 
-    print_step "Writting Raw Binary ..."
+    print_step "Writting RAW Binary ..."
     ./BFW.X                                                       >& $OUTPUT_TTY
     if [ $? != 0 ]; then
-        print_error "Error! Writting Raw Binary ..."
+        print_error "Error! Writting RAW Binary ..."
         exit 1
     fi
 
     ln -sf ${TARGET_BIN_WRITER}/instructions.bin ${GENERATED_APP}/instructions.bin
-elif [ $TARGET_BIN = "coff" ]; then
-    print_step "Compiling Target Coff Binary ... ${CCS_EXAMPLE_OUTFILE}"
+elif [ $TARGET_BIN = "COFF" ]; then
+    print_step "Compiling Target COFF Binary ... ${CCS_EXAMPLE_OUTFILE}"
     cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
     gmake -k all                                                  >& $OUTPUT_TTY
     if [ $? != 0 ]; then
-        print_error "Error! Compiling Coff Binary ..."
+        print_error "Error! Compiling COFF Binary ..."
         exit 1
     fi
 else
@@ -161,11 +182,17 @@ print_step "Decoding Target Binary ... "
 cd ${GENERATED_APP}
 rm -f gen_*
 
-if [ $TARGET_BIN = "raw" ]; then
-    ./c6x-decoder instructions.bin instructions.asm raw $GEN_CODE_LEVEL C62xISABehavior_v2.bc            >& $OUTPUT_TTY
+DEC_CMD_LINE=""
+
+if [ $TARGET_BIN = "RAW" ]; then
+    DEC_CMD_LINE+="instructions.bin -o instructions.asm -ibf=RAW"
 else
-    ./c6x-decoder ${CCS_EXAMPLE_PATH} ${CCS_EXAMPLE_PATH}.asm coff $GEN_CODE_LEVEL C62xISABehavior_v2.bc >& $OUTPUT_TTY
+    DEC_CMD_LINE+="${CCS_EXAMPLE_PATH} -o ${CCS_EXAMPLE_PATH}.asm -ibf=COFF"
 fi
+
+DEC_CMD_LINE+=" -$GEN_CODE_LEVEL -isa=C62xISABehavior_v2.bc $CODEGEN_OPT"
+
+./c6x-decoder $DEC_CMD_LINE                                       >& $OUTPUT_TTY
 if [ $? != 0 ]; then
     print_error "Error! Decoding Target Binary ... "
     exit 1
@@ -217,7 +244,7 @@ if [ -n "$RUN_SIMULATION" ]; then
     rm -f tty_debug_00
     export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
 
-    if [ $TARGET_BIN = "raw" ]; then
+    if [ $TARGET_BIN = "RAW" ]; then
         ./arch.x kvm_c6x_bootstrap APPLICATION.X
     else
         ./arch.x kvm_c6x_bootstrap APPLICATION.X ${CCS_EXAMPLE_PATH}

@@ -67,15 +67,26 @@ namespace native
         LLVM_CG_BB_LVL = 1
     } LLVMCodeGenLevel_t;
 
-    typedef enum LLVMCodeGenOption
+    /* Specifies the Bit Positions for Command-line Parsing */
+    typedef enum LLVMCGOBitVector
     {
-        LLVM_CGO_NONE           = 0x0,            // No Optimization
-        LLVM_CGO_INLINE         = 0x1,            // Enable Inlining
-        LLVM_CGO_FUF_INLINE     = 0x2,            // Enable Inlining of Frequently Used Functions
-        LLVM_CGO_OPTIMIZE_MOD   = 0x4,            // Enable Module Level Optimizations
-        LLVM_CGO_OPTIMIZE_FUN   = 0x8,            // Enable Function Level Optimizations
-        LLVM_CGO_OPTIMIZE_SPEC  = 0x10            // Enable Special Optimization (If Any)
-    } LLVMCodeGenOption_t;
+        LLVM_CGO_INLINE_BIT      = 0,
+        LLVM_CGO_FUF_INLINE_BIT  = 1,
+        LLVM_CGO_OPT_MOD_BIT     = 2,
+        LLVM_CGO_OPT_FUN_BIT     = 3,
+        LLVM_CGO_OPT_SPE_BIT     = 4
+    } LLVMCGOBitVector_t;
+
+    /* Specifies the Actuals Bits for Code Generation Options */
+    typedef enum LLVMCodeGenOptions
+    {
+        LLVM_CGO_NONE        = 0x0,            // No Optimization
+        LLVM_CGO_INLINE      = 0x1,            // Enable Inlining
+        LLVM_CGO_FUF_INLINE  = 0x2,            // Enable Inlining of Frequently Used Functions
+        LLVM_CGO_OPT_MOD     = 0x4,            // Enable Module Level Optimizations
+        LLVM_CGO_OPT_FUN     = 0x8,            // Enable Function Level Optimizations
+        LLVM_CGO_OPT_SPE     = 0x10            // Enable Special Optimization (If Any)
+    } LLVMCodeGenOptions_t;
 
     // The class responsible for generating LLVM Code
     class LLVMGenerator
@@ -90,7 +101,7 @@ namespace native
         llvm::FunctionPassManager  * p_fpm;       /* Would be suitable for Functions Generated at Runtime; if any */
 
         LLVMCodeGenLevel_t   m_code_gen_lvl;
-        LLVMCodeGenOption_t  m_code_gen_opt;
+        LLVMCodeGenOptions_t m_code_gen_opt;
 
         FrequentFuncList_t   m_fuf_list;         // List of Frequently Used Functions;
 
@@ -131,7 +142,7 @@ namespace native
         llvm::Function          * p_enq_result;
         llvm::Function          * p_update_immed;
 
-        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOption_t code_gen_opt);
+        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOptions_t code_gen_opt);
 
         virtual llvm::Module *      GetModule()    { return (p_module); }
         virtual llvm::LLVMContext & GetContext()   { return (m_context); }

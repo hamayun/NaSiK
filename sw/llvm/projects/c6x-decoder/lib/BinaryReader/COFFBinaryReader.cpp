@@ -78,6 +78,7 @@ namespace native
             return;
         }
 
+        ASSERT(p_string_table != NULL, "Invalid String Table");
         if(p_string_table->read(GetInputFileHandle(), strtab_start)){
             DOUT << "Error: Reading String Table" << endl;
             return;
@@ -207,13 +208,14 @@ namespace native
             return ((uint32_t *)EPI->second);
         }
 
-        DOUT << "Error: Section Not Found" << endl;
+        ASSERT(p_section != NULL, "Section Not Found");
         return (NULL);
     }
 
     uint32_t COFFBinaryReader :: GetSectionStartAddress(uint32_t * section_handle)
     {
         coff_section * p_section = (coff_section *) section_handle;
+        ASSERT(p_section != NULL, "Invalid Section Handle");
 
         if(p_section->get_nm_entries())
         {
