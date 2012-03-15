@@ -13,7 +13,8 @@ export BAREMETAL_TOOLCHAIN=/opt/toolchains/i386-pc-baremetal
 export TARGET_BIN_WRITER=/home/hamayun/examples/binary-file-writer
 
 export CCS_WORKSPACE_PATH=/home/hamayun/workspace_ccs
-export CCS_EXAMPLE_NAME=matmult
+#export CCS_EXAMPLE_NAME=matmult
+export CCS_EXAMPLE_NAME=fibonacci
 export CCS_EXAMPLE_BUILD=Debug
 export CCS_EXAMPLE_OUTFILE=${CCS_EXAMPLE_NAME}.out
 export CCS_EXAMPLE_PATH=${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}/${CCS_EXAMPLE_OUTFILE}
