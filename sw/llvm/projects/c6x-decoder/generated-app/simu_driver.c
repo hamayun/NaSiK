@@ -39,6 +39,8 @@ sim_func_t find_sim_func(uint32_t target_pc)
     sim_func_calls++;
 #endif
 
+    //printf("Searching for Target PC = 0x%08x\n", target_pc);
+
     while(low <= high)
     {
         uint32_t mid_index = (low + high) / 2;
@@ -88,18 +90,20 @@ int main(int argc, char **argv, char **environ)
             ret_val = curr_func(& p_state);
             //Print_DSP_State(& p_state);
         }
+#if 0
         else
         {
             printf("Target Program Counter = 0x%X\n", p_state.m_reg[REG_PC_INDEX]);
             ASSERT(0, "Native Simulation Function Not Found");
         }
+#endif
 
         if(p_state.m_reg[REG_PC_INDEX] == CIOFLUSH_POINT_PC)
         {
             DSP_Flush_CIO();
         }
 
-        if(p_state.m_reg[REG_PC_INDEX] == EXIT_POINT_PC)
+        if(p_state.m_reg[REG_PC_INDEX] == EXIT_POINT_PC || !curr_func)
         {
             CPU_PROFILE_COMP_END();
             CPU_PROFILE_FLUSH_DATA();

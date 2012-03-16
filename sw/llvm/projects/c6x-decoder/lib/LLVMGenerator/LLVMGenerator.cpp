@@ -32,6 +32,7 @@ namespace native
         LLVMCodeGenOptions_t code_gen_opt, bool enable_exec_stats) :
         p_module(NULL), m_context(getGlobalContext()), m_irbuilder(m_context), m_curr_function(NULL),
         p_pm(NULL), p_fpm(NULL), m_code_gen_lvl(code_gen_lvl), m_code_gen_opt(code_gen_opt), m_enable_exec_stats(enable_exec_stats),
+        m_bb_local_maps(true),
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
         i32(IntegerType::get(m_context, 32)), iptr(IntegerType::get(m_context, 8 * sizeof(intptr_t))),
         p_outs_gen_mod(GetOutputStream("gen_code.bc")),
@@ -385,8 +386,28 @@ namespace native
             CreateCallByNameNoParams("Inc_BB_Count");
         }
 
-        llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), const_int32_zero));
+        if(m_bb_local_maps)     // If we have enabled the Local Target to Host Function Mapping Inside Basic Blocks
+        {
+            llvm::AllocaInst * next_func_ptr = new llvm::AllocaInst(Geti32Type(), "InitNFP");
+            next_func_ptr->setAlignment(8);
+            llvm_bb_entry->getInstList().push_back(next_func_ptr);
+            // Initialize with NULL
+            llvm_bb_entry->getInstList().push_back(new llvm::StoreInst(const_int32_zero, next_func_ptr, false));
 
+            // In the Return BB; Load the Value from InitNFP and Return to Caller.
+            llvm::GetElementPtrInst * ret_nfp_ptr = llvm::GetElementPtrInst::Create(next_func_ptr, Geti32Value(0));
+            llvm_bb_return->getInstList().push_back(ret_nfp_ptr);
+            llvm::LoadInst * ret_nfp = new llvm::LoadInst(ret_nfp_ptr, "RetNFP", false);
+            llvm_bb_return->getInstList().push_back(ret_nfp);
+            llvm::ReturnInst * ret_instr = llvm::ReturnInst::Create(GetContext(), ret_nfp);
+            llvm_bb_return->getInstList().push_back(ret_instr);
+        }
+        else
+        {
+            llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), const_int32_zero));
+        }
+
+        // Here We Create a Skeleton of our Simulation Function; Except for Entry/Return that were create above
         for(uint32_t index = 0; index < exec_pkt_count; index++)
         {
             native::ExecutePacket  * exec_pkt = basic_block->GetExecutePacketByIndex(index);

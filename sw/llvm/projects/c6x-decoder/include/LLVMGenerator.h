@@ -92,19 +92,22 @@ namespace native
     class LLVMGenerator
     {
     private:
-        llvm::Module        *p_module;           // The input IR module; contains the ISA Behavior
-        llvm::LLVMContext   &m_context;
-        llvm::IRBuilder<>    m_irbuilder;        // LLVM IR Builder Object
-        llvm::Function *     m_curr_function;    // The current function that we are building
+        llvm::Module                   * p_module;           // The input IR module; contains the ISA Behavior
+        llvm::LLVMContext              & m_context;
+        llvm::IRBuilder<>                m_irbuilder;        // LLVM IR Builder Object
+        llvm::Function *                 m_curr_function;    // The current function that we are building
 
-        llvm::PassManager          * p_pm;
-        llvm::FunctionPassManager  * p_fpm;       /* Would be suitable for Functions Generated at Runtime; if any */
+        llvm::PassManager              * p_pm;
+        llvm::FunctionPassManager      * p_fpm;              /* Would be suitable for Functions Generated at Runtime; if any */
 
-        LLVMCodeGenLevel_t   m_code_gen_lvl;
-        LLVMCodeGenOptions_t m_code_gen_opt;
-        bool                 m_enable_exec_stats; // Add Function Calls for Execution Statistics Generation
+        LLVMCodeGenLevel_t               m_code_gen_lvl;
+        LLVMCodeGenOptions_t             m_code_gen_opt;
+        // Add Function Calls for Execution Statistics Generation
+        bool                             m_enable_exec_stats;
+        // Enable the Basic Block Level Target Address to Host Function Pointer Mapping.
+        bool                             m_bb_local_maps;
 
-        FrequentFuncList_t   m_fuf_list;         // List of Frequently Used Functions;
+        FrequentFuncList_t   m_fuf_list;                      // List of Frequently Used Functions;
 
         tool_output_file *GetOutputStream(const char *FileName);
 
@@ -115,10 +118,8 @@ namespace native
         const llvm::IntegerType * const i32;
         const llvm::IntegerType * const iptr;
 
-        uint32_t m_earlyexit_bb_flag;
-
-        llvm::Module * p_gen_mod;         // The output module that contains the generated code
-        llvm::Module * p_addr_mod;        // The output module that contains the Addressing Table
+        llvm::Module            * p_gen_mod;         // The output module that contains the generated code
+        llvm::Module            * p_addr_mod;        // The output module that contains the Addressing Table
 
         /* IMPORTANT:
          * We _MUST_ Delete the following object to Correctly Write the Bitstream File.
@@ -145,9 +146,9 @@ namespace native
 
         LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOptions_t code_gen_opt, bool enable_exec_stats);
 
-        virtual llvm::Module *      GetModule()    { return (p_module); }
-        virtual llvm::LLVMContext & GetContext()   { return (m_context); }
-        virtual llvm::IRBuilder<> & GetIRBuilder() { return (m_irbuilder); }
+        virtual llvm::Module *      GetModule()         { return (p_module); }
+        virtual llvm::LLVMContext & GetContext() const  { return (m_context); }
+        virtual llvm::IRBuilder<> & GetIRBuilder()      { return (m_irbuilder); }
 
         virtual void SetCurrentFunction(llvm::Function * curr_function) { m_curr_function = curr_function; }
         virtual llvm::Function * GetCurrentFunction() { return (m_curr_function); }
@@ -163,6 +164,11 @@ namespace native
         virtual llvm::Value * Geti8Value (int8_t  value) { return(llvm::ConstantInt::get(i8,  value)); }
         virtual llvm::Value * Geti16Value(int16_t value) { return(llvm::ConstantInt::get(i16, value)); }
         virtual llvm::Value * Geti32Value(int32_t value) { return(llvm::ConstantInt::get(i32, value)); }
+
+        virtual const llvm::Type * Geti1Type()  const { return (llvm::IntegerType::get(GetContext(),  1)); }
+        virtual const llvm::Type * Geti8Type()  const { return (llvm::IntegerType::get(GetContext(),  8)); }
+        virtual const llvm::Type * Geti16Type() const { return (llvm::IntegerType::get(GetContext(), 16)); }
+        virtual const llvm::Type * Geti32Type() const { return (llvm::IntegerType::get(GetContext(), 32)); }
 
         virtual llvm::Value * CreateCallByName(string func_name);
         virtual void CreateCallByNameNoParams(string func_name);

@@ -19,3 +19,4 @@ examples/platforms/tuzki/tty_*
 examples/platforms/tuzki/log*
 sw/llvm/projects/c6x-decoder/generated-app/gen_*
 sw/llvm/projects/c6x-decoder/generated-app/header_tables.txt
+sw/llvm/projects/c6x-decoder/generated-app/*.dot
