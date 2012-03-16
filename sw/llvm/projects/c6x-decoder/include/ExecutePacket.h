@@ -102,7 +102,7 @@ namespace native
             return (ep_name);
         }
 
-        virtual uint32_t GetBranchTargetInstructionAddress() const
+        virtual uint32_t GetBrTargetInstrAddr() const
         {
             DecodedInstruction * dec_instr = NULL;
 
@@ -118,7 +118,7 @@ namespace native
             return(NULL);
         }
 
-        virtual uint32_t GetBranchTargetInstructionCount() const
+        virtual uint32_t GetBrTargetInstrCount() const
         {
             DecodedInstruction * dec_instr = NULL;
             uint32_t branch_target_count = 0;
@@ -135,7 +135,7 @@ namespace native
             return(branch_target_count);
         }
 
-        virtual uint32_t GetBranchInstructionsCount() const
+        virtual uint32_t GetBrInstrCount() const
         {
             DecodedInstruction * dec_instr = NULL;
             uint32_t branch_instrs_count = 0;
@@ -152,7 +152,24 @@ namespace native
             return(branch_instrs_count);
         }
 
-        virtual uint32_t GetUnconditionalBranchInstructionsCount() const
+        virtual uint32_t GetRegBrInstrCount() const
+        {
+            DecodedInstruction * dec_instr = NULL;
+            uint32_t reg_br_count = 0;
+
+            for(InstructionList_ConstIterator_t ILCI = m_instr_list.begin(),
+                ILCE = m_instr_list.end(); ILCI != ILCE; ++ILCI)
+            {
+                dec_instr = (*ILCI)->GetDecodedInstruction();
+                ASSERT(dec_instr != NULL, "Instructions need to be decoded first.");
+
+                if(dec_instr->IsBranchInstruction() && dec_instr->IsRegisterBranch())
+                    reg_br_count++;
+            }
+            return(reg_br_count);
+        }
+
+        virtual uint32_t GetUCBrInstrCount() const
         {
             DecodedInstruction * dec_instr = NULL;
             uint32_t uncond_branch_count = 0;

@@ -43,8 +43,16 @@ namespace native
         uint32_t                          m_bb_id;
         ExecutePacketList_t               m_exec_packets_list;
 
+        // Some Target Basic Block Level Branch Statistics
+        uint32_t                          m_total_br_cnt;
+        uint32_t                          m_ucond_br_cnt;
+        uint32_t                          m_cond_br_cnt;
+        uint32_t                          m_offset_br_cnt;
+        uint32_t                          m_register_br_cnt;
+
     public:
-        BasicBlock(uint32_t bb_id) { m_bb_id = bb_id; }
+        BasicBlock(uint32_t bb_id) : m_bb_id(bb_id), m_total_br_cnt(0), m_ucond_br_cnt(0),
+                m_cond_br_cnt(0), m_offset_br_cnt(0), m_register_br_cnt(0) {}
         virtual ~BasicBlock() {}
 
         virtual int32_t AddMarkerExecutePackets()
@@ -55,7 +63,7 @@ namespace native
             for(ExecutePacketList_Iterator_t EPLI = m_exec_packets_list.begin(),
                     EPLE = m_exec_packets_list.end(); EPLI != EPLE; ++EPLI)
             {
-                if((*EPLI)->GetBranchInstructionsCount())
+                if((*EPLI)->GetBrInstrCount())
                 {
                     branch_packet_ilist.push_back(EPLI);
                 }
@@ -104,7 +112,9 @@ namespace native
         virtual void Print(ostream *out) const
         {
             (*out) << setw(8) << setfill(' ') << "" << "BasicBlock #: " << dec
-                   << GetID() << " (" << GetName() << ")" << endl;
+                   << GetID() << " (" << GetName() << ")" << " [Branches: " << m_total_br_cnt
+                   << ", UC: " << m_ucond_br_cnt << ", C: " << m_cond_br_cnt
+                   << ", REG: " << m_register_br_cnt << ", CST: " << m_offset_br_cnt << "]" << endl;
 
             for(ExecutePacketList_ConstIterator_t EPLCI = m_exec_packets_list.begin(),
                     EPLCE = m_exec_packets_list.end(); EPLCI != EPLCE; ++EPLCI)
@@ -174,6 +184,29 @@ namespace native
                 return (NULL);
             else
                 return (*EPI);
+        }
+
+        virtual uint32_t FillBranchInstrCounts()
+        {
+            uint32_t total_br_count    = 0;
+            uint32_t ucond_br_count    = 0;
+            uint32_t register_br_count = 0;
+
+            for(ExecutePacketList_Iterator_t EPLI = m_exec_packets_list.begin(),
+                EPLE = m_exec_packets_list.end(); EPLI != EPLE; ++EPLI)
+            {
+                total_br_count    += (*EPLI)->GetBrInstrCount();
+                ucond_br_count    += (*EPLI)->GetUCBrInstrCount();
+                register_br_count += (*EPLI)->GetRegBrInstrCount();
+            }
+
+            m_total_br_cnt    = total_br_count;
+            m_ucond_br_cnt    = ucond_br_count;
+            m_cond_br_cnt     = total_br_count - ucond_br_count;
+            m_register_br_cnt = register_br_count;
+            m_offset_br_cnt   = total_br_count - register_br_count;
+
+            return (0);
         }
     };
 }

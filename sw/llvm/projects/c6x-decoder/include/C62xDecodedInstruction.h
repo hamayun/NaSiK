@@ -1276,6 +1276,11 @@ namespace native
             {
                 uint32_t branch_cst_address = (uint32_t) ((C62xConstant *)src2_opr)->GetValue();
                 SetBranchConstAddress(branch_cst_address);
+                SetRegisterBranch(false);
+            }
+            else
+            {
+                SetRegisterBranch(true);
             }
         }
 
@@ -1291,7 +1296,8 @@ namespace native
             C62xDecodedInstruction(dec_instr)
         {
             SetMnemonic("B"); SetDelaySlots((uint8_t) C62X_BRANCH_DELAY); AddOperand(src2_opr);
-            SetBranchInstruction(true);
+            WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
+            SetBranchInstruction(true); SetRegisterBranch(true);
         }
 
         virtual ~C62xBranchIRPInstr() {}
@@ -1304,7 +1310,7 @@ namespace native
             C62xDecodedInstruction(dec_instr)
         {
             SetMnemonic("B"); SetDelaySlots((uint8_t) C62X_BRANCH_DELAY); AddOperand(src2_opr);
-            SetBranchInstruction(true);
+            SetBranchInstruction(true); SetRegisterBranch(true);
             WARN << "Non-Tested Instruction Instance (" << GetMnemonic() << ")" << endl;
         }
 

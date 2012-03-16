@@ -36,7 +36,9 @@ namespace native
     {
     private:
         BasicBlockList_t               m_basic_blocks_list;
-        
+        uint32_t                       m_cond_br_count;
+        uint32_t                       m_uncond_br_count;
+
     public:
         BasicBlockList(ExecutePacketList * exec_packets_list);
         virtual ~BasicBlockList() {}
@@ -79,6 +81,7 @@ namespace native
             return (NULL);
         }
 
+        virtual uint32_t FillBranchInstrCounts();
         virtual uint32_t RemoveRedundantEPs(ExecutePacketList * exec_pkts_list);
     };
 }

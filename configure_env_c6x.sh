@@ -10,7 +10,8 @@ echo "[Setting-up Software Platform Environment (Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
 export BAREMETAL_TOOLCHAIN=/opt/toolchains/i386-pc-baremetal
 
-export TARGET_BIN_WRITER=/home/hamayun/examples/binary-file-writer
+#export TARGET_BIN_WRITER=/home/hamayun/examples/binary-file-writer
+export TARGET_BIN_WRITER=/home/hamayun/examples/ti-c6x-examples/BinWriter
 
 export CCS_WORKSPACE_PATH=/home/hamayun/workspace_ccs
 #export CCS_EXAMPLE_NAME=matmult

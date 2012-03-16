@@ -32,7 +32,7 @@
 #define QUEUE_BASED_DREGS
 //#define DELAYED_MWBS
 #define PRINT_CYCLES
-//#define ENABLE_STATS
+#define ENABLE_STATS
 
 #ifdef ENABLE_TRACE
 #define TRACE_PRINT(fmt, args...)                               \

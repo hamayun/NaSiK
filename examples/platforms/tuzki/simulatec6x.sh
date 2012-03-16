@@ -123,7 +123,7 @@ if [ $TARGET_BIN = "RAW" ]; then
     fi
 
     print_step "Writting RAW Binary ..."
-    ./BFW.X                                                       >& $OUTPUT_TTY
+    ./BIN_WRITER.X                                                >& $OUTPUT_TTY
     if [ $? != 0 ]; then
         print_error "Error! Writting RAW Binary ..."
         exit 1

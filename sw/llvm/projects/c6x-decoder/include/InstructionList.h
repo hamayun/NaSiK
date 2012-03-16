@@ -89,8 +89,6 @@ namespace native
 
         virtual int32_t MarkBranchTargets()
         {
-            COUT << "Marking Branch Targets ... " << endl;
-
             for(InstructionList_ConstIterator_t ILI = m_instr_list.begin(),
                 ILE = m_instr_list.end(); ILI != ILE; ++ILI)
             {
@@ -123,7 +121,6 @@ namespace native
                     dec_instr->SetBranchTarget(true);
                 }
             }
-
             return (0);
         }
 

@@ -143,7 +143,7 @@ int main (int argc, char ** argv)
         ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
 
         const BasicBlockList_t * bb_list = bbList.GetList();
-        COUT << "Generating LLVM (BB Level) ... " << setw(4) << total_bbs << " Basic Blocks ... ";
+        COUT << "Generating LLVM (BB Level) ... " << setw(4) << total_bbs  << setw(21) << " Basic Blocks ... ";
 
         curr_bb  = 0;
         for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end(); BBLCI != BBLCE; ++BBLCI)
@@ -154,7 +154,7 @@ int main (int argc, char ** argv)
                 return (-1);
             }
 
-            progress = ++curr_bb / total_bbs * 100;
+            progress = (float)++curr_bb / total_bbs * 100;
             cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
         }
         cout << "\n";
@@ -164,7 +164,7 @@ int main (int argc, char ** argv)
     if(!llvm_gen) llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions, EnableExecStats);
     ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
 
-    COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << " Execute Packets ... ";
+    COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << setw(21) << " Execute Packets ... ";
     for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end(); EPLI != EPLE; ++EPLI)
     {
         if(llvm_gen->GenerateLLVM_EPLevel(*EPLI))
@@ -173,7 +173,7 @@ int main (int argc, char ** argv)
             return (-1);
         }
 
-        progress = ++curr_pkt / total_pkts * 100;
+        progress = (float)++curr_pkt / total_pkts * 100;
         cout << "[" << setw(3) << setfill(' ') << progress << "%]\b\b\b\b\b\b";
     }
     cout << "\n";

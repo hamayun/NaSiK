@@ -47,6 +47,7 @@ namespace native
         C62xPrintMode_t         m_preferred_print_mode;     // The preferred format for Constant Operands Printing.
         bool                    m_is_load_store;            // Is this a Load or Store Instruction.
         bool                    m_is_branch_instr;          // Is this a branch instruction.
+        bool                    m_is_reg_branch;            // Is this a register branch.
         bool                    m_is_branch_target;         // Is this instruction target of a branch instruction.
         bool                    m_is_nop_instr;             // Is this a NOP instruction
         uint32_t                m_branch_cst_addr;          // The branch constant address. Needed for Marking Branch Targets in InstructionList class
@@ -57,8 +58,8 @@ namespace native
     public:
         DecodedInstruction(Instruction * instr) :
             p_parent_instr(instr), m_is_conditional(false), m_preferred_print_mode(MODE_HEX),
-            m_is_load_store(false), m_is_branch_instr(false), m_is_branch_target(false), m_is_nop_instr(false),
-            m_branch_cst_addr(0x0), p_prev_instr(NULL), p_next_instr(NULL) {}
+            m_is_load_store(false), m_is_branch_instr(false), m_is_reg_branch(false), m_is_branch_target(false),
+            m_is_nop_instr(false),  m_branch_cst_addr(0x0), p_prev_instr(NULL), p_next_instr(NULL) {}
 
         virtual Instruction * GetParentInstruction() const { return (p_parent_instr); }
 
@@ -73,6 +74,9 @@ namespace native
 
         virtual void SetBranchInstruction(bool is_branch_instr) { m_is_branch_instr = is_branch_instr; }
         virtual bool IsBranchInstruction() const { return (m_is_branch_instr); }
+
+        virtual void SetRegisterBranch(bool is_reg_branch) { m_is_reg_branch = is_reg_branch; }
+        virtual bool IsRegisterBranch() const { return (m_is_reg_branch); }
 
         virtual void SetBranchTarget(bool is_branch_target) { m_is_branch_target = is_branch_target; }
         virtual bool IsBranchTarget() const { return (m_is_branch_target); }

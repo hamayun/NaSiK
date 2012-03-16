@@ -51,7 +51,7 @@ namespace native
         {
             ExecutePacketList_Iterator_t NEPI = EPLI; NEPI++;       // Next Execute Packet Iterator
             // See if the next execute packet is not the last one and contains a branch target?
-            if((NEPI != EPLE) && (*NEPI)->GetBranchTargetInstructionCount() && bookmark_flag == false)
+            if((NEPI != EPLE) && (*NEPI)->GetBrTargetInstrCount() && bookmark_flag == false)
             {
                 // We will build the next Basic Block Starting at this Execute Packet
                 bookmark_flag = true; BEPI = NEPI;
@@ -72,8 +72,8 @@ namespace native
              * of the previous Branch Instruction. This will be handled in LLVM Code Generation,
              * where we will check for Program Counter Modification in the Update_Registers Calls.
              */
-            //branch_count = (*EPLI)->GetUnconditionalBranchInstructionsCount();
-            branch_count = (*EPLI)->GetBranchInstructionsCount();
+            //branch_count = (*EPLI)->GetUCBrInstrCount();
+            branch_count = (*EPLI)->GetBrInstrCount();
             if(branch_count)
             {
                 branch_flag = true; delay_slot_count = 0;
@@ -120,7 +120,18 @@ namespace native
             //WARN << "Sink Basic Block Found" << endl;
         }
 
+        FillBranchInstrCounts();
         //ASSERT(!AddMarkerExecutePackets(), "Failed to Add Marker Execute Packets");
+    }
+
+    uint32_t BasicBlockList :: FillBranchInstrCounts()
+    {
+        for(BasicBlockList_Iterator_t BBLI = m_basic_blocks_list.begin(),
+            BBLE = m_basic_blocks_list.end(); BBLI != BBLE; ++BBLI)
+        {
+            (*BBLI)->FillBranchInstrCounts();
+        }
+        return (0);
     }
 
     uint32_t BasicBlockList :: RemoveRedundantEPs(ExecutePacketList * exec_pkts_list)
@@ -132,7 +143,6 @@ namespace native
             exec_pkts_list->Remove(exec_pkt);
             //exec_pkt->Print(&cout);
         }
-
         return (0);
     }
 
