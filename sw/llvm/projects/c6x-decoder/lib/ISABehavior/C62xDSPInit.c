@@ -26,6 +26,11 @@ extern uint32_t ENTRY_POINT_PC;
 extern uint32_t CIOBUFF_ADDR;
 extern void platform_console_puts_len (char * string, int len);
 
+#ifdef ENABLE_STATS
+uint32_t total_ep_count = 0;
+uint32_t total_bb_count = 0;
+#endif
+
 char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",
                        "C8", "C9", "C10", "C11", "C12", "C13", "C14", "PCE1"};
 

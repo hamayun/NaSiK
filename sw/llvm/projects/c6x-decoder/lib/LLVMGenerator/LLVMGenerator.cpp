@@ -28,9 +28,10 @@
 
 namespace native
 {
-    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOptions_t code_gen_opt) :
+    LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl,
+        LLVMCodeGenOptions_t code_gen_opt, bool enable_exec_stats) :
         p_module(NULL), m_context(getGlobalContext()), m_irbuilder(m_context), m_curr_function(NULL),
-        p_pm(NULL), p_fpm(NULL), m_code_gen_lvl(code_gen_lvl), m_code_gen_opt(code_gen_opt),
+        p_pm(NULL), p_fpm(NULL), m_code_gen_lvl(code_gen_lvl), m_code_gen_opt(code_gen_opt), m_enable_exec_stats(enable_exec_stats),
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
         i32(IntegerType::get(m_context, 32)), iptr(IntegerType::get(m_context, 8 * sizeof(intptr_t))),
         p_outs_gen_mod(GetOutputStream("gen_code.bc")),
@@ -198,6 +199,23 @@ namespace native
         return (func_value);
     }
 
+    void LLVMGenerator :: CreateCallByNameNoParams(string func_name)
+    {
+        llvm::Function    * func_ptr     = NULL;
+        std::vector<llvm::Value*> args;
+
+        func_ptr = p_gen_mod->getFunction(StringRef(func_name));
+        if(!func_ptr)
+        {
+          COUT << "Could not Get Function Call for: "  << func_name << endl;
+          ASSERT(func_ptr != NULL, "Failed to Get Function Call");
+        }
+
+        INFO << "    Call to: " << func_name << "(...)" << endl;
+        GetIRBuilder().CreateCall(func_ptr, args.begin(), args.end());
+
+        return;
+    }
 
     uint32_t LLVMGenerator :: Gen_LLVM_Immed_or_Buff_Updates(ExecutePacket * exec_pkt,
             llvm::AllocaInst * instr_results, llvm::BasicBlock * llvm_bb)
@@ -361,6 +379,12 @@ namespace native
         llvm::BasicBlock * llvm_bb_entry  = llvm::BasicBlock::Create(GetContext(), "BB_Entry", function);
         llvm::BasicBlock * llvm_bb_return = llvm::BasicBlock::Create(GetContext(), "BB_Return", function);
 
+        if(m_enable_exec_stats)
+        {
+            GetIRBuilder().SetInsertPoint(llvm_bb_entry);
+            CreateCallByNameNoParams("Inc_BB_Count");
+        }
+
         llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), const_int32_zero));
 
         for(uint32_t index = 0; index < exec_pkt_count; index++)
@@ -472,6 +496,12 @@ namespace native
 
         llvm::BasicBlock * llvm_bb_entry  = llvm::BasicBlock::Create(GetContext(), "BB_Entry", function);
         llvm::BasicBlock * llvm_bb_return = llvm::BasicBlock::Create(GetContext(), "BB_Return", function);
+
+        if(m_enable_exec_stats)
+        {
+            GetIRBuilder().SetInsertPoint(llvm_bb_entry);
+            CreateCallByNameNoParams("Inc_EP_Count");
+        }
 
         string llvm_bb_core_name          = "BB_" + exec_pkt->GetName() + "_Core";
         string llvm_bb_update_name        = "BB_" + exec_pkt->GetName() + "_Update";

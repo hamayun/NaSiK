@@ -22,6 +22,21 @@
 #include "C62xISABehavior_v2.h"
 #include "stdio.h"
 
+#ifdef ENABLE_STATS
+extern uint32_t total_ep_count;
+extern uint32_t total_bb_count;
+
+void Inc_EP_Count()
+{
+    total_ep_count++;
+}
+
+void Inc_BB_Count()
+{
+    total_bb_count++;
+}
+#endif
+
 extern char * BANKC_REGS[];
 
 #ifdef QUEUE_BASED_DREGS

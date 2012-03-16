@@ -34,8 +34,8 @@ static cl::opt<std::string> ISAFilename             ("isa", cl::desc("ISA Behavi
                                                      cl::value_desc("filename"), cl::Required);
 static cl::opt<LLVMCodeGenLevel_t> CodeGenLevel     (cl::desc("Code Generation Level:"), cl::init(LLVM_CG_BB_LVL),
                                                      cl::values(
-                                                     clEnumValN(LLVM_CG_EP_LVL, "EP", "Execute Packet Level Code Generation"),
-                                                     clEnumValN(LLVM_CG_BB_LVL, "BB", "Basic Block Level Code Generation [Mix-mode i.e. BB + EP]"),
+                                                     clEnumValN(LLVM_CG_EP_LVL, "EPL", "Execute Packet Level Code Generation"),
+                                                     clEnumValN(LLVM_CG_BB_LVL, "BBL", "Basic Block Level Code Generation [Mix-mode i.e. BBs + EPs]"),
                                                      clEnumValEnd));
 static cl::bits<LLVMCGOBitVector_t> CodeGenOptionsBV(cl::desc("Code Generation Options:"),
                                                      cl::values(
@@ -45,6 +45,7 @@ static cl::bits<LLVMCGOBitVector_t> CodeGenOptionsBV(cl::desc("Code Generation O
                                                      clEnumValN(LLVM_CGO_OPT_FUN_BIT, "fopt", "Enable Optimization at Function Level"),
                                                      clEnumValN(LLVM_CGO_OPT_SPE_BIT, "sopt", "Enable Special Optimizations (If Any)"),
                                                      clEnumValEnd));
+static cl::opt<bool> EnableExecStats                ("estats", cl::desc("Enable Execution Statistics Code Generation"), cl::init(false));
 
 int main (int argc, char ** argv)
 {
@@ -138,7 +139,7 @@ int main (int argc, char ** argv)
 
     if(CodeGenLevel == LLVM_CG_BB_LVL)
     {
-        llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions);
+        llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions, EnableExecStats);
         ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
 
         const BasicBlockList_t * bb_list = bbList.GetList();
@@ -160,7 +161,7 @@ int main (int argc, char ** argv)
     }
 
     curr_pkt = 0;
-    if(!llvm_gen) llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions);
+    if(!llvm_gen) llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions, EnableExecStats);
     ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
 
     COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << " Execute Packets ... ";

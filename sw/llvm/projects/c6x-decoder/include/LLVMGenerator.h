@@ -102,6 +102,7 @@ namespace native
 
         LLVMCodeGenLevel_t   m_code_gen_lvl;
         LLVMCodeGenOptions_t m_code_gen_opt;
+        bool                 m_enable_exec_stats; // Add Function Calls for Execution Statistics Generation
 
         FrequentFuncList_t   m_fuf_list;         // List of Frequently Used Functions;
 
@@ -142,7 +143,7 @@ namespace native
         llvm::Function          * p_enq_result;
         llvm::Function          * p_update_immed;
 
-        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOptions_t code_gen_opt);
+        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOptions_t code_gen_opt, bool enable_exec_stats);
 
         virtual llvm::Module *      GetModule()    { return (p_module); }
         virtual llvm::LLVMContext & GetContext()   { return (m_context); }
@@ -164,6 +165,7 @@ namespace native
         virtual llvm::Value * Geti32Value(int32_t value) { return(llvm::ConstantInt::get(i32, value)); }
 
         virtual llvm::Value * CreateCallByName(string func_name);
+        virtual void CreateCallByNameNoParams(string func_name);
 
         virtual uint32_t Gen_LLVM_Immed_or_Buff_Updates(ExecutePacket * exec_pkt,
                         llvm::AllocaInst * instr_results, llvm::BasicBlock * llvm_bb);

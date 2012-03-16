@@ -34,14 +34,15 @@ OPTIONS:
    -b      Compile Bootstraps
    -d      Run Decoder Only
    -f      Enable Function Level Optimization
-   -g      Generated Code Level, 'EP' or 'BB'   [Default 'BB']
+   -g      Generated Code Level, 'EPL' or 'BBL'   [Default 'BBL']
    -h      Show this help message
    -i      Enable Inline Code Generation
    -j      Enable Frequently Used Function Inline Code Generation
    -k      Compile KVM Libraries
    -m      Enable Module Level Optimization
    -p      Enable Special Optimizations (If Any)
-   -s      Run Simulation
+   -r      Run Simulation
+   -s      Generate Exection Statistics
    -t      Target Binary Type, 'RAW' or 'COFF'  [Default 'COFF']
    -v      Verbose Mode
 EOF
@@ -52,12 +53,12 @@ COMPILE_KVM=
 DECODE_ONLY=
 RUN_SIMULATION=
 COMPILE_BOOTSTRAPS=
-GEN_CODE_LEVEL="BB"
+GEN_CODE_LEVEL="BBL"
 VERBOSE=
 OUTPUT_TTY="/dev/null"
 CODEGEN_OPT=""
 
-while getopts “bdfg:hijkmpst:v” OPTION
+while getopts “bdfg:hijkmprst:v” OPTION
 do
      case $OPTION in
          b)
@@ -91,8 +92,11 @@ do
          p)
              CODEGEN_OPT+="-sopt "
              ;;
-         s)
+         r)
              RUN_SIMULATION=1
+             ;;
+         s)
+             CODEGEN_OPT+="-estats "
              ;;
          t)
              TARGET_BIN=$OPTARG
