@@ -27,9 +27,14 @@
 
 namespace native
 {
+    typedef set<uint32_t>                           ConstOffsetsSet_t;
+    typedef set<uint32_t>::iterator                 ConstOffsetsSet_Iterator_t;
+    typedef set<uint32_t>::const_iterator           ConstOffsetsSet_ConstIterator_t;
+
     typedef list<ExecutePacket *>                     ExecutePacketList_t;
     typedef list<ExecutePacket *> ::iterator          ExecutePacketList_Iterator_t;
     typedef list<ExecutePacket *> ::const_iterator    ExecutePacketList_ConstIterator_t;
+
     typedef set <ExecutePacket *>                     ExecutePacketSet_t;
     typedef set <ExecutePacket *> :: iterator         ExecutePacketSet_Iterator_t;
     typedef set <ExecutePacket *> :: const_iterator   ExecutePacketSet_ConstIterator_t;
@@ -49,6 +54,8 @@ namespace native
         uint32_t                          m_cond_br_cnt;
         uint32_t                          m_offset_br_cnt;
         uint32_t                          m_register_br_cnt;
+
+        ConstOffsetsSet_t                 m_offsets_set;  // A set that stores the constant offsets of branch instructions
 
     public:
         BasicBlock(uint32_t bb_id) : m_bb_id(bb_id), m_total_br_cnt(0), m_ucond_br_cnt(0),
@@ -198,6 +205,12 @@ namespace native
                 total_br_count    += (*EPLI)->GetBrInstrCount();
                 ucond_br_count    += (*EPLI)->GetUCBrInstrCount();
                 register_br_count += (*EPLI)->GetRegBrInstrCount();
+
+                ConstOffsetsSet_t * offsets =  (*EPLI)->GetConstOffsetsSet();
+                for(ConstOffsetsSet_Iterator_t OI = offsets->begin(), OE = offsets->end(); OI != OE; ++OI)
+                {
+                    m_offsets_set.insert(*OI);
+                }
             }
 
             m_total_br_cnt    = total_br_count;
@@ -208,6 +221,10 @@ namespace native
 
             return (0);
         }
+
+        virtual uint32_t GetRegisterBrCount() { return(m_register_br_cnt); }
+        virtual uint32_t GetOffsetBrCount() { return(m_offset_br_cnt); }
+        virtual ConstOffsetsSet_t * GetConstOffsetsSet() { return(& m_offsets_set); }
     };
 }
 

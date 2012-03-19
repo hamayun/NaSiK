@@ -379,32 +379,21 @@ namespace native
         uint32_t exec_pkt_count           = basic_block->GetSize();
         llvm::BasicBlock * llvm_bb_entry  = llvm::BasicBlock::Create(GetContext(), "BB_Entry", function);
         llvm::BasicBlock * llvm_bb_return = llvm::BasicBlock::Create(GetContext(), "BB_Return", function);
+        llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), const_int32_zero));
+
+        if(m_bb_local_maps)
+        {
+            // Here We Create A Variable to Store the Return Value of Update Registers Function Calls
+            llvm::AllocaInst * update_rval = new llvm::AllocaInst(Geti32Type(), "RetValUpReg", llvm_bb_entry);
+            update_rval->setAlignment(8);
+            new llvm::StoreInst(const_int32_zero, update_rval, false, llvm_bb_entry);  // Initialize with 0
+            m_ureg_rval_map[basic_block->GetTargetAddress()] = update_rval;
+        }
 
         if(m_enable_exec_stats)
         {
             GetIRBuilder().SetInsertPoint(llvm_bb_entry);
             CreateCallByNameNoParams("Inc_BB_Count");
-        }
-
-        if(m_bb_local_maps)     // If we have enabled the Local Target to Host Function Mapping Inside Basic Blocks
-        {
-            llvm::AllocaInst * next_func_ptr = new llvm::AllocaInst(Geti32Type(), "InitNFP");
-            next_func_ptr->setAlignment(8);
-            llvm_bb_entry->getInstList().push_back(next_func_ptr);
-            // Initialize with NULL
-            llvm_bb_entry->getInstList().push_back(new llvm::StoreInst(const_int32_zero, next_func_ptr, false));
-
-            // In the Return BB; Load the Value from InitNFP and Return to Caller.
-            llvm::GetElementPtrInst * ret_nfp_ptr = llvm::GetElementPtrInst::Create(next_func_ptr, Geti32Value(0));
-            llvm_bb_return->getInstList().push_back(ret_nfp_ptr);
-            llvm::LoadInst * ret_nfp = new llvm::LoadInst(ret_nfp_ptr, "RetNFP", false);
-            llvm_bb_return->getInstList().push_back(ret_nfp);
-            llvm::ReturnInst * ret_instr = llvm::ReturnInst::Create(GetContext(), ret_nfp);
-            llvm_bb_return->getInstList().push_back(ret_instr);
-        }
-        else
-        {
-            llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), const_int32_zero));
         }
 
         // Here We Create a Skeleton of our Simulation Function; Except for Entry/Return that were create above
@@ -450,6 +439,11 @@ namespace native
                 return (-1);
             }
 
+            if(m_bb_local_maps)
+            {
+                new llvm::StoreInst(pc_updated, m_ureg_rval_map[basic_block->GetTargetAddress()], false, llvm_bb_update);
+            }
+
             prev_llvm_bb = llvm_bb_update; // Save for Next Iteration Basic Block Chaining
         }
 
@@ -489,6 +483,168 @@ namespace native
         }
 #endif
         return (0);
+    }
+
+    int32_t LLVMGenerator :: GenerateLLVM_LocalMapping(const native::BasicBlockList_t * bb_list)
+    {
+        for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end(); BBLCI != BBLCE; ++BBLCI)
+        {
+            native::BasicBlock * basic_block = (*BBLCI);
+            uint32_t exec_pkt_count          = basic_block->GetSize();
+            llvm::Function        * gen_func = m_addr_table[basic_block->GetTargetAddress()];
+            ConstantInt  * const_int32_zero  = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
+            ConstantInt  * const_int32_one   = ConstantInt::get(GetContext(), APInt(32, StringRef("1"), 10));
+
+            llvm::Function::iterator BBI = gen_func->getBasicBlockList().begin();
+            llvm::Function::iterator BBE = gen_func->getBasicBlockList().end();
+
+            llvm::BasicBlock * llvm_bb_entry  = & (*BBI); ++BBI;        // The First BB is Entry
+            llvm::BasicBlock * llvm_bb_return = & (*BBI); ++BBI;        // The Second BB is Return
+
+            // Here we create a variable that will hold the Next Function Pointer; For returning to Caller
+            llvm::Instruction * entry_tinstr = llvm_bb_entry->getTerminator();
+            llvm::AllocaInst * next_func_ptr = new llvm::AllocaInst(Geti32Type(), "NFP", entry_tinstr);
+            next_func_ptr->setAlignment(8);
+            new llvm::StoreInst(const_int32_zero, next_func_ptr, false, entry_tinstr);  // Initialize with NULL
+
+            // Here we Create the Local Mapping Table in the Entry Basic Block
+            uint32_t          lmap_tblsize = basic_block->GetOffsetBrCount();
+            ConstOffsetsSet_t * br_offsets = basic_block->GetConstOffsetsSet();
+
+            std::vector<const Type*> lmap_struct_elems;
+            lmap_struct_elems.push_back(Geti32Type());
+            lmap_struct_elems.push_back(gen_func->getType());
+
+            llvm::StructType * lmap_struct_type = llvm::StructType::get(GetContext(), lmap_struct_elems, false);
+            ASSERT(lmap_struct_type, "Failed to Create Local Map Structure Type");  //lmap_struct_type->dump();
+
+            llvm::ArrayType * lmap_array_type = llvm::ArrayType::get(lmap_struct_type, lmap_tblsize);
+            ASSERT(lmap_array_type, "Failed to Create Local Map Array Type");       //lmap_array_type->dump();
+
+            GlobalVariable* lmap_table = new GlobalVariable(* p_gen_mod,
+                /*Type=*/lmap_array_type,
+                /*isConstant=*/true,
+                /*Linkage=*/GlobalValue::InternalLinkage,
+                /*Initializer=*/0, // has initializer, specified below
+                /*Name=*/ gen_func->getNameStr() + "_lMap");
+            lmap_table->setAlignment(32);
+
+            std::vector<Constant*> const_lmap_entries;
+            for (ConstOffsetsSet_Iterator_t COSI = br_offsets->begin(), COSE = br_offsets->end(); COSI != COSE; ++COSI)
+            {
+                std::vector<Constant *> lmap_entry_vals;
+                ConstantInt* const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, *COSI));
+
+                lmap_entry_vals.push_back(const_target_addr);
+                lmap_entry_vals.push_back(m_addr_table[*COSI]);
+
+                Constant * lmap_entry = ConstantStruct::get(lmap_struct_type, lmap_entry_vals);
+                const_lmap_entries.push_back(lmap_entry);
+            }
+            // Now Actually Initialize the Local Mapping Table
+            Constant* const_array = ConstantArray::get(lmap_array_type, const_lmap_entries);
+            lmap_table->setInitializer(const_array);
+
+            // Write the Size of Local Mapping Table; As global variables in this module ... :)
+            // So that we don't have to create this table every time we execute this function.
+            Constant * const_lmap_size = llvm::ConstantInt::get(Geti32Type(), lmap_tblsize);
+            GlobalVariable* global_lmap_size = new GlobalVariable(* p_gen_mod,
+                /*Type=*/ Geti32Type(),
+                /*isConstant=*/ true,
+                /*Linkage=*/ GlobalValue::InternalLinkage,
+                /*Initializer=*/ const_lmap_size,
+                /*Name=*/ gen_func->getNameStr() + "_lMap_Size");
+            global_lmap_size->setAlignment(32);
+
+            // Load the Value from InitNFP and Return to Caller.
+            llvm::Instruction * return_tinstr = llvm_bb_return->getTerminator();
+            llvm::GetElementPtrInst * ret_nfp_ptr = llvm::GetElementPtrInst::Create(next_func_ptr, Geti32Value(0), "", return_tinstr);
+            llvm::LoadInst * ret_nfp = new llvm::LoadInst(ret_nfp_ptr, "RetNFP", false, return_tinstr);
+            llvm::TerminatorInst::op_iterator OI = return_tinstr->op_begin(); // Get the Return Instruction's Operand
+            (*OI).set(ret_nfp);         // Set the NFP as Return Value
+
+            // We add the Local Mapping Address Checking Basic Blocks
+            llvm::BasicBlock  * llvm_bb_msize = llvm::BasicBlock::Create(GetContext(), "BB_lMapSize", gen_func);
+            llvm::BasicBlock  * llvm_bb_mtest = llvm::BasicBlock::Create(GetContext(), "BB_lMapTest", gen_func);
+            llvm::BasicBlock  * llvm_bb_mload = llvm::BasicBlock::Create(GetContext(), "BB_lMapLoad", gen_func);
+            llvm::BasicBlock * llvm_bb_incidx = llvm::BasicBlock::Create(GetContext(), "BB_InclMapIdx", gen_func);
+            llvm::BasicBlock * llvm_bb_updnfp = llvm::BasicBlock::Create(GetContext(), "BB_UpdateNFP", gen_func);
+
+            // Initialize the Map Size and Index
+            llvm::LoadInst        * lmap_size = new llvm::LoadInst(global_lmap_size, "lMapSize", false, llvm_bb_msize);
+            llvm::AllocaInst     * lmap_index = new llvm::AllocaInst(Geti32Type(), "lMapIndex", llvm_bb_msize);
+            lmap_index->setAlignment(8);
+            new llvm::StoreInst(const_int32_zero, lmap_index, false, llvm_bb_msize);  // Initialize with 0
+            llvm::BranchInst::Create(llvm_bb_mtest, llvm_bb_msize);
+
+            // Check the Current Index vs Local Mapping Size
+            llvm::LoadInst * lmap_curr_idx = new llvm::LoadInst(lmap_index, "lmap_curr_idx", false, llvm_bb_mtest);
+            llvm::ICmpInst * lmap_check = new llvm::ICmpInst(*llvm_bb_mtest, llvm::ICmpInst::ICMP_EQ, lmap_curr_idx, lmap_size, "idx_eq_size");
+            llvm_bb_mtest->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_return, llvm_bb_mload, lmap_check));
+
+            // We load the Return Value of UpdateRegisters Call and the one from local mapping table
+            std::vector<Value*> index_vector;
+            index_vector.push_back(const_int32_zero);           // First Index for mapping table pointer
+            index_vector.push_back(lmap_curr_idx);                 // Second Index for the table entry
+            index_vector.push_back(const_int32_zero);           // Third Index for the target address in table entry
+            llvm::GetElementPtrInst * gep_lmap_index = llvm::GetElementPtrInst::Create(lmap_table, index_vector.begin(), index_vector.end(),
+                                                        "lmap_target_addr", llvm_bb_mload);
+            llvm::LoadInst * target_addr_val = new llvm::LoadInst(gep_lmap_index, "target_addr_val", false, llvm_bb_mload);
+            llvm::LoadInst * upRegs_rval     = new llvm::LoadInst(m_ureg_rval_map[basic_block->GetTargetAddress()],
+                                                                  "rvalURegs", false, llvm_bb_mload);
+            llvm::ICmpInst * tgt_addr_check  = new llvm::ICmpInst(*llvm_bb_mload, llvm::ICmpInst::ICMP_EQ,
+                                                                  target_addr_val, upRegs_rval, "tgt_eq_uregs");
+            llvm::BranchInst::Create(llvm_bb_updnfp, llvm_bb_incidx, tgt_addr_check, llvm_bb_mload);
+
+            // Increment Index Basic Block
+            llvm::BinaryOperator* inc_index = BinaryOperator::Create(llvm::Instruction::Add, lmap_curr_idx, const_int32_one, "", llvm_bb_incidx);
+            new llvm::StoreInst(inc_index, lmap_index, false, llvm_bb_incidx);
+            llvm_bb_incidx->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_mtest));
+
+            // Update the Next Function Pointer
+#if 0 // Working Here
+            index_vector.clear();
+            index_vector.push_back(const_int32_zero);           // First Index for mapping table pointer
+            index_vector.push_back(lmap_curr_idx);              // Second Index for the table entry
+            index_vector.push_back(const_int32_one);            // Third Index for the native function pointer
+            llvm::GetElementPtrInst * gep_lmap_funptr = llvm::GetElementPtrInst::Create(lmap_table, index_vector.begin(), index_vector.end(),
+                                                        "lmap_target_addr", llvm_bb_updnfp);
+            llvm::LoadInst            * native_funptr = new llvm::LoadInst(gep_lmap_funptr, "native_funptr", false, llvm_bb_updnfp);
+            llvm::GetElementPtrInst         * nfp_ptr = llvm::GetElementPtrInst::Create(next_func_ptr, Geti32Value(0), "", llvm_bb_updnfp);
+
+            cout << "function ptr type: ";
+            native_funptr->getType()->dump();
+            cout << "nfp ptr type: ";
+            nfp_ptr->getType()->dump();
+            //new llvm::StoreInst(native_funptr, nfp_ptr, false, llvm_bb_updnfp);
+#endif
+
+            llvm_bb_updnfp->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_return));
+
+
+
+
+            // Now we loop through the rest of Core and Update Basic Blocks.
+            for(uint32_t index = 0; ((BBI != BBE) && (index < exec_pkt_count)); index++)
+            {
+                ++BBI;  // We Skip the Core Basic Block
+                llvm::BasicBlock * llvm_bb_update = &(*BBI); ++BBI;
+                //native::ExecutePacket  * exec_pkt = basic_block->GetExecutePacketByIndex(index);
+
+                llvm::TerminatorInst * t_instr = llvm_bb_update->getTerminator();
+                for(llvm::TerminatorInst::op_iterator OI = t_instr->op_begin(), OE = t_instr->op_end(); OI != OE; ++OI)
+                {
+                    llvm::Value * opr_val =  (*OI).get();
+                    if(opr_val == llvm_bb_return)
+                    {
+                        (*OI).set(llvm_bb_msize);
+                    }
+                }
+            }
+        }
+
+        return 0;
+
     }
 
     int32_t LLVMGenerator :: GenerateLLVM_EPLevel(native::ExecutePacket * exec_pkt)
@@ -699,7 +855,7 @@ namespace native
                /*UnrollLoops=*/true, /*!DisableSimplifyLibCalls,*/true,
                /*HaveExceptions=*/ true, AlwaysInliningPass);
         }
-        
+
         p_fpm->add(createCFGOnlyPrinterPass("_0"));
 
         p_fpm->add(createGVNPass());

@@ -178,6 +178,8 @@ int main (int argc, char ** argv)
     }
     cout << "\n";
 
+    llvm_gen->GenerateLLVM_LocalMapping(bbList.GetList());
+
     COUT << "Verifying Module ... " << endl;              llvm_gen->VerifyGeneratedModule();
     COUT << "Writing Addressing Table ... " << endl;      llvm_gen->WriteAddressingTable();
     COUT << "Optimizing LLVM Instructions ..." << endl;   llvm_gen->OptimizeModule();

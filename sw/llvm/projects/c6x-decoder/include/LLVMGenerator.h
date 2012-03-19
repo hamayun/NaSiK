@@ -48,6 +48,8 @@
 
 #include "C62xCommon.h"
 #include "ExecutePacket.h"
+#include "ExecutePacketList.h"
+#include "BasicBlockList.h"
 
 using namespace llvm;
 
@@ -57,6 +59,9 @@ namespace native
 {
     typedef std::map<uint32_t, llvm::Function *>           AddressTable_t;
     typedef std::map<uint32_t, llvm::Function *>::iterator AddressTable_Iterator_t;
+
+    typedef std::map<uint32_t, llvm::AllocaInst *>           UpdateRegValMap_t;
+    typedef std::map<uint32_t, llvm::AllocaInst *>::iterator UpdateRegValMap_Iterator_t;
 
     typedef std::list<string>                   FrequentFuncList_t;
     typedef std::list<string>::iterator         FrequentFuncList_Iterator_t;
@@ -106,6 +111,7 @@ namespace native
         bool                             m_enable_exec_stats;
         // Enable the Basic Block Level Target Address to Host Function Pointer Mapping.
         bool                             m_bb_local_maps;
+        UpdateRegValMap_t                m_ureg_rval_map;
 
         FrequentFuncList_t   m_fuf_list;                      // List of Frequently Used Functions;
 
@@ -177,6 +183,7 @@ namespace native
                         llvm::AllocaInst * instr_results, llvm::BasicBlock * llvm_bb);
         virtual llvm::Value * GenerateLLVM_Exec_Packet(llvm::Function * function, ExecutePacket * exec_packet,
                         llvm::BasicBlock * llvm_bb_core, llvm::BasicBlock * llvm_bb_update, llvm::BasicBlock * llvm_bb_return);
+        virtual int32_t GenerateLLVM_LocalMapping(const native::BasicBlockList_t * bb_list);
 
         virtual int32_t GenerateLLVM_EPLevel(ExecutePacket * exec_packet);   // Using Execute Packet Level Granularity
         virtual int32_t GenerateLLVM_BBLevel(native::BasicBlock * input_bb);         // Using Basic Block Level Granularity

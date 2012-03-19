@@ -34,6 +34,10 @@ namespace native
 {
     class BasicBlock;
 
+    typedef set<uint32_t>                           ConstOffsetsSet_t;
+    typedef set<uint32_t>::iterator                 ConstOffsetsSet_Iterator_t;
+    typedef set<uint32_t>::const_iterator           ConstOffsetsSet_ConstIterator_t;
+
     typedef list<Instruction *>                     InstructionList_t;
     typedef list<Instruction *> ::iterator          InstructionList_Iterator_t;
     typedef list<Instruction *> ::const_iterator    InstructionList_ConstIterator_t;
@@ -63,6 +67,8 @@ namespace native
 
         BasicBlockSet_t                 m_parent_bb_set;  // We can have multiple parents basic blocks
         InstructionList_Iterator_t      m_instr_iterator; // Iterator Used to Get Instructions One by One
+
+        ConstOffsetsSet_t               m_offsets_set;     // Set of Constant Offsets used in Branch Instructions
 
     public:
         ExecutePacket(ExecutePacketType_t packet_type) : m_packet_type(packet_type), m_special_flags(BRANCH_TAKEN) {}
@@ -168,6 +174,27 @@ namespace native
             }
             return(reg_br_count);
         }
+
+        virtual ConstOffsetsSet_t * GetConstOffsetsSet()
+        {
+            DecodedInstruction * dec_instr = NULL;
+            m_offsets_set.clear();
+
+            for(InstructionList_ConstIterator_t ILCI = m_instr_list.begin(),
+                ILCE = m_instr_list.end(); ILCI != ILCE; ++ILCI)
+            {
+                dec_instr = (*ILCI)->GetDecodedInstruction();
+                ASSERT(dec_instr != NULL, "Instructions need to be decoded first.");
+
+                if(dec_instr->IsBranchInstruction() && !(dec_instr->IsRegisterBranch()))
+                {
+                    m_offsets_set.insert(dec_instr->GetBranchConstAddress());
+                }
+
+            }
+            return(& m_offsets_set);
+        }
+
 
         virtual uint32_t GetUCBrInstrCount() const
         {
