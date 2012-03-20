@@ -29,10 +29,10 @@
 namespace native
 {
     LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl,
-        LLVMCodeGenOptions_t code_gen_opt, bool enable_exec_stats) :
+        LLVMCodeGenOptions_t code_gen_opt, bool enable_exec_stats, bool enable_locmaps) :
         p_module(NULL), m_context(getGlobalContext()), m_irbuilder(m_context), m_curr_function(NULL),
         p_pm(NULL), p_fpm(NULL), m_code_gen_lvl(code_gen_lvl), m_code_gen_opt(code_gen_opt), m_enable_exec_stats(enable_exec_stats),
-        m_bb_local_maps(true),
+        m_bb_local_maps(enable_locmaps),
         i1(IntegerType::get(m_context, 1)), i8(IntegerType::get(m_context, 8)), i16(IntegerType::get(m_context, 16)),
         i32(IntegerType::get(m_context, 32)), iptr(IntegerType::get(m_context, 8 * sizeof(intptr_t))),
         p_outs_gen_mod(GetOutputStream("gen_code.bc")),
@@ -104,6 +104,35 @@ namespace native
 
         p_proc_state_type = llvm::PointerType::getUnqual(proc_state_type);
         ASSERT(proc_state_type, "Could Not Get Processor State Type Pointer");
+
+        p_void_ptr_type = llvm::PointerType::get(Geti8Type(), 0 /* Address Space */);
+        ASSERT(p_void_ptr_type != NULL, "Error Creating Void Pointer Type");
+
+        // Types for the Generated Simulation Functions
+        if(m_bb_local_maps)
+        {
+            const Type * return_type = p_void_ptr_type;
+            std::vector<const Type*> params;
+            params.push_back(p_proc_state_type);
+
+            p_gen_func_type = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
+            ASSERT(p_gen_func_type != NULL, "Error Creating Gen Function Type");
+        }
+        else
+        {
+            const Type * return_type = Geti32Type();
+            std::vector<const Type*> params;
+            params.push_back(p_proc_state_type);
+
+            p_gen_func_type = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
+            ASSERT(p_gen_func_type != NULL, "Error Creating Gen Function Type");
+        }
+
+        p_gen_func_ptr_type = llvm::PointerType::get(p_gen_func_type, 0 /*Address Space*/);
+        ASSERT(p_gen_func_ptr_type != NULL, "Error Creating Pointer to Gen Function Type");
+
+        p_const_null_fptr = llvm::ConstantPointerNull::get(p_gen_func_ptr_type);
+        ASSERT(p_const_null_fptr != NULL, "Error Creating Const Null Function Pointer");
 
         // Some common Processor State Manipulation Functions
         p_update_pc    = p_gen_mod->getFunction("Update_PC");           ASSERT(p_update_pc, "Could Not Get Update_PC");
@@ -356,12 +385,7 @@ namespace native
         string           function_name      = "Sim" + basic_block->GetName();
         llvm::IRBuilder<>  & irbuilder      = GetIRBuilder();
 
-        const Type * return_type            = Type::getInt32Ty(GetContext());
-        std::vector<const Type*> params;
-        params.push_back(p_proc_state_type);
-
-        llvm::FunctionType * func_type      = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
-        llvm::Function     * function       = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
+        llvm::Function     * function       = llvm::Function::Create(p_gen_func_type, Function::ExternalLinkage, function_name, p_gen_mod);
         ConstantInt      * const_int32_zero = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
 
         INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
@@ -379,15 +403,28 @@ namespace native
         uint32_t exec_pkt_count           = basic_block->GetSize();
         llvm::BasicBlock * llvm_bb_entry  = llvm::BasicBlock::Create(GetContext(), "BB_Entry", function);
         llvm::BasicBlock * llvm_bb_return = llvm::BasicBlock::Create(GetContext(), "BB_Return", function);
-        llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), const_int32_zero));
 
         if(m_bb_local_maps)
         {
+            // Allocate Space for Next Function Pointer & Initialize with NULL
+            llvm::AllocaInst * next_func_ptr = new llvm::AllocaInst(p_gen_func_ptr_type, "NFP", llvm_bb_entry);
+            next_func_ptr->setAlignment(8);
+            new llvm::StoreInst(p_const_null_fptr, next_func_ptr, false, llvm_bb_entry);  // Initialize with NULL
+
+            llvm::LoadInst * ret_nfp = new llvm::LoadInst(next_func_ptr, "RetNFP", false, llvm_bb_return);
+            llvm::CastInst * ret_nfp_void_ptr = new llvm::BitCastInst(ret_nfp, p_void_ptr_type, "", llvm_bb_return);
+            llvm::ReturnInst::Create(GetContext(), ret_nfp_void_ptr, llvm_bb_return);
+
             // Here We Create A Variable to Store the Return Value of Update Registers Function Calls
             llvm::AllocaInst * update_rval = new llvm::AllocaInst(Geti32Type(), "RetValUpReg", llvm_bb_entry);
             update_rval->setAlignment(8);
             new llvm::StoreInst(const_int32_zero, update_rval, false, llvm_bb_entry);  // Initialize with 0
             m_ureg_rval_map[basic_block->GetTargetAddress()] = update_rval;
+            m_nfp_instr_map[basic_block->GetTargetAddress()] = next_func_ptr;
+        }
+        else
+        {
+            llvm::ReturnInst::Create(GetContext(), const_int32_zero, llvm_bb_return);
         }
 
         if(m_enable_exec_stats)
@@ -487,6 +524,12 @@ namespace native
 
     int32_t LLVMGenerator :: GenerateLLVM_LocalMapping(const native::BasicBlockList_t * bb_list)
     {
+        if(!m_bb_local_maps || m_code_gen_lvl == LLVM_CG_EP_LVL)
+        {
+            WARN << "Local Mapping Generation is Disabled" << endl;
+            return 0;
+        }
+
         for(BasicBlockList_ConstIterator_t BBLCI = bb_list->begin(), BBLCE = bb_list->end(); BBLCI != BBLCE; ++BBLCI)
         {
             native::BasicBlock * basic_block = (*BBLCI);
@@ -498,18 +541,12 @@ namespace native
             llvm::Function::iterator BBI = gen_func->getBasicBlockList().begin();
             llvm::Function::iterator BBE = gen_func->getBasicBlockList().end();
 
-            llvm::BasicBlock * llvm_bb_entry  = & (*BBI); ++BBI;        // The First BB is Entry
+            ++BBI;                                                      // The First BB is Entry; Skipped Here
             llvm::BasicBlock * llvm_bb_return = & (*BBI); ++BBI;        // The Second BB is Return
 
-            // Here we create a variable that will hold the Next Function Pointer; For returning to Caller
-            llvm::Instruction * entry_tinstr = llvm_bb_entry->getTerminator();
-            llvm::AllocaInst * next_func_ptr = new llvm::AllocaInst(Geti32Type(), "NFP", entry_tinstr);
-            next_func_ptr->setAlignment(8);
-            new llvm::StoreInst(const_int32_zero, next_func_ptr, false, entry_tinstr);  // Initialize with NULL
-
             // Here we Create the Local Mapping Table in the Entry Basic Block
-            uint32_t          lmap_tblsize = basic_block->GetOffsetBrCount();
             ConstOffsetsSet_t * br_offsets = basic_block->GetConstOffsetsSet();
+            uint32_t          lmap_tblsize = br_offsets->size();
 
             std::vector<const Type*> lmap_struct_elems;
             lmap_struct_elems.push_back(Geti32Type());
@@ -556,13 +593,6 @@ namespace native
                 /*Name=*/ gen_func->getNameStr() + "_lMap_Size");
             global_lmap_size->setAlignment(32);
 
-            // Load the Value from InitNFP and Return to Caller.
-            llvm::Instruction * return_tinstr = llvm_bb_return->getTerminator();
-            llvm::GetElementPtrInst * ret_nfp_ptr = llvm::GetElementPtrInst::Create(next_func_ptr, Geti32Value(0), "", return_tinstr);
-            llvm::LoadInst * ret_nfp = new llvm::LoadInst(ret_nfp_ptr, "RetNFP", false, return_tinstr);
-            llvm::TerminatorInst::op_iterator OI = return_tinstr->op_begin(); // Get the Return Instruction's Operand
-            (*OI).set(ret_nfp);         // Set the NFP as Return Value
-
             // We add the Local Mapping Address Checking Basic Blocks
             llvm::BasicBlock  * llvm_bb_msize = llvm::BasicBlock::Create(GetContext(), "BB_lMapSize", gen_func);
             llvm::BasicBlock  * llvm_bb_mtest = llvm::BasicBlock::Create(GetContext(), "BB_lMapTest", gen_func);
@@ -585,7 +615,7 @@ namespace native
             // We load the Return Value of UpdateRegisters Call and the one from local mapping table
             std::vector<Value*> index_vector;
             index_vector.push_back(const_int32_zero);           // First Index for mapping table pointer
-            index_vector.push_back(lmap_curr_idx);                 // Second Index for the table entry
+            index_vector.push_back(lmap_curr_idx);              // Second Index for the table entry
             index_vector.push_back(const_int32_zero);           // Third Index for the target address in table entry
             llvm::GetElementPtrInst * gep_lmap_index = llvm::GetElementPtrInst::Create(lmap_table, index_vector.begin(), index_vector.end(),
                                                         "lmap_target_addr", llvm_bb_mload);
@@ -602,34 +632,23 @@ namespace native
             llvm_bb_incidx->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_mtest));
 
             // Update the Next Function Pointer
-#if 0 // Working Here
             index_vector.clear();
             index_vector.push_back(const_int32_zero);           // First Index for mapping table pointer
             index_vector.push_back(lmap_curr_idx);              // Second Index for the table entry
             index_vector.push_back(const_int32_one);            // Third Index for the native function pointer
             llvm::GetElementPtrInst * gep_lmap_funptr = llvm::GetElementPtrInst::Create(lmap_table, index_vector.begin(), index_vector.end(),
-                                                        "lmap_target_addr", llvm_bb_updnfp);
+                                                                                        "lmap_target_addr", llvm_bb_updnfp);
             llvm::LoadInst            * native_funptr = new llvm::LoadInst(gep_lmap_funptr, "native_funptr", false, llvm_bb_updnfp);
-            llvm::GetElementPtrInst         * nfp_ptr = llvm::GetElementPtrInst::Create(next_func_ptr, Geti32Value(0), "", llvm_bb_updnfp);
-
-            cout << "function ptr type: ";
-            native_funptr->getType()->dump();
-            cout << "nfp ptr type: ";
-            nfp_ptr->getType()->dump();
-            //new llvm::StoreInst(native_funptr, nfp_ptr, false, llvm_bb_updnfp);
-#endif
-
+            llvm::GetElementPtrInst   * nfp_ptr = llvm::GetElementPtrInst::Create(m_nfp_instr_map[basic_block->GetTargetAddress()],
+                                                                                  Geti32Value(0), "", llvm_bb_updnfp);
+            new llvm::StoreInst(native_funptr, nfp_ptr, false, llvm_bb_updnfp);
             llvm_bb_updnfp->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_return));
-
-
-
 
             // Now we loop through the rest of Core and Update Basic Blocks.
             for(uint32_t index = 0; ((BBI != BBE) && (index < exec_pkt_count)); index++)
             {
                 ++BBI;  // We Skip the Core Basic Block
                 llvm::BasicBlock * llvm_bb_update = &(*BBI); ++BBI;
-                //native::ExecutePacket  * exec_pkt = basic_block->GetExecutePacketByIndex(index);
 
                 llvm::TerminatorInst * t_instr = llvm_bb_update->getTerminator();
                 for(llvm::TerminatorInst::op_iterator OI = t_instr->op_begin(), OE = t_instr->op_end(); OI != OE; ++OI)
@@ -642,22 +661,13 @@ namespace native
                 }
             }
         }
-
         return 0;
-
     }
 
     int32_t LLVMGenerator :: GenerateLLVM_EPLevel(native::ExecutePacket * exec_pkt)
     {
         string           function_name      = "Sim" + exec_pkt->GetName();
-
-        const Type * return_type            = Type::getInt32Ty(GetContext());
-        std::vector<const Type*> params;
-        params.push_back(p_proc_state_type);
-
-        llvm::FunctionType * func_type      = llvm::FunctionType::get(return_type, params, /*not vararg*/false);
-        llvm::Function     * function       = llvm::Function::Create(func_type, Function::ExternalLinkage, function_name, p_gen_mod);
-        ConstantInt     * const_int32_zero  = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
+        llvm::Function     * function       = llvm::Function::Create(p_gen_func_type, Function::ExternalLinkage, function_name, p_gen_mod);
 
         INFO << "Function ... " << function_name << "(C62x_DSPState_t * p_state, ...)" << endl;
         SetCurrentFunction(function);
@@ -673,6 +683,23 @@ namespace native
 
         llvm::BasicBlock * llvm_bb_entry  = llvm::BasicBlock::Create(GetContext(), "BB_Entry", function);
         llvm::BasicBlock * llvm_bb_return = llvm::BasicBlock::Create(GetContext(), "BB_Return", function);
+
+        if(m_bb_local_maps)
+        {
+            // Allocate Space for Next Function Pointer & Initialize with NULL
+            llvm::AllocaInst * next_func_ptr = new llvm::AllocaInst(p_gen_func_ptr_type, "NFP", llvm_bb_entry);
+            next_func_ptr->setAlignment(8);
+            new llvm::StoreInst(p_const_null_fptr, next_func_ptr, false, llvm_bb_entry);  // Initialize with NULL
+
+            llvm::LoadInst * ret_nfp = new llvm::LoadInst(next_func_ptr, "RetNFP", false, llvm_bb_return);
+            llvm::CastInst * ret_nfp_void_ptr = new llvm::BitCastInst(ret_nfp, p_void_ptr_type, "", llvm_bb_return);
+            llvm::ReturnInst::Create(GetContext(), ret_nfp_void_ptr, llvm_bb_return);
+        }
+        else
+        {
+            ConstantInt * const_int32_zero = ConstantInt::get(GetContext(), APInt(32, StringRef("0"), 10));
+            llvm::ReturnInst::Create(GetContext(), const_int32_zero, llvm_bb_return);
+        }
 
         if(m_enable_exec_stats)
         {
@@ -699,10 +726,6 @@ namespace native
         // We create an unconditional branch instruction in the update bb to return bb.
         llvm_bb_update->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_return));
 
-        llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), const_int32_zero));
-        // TODO: We can return the reason to Dispatcher; If it needs to use it.
-        //llvm_bb_return->getInstList().push_back(llvm::ReturnInst::Create(GetContext(), pc_updated));
-
         //function->dump();
         return (0);
     }
@@ -713,30 +736,15 @@ namespace native
         return (0);
     }
 
-#if 0 // The following function creates something like this ...
-    %struct.address_entry_t = type { i32, i32 (%struct.C62x_DSPState_t*)* }
-
-    @AddressingTable = global [8 x %struct.address_entry_t] [
-            %struct.address_entry_t { i32 0, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000000 },
-            %struct.address_entry_t { i32 4, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000004 },
-            %struct.address_entry_t { i32 8, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000008 },
-            %struct.address_entry_t { i32 12, i32 (%struct.C62x_DSPState_t*)* @SimEP_0000000c },
-            %struct.address_entry_t { i32 16, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000010 },
-            %struct.address_entry_t { i32 20, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000014 },
-            %struct.address_entry_t { i32 24, i32 (%struct.C62x_DSPState_t*)* @SimEP_00000018 },
-            %struct.address_entry_t { i32 28, i32 (%struct.C62x_DSPState_t*)* @SimEP_0000001c }], align 32
-#endif
-
     int32_t LLVMGenerator :: WriteAddressingTable()
     {
         uint32_t         tablesize     = m_addr_table.size();
-        llvm::Function * nativefptr    = m_addr_table.begin()->second;
         llvm::IRBuilder<>  & irbuilder = GetIRBuilder();
 
         // Type Definitions
         std::vector<const Type*> gen_struct_elems;
         gen_struct_elems.push_back(irbuilder.getInt32Ty());
-        gen_struct_elems.push_back(nativefptr->getType());
+        gen_struct_elems.push_back(p_gen_func_ptr_type);
 
         llvm::StructType * gen_addr_entry_ty = llvm::StructType::get(GetContext(), gen_struct_elems, false);
         ASSERT(gen_addr_entry_ty, "Failed to Create Address Entry Structure Type");
@@ -862,6 +870,8 @@ namespace native
         p_fpm->add(createInstructionCombiningPass());
         p_fpm->add(createCFGSimplificationPass());
         p_fpm->add(createDeadStoreEliminationPass());
+
+        //p_fpm->add(createCFGOnlyPrinterPass("_1"));
     }
 
     int32_t LLVMGenerator :: OptimizeModule()

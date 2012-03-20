@@ -76,7 +76,7 @@ sim_func_t find_sim_func(uint32_t target_pc)
 int main(int argc, char **argv, char **environ)
 {
     sim_func_t curr_func = NULL;
-    uint32_t ret_val = 0;
+    sim_func_t next_func_ptr = NULL;
 
     C62x_DSPState_t p_state;
     Init_DSP_State(& p_state);
@@ -84,11 +84,16 @@ int main(int argc, char **argv, char **environ)
     CPU_PROFILE_COMP_START();
     while(1)
     {
-        curr_func = find_sim_func(p_state.m_reg[REG_PC_INDEX]);
+        if(next_func_ptr == NULL)
+            curr_func = find_sim_func(p_state.m_reg[REG_PC_INDEX]);
+        else
+            curr_func = next_func_ptr;
+
         if(curr_func)
         {
-            ret_val = curr_func(& p_state);
+            next_func_ptr = (sim_func_t) curr_func(& p_state);
             //Print_DSP_State(& p_state);
+            //printf("Next Function Pointer: 0x%08X\n", next_func_ptr);
         }
 #if 0
         else

@@ -39,6 +39,7 @@ OPTIONS:
    -i      Enable Inline Code Generation
    -j      Enable Frequently Used Function Inline Code Generation
    -k      Compile KVM Libraries
+   -l      Enable Basic Block Level Local Mapping Generation
    -m      Enable Module Level Optimization
    -p      Enable Special Optimizations (If Any)
    -r      Run Simulation
@@ -58,7 +59,7 @@ VERBOSE=
 OUTPUT_TTY="/dev/null"
 CODEGEN_OPT=""
 
-while getopts “bdfg:hijkmprst:v” OPTION
+while getopts “bdfg:hijklmprst:v” OPTION
 do
      case $OPTION in
          b)
@@ -85,6 +86,9 @@ do
              ;;
          k)
              COMPILE_KVM=1
+             ;;
+         l)
+             CODEGEN_OPT+="-lmaps "
              ;;
          m)
              CODEGEN_OPT+="-mopt "
@@ -195,6 +199,7 @@ else
 fi
 
 DEC_CMD_LINE+=" -$GEN_CODE_LEVEL -isa=C62xISABehavior_v2.bc $CODEGEN_OPT"
+#echo "$DEC_CMD_LINE"
 
 ./c6x-decoder $DEC_CMD_LINE                                       >& $OUTPUT_TTY
 if [ $? != 0 ]; then

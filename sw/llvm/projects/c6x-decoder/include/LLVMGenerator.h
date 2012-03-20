@@ -60,8 +60,8 @@ namespace native
     typedef std::map<uint32_t, llvm::Function *>           AddressTable_t;
     typedef std::map<uint32_t, llvm::Function *>::iterator AddressTable_Iterator_t;
 
-    typedef std::map<uint32_t, llvm::AllocaInst *>           UpdateRegValMap_t;
-    typedef std::map<uint32_t, llvm::AllocaInst *>::iterator UpdateRegValMap_Iterator_t;
+    typedef std::map<uint32_t, llvm::AllocaInst *>           GenFuncInstrMap_t;
+    typedef std::map<uint32_t, llvm::AllocaInst *>::iterator GenFuncInstrMap_Iterator_t;
 
     typedef std::list<string>                   FrequentFuncList_t;
     typedef std::list<string>::iterator         FrequentFuncList_Iterator_t;
@@ -111,7 +111,8 @@ namespace native
         bool                             m_enable_exec_stats;
         // Enable the Basic Block Level Target Address to Host Function Pointer Mapping.
         bool                             m_bb_local_maps;
-        UpdateRegValMap_t                m_ureg_rval_map;
+        GenFuncInstrMap_t                m_ureg_rval_map;
+        GenFuncInstrMap_t                m_nfp_instr_map;
 
         FrequentFuncList_t   m_fuf_list;                      // List of Frequently Used Functions;
 
@@ -136,8 +137,12 @@ namespace native
 
         AddressTable_t            m_addr_table;
 
-        llvm::PointerType       * p_proc_state_type;    // Pointer type to the Processor State. i.e. "Proc_State_t *"
-        llvm::Value             * p_proc_state;         // Pointer to Processor State argument that is passed to the current function
+        llvm::PointerType         * p_proc_state_type;    // Pointer type to the Processor State. i.e. "Proc_State_t *"
+        llvm::Value               * p_proc_state;         // Pointer to Processor State argument that is passed to the current function
+        llvm::PointerType         * p_void_ptr_type;      // Void Pointer Type (Actually i8 *)
+        llvm::FunctionType        * p_gen_func_type;      // Generated Function Type
+        llvm::PointerType         * p_gen_func_ptr_type;  // Pointer to the Generated Function Type
+        llvm::ConstantPointerNull * p_const_null_fptr;    // Const Null Function Pointer.
 
         llvm::Function          * p_update_pc;
         llvm::Function          * p_get_pc;
@@ -150,7 +155,8 @@ namespace native
         llvm::Function          * p_enq_result;
         llvm::Function          * p_update_immed;
 
-        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl, LLVMCodeGenOptions_t code_gen_opt, bool enable_exec_stats);
+        LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl,
+                      LLVMCodeGenOptions_t code_gen_opt, bool enable_exec_stats, bool enable_locmaps);
 
         virtual llvm::Module *      GetModule()         { return (p_module); }
         virtual llvm::LLVMContext & GetContext() const  { return (m_context); }

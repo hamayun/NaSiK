@@ -46,6 +46,7 @@ static cl::bits<LLVMCGOBitVector_t> CodeGenOptionsBV(cl::desc("Code Generation O
                                                      clEnumValN(LLVM_CGO_OPT_SPE_BIT, "sopt", "Enable Special Optimizations (If Any)"),
                                                      clEnumValEnd));
 static cl::opt<bool> EnableExecStats                ("estats", cl::desc("Enable Execution Statistics Code Generation"), cl::init(false));
+static cl::opt<bool> EnableLocalMappings            ("lmaps", cl::desc("Enable Generation of Local Mappings for Each Basic Block"), cl::init(false));
 
 int main (int argc, char ** argv)
 {
@@ -137,11 +138,11 @@ int main (int argc, char ** argv)
     total_pkts = exec_list->size();
     progress   = 0;
 
+    llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions, EnableExecStats, EnableLocalMappings);
+    ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
+
     if(CodeGenLevel == LLVM_CG_BB_LVL)
     {
-        llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions, EnableExecStats);
-        ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
-
         const BasicBlockList_t * bb_list = bbList.GetList();
         COUT << "Generating LLVM (BB Level) ... " << setw(4) << total_bbs  << setw(21) << " Basic Blocks ... ";
 
@@ -161,9 +162,6 @@ int main (int argc, char ** argv)
     }
 
     curr_pkt = 0;
-    if(!llvm_gen) llvm_gen = new LLVMGenerator(ISAFilename, CodeGenLevel, CodeGenOptions, EnableExecStats);
-    ASSERT(llvm_gen != NULL, "Error Creating LLVM Generator Object!!!");
-
     COUT << "Generating LLVM (EP Level) ... " <<  setw(4) << total_pkts << setw(21) << " Execute Packets ... ";
     for(ExecutePacketList_ConstIterator_t EPLI = exec_list->begin(), EPLE = exec_list->end(); EPLI != EPLE; ++EPLI)
     {
@@ -178,7 +176,11 @@ int main (int argc, char ** argv)
     }
     cout << "\n";
 
-    llvm_gen->GenerateLLVM_LocalMapping(bbList.GetList());
+    if(EnableLocalMappings)
+    {
+        COUT << "Generating Local Mappings (Per Basic Block) ... " << endl;
+        llvm_gen->GenerateLLVM_LocalMapping(bbList.GetList());
+    }
 
     COUT << "Verifying Module ... " << endl;              llvm_gen->VerifyGeneratedModule();
     COUT << "Writing Addressing Table ... " << endl;      llvm_gen->WriteAddressingTable();

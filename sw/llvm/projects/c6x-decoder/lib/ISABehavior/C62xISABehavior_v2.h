@@ -32,7 +32,7 @@
 #define QUEUE_BASED_DREGS
 //#define DELAYED_MWBS
 #define PRINT_CYCLES
-#define ENABLE_STATS
+//#define ENABLE_STATS
 
 #ifdef ENABLE_TRACE
 #define TRACE_PRINT(fmt, args...)                               \
@@ -134,7 +134,9 @@ typedef struct C62x_DSPState
     uint64_t                      m_curr_cycle;
     uint32_t                      m_reg[C62X_REG_BANKS * C62X_REGS_PER_BANK];
     C62x_Delay_Queue_t            m_delay_q[C62X_MAX_DELAY_SLOTS + 1];
+#ifdef DELAYED_MWBS
     C62x_MWB_Queue_t              m_mwback_q[C62X_MAX_DELAY_SLOTS + 1];
+#endif
 } C62x_DSPState_t;
 /* LLVM Type ... { i64, i32*, [48 x i32], [6 x { { i16, i32, \2 }*, { i16, i32, \2 }*, i32, i32 } ... ] } */
 
