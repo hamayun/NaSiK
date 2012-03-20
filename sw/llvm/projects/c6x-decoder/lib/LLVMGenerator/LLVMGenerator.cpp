@@ -605,6 +605,11 @@ namespace native
             llvm::AllocaInst     * lmap_index = new llvm::AllocaInst(Geti32Type(), "lMapIndex", llvm_bb_msize);
             lmap_index->setAlignment(8);
             new llvm::StoreInst(const_int32_zero, lmap_index, false, llvm_bb_msize);  // Initialize with 0
+            if(m_enable_exec_stats)
+            {
+                GetIRBuilder().SetInsertPoint(llvm_bb_msize);
+                CreateCallByNameNoParams("Inc_LMAP_Search");
+            }
             llvm::BranchInst::Create(llvm_bb_mtest, llvm_bb_msize);
 
             // Check the Current Index vs Local Mapping Size
@@ -629,6 +634,11 @@ namespace native
             // Increment Index Basic Block
             llvm::BinaryOperator* inc_index = BinaryOperator::Create(llvm::Instruction::Add, lmap_curr_idx, const_int32_one, "", llvm_bb_incidx);
             new llvm::StoreInst(inc_index, lmap_index, false, llvm_bb_incidx);
+            if(m_enable_exec_stats)
+            {
+                GetIRBuilder().SetInsertPoint(llvm_bb_incidx);
+                CreateCallByNameNoParams("Inc_LMAP_Extrloops");
+            }
             llvm_bb_incidx->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_mtest));
 
             // Update the Next Function Pointer
@@ -642,6 +652,11 @@ namespace native
             llvm::GetElementPtrInst   * nfp_ptr = llvm::GetElementPtrInst::Create(m_nfp_instr_map[basic_block->GetTargetAddress()],
                                                                                   Geti32Value(0), "", llvm_bb_updnfp);
             new llvm::StoreInst(native_funptr, nfp_ptr, false, llvm_bb_updnfp);
+            if(m_enable_exec_stats)
+            {
+                GetIRBuilder().SetInsertPoint(llvm_bb_updnfp);
+                CreateCallByNameNoParams("Inc_LMAP_Found");
+            }
             llvm_bb_updnfp->getInstList().push_back(llvm::BranchInst::Create(llvm_bb_return));
 
             // Now we loop through the rest of Core and Update Basic Blocks.

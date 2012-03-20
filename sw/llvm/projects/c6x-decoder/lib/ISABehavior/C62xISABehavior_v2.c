@@ -25,16 +25,15 @@
 #ifdef ENABLE_STATS
 extern uint32_t total_ep_count;
 extern uint32_t total_bb_count;
+extern uint32_t total_lmap_search;
+extern uint32_t total_lmap_found;
+extern uint32_t total_lmap_extraloops;
 
-void Inc_EP_Count()
-{
-    total_ep_count++;
-}
-
-void Inc_BB_Count()
-{
-    total_bb_count++;
-}
+void Inc_EP_Count()             { total_ep_count++;             }
+void Inc_BB_Count()             { total_bb_count++;             }
+void Inc_LMAP_Search()          { total_lmap_search++;          }
+void Inc_LMAP_Found()           { total_lmap_found++;           }
+void Inc_LMAP_Extrloops()       { total_lmap_extraloops++;      }
 #endif
 
 extern char * BANKC_REGS[];

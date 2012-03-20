@@ -22,7 +22,7 @@ INCDIR   +=-I${C6XDEC_SOURCE}/include
 INCDIR   +=-I${TOOLCHAIN}/i386-pc-baremetal/include
 INCDIR   +=-I${TOOLCHAIN}/lib/gcc/i386-pc-baremetal/4.5.0/include
 
-CFLAGS    = -Wall -Wno-format -std=c99 -g -O3 -nostdinc
+CFLAGS    = -Wall -Wno-format -std=c99 -g -O3 -nostdinc ${ISA_EXTRA_FLAGS}
 LDFLAGS   =${CRT0} ${KVMSTART} -Wl,-T,ldscript.kvm -nostdlib -L${TOOLCHAIN}/i386-pc-baremetal/lib -lc -lgcc
 
 TARGET    = APPLICATION.X

@@ -58,6 +58,7 @@ GEN_CODE_LEVEL="BBL"
 VERBOSE=
 OUTPUT_TTY="/dev/null"
 CODEGEN_OPT=""
+ESTATS_OPT=""
 
 while getopts “bdfg:hijklmprst:v” OPTION
 do
@@ -101,6 +102,7 @@ do
              ;;
          s)
              CODEGEN_OPT+="-estats "
+             ESTATS_OPT+="-DENABLE_STATS "
              ;;
          t)
              TARGET_BIN=$OPTARG
@@ -158,6 +160,7 @@ fi
 #------------------------------------------------------------------------------#
 print_step "Generating ISA Behavior ... "
 cd ${C6XISA_BEHAVIOR}
+export ISA_EXTRA_FLAGS=$ESTATS_OPT
 make clean                                                        >& $OUTPUT_TTY
 make -s                                                           >& $OUTPUT_TTY
 if [ $? != 0 ]; then

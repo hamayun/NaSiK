@@ -29,6 +29,9 @@ extern void platform_console_puts_len (char * string, int len);
 #ifdef ENABLE_STATS
 uint32_t total_ep_count = 0;
 uint32_t total_bb_count = 0;
+uint32_t total_lmap_search = 0;
+uint32_t total_lmap_found = 0;
+uint32_t total_lmap_extraloops = 0;
 #endif
 
 char * BANKC_REGS[] = {"AMR", "CSR", "ISR", "ICR", "IER", "ISTP", "IRP", "NRP",

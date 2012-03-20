@@ -27,6 +27,9 @@ typedef int (*sim_func_t)(C62x_DSPState_t * p_state);
     uint32_t total_mem_access   = 0;
     extern uint32_t total_ep_count;
     extern uint32_t total_bb_count;
+    extern uint32_t total_lmap_search;
+    extern uint32_t total_lmap_found;
+    extern uint32_t total_lmap_extraloops;
 #endif
 
 sim_func_t find_sim_func(uint32_t target_pc)
@@ -115,6 +118,8 @@ int main(int argc, char **argv, char **environ)
             printf("EXIT_POINT_PC (0x%08X) Reached in %lld Cycles\n", EXIT_POINT_PC, p_state.m_curr_cycle);
 
 #ifdef ENABLE_STATS
+            uint32_t total_bb_ep_count = total_ep_count + total_bb_count;
+
             printf("*----- Simulation Driver Statistics -----*\n");
             printf("Find Function Calls           : %d times \n", sim_func_calls);
             printf("Total Loop Count              : %ld times \n", total_loop_count);
@@ -122,9 +127,16 @@ int main(int argc, char **argv, char **environ)
                     search_loop_min, search_loop_max, ((float) total_loop_count / sim_func_calls));
             printf("Total Mem Access Count        : %ld times \n", total_mem_access);
             printf("Avg Mem Access Count          : %.3f times/call \n", ((float) total_mem_access/sim_func_calls));
-            printf("Total EPs Executed            : %ld (%.5f%%)\n", total_ep_count, (100.0 * total_ep_count/(total_ep_count+total_bb_count)));
-            printf("Total BBs Executed            : %ld (%.5f%%)\n", total_bb_count, (100.0 * total_bb_count/(total_ep_count+total_bb_count)));
-            printf("Find Function Calls == EP+BB ?: %s\n", ((total_bb_count+total_ep_count) == sim_func_calls) ? "YES" : "NO");
+            printf("Total EPs Executed            : %ld (%.5f%%)\n", total_ep_count, (100.0 * total_ep_count/(total_bb_ep_count)));
+            printf("Total BBs Executed            : %ld (%.5f%%)\n", total_bb_count, (100.0 * total_bb_count/(total_bb_ep_count)));
+            printf("Find Function Calls == EP+BB ?: %s\n", (total_bb_ep_count == sim_func_calls) ? "YES" : "NO");
+
+            printf("Total Local Map Searchs       : %d times (%.2f%%)\n",
+                    total_lmap_search, (100.0 * total_lmap_search/(total_bb_ep_count)));
+            printf("Number of Times Found         : %d times (%.2f%%)\n",
+                    total_lmap_found, (100.0 * total_lmap_found/(total_lmap_search)));
+            printf("Number of Extra Search Loops  : %d times (%.3f%%)\n",
+                    total_lmap_extraloops, (100.0 * total_lmap_extraloops/(total_lmap_search)));
             printf("*-----------------------------------------*\n");
 #endif
             // Halt the KVM CPU
