@@ -1128,6 +1128,11 @@ namespace native
             C62xDecodedInstruction(dec_instr), m_ldst_mode (mode), m_type (type), m_requires_left_shift(false), m_left_shift_bits(0)
         {
             SetLoadStoreInstruction(true);
+            if(type == LOAD_INSTR)
+                SetLoadInstr(true);
+            else
+                SetStoreInstr(true);
+
             SetPreferredPrintMode(MODE_DEC);
         }
 

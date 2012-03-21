@@ -46,6 +46,8 @@ namespace native
         string                  m_mnemonic;
         C62xPrintMode_t         m_preferred_print_mode;     // The preferred format for Constant Operands Printing.
         bool                    m_is_load_store;            // Is this a Load or Store Instruction.
+        bool                    m_is_load;
+        bool                    m_is_store;
         bool                    m_is_branch_instr;          // Is this a branch instruction.
         bool                    m_is_reg_branch;            // Is this a register branch.
         bool                    m_is_branch_target;         // Is this instruction target of a branch instruction.
@@ -71,6 +73,12 @@ namespace native
 
         virtual void SetLoadStoreInstruction(bool is_load_store) { m_is_load_store = is_load_store; }
         virtual bool IsLoadStoreInstruction() const { return (m_is_load_store); }
+
+        virtual void SetLoadInstr(bool is_load) { m_is_load = is_load; }
+        virtual bool IsLoadInstr() const { return (m_is_load); }
+
+        virtual void SetStoreInstr(bool is_store) { m_is_store = is_store; }
+        virtual bool IsStoreInstr() const { return (m_is_store); }
 
         virtual void SetBranchInstruction(bool is_branch_instr) { m_is_branch_instr = is_branch_instr; }
         virtual bool IsBranchInstruction() const { return (m_is_branch_instr); }

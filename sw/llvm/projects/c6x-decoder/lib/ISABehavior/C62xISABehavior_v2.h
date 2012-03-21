@@ -71,32 +71,42 @@ typedef struct C62x_Delay_Queue
 } C62x_Delay_Queue_t;
 #endif
 
-#define MAX_RESULT_SIZE         2
+#define MAX_RESULT_SIZE         3
+#define RESULT_LREG_IDX 0
+#define RESULT_HREG_IDX 1
+#define RESULT_SREG_IDX 2
+
 typedef enum C62x_Result_Type
 {
     C62X_NO_RESULT = 0,
-    C62X_REGISTER = 1,
-    C62X_MULTIREGISTER = 2,
+    C62X_REGISTER = 1,    /* Single Register Result */
+    C62X_MULTIREG = 2,    /* Multiple Registers Result */
+    C62X_SREG_UPDATE = 4, /* Register Update as Side Effect to Normal Instruction Result */
 } C62x_Result_Type_t;
 
 typedef struct C62x_Result
 {
     C62x_Result_Type_t       m_type;
     uint16_t                 m_reg_id[MAX_RESULT_SIZE];
-    uint32_t                 m_value[MAX_RESULT_SIZE];
+    uint32_t                 m_value [MAX_RESULT_SIZE];
 } C62x_Result_t;
 
-#define SAVE_REGISTER_RESULT(result, idx_rd, rd)                               \
-        result->m_type = C62X_REGISTER;                                        \
-        result->m_reg_id[0] = idx_rd;                                          \
-        result->m_value[0] = rd;
+#define SAVE_REGISTER_RESULT(result, idx_rd, val_rd)                           \
+        result->m_type |= C62X_REGISTER;                                       \
+        result->m_reg_id[RESULT_LREG_IDX] = idx_rd;                            \
+        result->m_value [RESULT_LREG_IDX] = val_rd;
 
-#define SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl)          \
-        result->m_type = C62X_MULTIREGISTER;                                   \
-        result->m_reg_id[0] = idx_rdh;                                         \
-        result->m_value[0] = rdh;                                              \
-        result->m_reg_id[1] = idx_rdl;                                         \
-        result->m_value[1] = rdl;
+#define SAVE_MULTIREGISTER_RESULT(result, idx_rdh, val_rdh, idx_rdl, val_rdl)  \
+        result->m_type |= C62X_MULTIREG;                                       \
+        result->m_reg_id[RESULT_LREG_IDX] = idx_rdl;                           \
+        result->m_value [RESULT_LREG_IDX] = val_rdl;                           \
+        result->m_reg_id[RESULT_HREG_IDX] = idx_rdh;                           \
+        result->m_value [RESULT_HREG_IDX] = val_rdh;
+
+#define SAVE_SREG_UPDATE(result, idx_rd, val_rd)                               \
+        result->m_type |= C62X_SREG_UPDATE;                                    \
+        result->m_reg_id[RESULT_SREG_IDX] = idx_rd;                            \
+        result->m_value [RESULT_SREG_IDX] = val_rd;
 
 typedef enum C62xAlignment
 {

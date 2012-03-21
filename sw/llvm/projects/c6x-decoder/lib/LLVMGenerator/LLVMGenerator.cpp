@@ -23,9 +23,6 @@
 #include "BasicBlock.h"
 #include "llvm/Analysis/CFGPrinter.h"
 
-// TODO: Remove the following include and make it Target Independent
-#include "C62xDecodedInstruction.h"
-
 namespace native
 {
     LLVMGenerator :: LLVMGenerator(string input_isa, LLVMCodeGenLevel_t code_gen_lvl,
@@ -263,8 +260,6 @@ namespace native
         instr_index = 0;
         while((instr = exec_pkt->GetNextInstruction()))
         {
-            uint32_t skip_enq_call = 0;
-
             dec_instr = instr->GetDecodedInstruction();
             ASSERT(dec_instr != NULL, "Instructions need to be Decoded First");
 
@@ -273,24 +268,17 @@ namespace native
 
             if(dec_instr->GetDelaySlots())
             {
-                if(dec_instr->IsLoadStoreInstruction())
-                {
-                    // TODO: Make It independent of Target Arch.
-                    C62xLDSTInstr * ldst_instr = (C62xLDSTInstr *) dec_instr;
-                    if(ldst_instr->GetLoadStoreType() == STORE_INSTR)
-                    {
-                        skip_enq_call = 1;
-                    }
-                }
-
-                if(!skip_enq_call)
-                {
+                if(!dec_instr->IsStoreInstr()){
                     // Add to Delay Buffer; Will be Updated Later
                     irbuilder.CreateCall3(p_enq_result, p_proc_state, result, Geti8Value(dec_instr->GetDelaySlots()));
                 }
+
+                if(dec_instr->IsLoadStoreInstruction()){
+                    // We can have a possible side effect in case of load store instructions
+                    irbuilder.CreateCall2(p_update_immed, p_proc_state, result);
+                }
             }
-            else
-            {
+            else {
                 // Immediate Update;
                 irbuilder.CreateCall2(p_update_immed, p_proc_state, result);
             }
