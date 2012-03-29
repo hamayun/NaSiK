@@ -42,7 +42,7 @@ using namespace std;
 #define GEN_FUNC_INFO 0
 
 //#define DOUT            cerr << __PRETTY_FUNCTION__ << " "
-#define DOUT            cout << "<" << __func__ << ">: "
+#define DOUT            cout << "<" << __func__ << ":" << dec << __LINE__ << ">: "
 #define COUT            cout << "<" << __func__ << ">: "
 #define WARN            cerr << __func__ << "():" << __LINE__ << " :: WARNING !!! "
 #define INFO            if(GEN_FUNC_INFO) cout
@@ -50,6 +50,10 @@ using namespace std;
 #define FMT_CHAR        "0x" << hex << setfill('0') << setw(2)
 #define FMT_SHORT       "0x" << hex << setfill('0') << setw(4)
 #define FMT_INT         "0x" << hex << setfill('0') << setw(8)
+
+#define FMT_HEX2        hex << setfill(' ') << setw(2)
+#define FMT_HEX4        hex << setfill(' ') << setw(4)
+#define FMT_HEX8        hex << setfill(' ') << setw(8)
 
 #ifdef __cplusplus
 #define ASSERT(condition,msg) if(!(condition))                              \

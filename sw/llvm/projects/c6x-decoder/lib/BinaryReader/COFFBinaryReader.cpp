@@ -24,6 +24,8 @@
 
 namespace native
 {
+    string loadable_sections[] = {".text", ".const", ".data", ".cinit", ".pinit", ".far", ".switch", ".cio", ".ppinfo", ".ppdata", ""};
+
     COFFBinaryReader :: COFFBinaryReader(string input_binary_name) : BinaryReader(input_binary_name)
     {
         p_file_out = new ofstream("header_tables.txt", ios::out);
@@ -104,6 +106,12 @@ namespace native
             return;
         }
 
+        (*p_file_out) << "[ #]         COFF SECTION" << setfill(' ')
+                      << setw(10) << "Physical" << setw(10) << "Virtual"
+                      << setw(10) << "Size"     << setw(10) << "PTR RAW"  << setw(10) << "PTR Rel"
+                      << setw(10) << "Rsvd"     << setw(10) << "Num Reloc"<< setw(10) << "Num Line"
+                      << setw(10) << "Flags"    << setw(6)  << "Rsvd2"    << setw(6)  << "Page" << endl;
+
         for (int i=0; i<p_file_header->get_nm_sect_hdrs(); i++){
             p_section_header[i] = new coff2_section_header();
             if(!p_section_header[i]){
@@ -124,17 +132,25 @@ namespace native
             return;
         }
 
-        for (int i=0; i<p_file_header->get_nm_sect_hdrs(); i++){
-            p_section[i] = new coff_section(p_section_header[i]);
-            if(!p_section[i]){
-                DOUT << "Error: Memory Allocation for Section Objects" << endl;
-                return;
+        for (int i=0; i<p_file_header->get_nm_sect_hdrs(); i++)
+        {
+            if(IsLoadableSection(p_section_header[i]->get_name()))
+            {
+                p_section[i] = new coff_section(p_section_header[i]);
+                if(!p_section[i]){
+                    DOUT << "Error: Memory Allocation for Section Objects" << endl;
+                    return;
+                }
+                if(p_section[i]->read(GetInputFileHandle())){
+                    DOUT << "Error: Reading Section" << endl;
+                    return;
+                }
+                //p_section[i]->print(p_file_out);
             }
-            if(p_section[i]->read(GetInputFileHandle())){
-                DOUT << "Error: Reading Section" << endl;
-                return;
+            else
+            {
+                p_section[i] = NULL;   // Explicitly Nulled so as to indicate that its not loaded
             }
-            //p_section[i]->print(p_file_out);
         }
 
         // Now create the sections names to in-memory section structures mapping
@@ -149,7 +165,8 @@ namespace native
         {
             DOUT << "Section: " << setw(18) << setfill(' ') << SMI->first
                  << "  Mapped to: " << FMT_INT << SMI->second << endl;
-        }*/
+        }
+        */
     }
 
     COFFBinaryReader :: ~COFFBinaryReader()
@@ -200,6 +217,16 @@ namespace native
         }
     }
 
+    bool COFFBinaryReader :: IsLoadableSection(char * name)
+    {
+        for(int i = 0; strcmp(loadable_sections[i].c_str(), "") != 0; i++)
+        {
+            if(strcmp(loadable_sections[i].c_str(), name) == 0)
+                return true;
+        }
+        return false;
+    }
+
     uint32_t * COFFBinaryReader :: GetSectionHandle(string section_name)
     {
         SectionMap_Iterator_t EPI = m_sections_map.find(section_name);
@@ -208,6 +235,8 @@ namespace native
             return ((uint32_t *)EPI->second);
         }
 
+        cout << "Searching for Section :" << section_name << endl;
+        cout << "Sections Map Size     :" << dec << m_sections_map.size() << endl;
         ASSERT(p_section != NULL, "Section Not Found");
         return (NULL);
     }

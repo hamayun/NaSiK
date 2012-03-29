@@ -380,20 +380,22 @@ namespace native
 
         int read(ifstream *file, COFFStringTable *p_string_table);
 
-        void print (ostream *out, short sec_num){
-            (*out) << "--- COFF SECTION HEADER --- [" << FMT_SHORT << sec_num << "]" << endl;
-            (*out) << "Section Name: " << (p_name_str?p_name_str:m_name) << endl;
-            (*out) << "Physical Address: " << FMT_INT << m_phy_addr << endl;
-            (*out) << "Virtual Address: " << FMT_INT << m_vir_addr << endl;
-            (*out) << "Section Size: " << FMT_INT << m_size << endl;
-            (*out) << "File PTR Raw Data: " << FMT_INT << m_fptr_raw_data << endl;
-            (*out) << "File PTR Reloc Entries: " << FMT_INT << m_fptr_reloc_entries << endl;
-            (*out) << "Reserved #1: " << FMT_INT << m_reserved_1 << endl;
-            (*out) << "Num Reloc Entries: " << FMT_INT << m_nm_reloc_entries << endl;
-            (*out) << "Num Line Entries: " << FMT_INT << m_nm_line_entries << endl;
-            (*out) << "Flags: " << FMT_INT << m_flags << endl;
-            (*out) << "Reserved #2: " << FMT_SHORT << m_reserved_2 << endl;
-            (*out) << "Mem Page Number: " << FMT_SHORT << m_mem_page_nb << endl << endl;
+        void print (ostream *out, short sec_num)
+        {
+            (*out) << "[" << dec << setfill(' ') << setw(2) << sec_num << "] "    << setfill(' ')
+                   << setw(20) << (p_name_str?p_name_str:m_name)
+                   << "  " << FMT_HEX8 << m_phy_addr
+                   << "  " << FMT_HEX8 << m_vir_addr
+                   << "  " << FMT_HEX8 << m_size
+                   << "  " << FMT_HEX8 << m_fptr_raw_data
+                   << "  " << FMT_HEX8 << m_fptr_reloc_entries
+                   << "  " << FMT_HEX8 << m_reserved_1
+                   << "  " << FMT_HEX8 << m_nm_reloc_entries
+                   << "  " << FMT_HEX8 << m_nm_line_entries
+                   << "  " << FMT_HEX8 << m_flags
+                   << "  " << FMT_HEX4 << m_reserved_2
+                   << "  " << FMT_HEX4 << m_mem_page_nb << endl;
+            return;
         }
 
         void set_name(char *name){

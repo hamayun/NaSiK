@@ -83,6 +83,7 @@ int main (int argc, char ** argv)
     }
 
     section_handle = reader->GetSectionHandle(".text");
+    ASSERT(section_handle != NULL, "Text Section Handle Not Found");
     instr_address  = reader->GetSectionStartAddress(section_handle);
 
     COUT << "Reading Input Binary ... " << endl;

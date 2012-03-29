@@ -63,6 +63,7 @@ namespace native
     public:
         COFFBinaryReader(string input_binary_name);
         virtual ~COFFBinaryReader();
+        virtual bool IsLoadableSection(char * name);
 
         virtual uint32_t *GetSectionHandle(string section_name);
         virtual uint32_t  GetSectionStartAddress(uint32_t * section_handle);

@@ -314,7 +314,8 @@ namespace native
         // Move File Pointer to Start of Section
         file->seekg(get_section_header()->get_fptr_raw_data(), ios::beg);
 
-        for(int i=0; i<m_nm_entries; i++){
+        for(int i=0; i<m_nm_entries; i++)
+        {
             file->read((char*)&value, sizeof(uint32_t));
             if(file->eof() || file->fail()){
                 DOUT << "Error: Reading Instruction From File" << endl;
