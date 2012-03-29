@@ -77,10 +77,11 @@ sim_func_t find_sim_func(uint32_t target_pc)
 }
 
 #ifdef USE_HASH
-sim_func_t hash_sim_func(uint32_t target_pc)
+extern uint32_t TARGET_TEXT_START;
+inline sim_func_t hash_sim_func(uint32_t target_pc)
 {
-    uint32_t index = target_pc >> 2;
-    sim_func_t sim_func = AddressTable[index].func_address;;
+    uint32_t index = (target_pc - TARGET_TEXT_START) >> 2;
+    sim_func_t sim_func = AddressTable[index].func_address;
 
     return (sim_func);
 }

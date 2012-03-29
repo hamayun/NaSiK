@@ -744,13 +744,28 @@ namespace native
         uint32_t         tablesize     = m_addr_table.size();
         llvm::IRBuilder<>  & irbuilder = GetIRBuilder();
         ofstream        * p_text_table = NULL;
+
+        uint32_t          target_text_start = 0;
+        uint32_t          target_text_end   = 0;
         uint32_t          null_entries = 0;
 
         if(use_hash_maps)
         {
-            AddressTable_Iterator_t ATI = m_addr_table.end(); --ATI;
-            cout << "Last Target Address: 0x" << hex << setfill('0') << setw(8) << (*ATI).first << endl;
-            tablesize = ((*ATI).first >> 2) + 1;
+            AddressTable_Iterator_t ATI = m_addr_table.begin();
+            AddressTable_Iterator_t ATE = m_addr_table.end(); --ATE;
+
+            target_text_start = (*ATI).first;
+            target_text_end   = (*ATE).first;
+            tablesize = ((target_text_end - target_text_start) >> 2) + 1;
+
+            Constant *const_target_text_start = irbuilder.getInt32(target_text_start);
+            GlobalVariable* gen_target_text_start = new GlobalVariable(*p_addr_mod,
+                /*Type=*/irbuilder.getInt32Ty(),
+                /*isConstant=*/true,
+                /*Linkage=*/GlobalValue::ExternalLinkage,
+                /*Initializer=*/const_target_text_start,
+                /*Name=*/"TARGET_TEXT_START");
+            gen_target_text_start->setAlignment(32);
         }
 
         if(gen_text_table)
@@ -806,7 +821,7 @@ namespace native
                 ConstantInt * const_target_addr = NULL;
                 llvm::Function * func_decl = (llvm::Function *) p_const_null_fptr;
 
-                if((target_addr >> 2) == index)
+                if(((target_addr - target_text_start) >> 2) == index)
                 {
                     const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, (*ATI).first));
 
