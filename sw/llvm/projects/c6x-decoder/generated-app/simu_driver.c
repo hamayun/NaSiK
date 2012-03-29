@@ -76,6 +76,16 @@ sim_func_t find_sim_func(uint32_t target_pc)
     return (sim_func);
 }
 
+#ifdef USE_HASH
+sim_func_t hash_sim_func(uint32_t target_pc)
+{
+    uint32_t index = target_pc >> 2;
+    sim_func_t sim_func = AddressTable[index].func_address;;
+
+    return (sim_func);
+}
+#endif
+
 int main(int argc, char **argv, char **environ)
 {
     sim_func_t curr_func = NULL;
@@ -88,7 +98,13 @@ int main(int argc, char **argv, char **environ)
     while(1)
     {
         if(next_func_ptr == NULL)
+        {
+#ifdef USE_HASH
+            curr_func = hash_sim_func(p_state.m_reg[REG_PC_INDEX]);
+#else
             curr_func = find_sim_func(p_state.m_reg[REG_PC_INDEX]);
+#endif
+        }
         else
             curr_func = next_func_ptr;
 
@@ -150,7 +166,7 @@ int main(int argc, char **argv, char **environ)
         }
 #endif
     }
-    
+
     return 0;
 }
 

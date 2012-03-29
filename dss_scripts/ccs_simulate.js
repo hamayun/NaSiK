@@ -21,8 +21,8 @@ script.traceSetFileLevel(TraceLevel.OFF);
 
 // Get the Debug Server and start a Debug Session
 debugServer = script.getServer("DebugServer.1");
-debugServer.setConfig("../C64/tisim_c64xple.ccxml");
-//debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64x_LE_CycleAccurate.ccxml");
+//debugServer.setConfig("../C64/tisim_c64xple.ccxml");
+debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64x_LE_CycleAccurate.ccxml");
 debugSession = debugServer.openSession(".*");
 
 //var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";

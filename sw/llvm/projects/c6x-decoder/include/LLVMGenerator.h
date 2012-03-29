@@ -200,7 +200,7 @@ namespace native
         virtual int32_t OptimizeModule();
         virtual int32_t OptimizeFunction(llvm::Function * func);
 
-        virtual int32_t WriteAddressingTable();
+        virtual int32_t WriteAddressingTable(bool use_hash_maps, bool gen_text_table = false);
         virtual int32_t WriteBinaryConfigs(BinaryReader * reader);
         virtual int32_t WriteBitcodeFile();
 

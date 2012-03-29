@@ -739,10 +739,31 @@ namespace native
         return (0);
     }
 
-    int32_t LLVMGenerator :: WriteAddressingTable()
+    int32_t LLVMGenerator :: WriteAddressingTable(bool use_hash_maps, bool gen_text_table)
     {
         uint32_t         tablesize     = m_addr_table.size();
         llvm::IRBuilder<>  & irbuilder = GetIRBuilder();
+        ofstream        * p_text_table = NULL;
+        uint32_t          null_entries = 0;
+
+        if(use_hash_maps)
+        {
+            AddressTable_Iterator_t ATI = m_addr_table.end(); --ATI;
+            cout << "Last Target Address: 0x" << hex << setfill('0') << setw(8) << (*ATI).first << endl;
+            tablesize = ((*ATI).first >> 2) + 1;
+        }
+
+        if(gen_text_table)
+        {
+            p_text_table = new ofstream("GlobalAddrMap.txt", ios::out);
+            if(!p_text_table->is_open())
+            {
+                DOUT << "Error: Creating Text Table File" << endl;
+                return (EXIT_FAILURE);
+            }
+
+            (*p_text_table) << "Global Address Table Size: " << tablesize << endl;
+        }
 
         // Type Definitions
         std::vector<const Type*> gen_struct_elems;
@@ -776,32 +797,98 @@ namespace native
 
         std::vector<Constant*> const_array_elems;
 
-        for(AddressTable_Iterator_t ATI = m_addr_table.begin(), ATE = m_addr_table.end(); ATI != ATE; ++ATI)
+        AddressTable_Iterator_t ATI = m_addr_table.begin();
+        for(uint32_t index = 0; index < tablesize; index++)
         {
-            ConstantInt* const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, (*ATI).first));
+            if(use_hash_maps)
+            {
+                uint32_t target_addr = (*ATI).first;
+                ConstantInt * const_target_addr = NULL;
+                llvm::Function * func_decl = (llvm::Function *) p_const_null_fptr;
 
-            // Add External Function Declarations
-            llvm::Function* func_ptr = (*ATI).second;
-            llvm::Function* func_decl = Function::Create(
-                /*Type=*/func_ptr->getFunctionType(),
-                /*Linkage=*/GlobalValue::ExternalLinkage,
-                /*Name=*/func_ptr->getNameStr(), p_addr_mod); // (external, no body)
-            func_decl->setCallingConv(CallingConv::C);
-            AttrListPtr func_decl_PAL;
-            func_decl->setAttributes(func_decl_PAL);
+                if((target_addr >> 2) == index)
+                {
+                    const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, (*ATI).first));
 
-            // Create Addressing Table Entry (Target Address, Native Function Pointer)
-            std::vector<Constant*> const_struct_fields;
-            const_struct_fields.push_back(const_target_addr);
-            const_struct_fields.push_back(func_decl);
+                    // Add External Function Declarations
+                    llvm::Function* func_ptr = (*ATI).second;
+                    func_decl = Function::Create(/*Type=*/func_ptr->getFunctionType(),
+                        /*Linkage=*/GlobalValue::ExternalLinkage,/*Name=*/func_ptr->getNameStr(), p_addr_mod); // (external, no body)
+                    func_decl->setCallingConv(CallingConv::C);
+                    AttrListPtr func_decl_PAL;
+                    func_decl->setAttributes(func_decl_PAL);
+                    // Move to the Next Entry in Address Map
+                    ATI++;
 
-            Constant* const_gen_entry = ConstantStruct::get(gen_addr_entry_ty, const_struct_fields);
-            const_array_elems.push_back(const_gen_entry);
+                    if(gen_text_table)
+                    {
+                        (*p_text_table) << "[" << dec << index << "]: 0x" << hex << setfill('0') << setw(8) << target_addr
+                                        << " --> @" << func_ptr->getNameStr() << endl;
+                    }
+                }
+                else
+                {
+                    const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, 0));
+                    if(gen_text_table)
+                    {
+                        (*p_text_table) << "[" << dec << index << "]: 0x0 --> NULL" << endl;
+                    }
+                    null_entries++;
+                }
+
+                // Create Addressing Table Entry (Target Address, Native Function Pointer)
+                std::vector<Constant*> const_struct_fields;
+                const_struct_fields.push_back(const_target_addr);
+                const_struct_fields.push_back(func_decl);
+
+                Constant* const_gen_entry = ConstantStruct::get(gen_addr_entry_ty, const_struct_fields);
+                const_array_elems.push_back(const_gen_entry);
+            }
+            else
+            {
+                ConstantInt* const_target_addr = ConstantInt::get(GetContext(), llvm::APInt(32, (*ATI).first));
+
+                // Add External Function Declarations
+                llvm::Function* func_ptr = (*ATI).second;
+                llvm::Function* func_decl = Function::Create(/*Type=*/func_ptr->getFunctionType(),
+                    /*Linkage=*/GlobalValue::ExternalLinkage,/*Name=*/func_ptr->getNameStr(), p_addr_mod); // (external, no body)
+                func_decl->setCallingConv(CallingConv::C);
+                AttrListPtr func_decl_PAL;
+                func_decl->setAttributes(func_decl_PAL);
+
+                // Create Addressing Table Entry (Target Address, Native Function Pointer)
+                std::vector<Constant*> const_struct_fields;
+                const_struct_fields.push_back(const_target_addr);
+                const_struct_fields.push_back(func_decl);
+
+                Constant* const_gen_entry = ConstantStruct::get(gen_addr_entry_ty, const_struct_fields);
+                const_array_elems.push_back(const_gen_entry);
+
+                // Move to the Next Entry in Address Map
+                ATI++;
+                if(gen_text_table)
+                {
+                    (*p_text_table) << "[" << dec << index << "]: 0x" << hex << setfill('0') << setw(8) << (*ATI).first
+                                    << " --> @" << func_ptr->getNameStr() << endl;
+                }
+            }
         }
 
         // Now Actually Initialize the Addressing Table
         Constant* const_array = ConstantArray::get(gen_addr_table_ty, const_array_elems);
         gen_addr_table->setInitializer(const_array);
+
+        if(gen_text_table)
+        {
+            p_text_table->close();
+            p_text_table = NULL;
+        }
+
+        if(use_hash_maps)
+        {
+            cout << "NULL Hash Entries  : " << dec << null_entries << ", Table Size: " << tablesize << " ["
+                 << ((float)null_entries/tablesize) * 100 << "%]" << endl;
+        }
 
         return (0);
     }
@@ -874,7 +961,7 @@ namespace native
         p_fpm->add(createCFGSimplificationPass());
         p_fpm->add(createDeadStoreEliminationPass());
 
-        //p_fpm->add(createCFGOnlyPrinterPass("_1"));
+        p_fpm->add(createCFGOnlyPrinterPass("_1"));
     }
 
     int32_t LLVMGenerator :: OptimizeModule()

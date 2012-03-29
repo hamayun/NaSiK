@@ -59,7 +59,7 @@ int32_t EnQ_Delay_Result(C62x_DSPState_t * p_state, C62x_Result_t * result, uint
 
     if(result->m_type & C62X_REGISTER)
     {
-        TRACE_PRINT("%s: Type = C62X_REGISTER, %s = 0x%08X, Delay = %d\n",
+        TRACE(VERBOSE_LEVEL, "%s: Type = C62X_REGISTER, %s = 0x%08X, Delay = %d\n",
                     __func__, REG(result->m_reg_id[RESULT_LREG_IDX]), result->m_value[RESULT_LREG_IDX], delay_slots);
 
         tail_node->m_reg_id = result->m_reg_id[RESULT_LREG_IDX];
@@ -70,7 +70,7 @@ int32_t EnQ_Delay_Result(C62x_DSPState_t * p_state, C62x_Result_t * result, uint
 
     if(result->m_type & C62X_MULTIREG)
     {
-        TRACE_PRINT("%s: Type = C62X_MULTIREG, %s = 0x%08X, %s = 0x%08X, Delay = %d\n",
+        TRACE(VERBOSE_LEVEL, "%s: Type = C62X_MULTIREG, %s = 0x%08X, %s = 0x%08X, Delay = %d\n",
                     __func__, REG(result->m_reg_id[RESULT_LREG_IDX]), result->m_value[RESULT_LREG_IDX],
                     REG(result->m_reg_id[RESULT_HREG_IDX]), result->m_value[RESULT_HREG_IDX], delay_slots);
 
@@ -93,7 +93,7 @@ int32_t Update_Immediate(C62x_DSPState_t * p_state, C62x_Result_t * result)
 {
     if(result->m_type & C62X_REGISTER)
     {
-        TRACE_PRINT("%s: Type = C62X_REGISTER, %s = 0x%08X\n",
+        TRACE(VERBOSE_LEVEL, "%s: Type = C62X_REGISTER, %s = 0x%08X\n",
                     __func__, REG(result->m_reg_id[RESULT_LREG_IDX]), result->m_value[RESULT_LREG_IDX]);
 
         p_state->m_reg[result->m_reg_id[RESULT_LREG_IDX]] = result->m_value[RESULT_LREG_IDX];
@@ -102,7 +102,7 @@ int32_t Update_Immediate(C62x_DSPState_t * p_state, C62x_Result_t * result)
 
     if(result->m_type & C62X_MULTIREG)
     {
-        TRACE_PRINT("%s: Type = C62X_MULTIREG, %s = 0x%08X, %s = 0x%08X\n",
+        TRACE(VERBOSE_LEVEL, "%s: Type = C62X_MULTIREG, %s = 0x%08X, %s = 0x%08X\n",
                     __func__, REG(result->m_reg_id[RESULT_LREG_IDX]), result->m_value[RESULT_LREG_IDX],
                     REG(result->m_reg_id[RESULT_HREG_IDX]), result->m_value[RESULT_HREG_IDX]);
 
@@ -113,7 +113,7 @@ int32_t Update_Immediate(C62x_DSPState_t * p_state, C62x_Result_t * result)
 
     if(result->m_type & C62X_SREG_UPDATE)
     {
-        TRACE_PRINT("%s: Type = C62X_SREG_UPDATE, %s = 0x%08X\n",
+        TRACE(VERBOSE_LEVEL, "%s: Type = C62X_SREG_UPDATE, %s = 0x%08X\n",
                     __func__, REG(result->m_reg_id[RESULT_SREG_IDX]), result->m_value[RESULT_SREG_IDX]);
 
         p_state->m_reg[result->m_reg_id[RESULT_SREG_IDX]] = result->m_value[RESULT_SREG_IDX];
@@ -261,17 +261,17 @@ int32_t Do_Memory_Writebacks(C62x_DSPState_t * p_state)
         {
             case MWB_BYTE:
                 *((uint8_t *) mwb_node->m_addr) = (uint8_t) mwb_node->m_value;
-                TRACE_PRINT("Mem[%08X]=%02X\n", mwb_node->m_addr, (uint8_t) mwb_node->m_value);
+                TRACE(VERBOSE_LEVEL, "Mem[%08X]=%02X\n", mwb_node->m_addr, (uint8_t) mwb_node->m_value);
                 break;
 
             case MWB_HWORD:
                 *((uint16_t *) mwb_node->m_addr) = (uint16_t) mwb_node->m_value;
-                TRACE_PRINT("Mem[%08X]=%04X\n", mwb_node->m_addr, (uint16_t) mwb_node->m_value);
+                TRACE(VERBOSE_LEVEL, "Mem[%08X]=%04X\n", mwb_node->m_addr, (uint16_t) mwb_node->m_value);
                 break;
 
             case MWB_WORD:
                 *((uint32_t *) mwb_node->m_addr) = (uint32_t) mwb_node->m_value;
-                TRACE_PRINT("Mem[%08X]=%08X\n", mwb_node->m_addr, (uint32_t) mwb_node->m_value);
+                TRACE(VERBOSE_LEVEL, "Mem[%08X]=%08X\n", mwb_node->m_addr, (uint32_t) mwb_node->m_value);
                 break;
 
             default:
@@ -345,7 +345,7 @@ C62xABS_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tABS       %s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tABS       %s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
     }
     return OK;
@@ -374,7 +374,7 @@ C62xABS_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%010x\tABS       %s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%010x\tABS       %s:%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -394,7 +394,7 @@ C62xADD_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADD       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADD       %s,%s,%s\n",
                Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -415,7 +415,7 @@ C62xADD_SR32_SR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tADD       %s,%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADD       %s,%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -439,7 +439,7 @@ C62xADD_SR32_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tADD       %s,%s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADD       %s,%s:%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -457,7 +457,7 @@ C62xADD_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADD       0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADD       0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -475,7 +475,7 @@ C62xADD_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADD       %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADD       %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -499,7 +499,7 @@ C62xADD_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tADD       0x%x,%s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADD       0x%x,%s:%s,%s:%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -522,7 +522,7 @@ C62xADDAB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADDAB     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDAB     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -544,7 +544,7 @@ C62xADDAB_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADDAB     %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDAB     %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -567,7 +567,7 @@ C62xADDAH_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADDAH     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDAH     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -589,7 +589,7 @@ C62xADDAH_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADDAH     %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDAH     %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -612,7 +612,7 @@ C62xADDAW_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADDAW     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDAW     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -634,7 +634,7 @@ C62xADDAW_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADDAW     %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDAW     %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -652,7 +652,7 @@ C62xADDK_SC16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, 
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADDK      0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDK      0x%x,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rd));
     }
     return OK;
@@ -674,7 +674,7 @@ C62xADDU_UR32_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tADDU      %s,%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDU      %s,%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -698,7 +698,7 @@ C62xADDU_UR32_UR40_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tADDU      %s,%s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADDU      %s,%s:%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -724,7 +724,7 @@ C62xADD2_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tADD2      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tADD2      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -747,7 +747,7 @@ C62xAND_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tAND       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tAND       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -765,7 +765,7 @@ C62xAND_SC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tAND       0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tAND       0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -805,7 +805,7 @@ C62xB_SC23(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t
 
         SAVE_REGISTER_RESULT(result, REG_PC_INDEX, rd);
         
-        TRACE_PRINT("%08x\t[%s] B       0x%x\n", Get_DSP_PC(p_state), REG(idx_rc), rd);
+        TRACE(INFO_LEVEL, "%08x\t[%s] B       0x%x\n", Get_DSP_PC(p_state), REG(idx_rc), rd);
     }
     return OK;
 }
@@ -857,7 +857,7 @@ C62xB_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t
 
         SAVE_REGISTER_RESULT(result, REG_PC_INDEX, rd);
 
-        TRACE_PRINT("%08x\tB         %s\n", Get_DSP_PC(p_state), REG(idx_ra));
+        TRACE(INFO_LEVEL, "%08x\tB         %s\n", Get_DSP_PC(p_state), REG(idx_ra));
     }
     return OK;
 }
@@ -885,7 +885,7 @@ C62xCLR_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCLR       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCLR       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -912,7 +912,7 @@ C62xCLR_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCLR       %s,0x%x,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCLR       %s,0x%x,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), csta, cstb, REG(idx_rd));
     }
     return OK;
@@ -931,7 +931,7 @@ C62xCMPEQ_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPEQ     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPEQ     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -949,7 +949,7 @@ C62xCMPEQ_SC5_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPEQ     0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPEQ     0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -969,7 +969,7 @@ C62xCMPEQ_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPEQ     %s,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPEQ     %s,%s:%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -989,7 +989,7 @@ C62xCMPEQ_SC5_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPEQ     0x%x,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPEQ     0x%x,%s:%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1037,7 +1037,7 @@ C62xCMPGT_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPGT     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPGT     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1055,7 +1055,7 @@ C62xCMPGT_SC5_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPGT     0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPGT     0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1075,7 +1075,7 @@ C62xCMPGT_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPGT     %s,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPGT     %s,%s:%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1095,7 +1095,7 @@ C62xCMPGT_SC5_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPGT     0x%x,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPGT     0x%x,%s:%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1120,7 +1120,7 @@ C62xCMPGTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPGTU     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPGTU     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1138,7 +1138,7 @@ C62xCMPGTU_UC4_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPGTU    0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPGTU    0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1158,7 +1158,7 @@ C62xCMPGTU_UR32_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPGTU    %s,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPGTU    %s,%s:%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1178,7 +1178,7 @@ C62xCMPGTU_UC4_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPGTU    0x%x,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPGTU    0x%x,%s:%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1197,7 +1197,7 @@ C62xCMPLT_SR32_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPLT     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPLT     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1215,7 +1215,7 @@ C62xCMPLT_SC5_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPLT     0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPLT     0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1235,7 +1235,7 @@ C62xCMPLT_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPLT     %s,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPLT     %s,%s:%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1255,7 +1255,7 @@ C62xCMPLT_SC5_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPLT     0x%x,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPLT     0x%x,%s:%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1274,7 +1274,7 @@ C62xCMPLTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPLTU     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPLTU     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1292,7 +1292,7 @@ C62xCMPLTU_UC4_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPLTU    0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPLTU    0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1312,7 +1312,7 @@ C62xCMPLTU_UR32_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPLTU    %s,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPLTU    %s,%s:%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1332,7 +1332,7 @@ C62xCMPLTU_UC4_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tCMPLTU    0x%x,%s:%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCMPLTU    0x%x,%s:%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rd));
     }
     return OK;
@@ -1355,7 +1355,7 @@ C62xEXT_UR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tEXT       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tEXT       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1376,7 +1376,7 @@ C62xEXT_SR32_UC5_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tEXT       %s,0x%x,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tEXT       %s,0x%x,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), csta, cstb, REG(idx_rd));
     }
     return OK;
@@ -1399,7 +1399,7 @@ C62xEXTU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tEXTU      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tEXTU      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1420,7 +1420,7 @@ C62xEXTU_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tEXTU       %s,0x%x,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tEXTU       %s,0x%x,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), csta, cstb, REG(idx_rd));
     }
     return OK;
@@ -1437,7 +1437,7 @@ C62xIDLE(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t i
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        TRACE_PRINT("%08x\tIDLE\n", Get_DSP_PC(p_state));
+        TRACE(INFO_LEVEL, "%08x\tIDLE\n", Get_DSP_PC(p_state));
     }
     return WAIT_FOR_INTERRUPT;
 }
@@ -1518,7 +1518,7 @@ C62xLDB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tLDB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd, (int8_t) rd);
     }
     return OK;
@@ -1544,7 +1544,7 @@ C62xLDB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd, (int8_t) rd);
     }
     return OK;
@@ -1570,7 +1570,7 @@ C62xLDB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tLDB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int8_t) rd, (int8_t) rd);
     }
     return OK;
@@ -1597,7 +1597,7 @@ C62xLDBU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tLDBU      %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd, (uint8_t) rd);
     }
     return OK;
@@ -1622,7 +1622,7 @@ C62xLDBU_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd, (uint8_t) rd);
     }
     return OK;
@@ -1647,7 +1647,7 @@ C62xLDBU_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tLDBU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) rd, (uint8_t) rd);
     }
     return OK;
@@ -1676,7 +1676,7 @@ C62xLDH_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDH       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDH       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int16_t) rd);
     }
     return OK;
@@ -1702,7 +1702,7 @@ C62xLDH_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int16_t) rd);
     }
     return OK;
@@ -1728,7 +1728,7 @@ C62xLDH_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int16_t) rd);
     }
     return OK;
@@ -1756,7 +1756,7 @@ C62xLDHU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDHU      %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDHU      %s,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int16_t) rd);
     }
     return OK;
@@ -1781,7 +1781,7 @@ C62xLDHU_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDHU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDHU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int16_t) rd);
     }
     return OK;
@@ -1806,7 +1806,7 @@ C62xLDHU_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDHU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDHU      0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X => 0x%04X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (int16_t) rd);
     }
     return OK;
@@ -1834,7 +1834,7 @@ C62xLDW_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDW       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDW       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -1859,7 +1859,7 @@ C62xLDW_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -1884,7 +1884,7 @@ C62xLDW_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLDW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
+        TRACE(INFO_LEVEL, "%08x\tLDW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr));
     }
     return OK;
@@ -1911,17 +1911,17 @@ C62xLMBD_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         if(!detect_one)
             rb = ~rb;  /* Invert bits; So we always look for the left most 1 bit */
 
-        TRACE_PRINT("detect_one = %d\n", detect_one);
+        TRACE(VERBOSE_LEVEL, "detect_one = %d\n", detect_one);
 
         while(!(mask & rb) && mask)
         {
             rd++; mask >>= 1;
-            TRACE_PRINT("rd = %2d, mask = 0x%08X\n", rd, mask);
+            TRACE(VERBOSE_LEVEL, "rd = %2d, mask = 0x%08X\n", rd, mask);
         }
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tLMBD      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tLMBD      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1941,16 +1941,16 @@ C62xLMBD_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if(!detect_one)
             rb = ~rb;  /* Invert bits; So we always look for the left most 1 bit */
 
-        TRACE_PRINT("detect_one = %d\n", detect_one);
+        TRACE(VERBOSE_LEVEL, "detect_one = %d\n", detect_one);
 
         while(!(mask & rb) && mask)
         {
             rd++; mask >>= 1;
-            TRACE_PRINT("rd = %2d, mask = 0x%08X\n", rd, mask);
+            TRACE(VERBOSE_LEVEL, "rd = %2d, mask = 0x%08X\n", rd, mask);
         }
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
-        TRACE_PRINT("%08x\tLMBD      0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tLMBD      0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1969,7 +1969,7 @@ C62xMPY_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPY       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPY       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -1988,7 +1988,7 @@ C62xMPY_SC5_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPY       0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPY       0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2007,7 +2007,7 @@ C62xMPYH_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYH      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYH      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2026,7 +2026,7 @@ C62xMPYHL_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYHL     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYHL     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2045,7 +2045,7 @@ C62xMPYHLU_UR16_UR16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYHLU    %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYHLU    %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2064,7 +2064,7 @@ C62xMPYHSLU_SR16_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYHSLU   %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYHSLU   %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2083,7 +2083,7 @@ C62xMPYHSU_SR16_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYHSU    %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYHSU    %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2102,7 +2102,7 @@ C62xMPYHU_UR16_UR16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYHU     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYHU     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2121,7 +2121,7 @@ C62xMPYHULS_UR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYHULS   %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYHULS   %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2140,7 +2140,7 @@ C62xMPYHUS_UR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYHUS   %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYHUS   %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2159,7 +2159,7 @@ C62xMPYLH_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYLH    %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYLH    %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2178,7 +2178,7 @@ C62xMPYLHU_UR16_UR16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYLHU   %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYLHU   %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2197,7 +2197,7 @@ C62xMPYLSHU_SR16_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYLSHU   %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYLSHU   %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2216,7 +2216,7 @@ C62xMPYLUHS_UR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t b
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYLUHS   %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYLUHS   %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2235,7 +2235,7 @@ C62xMPYSU_SR16_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYSU     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYSU     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2254,7 +2254,8 @@ C62xMPYSU_SC5_UR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYSU     0x%x,%s,%s\n",
+
+        TRACE(INFO_LEVEL, "%08x\tMPYSU     0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2273,7 +2274,7 @@ C62xMPYU_UR16_UR16_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYU      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYU      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2292,7 +2293,7 @@ C62xMPYUS_UR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMPYUS      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMPYUS      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2309,7 +2310,7 @@ C62xMV_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, ui
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tMV        %s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMV        %s:%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -2325,7 +2326,7 @@ C62xMV_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, ui
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMV        %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
+        TRACE(INFO_LEVEL, "%08x\tMV        %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
     }
     return OK;
 }
@@ -2340,7 +2341,7 @@ C62xMV_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, ui
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMV        %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
+        TRACE(INFO_LEVEL, "%08x\tMV        %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
     }
     return OK;
 }
@@ -2370,7 +2371,7 @@ C62xMVC_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
             SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-            TRACE_PRINT("%08x\tMVC        %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
+            TRACE(INFO_LEVEL, "%08x\tMVC        %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
         }
         else
         {
@@ -2390,7 +2391,7 @@ C62xMVK_SC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMVK       0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMVK       0x%x,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rd));
     }
     return OK;
@@ -2408,7 +2409,7 @@ C62xMVKH_UC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, 
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMVKH      0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMVKH      0x%x,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rd));
     }
     return OK;
@@ -2426,7 +2427,7 @@ C62xMVKLH_UC16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero,
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tMVKLH     0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tMVKLH     0x%x,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rd));
     }
     return OK;
@@ -2442,7 +2443,7 @@ C62xNEG_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tNEG       %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
+        TRACE(INFO_LEVEL, "%08x\tNEG       %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
     }
     return OK;
 }
@@ -2463,7 +2464,7 @@ C62xNEG_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tNEG       %s:%s,%s:%s\n", Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rdh), REG(idx_rdl));
+        TRACE(INFO_LEVEL, "%08x\tNEG       %s:%s,%s:%s\n", Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }
@@ -2486,7 +2487,7 @@ C62xNOP(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t id
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        TRACE_PRINT("%08x\tNOP\n", Get_DSP_PC(p_state));
+        TRACE(INFO_LEVEL, "%08x\tNOP\n", Get_DSP_PC(p_state));
     }
     return OK;
 }
@@ -2500,7 +2501,7 @@ C62xNOP_UC4(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_
         uint32_t nop_count = GET_BITS_0_TO_3(constant) - 1;
         uint32_t new_pc = 0;
 
-        TRACE_PRINT("%08x\tNOP       0x%x\n", Get_DSP_PC(p_state), constant);
+        TRACE(INFO_LEVEL, "%08x\tNOP       0x%x\n", Get_DSP_PC(p_state), constant);
         for(uint32_t i = 0; i < nop_count; i++)
         {
             //printf("Multi-Cycle NOP; i = %d\n", i);
@@ -2511,7 +2512,7 @@ C62xNOP_UC4(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_
             new_pc = Update_Registers(p_state);
             if(new_pc)
             {
-                TRACE_PRINT("Multi-Cycle NOP Early Termination [i=%d]; PC Updated\n", i);
+                TRACE(VERBOSE_LEVEL, "Multi-Cycle NOP Early Termination [i=%d]; PC Updated\n", i);
                 return PC_UPDATED;
             }
         }
@@ -2534,12 +2535,12 @@ C62xNORM_SR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, 
         while(((ra & mask) == signbit) && mask)
         {
             rd++; mask >>= 1; signbit >>= 1;
-            TRACE_PRINT("rd = %2d, mask = 0x%08X, signbit = 0x%08X\n", rd, mask, signbit);
+            TRACE(VERBOSE_LEVEL, "rd = %2d, mask = 0x%08X, signbit = 0x%08X\n", rd, mask, signbit);
         }
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tNORM      %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
+        TRACE(INFO_LEVEL, "%08x\tNORM      %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
     }
     return OK;
 }
@@ -2565,7 +2566,7 @@ C62xNORM_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, 
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tNORM      %s:%s,%s\n", Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rd));
+        TRACE(INFO_LEVEL, "%08x\tNORM      %s:%s,%s\n", Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rd));
     }
     return OK;
 }
@@ -2581,7 +2582,7 @@ C62xNOT_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tNOT       %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
+        TRACE(INFO_LEVEL, "%08x\tNOT       %s,%s\n", Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rd));
     }
     return OK;
 }
@@ -2598,7 +2599,7 @@ C62xOR_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tOR        %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tOR        %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2616,7 +2617,7 @@ C62xOR_SC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tOR        0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tOR        0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2654,12 +2655,12 @@ C62xSADD_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         if((ra > 0) && (rb > 0) && (rd < 0))
         {
             rd = 0x7FFFFFFF; sflag = 1;
-            TRACE_PRINT("+VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "+VE Saturation\n");
         }
         else if((ra < 0) && (rb < 0) && (rd > 0))
         {
             rd = 0x80000000; sflag = 1;
-            TRACE_PRINT("-VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "-VE Saturation\n");
         }
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
@@ -2671,7 +2672,7 @@ C62xSADD_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSADD      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSADD      %s,%s,%s\n",
                     Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2694,12 +2695,12 @@ C62xSADD_SR32_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         if((ra > 0) && (rb > 0) && (rd < 0))
         {
             rd = 0x7FFFFFFFFF; sflag = 1;
-            TRACE_PRINT("+VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "+VE Saturation\n");
         }
         else if((ra < 0) && (rb < 0) && (rd > 0))
         {
             rd = 0x8000000000; sflag = 1;
-            TRACE_PRINT("-VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "-VE Saturation\n");
         }
 
         int32_t rdh = U64_TO_C6XMSB12(rd);
@@ -2714,7 +2715,7 @@ C62xSADD_SR32_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSADD      %s,%s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSADD      %s,%s:%s,%s:%s\n",
                     Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -2735,12 +2736,12 @@ C62xSADD_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if((ra > 0) && (rb > 0) && (rd < 0))
         {
             rd = 0x7FFFFFFF; sflag = 1;
-            TRACE_PRINT("+VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "+VE Saturation\n");
         }
         else if((ra < 0) && (rb < 0) && (rd > 0))
         {
             rd = 0x80000000; sflag = 1;
-            TRACE_PRINT("-VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "-VE Saturation\n");
         }
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
@@ -2752,7 +2753,7 @@ C62xSADD_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSADD      0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSADD      0x%x,%s,%s\n",
                     Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2775,12 +2776,12 @@ C62xSADD_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if((ra > 0) && (rb > 0) && (rd < 0))
         {
             rd = 0x7FFFFFFFFF; sflag = 1;
-            TRACE_PRINT("+VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "+VE Saturation\n");
         }
         else if((ra < 0) && (rb < 0) && (rd > 0))
         {
             rd = 0x8000000000; sflag = 1;
-            TRACE_PRINT("-VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "-VE Saturation\n");
         }
 
         int32_t rdh = U64_TO_C6XMSB12(rd);
@@ -2795,7 +2796,7 @@ C62xSADD_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSADD      0x%x,%s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSADD      0x%x,%s:%s,%s:%s\n",
                     Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -2824,12 +2825,12 @@ C62xSAT_SR40_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
         if(!(ra & 0x8000000000) && ra > 0x7FFFFFFF)
         {
             rd = 0x7FFFFFFF; sflag = 1;
-            TRACE_PRINT("+VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "+VE Saturation\n");
         }
         else if((ra & 0x8000000000) && ral < 0x80000000)
         {
             rd = 0x80000000; sflag = 1;
-            TRACE_PRINT("-VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "-VE Saturation\n");
         }
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
@@ -2841,7 +2842,7 @@ C62xSAT_SR40_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, u
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSAT       %s:%s,%s\n", Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rd));
+        TRACE(INFO_LEVEL, "%08x\tSAT       %s:%s,%s\n", Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rd));
     }
     return OK;
 }
@@ -2885,7 +2886,7 @@ C62xSET_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSET       %s,%d,%d,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSET       %s,%d,%d,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), csta, cstb, REG(idx_rd));
     }
     return OK;
@@ -2924,7 +2925,7 @@ C62xSET_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSET       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSET       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2956,7 +2957,7 @@ C62xSHL_SR32_UR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSHL       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHL       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -2982,7 +2983,7 @@ C62xSHL_SR40_UR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSHL       %s:%s,%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHL       %s:%s,%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3008,7 +3009,7 @@ C62xSHL_UR32_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSHL       %s,%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHL       %s,%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3027,7 +3028,7 @@ C62xSHL_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSHL       %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHL       %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), shift, REG(idx_rd));
     }
     return OK;
@@ -3051,7 +3052,7 @@ C62xSHL_SR40_UC5_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSHL       %s:%s,0x%x,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHL       %s:%s,0x%x,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), shift, REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3073,7 +3074,7 @@ C62xSHL_UR32_UC5_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSHL       %s,0x%x,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHL       %s,0x%x,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), shift, REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3103,7 +3104,7 @@ C62xSHR_SR32_UR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSHR       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHR       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3129,7 +3130,7 @@ C62xSHR_SR40_UR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSHR       %s:%s,%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHR       %s:%s,%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3148,7 +3149,7 @@ C62xSHR_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSHR       %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHR       %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), shift, REG(idx_rd));
     }
     return OK;
@@ -3172,7 +3173,7 @@ C62xSHR_SR40_UC5_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSHR       %s:%s,0x%x,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHR       %s:%s,0x%x,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), shift, REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3203,7 +3204,7 @@ C62xSHRU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSHRU      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHRU      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3229,7 +3230,7 @@ C62xSHRU_UR40_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSHRU      %s:%s,%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHRU      %s:%s,%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3248,7 +3249,7 @@ C62xSHRU_UR32_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSHRU      %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHRU      %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), shift, REG(idx_rd));
     }
     return OK;
@@ -3272,7 +3273,7 @@ C62xSHRU_UR40_UC5_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSHRU      %s:%s,0x%x,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSHRU      %s:%s,0x%x,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), shift, REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3312,7 +3313,7 @@ C62xSMPY_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSMPY      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSMPY      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3345,7 +3346,7 @@ C62xSMPYH_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSMPYH     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSMPYH     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3378,7 +3379,7 @@ C62xSMPYHL_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSMPYHL    %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSMPYHL    %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3411,7 +3412,7 @@ C62xSMPYLH_SR16_SR16_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSMPYLH    %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSMPYLH    %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3470,7 +3471,7 @@ C62xSSHL_SR32_UR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSSHL       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSSHL       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3521,7 +3522,7 @@ C62xSSHL_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSSHL       %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSSHL       %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), shift, REG(idx_rd));
     }
     return OK;
@@ -3554,12 +3555,12 @@ C62xSSUB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         if((ra < 0) && (rb > 0) && (rd > 0))
         {
             rd = 0x80000000; sflag = 1;
-            TRACE_PRINT("-VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "-VE Saturation\n");
         }
         else if((ra > 0) && (rb < 0) && (rd < 0))
         {
             rd = 0x7FFFFFFF; sflag = 1;
-            TRACE_PRINT("+VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "+VE Saturation\n");
         }
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
@@ -3571,7 +3572,7 @@ C62xSSUB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSSUB      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSSUB      %s,%s,%s\n",
                     Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3592,12 +3593,12 @@ C62xSSUB_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if((ra < 0) && (rb > 0) && (rd > 0))
         {
             rd = 0x80000000; sflag = 1;
-            TRACE_PRINT("-VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "-VE Saturation\n");
         }
         else if((ra > 0) && (rb < 0) && (rd < 0))
         {
             rd = 0x7FFFFFFF; sflag = 1;
-            TRACE_PRINT("+VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "+VE Saturation\n");
         }
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
@@ -3609,7 +3610,7 @@ C62xSSUB_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSSUB      0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSSUB      0x%x,%s,%s\n",
                     Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3632,12 +3633,12 @@ C62xSSUB_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         if((ra < 0) && (rb > 0) && (rd > 0))
         {
             rd = 0x8000000000; sflag = 1;
-            TRACE_PRINT("-VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "-VE Saturation\n");
         }
         else if((ra > 0) && (rb < 0) && (rd < 0))
         {
             rd = 0x7FFFFFFFFF; sflag = 1;
-            TRACE_PRINT("+VE Saturation\n");
+            TRACE(VERBOSE_LEVEL, "+VE Saturation\n");
         }
 
         int32_t rdh = U64_TO_C6XMSB12(rd);
@@ -3652,7 +3653,7 @@ C62xSSUB_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
             EnQ_Delay_Reg(p_state, REG_CSR_INDEX, (uint32_t) csr, delay + 1);
         }
 
-        TRACE_PRINT("%08x\tSSUB      0x%x,%s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSSUB      0x%x,%s:%s,%s:%s\n",
                     Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -3681,7 +3682,7 @@ C62xSTB_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, BYTE_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tSTB       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src, (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3712,7 +3713,7 @@ C62xSTB_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src, (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3743,7 +3744,7 @@ C62xSTB_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint8_t * ptr = (uint8_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, BYTE_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
+        TRACE(INFO_LEVEL, "%08x\tSTB       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%02X \'%c\'\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint8_t) src, (uint8_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3776,7 +3777,7 @@ C62xSTH_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint16_t *ptr = (uint16_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, HWORD_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTH       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tSTH       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint16_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3807,7 +3808,7 @@ C62xSTH_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         uint16_t *ptr = (uint16_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, HWORD_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tSTH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint16_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3838,7 +3839,7 @@ C62xSTH_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint16_t *ptr = (uint16_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, HWORD_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
+        TRACE(INFO_LEVEL, "%08x\tSTH       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%04X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint16_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3871,7 +3872,7 @@ C62xSTW_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, ra, mode, WORD_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTW       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
+        TRACE(INFO_LEVEL, "%08x\tSTW       %s,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint32_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3902,7 +3903,7 @@ C62xSTW_UC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, WORD_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
+        TRACE(INFO_LEVEL, "%08x\tSTW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint32_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3933,7 +3934,7 @@ C62xSTW_UC15_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         uint32_t *ptr = (uint32_t *) FindMemoryAddress(p_state, rb, idx_rb, constant, mode, WORD_ALIGN, result);
 
-        TRACE_PRINT("%08x\tSTW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
+        TRACE(INFO_LEVEL, "%08x\tSTW       0x%x,%s,%s\t\tMEM[0x%08X] = 0x%08X <= 0x%08X\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd), ptr, *((uint32_t *) ptr), (uint32_t) src);
 
         // Now we should have a valid address (mode-wise).
@@ -3963,7 +3964,7 @@ C62xSUB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUB       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUB       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -3984,7 +3985,7 @@ C62xSUB_SR32_SR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSUB       %s,%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUB       %s,%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -4002,7 +4003,7 @@ C62xSUB_SC5_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUB       0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUB       0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -4026,7 +4027,7 @@ C62xSUB_SC5_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSUB       0x%x,%s:%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUB       0x%x,%s:%s,%s:%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rbh), REG(idx_rbl), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -4044,7 +4045,7 @@ C62xSUB_SR32_SC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUB       %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUB       %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -4062,7 +4063,7 @@ C62xSUB_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUB       %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUB       %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -4086,7 +4087,7 @@ C62xSUB_SR40_SC5_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSUB       %s:%s,0x%x,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUB       %s:%s,0x%x,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_rah), REG(idx_ral), constant, REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -4109,7 +4110,7 @@ C62xSUBAB_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUBAB     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUBAB     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -4131,7 +4132,7 @@ C62xSUBAB_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUBAB     %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUBAB     %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -4154,7 +4155,7 @@ C62xSUBAH_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUBAH     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUBAH     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -4176,7 +4177,7 @@ C62xSUBAH_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUBAH     %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUBAH     %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -4199,7 +4200,7 @@ C62xSUBAW_SR32_SR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUBAW     %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUBAW     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -4221,7 +4222,7 @@ C62xSUBAW_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUBAW     %s,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUBAW     %s,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), constant, REG(idx_rd));
     }
     return OK;
@@ -4252,7 +4253,7 @@ C62xSUBC_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUBC      %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUBC      %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -4275,7 +4276,7 @@ C62xSUBU_UR32_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, rdh, idx_rdl, rdl);
 
-        TRACE_PRINT("%08x\tSUBU      %s,%s,%s:%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUBU      %s,%s,%s:%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
@@ -4307,7 +4308,7 @@ C62xSUB2_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tSUB2       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tSUB2       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -4330,7 +4331,7 @@ C62xXOR_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tXOR       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tXOR       %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -4348,7 +4349,7 @@ C62xXOR_SC5_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zer
 
         SAVE_REGISTER_RESULT(result, idx_rd, rd);
 
-        TRACE_PRINT("%08x\tXOR       0x%x,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tXOR       0x%x,%s,%s\n",
                 Get_DSP_PC(p_state), constant, REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -4363,7 +4364,7 @@ C62xZERO_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint1
     {
         SAVE_REGISTER_RESULT(result, idx_rd, 0);
 
-        TRACE_PRINT("%08x\tZERO      %s\n", Get_DSP_PC(p_state), REG(idx_rd));
+        TRACE(INFO_LEVEL, "%08x\tZERO      %s\n", Get_DSP_PC(p_state), REG(idx_rd));
     }
     return OK;
 }
@@ -4376,7 +4377,7 @@ C62xZERO_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint1
     {
         SAVE_MULTIREGISTER_RESULT(result, idx_rdh, 0x0, idx_rdl, 0x0);
 
-        TRACE_PRINT("%08x\tZERO      %s:%s\n", Get_DSP_PC(p_state), REG(idx_rdh), REG(idx_rdl));
+        TRACE(INFO_LEVEL, "%08x\tZERO      %s:%s\n", Get_DSP_PC(p_state), REG(idx_rdh), REG(idx_rdl));
     }
     return OK;
 }

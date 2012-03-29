@@ -33,7 +33,7 @@ This script Compiles, Translates and Simulates a Given Target Binary.
 OPTIONS:
    -b      Compile Bootstraps
    -d      Run Decoder Only
-   -f      Enable Function Level Optimization
+   -f      Enable Function Level Optimization + CFG Generation
    -g      Generated Code Level, 'EPL' or 'BBL'   [Default 'BBL']
    -h      Show this help message
    -i      Enable Inline Code Generation
@@ -46,6 +46,7 @@ OPTIONS:
    -s      Generate Exection Statistics
    -t      Target Binary Type, 'RAW' or 'COFF'  [Default 'COFF']
    -v      Verbose Mode
+   -z      Use Hash Function for Global Mapping
 EOF
 }
 
@@ -58,9 +59,9 @@ GEN_CODE_LEVEL="BBL"
 VERBOSE=
 OUTPUT_TTY="/dev/null"
 CODEGEN_OPT=""
-ESTATS_OPT=""
+ISA_EXTRA_FLAGS=""
 
-while getopts “bdfg:hijklmprst:v” OPTION
+while getopts “bdfg:hijklmprst:vz” OPTION
 do
      case $OPTION in
          b)
@@ -102,7 +103,7 @@ do
              ;;
          s)
              CODEGEN_OPT+="-estats "
-             ESTATS_OPT+="-DENABLE_STATS "
+             ISA_EXTRA_FLAGS+="-DENABLE_STATS "
              ;;
          t)
              TARGET_BIN=$OPTARG
@@ -110,6 +111,10 @@ do
          v)
              VERBOSE=1
              OUTPUT_TTY="/dev/stdout"
+             ;;
+         z)
+             CODEGEN_OPT+="-hmaps "
+             ISA_EXTRA_FLAGS+="-DUSE_HASH "
              ;;
          "?")
              usage
@@ -160,7 +165,7 @@ fi
 #------------------------------------------------------------------------------#
 print_step "Generating ISA Behavior ... "
 cd ${C6XISA_BEHAVIOR}
-export ISA_EXTRA_FLAGS=$ESTATS_OPT
+export ISA_EXTRA_FLAGS
 make clean                                                        >& $OUTPUT_TTY
 make -s                                                           >& $OUTPUT_TTY
 if [ $? != 0 ]; then

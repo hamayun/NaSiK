@@ -47,6 +47,7 @@ static cl::bits<LLVMCGOBitVector_t> CodeGenOptionsBV(cl::desc("Code Generation O
                                                      clEnumValEnd));
 static cl::opt<bool> EnableExecStats                ("estats", cl::desc("Enable Execution Statistics Code Generation"), cl::init(false));
 static cl::opt<bool> EnableLocalMappings            ("lmaps", cl::desc("Enable Generation of Local Mappings for Each Basic Block"), cl::init(false));
+static cl::opt<bool> EnableHashMappings             ("hmaps", cl::desc("Enable Generation of Global Hash-based Mappings"), cl::init(false));
 
 int main (int argc, char ** argv)
 {
@@ -183,7 +184,7 @@ int main (int argc, char ** argv)
     }
 
     COUT << "Verifying Module ... " << endl;              llvm_gen->VerifyGeneratedModule();
-    COUT << "Writing Addressing Table ... " << endl;      llvm_gen->WriteAddressingTable();
+    COUT << "Writing Addressing Table ... " << endl;      llvm_gen->WriteAddressingTable(EnableHashMappings, true);
     COUT << "Optimizing LLVM Instructions ..." << endl;   llvm_gen->OptimizeModule();
     COUT << "Writing Binary Configurations ... " << endl; llvm_gen->WriteBinaryConfigs(reader);
     COUT << "Writing Output Bitcode ..." << endl;         llvm_gen->WriteBitcodeFile();
