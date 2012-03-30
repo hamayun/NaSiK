@@ -284,7 +284,7 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
                 }
 
                 fflush(pht->m_host_file);
-                //close_hosttime(pht);
+                close_hosttime(pht);
             }
             break;
 

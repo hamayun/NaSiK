@@ -20,3 +20,12 @@ examples/platforms/tuzki/log*
 sw/llvm/projects/c6x-decoder/generated-app/gen_*
 sw/llvm/projects/c6x-decoder/generated-app/header_tables.txt
 sw/llvm/projects/c6x-decoder/generated-app/*.dot
+sw/llvm/projects/c6x-decoder/generated-app/*.ll
+sw/llvm/projects/c6x-decoder/generated-app/*.o
+sw/llvm/projects/c6x-decoder/generated-app/*.s
+sw/llvm/projects/c6x-decoder/generated-app/*.bc
+sw/llvm/projects/c6x-decoder/generated-app/APPLICATION.X
+sw/llvm/projects/c6x-decoder/lib/ISABehavior/*.bc
+sw/llvm/projects/c6x-decoder/lib/ISABehavior/*.ll
+examples/platforms/tuzki/kvm_c6x_bootstrap
+
