@@ -1,0 +1,1 @@
+/home/hamayun/workspace/NaSiK/examples/applications/ldscript_elf.kvm_mibench
