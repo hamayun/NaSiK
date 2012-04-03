@@ -312,7 +312,7 @@ void DSP_Dump_Memory(uint32_t start_addr, uint32_t size)
 
 void DSP_Flush_CIO()
 {
-    uint32_t io_len = *((uint32_t *) CIOBUFF_ADDR);
+    uint32_t io_len = *((uint32_t *) CIOBUFF_ADDR); // _CIOBUF_ Address
     char * io_str = ((char *) CIOBUFF_ADDR) + 0xD;
 
     if(io_len)

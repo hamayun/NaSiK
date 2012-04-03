@@ -149,8 +149,10 @@ elif [ $TARGET_BIN = "COFF" ]; then
         print_error "Error! Compiling COFF Binary ..."
         exit 1
     fi
+elif [ $TARGET_BIN = "COFFBUILT" ]; then
+    print_step "Using Pre-Built Version ... ${CCS_EXAMPLE_PATH}"
 else
-    print_error "Error! Un-supported Binary Format ... " $TARGET_BIN
+    print_error "Error! Unknown Binary Format ..."
     usage
     exit 1
 fi

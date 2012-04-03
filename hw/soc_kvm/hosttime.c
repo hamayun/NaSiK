@@ -27,6 +27,8 @@ void soc_memory_dump(unsigned long addr, unsigned long size);
 int soc_erase_memory(int size);
 int soc_verify_memory(int size);
 
+//#define VERBOSE_FLUSH
+
 #if 0
 double get_clock(void) {
   /* Unix or Linux: use resource usage */
@@ -189,7 +191,7 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
         case HOSTTIME_FLUSH_DATA:
             {
                 double io_profile_overhead, comp_profile_overhead;
-                double net_io_cost_ts, net_comp_cost_ts;
+                double net_io_cost_ts, net_comp_cost_ts, net_cost;
                 struct timespec        total_cost;
 
                 if(pht->m_estimate_cost_factor)
@@ -222,6 +224,7 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
                     total_cost.tv_sec++;
                 }
 
+#ifdef VERBOSE_FLUSH
                 fprintf(stderr,
                         "Total IO Time                : %ld.%09ld    [%06d/%06d] Profile Overhead: %4.6f, Net Cost: %4.6f\n",
                         pht->m_io_total_ts.tv_sec, pht->m_io_total_ts.tv_nsec,
@@ -261,6 +264,12 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
                         pht->m_io_end_count + pht->m_comp_end_count,
                         io_profile_overhead + comp_profile_overhead,
                         net_io_cost_ts + net_comp_cost_ts);
+
+#else
+                net_cost = net_io_cost_ts + net_comp_cost_ts;
+                fprintf(stderr, "NetCost: %4.6f\n", net_cost);
+                fprintf(pht->m_host_file, "NetCost: %4.6f\n", net_cost);
+#endif
 
                 if(pht->m_estimate_cost_factor)
                 {

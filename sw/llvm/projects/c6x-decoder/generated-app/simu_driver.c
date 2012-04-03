@@ -11,7 +11,7 @@ extern uint32_t AddressTableSize;
 
 extern uint32_t EXIT_POINT_PC;
 extern uint32_t CIOFLUSH_POINT_PC;
-extern uint32_t CIOBUFF_ADDR;
+extern uint32_t CIOBUFF_ADDR; // _CIOBUF_ Address
 
 extern void Print_DSP_Stack(C62x_DSPState_t * p_state, uint32_t stack_start);
 extern void DSP_Dump_Memory(uint32_t start_addr, uint32_t size);

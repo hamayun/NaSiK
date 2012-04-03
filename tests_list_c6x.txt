@@ -1,5 +1,4 @@
--t COFF -g BBL -bijmrv
--t COFF -g BBL -bijmrvl
--t COFF -g BBL -bijmrvz
--t COFF -g EPL -bijmrv
--t COFF -g EPL -bijmrvz
+-t COFFBUILT -g BBL -bmlrv
+-t COFFBUILT -g BBL -bmlijrv
+-t COFFBUILT -g BBL -bmzrv
+-t COFFBUILT -g BBL -bmzijrv
