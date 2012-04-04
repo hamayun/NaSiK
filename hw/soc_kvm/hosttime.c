@@ -23,7 +23,8 @@
 
 int soc_load_target_binary();
 int soc_fill_memory_pattern(uint32_t size, uint32_t pattern);
-void soc_memory_dump(unsigned long addr, unsigned long size);
+void soc_memory_dump_chars(unsigned long addr, unsigned long size);
+void soc_memory_dump_ints(unsigned long addr, unsigned long size);
 int soc_erase_memory(int size);
 int soc_verify_memory(int size);
 
@@ -351,7 +352,8 @@ int32_t hosttime_handler(void *opaque, int32_t size, int32_t is_write, uint64_t 
             //soc_fill_memory_pattern(1 * 1024 * 1024, 0x0);
 
             soc_load_target_binary();
-            //soc_memory_dump(0x9BF0, 0x100);
+            //soc_memory_dump_chars(0x49c50, 0x1ac);
+            //soc_memory_dump_ints(0x49c50, 0x1ac);
             break;
 
         case HOSTTIME_VERIFY_MEMORY:

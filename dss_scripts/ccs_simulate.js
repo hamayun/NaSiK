@@ -5,6 +5,37 @@ importPackage(Packages.com.ti.ccstudio.scripting.environment);
 importPackage(Packages.java.lang);
 importPackage(Packages.java.io);
 
+var c6x_coff_binary;
+var use_C64xp = false;
+
+function usage() {
+    script.traceWrite("Usage: ccs_simulate [-p] app_dir_path");
+    script.traceWrite("app_dir_path : Path to the Directory Containing C6x Executables");
+    script.traceWrite("          -p : Use C64x+ Simulator (Slower)");
+}
+
+function read_args(args)
+{
+    if(args.length < 1) {
+        usage();
+        java.lang.System.exit(1);
+    }
+
+    for(i = 0; i < args.length; i++) 
+    {
+        switch(args[i])
+        {
+            case "-p":
+                use_C64xp = true;
+                break;
+
+            default:
+                c6x_coff_binary = args[i];
+                break;
+        }
+    }
+}
+
 // Create our scripting environment object - which is the main entry point into any script and
 // the factory for creating other Scriptable ervers and Sessions
 var script = ScriptingEnvironment.instance();
@@ -19,15 +50,24 @@ script.setScriptTimeout(-1);        // In milliseconds or -1 for Infinite.
 script.traceSetConsoleLevel(TraceLevel.INFO);
 script.traceSetFileLevel(TraceLevel.OFF);
 
+c6x_coff_binary = ""
+read_args(arguments);
+
 // Get the Debug Server and start a Debug Session
 debugServer = script.getServer("DebugServer.1");
-debugServer.setConfig("../C64/tisim_c64xple.ccxml");
-//debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64x_LE_CycleAccurate.ccxml");
+if(use_C64xp)
+{
+    debugServer.setConfig("../C64/tisim_c64xple.ccxml");
+    script.traceWrite("Using C64x+ Simulator (Slower)");
+}
+else
+{
+    debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64x_LE_CycleAccurate.ccxml");
+    script.traceWrite("Using C64x Simulator (Faster)");
+}
 debugSession = debugServer.openSession(".*");
 
-//var c6x_coff_binary = "/home/hamayun/workspace_ccs/fibonacci/Debug/fibonacci.out";
-//var c6x_coff_binary = "/home/hamayun/workspace_ccs/matmult/Debug/matmult.out";
-var c6x_coff_binary = "/home/hamayun/workspace_ccs/factorial/Debug/factorial.out";
+//script.traceWrite("Target Binary :" + c6x_coff_binary);
 
 try {
     debugSession.memory.loadProgram(c6x_coff_binary);

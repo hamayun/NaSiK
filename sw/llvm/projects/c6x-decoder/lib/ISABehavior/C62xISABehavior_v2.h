@@ -32,11 +32,11 @@
 //#define DELAYED_MWBS
 #define PRINT_CYCLES
 
-#define PANIC_LEVEL 1
+#define MEMIO_LEVEL 1
 #define INFO_LEVEL 2
 #define VERBOSE_LEVEL 3
 
-//#define ENABLE_TRACE INFO_LEVEL
+//#define ENABLE_TRACE VERBOSE_LEVEL
 
 #define LOG(format, ...)                                      \
     fprintf (stderr, format, ## __VA_ARGS__);
@@ -45,14 +45,14 @@
 #define ENABLE_TRACE 0
 #define TRACE(level, format, ...) do {} while(0)
 #else
-#if ENABLE_TRACE < PANIC_LEVEL || ENABLE_TRACE > VERBOSE_LEVEL
+#if ENABLE_TRACE < MEMIO_LEVEL || ENABLE_TRACE > VERBOSE_LEVEL
 #error __FUNCTION ", " __LINE__ ": Invalid Trace Level"
 #endif
 
-#if (ENABLE_TRACE >= PANIC_LEVEL)
-#define LOG_PANIC_LEVEL(format, ...) LOG(format, ## __VA_ARGS__)
+#if (ENABLE_TRACE >= MEMIO_LEVEL)
+#define LOG_MEMIO_LEVEL(format, ...) LOG(format, ## __VA_ARGS__)
 #else
-#define LOG_PANIC_LEVEL(format, ...)
+#define LOG_MEMIO_LEVEL(format, ...)
 #endif
 
 #if (ENABLE_TRACE >= INFO_LEVEL)

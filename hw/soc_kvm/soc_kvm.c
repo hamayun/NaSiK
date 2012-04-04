@@ -372,6 +372,7 @@ static int test_mmio_read(void *opaque, uint64_t addr, uint8_t *data, int len)
                 __func__, (uint32_t) addr, (uint32_t) addr+len-1, len);
 
         kvm_show_regs(kvm, 0);
+        while(1);
         return 1;
     }
 
@@ -394,6 +395,7 @@ static int test_mmio_write(void *opaque, uint64_t addr, uint8_t *data, int len)
         fprintf(stderr, "%s: Address: 0x%x, Address End: 0x%x (len = %d)\n",
 		__func__, (uint32_t) addr, (uint32_t) addr+len-1, len);
         kvm_show_regs(kvm, 0);
+        while(1);
         return 1;
     }
 
@@ -914,7 +916,7 @@ int soc_fill_memory_pattern(uint32_t size, uint32_t pattern)
     return (0);
 }
 
-void soc_memory_dump(unsigned long addr, unsigned long size)
+void soc_memory_dump_chars(unsigned long addr, unsigned long size)
 {
     unsigned char *p;
     unsigned long n;
@@ -928,6 +930,23 @@ void soc_memory_dump(unsigned long addr, unsigned long size)
         printf("  0x%08lx: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n",
                addr + n, p[n + 0], p[n + 1], p[n + 2], p[n + 3], p[n + 4], p[n + 5], p[n + 6], p[n + 7],
                          p[n + 8], p[n + 9], p[n + 10], p[n + 11], p[n + 12], p[n + 13], p[n + 14], p[n + 15]);
+    }
+
+    return;
+}
+
+void soc_memory_dump_ints(unsigned long addr, unsigned long size)
+{
+    unsigned char *p;
+    unsigned long n;
+
+    size &= ~15; /* mod 16 */
+    if (!size) return;
+
+    p = (unsigned char *) soc_kvm_init_data.vm_mem + addr;
+
+    for (n = 0; n < size; n += 4) {
+        printf("[%x] = 0x%x\n", (unsigned int)(addr + n), *((unsigned int *)(p + n)));
     }
 
     return;

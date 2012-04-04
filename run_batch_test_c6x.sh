@@ -6,12 +6,12 @@ RESULTSDIR=$HOME/batchtest-c6x-${TIMESTAMP}
 RESULTFILE=hosttime_kvm.txt
 TTYLOGFILE=tty_debug_00
 TTYCONFILE=tty_console_00
-ALL_TTYLOGS_FILE=${HOME}/tty_debug_all.txt
-ALL_TTYCONS_FILE=${HOME}/tty_console_all.txt
-ALL_RESULTS_FILE=${HOME}/hosttime_kvm_results.txt
+ALL_TTYLOGS_FILE=${RESULTSDIR}/tty_debug_all.txt
+ALL_TTYCONS_FILE=${RESULTSDIR}/tty_console_all.txt
+ALL_RESULTS_FILE=${RESULTSDIR}/hosttime_kvm_results.txt
 
 #APPS_LIST="fibonacci matmult factorial"
-APPS_LIST="fibonacci"
+APPS_LIST="IDCT"
 TESTS_FILE="tests_list_c6x.txt"
 SCRIPT="simulatec6x.sh"
 
@@ -58,9 +58,6 @@ do
 )
 done
 
-mv -f ${ALL_RESULTS_FILE} ${RESULTSDIR}/
-mv -f ${ALL_TTYLOGS_FILE} ${RESULTSDIR}/
-mv -f ${ALL_TTYCONS_FILE} ${RESULTSDIR}/
 echo "Batch Test ... Completed: $(date)"
 echo "Done !"
 
