@@ -41,7 +41,8 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=kvmPhyMemTest
 #APPLICATION=factorial
 #APPLICATION=matmult
-APPLICATION=fibonacci
+#APPLICATION=fibonacci
+APPLICATION=IDCT
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 

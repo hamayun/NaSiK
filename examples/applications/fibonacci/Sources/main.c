@@ -4,6 +4,10 @@
 #define ENABLE_IO 0
 #define PRINTF if(ENABLE_IO) printf
 
+#ifndef CUSTOM_INDEX
+#define CUSTOM_INDEX 30
+#endif
+
 long int fibonacci(int index)
 {
     if(index <= 2)
@@ -14,13 +18,12 @@ long int fibonacci(int index)
 
 int main(void) 
 {
-    int index = 30;
+    int index = CUSTOM_INDEX;
     CPU_PROFILE_COMP_START();
-    //for(index = 1; index < 30; index++)
-    {
-        long fibo = fibonacci(index);
-        PRINTF("Fibonacci Index (%2d): %ld\n", index, fibo);
-    }
+
+    long fibo = fibonacci(index);
+    PRINTF("Fibonacci Index (%2d): %ld\n", index, fibo);
+
     CPU_PROFILE_COMP_END();
     CPU_PROFILE_FLUSH_DATA();
     return 0;

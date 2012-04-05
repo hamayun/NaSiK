@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <Processor/Profile.h>
 
+#ifndef CUSTOM_INDEX
+#define CUSTOM_INDEX 14
+#endif
+
 unsigned long factorial(int x)
 {
     if(x == 1)
@@ -10,12 +14,13 @@ unsigned long factorial(int x)
 }
 
 int main(void) {
-        int i = 0;
+        int i, index = CUSTOM_INDEX;
         unsigned long f = 0;
+
         CPU_PROFILE_COMP_START();
-        for (; i < 200000; i++)
+        for (i = 0; i < 100000; i++)
         {
-            f = factorial(14);
+            f = factorial(index);
         }
 
 //        printf("Factorial is = %ld\n", f);
