@@ -1,5 +1,6 @@
--t COFFBUILT -g BBL -bmrv
--t COFFBUILT -g BBL -bmlrv
--t COFFBUILT -g BBL -bmlijrv
--t COFFBUILT -g BBL -bmzrv
--t COFFBUILT -g BBL -bmzijrv
+-t COFFBUILT -g BBL -bvr -m
+-t COFFBUILT -g BBL -bvr -mij
+-t COFFBUILT -g BBL -bvr -ml
+-t COFFBUILT -g BBL -bvr -mlij
+-t COFFBUILT -g BBL -bvr -mz
+-t COFFBUILT -g BBL -bvr -mzij

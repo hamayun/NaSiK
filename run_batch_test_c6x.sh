@@ -8,10 +8,10 @@ TTYLOGFILE=tty_debug_00
 TTYCONFILE=tty_console_00
 ALL_TTYLOGS_FILE=${RESULTSDIR}/tty_debug_all.txt
 ALL_TTYCONS_FILE=${RESULTSDIR}/tty_console_all.txt
-ALL_RESULTS_FILE=${RESULTSDIR}/hosttime_kvm_results.txt
+ALL_RESULTS_PATH=${RESULTSDIR}/results
 
 #APPS_LIST="fibonacci matmult factorial"
-APPS_LIST="IDCT"
+APPS_LIST="factorial IDCT fibonacci"
 TESTS_FILE="tests_list_c6x.txt"
 SCRIPT="simulatec6x.sh"
 
@@ -21,6 +21,8 @@ mkdir -p ${RESULTSDIR}
 for TARGET_APP in ${APPS_LIST}
 do
 (
+    APP_RESULTS_PATH=${ALL_RESULTS_PATH}_${TARGET_APP}.txt
+
     export CCS_EXAMPLE_BUILD=Debug
     export CCS_EXAMPLE_NAME=$TARGET_APP
     export CCS_EXAMPLE_OUTFILE=${CCS_EXAMPLE_NAME}.out
@@ -43,18 +45,18 @@ do
 
             ./$SCRIPT $TestType
 
-            echo "[Test # $Test] $SCRIPT $TestType [Application: $TGT_APP_VER]" >> ${ALL_RESULTS_FILE}
-            cat ${RESULTFILE} >> ${ALL_RESULTS_FILE}
-            echo "------------------------------------------------------------------------------------------------------------" >> ${ALL_RESULTS_FILE}
+            echo "[Test # $Test] $SCRIPT $TestType [Application: $TGT_APP_VER]" >> ${APP_RESULTS_PATH}
+            cat ${RESULTFILE} >> ${APP_RESULTS_PATH}
+            echo "------------------------------------------------------------------------------------------------------------" >> ${APP_RESULTS_PATH}
             cat ${TTYLOGFILE} >> ${ALL_TTYLOGS_FILE}
             cat ${TTYCONFILE} >> ${ALL_TTYCONS_FILE}
             rm -f ${RESULTFILE} ${TTYLOGFILE} ${TTYCONFILE}
         )
         done
-        echo "++++++++++++++++++++++++++++++++++++++++++ END OF TEST # $Test +++++++++++++++++++++++++++++++++++++++++++++++++" >> ${ALL_RESULTS_FILE}
+        echo "++++++++++++++++++++++++++++++++++++++++++ END OF TEST # $Test +++++++++++++++++++++++++++++++++++++++++++++++++" >> ${APP_RESULTS_PATH}
         (( Test = Test + 1 ))
     done < $HOME/$TESTS_FILE
-    echo "########################################## END OF APPLICATION TEST #########################################" >> ${ALL_RESULTS_FILE}
+    echo "########################################## END OF APPLICATION TEST #########################################" >> ${APP_RESULTS_PATH}
 )
 done
 
