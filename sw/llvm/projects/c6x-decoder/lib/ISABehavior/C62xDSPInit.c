@@ -19,7 +19,7 @@
  *
  *************************************************************************************/
 
-#include "C62xISABehavior_v2.h"
+#include "C62xISABehavior_v3.h"
 #include "stdio.h"
 
 extern uint32_t ENTRY_POINT_PC;

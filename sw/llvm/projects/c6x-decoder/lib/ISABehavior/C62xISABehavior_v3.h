@@ -121,12 +121,12 @@ typedef struct C62x_Result
     uint32_t                 m_value [MAX_RESULT_SIZE];
 } C62x_Result_t;
 
-#define SAVE_REGISTER_RESULT(result, idx_rd, val_rd)                           \
+#define SAVE_REG_RESULT(result, idx_rd, val_rd)                           \
         result->m_type |= C62X_REGISTER;                                       \
         result->m_reg_id[RESULT_LREG_IDX] = idx_rd;                            \
         result->m_value [RESULT_LREG_IDX] = val_rd;
 
-#define SAVE_MULTIREGISTER_RESULT(result, idx_rdh, val_rdh, idx_rdl, val_rdl)  \
+#define SAVE_MREGS_RESULT(result, idx_rdh, val_rdh, idx_rdl, val_rdl)  \
         result->m_type |= C62X_MULTIREG;                                       \
         result->m_reg_id[RESULT_LREG_IDX] = idx_rdl;                           \
         result->m_value [RESULT_LREG_IDX] = val_rdl;                           \

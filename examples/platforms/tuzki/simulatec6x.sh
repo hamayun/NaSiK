@@ -208,7 +208,7 @@ else
     DEC_CMD_LINE+="${CCS_EXAMPLE_PATH} -o ${CCS_EXAMPLE_PATH}.asm -ibf=COFF"
 fi
 
-DEC_CMD_LINE+=" -$GEN_CODE_LEVEL -isa=C62xISABehavior_v2.bc $CODEGEN_OPT"
+DEC_CMD_LINE+=" -$GEN_CODE_LEVEL -isa=C62xISABehavior_v3.bc $CODEGEN_OPT"
 #echo "$DEC_CMD_LINE"
 
 ./c6x-decoder $DEC_CMD_LINE                                       >& $OUTPUT_TTY

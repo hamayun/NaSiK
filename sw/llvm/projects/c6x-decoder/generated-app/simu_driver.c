@@ -4,7 +4,7 @@
 #include <Processor/IO.h>
 #include <Processor/Profile.h>
 
-#include "C62xISABehavior_v2.h"
+#include "C62xISABehavior_v3.h"
 
 extern address_entry_t AddressTable[];
 extern uint32_t AddressTableSize;
