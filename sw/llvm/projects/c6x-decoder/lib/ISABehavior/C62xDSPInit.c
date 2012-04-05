@@ -70,7 +70,8 @@ int32_t Init_DSP_State(C62x_DSPState_t * p_state)
     // Setup Start Program Counter & Cycle Counter
     p_state->m_curr_cycle = 0;
     p_state->m_reg[REG_PC_INDEX] = ENTRY_POINT_PC;
-    p_state->m_reg[REG_CSR_INDEX] = 0xC020100;         // Taken From C6x Simulator
+    p_state->m_reg[REG_CSR_INDEX] = 0x0C020100;         // Taken From C6x Simulator (C64x)
+    //p_state->m_reg[REG_CSR_INDEX] = 0x40010100;         // Taken From C6x Simulator (C64x+)
 
     for(index = 0; index < (C62X_MAX_DELAY_SLOTS + 1); index++)
     {
