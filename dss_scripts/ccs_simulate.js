@@ -7,6 +7,7 @@ importPackage(Packages.java.io);
 
 var c6x_coff_binary;
 var use_C64xp = false;
+var use_C64x_custom = false;
 
 function usage() {
     script.traceWrite("Usage: ccs_simulate [-p] app_dir_path");
@@ -27,6 +28,10 @@ function read_args(args)
         {
             case "-p":
                 use_C64xp = true;
+                break;
+
+            case "-q":
+                use_C64x_custom = true;
                 break;
 
             default:
@@ -60,11 +65,17 @@ if(use_C64xp)
     debugServer.setConfig("../C64/tisim_c64xple.ccxml");
     script.traceWrite("Using C64x+ Simulator (Slower)");
 }
+else if(use_C64x_custom)
+{
+    debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64xx_LE_CA_CPU_Only.ccxml");
+    script.traceWrite("Using C64x Simulator (Custom)");
+}
 else
 {
-    debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C64x_LE_CycleAccurate.ccxml");
+    debugServer.setConfig("/home/hamayun/TI/CCSTargetConfigurations/C6416_LE_CA_DeviceFunctional.ccxml");
     script.traceWrite("Using C64x Simulator (Faster)");
 }
+
 debugSession = debugServer.openSession(".*");
 
 //script.traceWrite("Target Binary :" + c6x_coff_binary);
