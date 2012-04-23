@@ -5,7 +5,7 @@
 
 APP_LIST=`ls $1/*.out__*`
 
-echo "Testing with CCS C64x (Device Functional) Simulator ..."
+echo "Testing with CCS C64x (CPU CA + Device Functional) Simulator ..."
 for TARGET_APP in $APP_LIST
 do
 (
@@ -28,7 +28,7 @@ do
 done
 
 echo "======================================================================"
-echo "Now Testing with CCS Custom Simulator ..."
+echo "Now Testing with CCS C64x (CPU Cycle Accurate) Simulator ..."
 
 for TARGET_APP in $APP_LIST
 do

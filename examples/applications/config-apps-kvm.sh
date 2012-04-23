@@ -15,7 +15,7 @@ export APES_CC2_FLAGS="-soft-float -annotate=arm"
 
 # On Failure Use the default APES_COMPILER
 export APES_COMPILER="i386-sls-dnaos-gcc"
-export APES_CC_FLAGS="-Wall -Wno-format -std=c99 -O3 $CUSTOM_INCLUDES"
+export APES_CC_FLAGS="-Wall -Wno-format -std=c99 -O0 ${CUSTOM_PARAM} $CUSTOM_INCLUDES"
 export APES_ASSEMBLER="i386-sls-dnaos-as"
 
 export APES_LINKER="i386-sls-dnaos-gcc"
