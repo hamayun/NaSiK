@@ -3,7 +3,7 @@ COMPONENTS   = hw/components
 PLATFORM     = examples/platforms/kroger
 SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/mem                \
-               $(COMPONENTS)/kvm_processor      \
+               $(COMPONENTS)/kvm_wrapper_2      \
                $(COMPONENTS)/framebuffer        \
                $(COMPONENTS)/sem                \
                $(COMPONENTS)/slave_device       \

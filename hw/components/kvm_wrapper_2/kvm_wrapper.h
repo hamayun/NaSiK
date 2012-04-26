@@ -17,14 +17,15 @@
  *  along with Rabbits.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __KVM_PROCESSOR_H__
-#define __KVM_PROCESSOR_H__
+#ifndef __KVM_WRAPPER_H__
+#define __KVM_WRAPPER_H__
 
 #define USE_ANNOTATION_BUFFERS
 //#define USE_EXECUTION_SPY
 #define ENABLE_CPU_STATS
 
-#include <kvm_processor_request.h>
+#include <kvm_wrapper_request.h>
+#include <kvm_imported.h>
 #include <master_device.h>
 
 using namespace noc;
@@ -35,12 +36,16 @@ class cpu_logs;
 #define LOG_KVM_STATS                               0x0050
 #define LOG_KVM_STATS_DELTA                         0x0058
 
-class kvm_processor : public master_device
+class kvm_wrapper : public master_device
 {
 public:
-    SC_HAS_PROCESS (kvm_processor);
-    kvm_processor (sc_module_name name, uint32_t num_cores, int node_id=0);
-    ~kvm_processor ();
+    SC_HAS_PROCESS (kvm_wrapper);
+    kvm_wrapper (sc_module_name name, uint32_t num_cores, int node_id=0);
+    ~kvm_wrapper ();
+
+public:
+    void                           *m_kvm_instance;
+    kvm_import_t                    m_kvm_import;   		// Functions that are defined in KVM Library
 
 private:
     void kvm_cpu_thread ();
@@ -58,7 +63,7 @@ public:
 
 private:
     uint32_t                        m_nr_cores;
-    kvm_processor_requests         *m_rqs;
+    kvm_wrapper_requests           *m_rqs;
     bool                            m_unblocking_write;
 
     // Statistics extracted from Annotations
@@ -68,7 +73,7 @@ private:
     uint64_t                        m_cpu_stores_count;
 };
 
-typedef kvm_processor kvm_processor_t;
+typedef kvm_wrapper kvm_wrapper_t;
 
 #endif
 

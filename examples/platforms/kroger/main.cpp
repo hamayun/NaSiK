@@ -29,7 +29,7 @@
 #include <abstract_noc.h>
 #include <interconnect_master.h>
 
-#include <kvm_processor.h>
+#include <kvm_wrapper.h>
 #include <interconnect.h>
 #include <tg_device.h>
 #include <sl_tg_device.h>
@@ -94,8 +94,8 @@ int sc_main (int argc, char ** argv)
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
     int         kvm_num_procs = 1;
-    kvm_processor_t kvm_processor("kvm_proc", kvm_num_procs);
-    p_kvm_cpu_adaptor = & kvm_processor;
+    kvm_wrapper_t kvm_wrapper("kvm_wrap", kvm_num_procs);
+    p_kvm_cpu_adaptor = & kvm_wrapper;
 
     sl_block_device   *bl1  = new sl_block_device("block1", 1, "input_data", 1);
     sl_block_device   *bl2  = new sl_block_device("block2", 2, "input_data", 1);
@@ -118,7 +118,7 @@ int sc_main (int argc, char ** argv)
     slaves[nslaves++] = bl2->get_slave();        // 7	0xC6500000 - 0xC6600000
     slaves[nslaves++] = bl3->get_slave();        // 8	0xC6A00000 - 0xC6B00000
 
-    timer_device	*timers[3 + 1 /* kvm_processor_t */];
+    timer_device	*timers[3 + 1 /* kvm_wrapper_t */];
     int       ntimers = sizeof (timers) / sizeof (timer_device *);   // Why we divide by pointer size here ???
     for (i = 0; i < ntimers; i ++)
     {
@@ -139,11 +139,13 @@ int sc_main (int argc, char ** argv)
     fb->irq (wires_irq_qemu[no_irqs-1]);
 
     //interconnect
-    onoc = new interconnect ("interconnect", (1 /* kvm_processor_t */ + 4), nslaves);
+    onoc = new interconnect ("interconnect", (1 /* kvm_wrapper_t */ + 4), nslaves);
     for (i = 0; i < nslaves; i++)
         onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
 
-    onoc->connect_master_64 (0, kvm_processor.put_port, kvm_processor.get_port);
+    onoc->connect_master_64 (0, kvm_wrapper.put_port, kvm_wrapper.get_port);
+
+	kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, 1234);
 
     // connect block device
     onoc->connect_master_64(1,

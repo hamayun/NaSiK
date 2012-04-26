@@ -9,4 +9,5 @@ examples/platforms/kroger/tty100
 sw/apes-components/KVMx86BootLoader/bin/
 sw/apes-components/KVMx86BootLoader/obj/
 hw/soc_kvm/libsoc_kvm.so
-
+batchtest*
+examples/applications/printFloats/

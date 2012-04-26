@@ -1,20 +1,23 @@
-#include <kvm_processor.h>
+#include <stdio.h>
+#include <kvm_wrapper.h>
 #include <streambuf>
 #include <iomanip>
 
-#define DEBUG_KVM_PROCESSOR false
-#define DOUT_NAME if(DEBUG_KVM_PROCESSOR) std::cout << this->name() << ": "
+using namespace std;
+
+#define DEBUG_KVM_WRAPPER false
+#define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
-    int kvm_internel_init(int argc, const char **argv, const char *prefix);
+    void * kvm_internal_init(struct kvm_import_t * ki, int argc, const char **argv, const char *prefix);
     int kvm_cmd_run();
 }
 
-kvm_processor::kvm_processor (sc_module_name name, uint32_t num_cores, int node_id)
+kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cores, int node_id)
 	: master_device (name)
 {
     m_nr_cores = num_cores;
-    m_rqs = new kvm_processor_requests (100);
+    m_rqs = new kvm_wrapper_requests (100);
     m_unblocking_write = 0;
     m_node_id = node_id;
 
@@ -23,17 +26,17 @@ kvm_processor::kvm_processor (sc_module_name name, uint32_t num_cores, int node_
     m_cpu_loads_count  = 0;
     m_cpu_stores_count = 0;
 
-    #define ARGC 6
+#define ARGC 5
     int argc = ARGC;
     char *argv[ARGC] = {
 #if 1
             (char *) "--cpus",
-            (char *) "4",
+            (char *) "1",
             (char *) "-k",
             (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmParallelMjpeg/MJPEGKVM",
             (char *) "--debug-ioport",
-            (char *) "--debug-single-step",
 #if 0
+            (char *) "--debug-single-step",
             (char *) "-p",
             (char *) "kgdboc=ttyS1 kgdbwait",
             (char *) "--tty",
@@ -51,16 +54,16 @@ kvm_processor::kvm_processor (sc_module_name name, uint32_t num_cores, int node_
 #endif
     };
 
-
-    kvm_internel_init(argc, (const char **) &argv[0], NULL);
+    m_kvm_instance = kvm_internal_init(& m_kvm_import, argc, (const char **) &argv[0], NULL);
+    //printf("(SysC) GDB (After): 0x%08X\n", m_kvm_import.gdb_srv_start_and_wait);
 
     SC_THREAD (kvm_cpu_thread);
 }
 
-kvm_processor::~kvm_processor () {}
+kvm_wrapper::~kvm_wrapper () {}
 
 // A thread used to simulate the kvm processor(s)
-void kvm_processor::kvm_cpu_thread ()
+void kvm_wrapper::kvm_cpu_thread ()
 {
     int rval = 0;
 
@@ -70,7 +73,7 @@ void kvm_processor::kvm_cpu_thread ()
 }
 
 /*
-void kvm_processor::update_cpu_stats(annotation_db_t *pdb)
+void kvm_wrapper::update_cpu_stats(annotation_db_t *pdb)
 {
     m_cpu_instrs_count += pdb->InstructionCount;
     m_cpu_cycles_count += pdb->CycleCount;
@@ -79,7 +82,7 @@ void kvm_processor::update_cpu_stats(annotation_db_t *pdb)
 }
 */
 
-void kvm_processor::log_cpu_stats()
+void kvm_wrapper::log_cpu_stats()
 {
     std::cout << "KVM STATS: cpu_instrs_count = " << m_cpu_instrs_count
               << " cpu_cycles_count = " << m_cpu_cycles_count
@@ -87,7 +90,7 @@ void kvm_processor::log_cpu_stats()
               << " cpu_stores_count = " << m_cpu_stores_count << std::endl;
 }
 
-void kvm_processor::log_cpu_stats_delta(unsigned char *data)
+void kvm_wrapper::log_cpu_stats_delta(unsigned char *data)
 {
     static uint64_t cpu_instrs_count_prev = 0, cpu_cycles_count_prev = 0, cpu_loads_count_prev = 0, cpu_stores_count_prev = 0;
     uint32_t value = (uint32_t) *data;
@@ -109,11 +112,11 @@ void kvm_processor::log_cpu_stats_delta(unsigned char *data)
     }
 }
 
-void kvm_processor::rcv_rsp(unsigned char tid, unsigned char *data,
+void kvm_wrapper::rcv_rsp(unsigned char tid, unsigned char *data,
                                bool bErr, bool bWrite)
 {
 
-    kvm_processor_request            *localrq;
+    kvm_wrapper_request            *localrq;
 
     localrq = m_rqs->GetRequestByTid (tid);
     if (localrq == NULL)
@@ -137,14 +140,14 @@ void kvm_processor::rcv_rsp(unsigned char tid, unsigned char *data,
     return;
 }
 
-uint64_t kvm_processor::read (uint64_t addr,
+uint64_t kvm_wrapper::read (uint64_t addr,
     int nbytes, int bIO)
 {
     unsigned char           adata[8];
     uint64_t                ret;
     int                     i;
     unsigned char           tid;
-    kvm_processor_request   *localrq;
+    kvm_wrapper_request   *localrq;
 
     if (m_unblocking_write)
         localrq = m_rqs->GetNewRequest (1);
@@ -157,7 +160,7 @@ uint64_t kvm_processor::read (uint64_t addr,
     localrq->bWrite = 0;
     tid = localrq->tid;
 
-    //printf("kvm_processor: Read tid = %x, addr = 0x%08x, nbytes = %d\n", tid, (uint32_t) addr, nbytes);
+    //printf("kvm_wrapper: Read tid = %x, addr = 0x%08x, nbytes = %d\n", tid, (uint32_t) addr, nbytes);
     send_req(tid, addr, adata, nbytes, 0);
 
     if (!localrq->bDone)
@@ -175,11 +178,11 @@ uint64_t kvm_processor::read (uint64_t addr,
     return ret;
 }
 
-void kvm_processor::write (uint64_t addr,
+void kvm_wrapper::write (uint64_t addr,
     unsigned char *data, int nbytes, int bIO)
 {
     unsigned char                   tid;
-    kvm_processor_request            *localrq;
+    kvm_wrapper_request            *localrq;
 
     /* See if this request is for KVM Wrapper? */
     if(addr >= KVM_ADDR_BASE && addr <= KVM_ADDR_END)
@@ -226,7 +229,7 @@ void kvm_processor::write (uint64_t addr,
 extern "C"
 {
     uint64_t
-    systemc_kvm_read_memory (kvm_processor_t *_this, uint64_t addr,
+    systemc_kvm_read_memory (kvm_wrapper_t *_this, uint64_t addr,
         int nbytes, unsigned int *ns, int bIO)
     {
         uint64_t ret;
@@ -235,7 +238,7 @@ extern "C"
     }
 
     void
-    systemc_kvm_write_memory (kvm_processor_t *_this, uint64_t addr,
+    systemc_kvm_write_memory (kvm_wrapper_t *_this, uint64_t addr,
         unsigned char *data, int nbytes, unsigned int *ns, int bIO)
     {
        _this->write (addr, data, nbytes, bIO);
@@ -262,13 +265,13 @@ extern "C"
 #ifdef USE_ANNOTATION_BUFFERS
 #ifdef USE_EXECUTION_SPY
     void
-    systemc_annotate_function(kvm_processor_t *_this, void *vm_addr, void *ptr)
+    systemc_annotate_function(kvm_wrapper_t *_this, void *vm_addr, void *ptr)
     {
         _this->annotate((void *)vm_addr, (db_buffer_desc_t *) ptr);
     }
 #else
     void
-    systemc_annotate_function(kvm_processor_t *_this, void *vm_addr, void *ptr)
+    systemc_annotate_function(kvm_wrapper_t *_this, void *vm_addr, void *ptr)
     {
 /*
         db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) ptr;
@@ -292,7 +295,7 @@ extern "C"
 #endif
 #else
     void
-    systemc_annotate_function(kvm_processor_t *_this, void *vm_addr, void *ptr)
+    systemc_annotate_function(kvm_wrapper_t *_this, void *vm_addr, void *ptr)
     {
 /*
         annotation_db_t *pdb = (annotation_db_t *) ptr;

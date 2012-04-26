@@ -17,44 +17,42 @@
  *  along with Rabbits.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _QEMU_WRAPPER_REQUEST_
-#define _QEMU_WRAPPER_REQUEST_
+#ifndef _KVM_IMPORTED_FUNCTIONS_
+#define _KVM_IMPORTED_FUNCTIONS_
 
-#include <systemc.h>
+#include <inttypes.h>
 
-class kvm_processor_request
+#ifdef __cplusplus
+extern "C"
 {
-public:
-    kvm_processor_request (unsigned id);
+#endif
 
-public:
-    unsigned char			tid;
-    unsigned char			ropcode;
-    unsigned char			bDone;
-    unsigned char           bWrite;
-    sc_event				evDone;
-    unsigned int			low_word;
-    unsigned int			high_word;
+    struct kvm_import_t;
+    struct kvm_counters_t;
 
-    kvm_processor_request		*m_next;
-};
+    typedef int             (*gdb_srv_start_and_wait_fc_t) (void* instance, int port);
 
-class kvm_processor_requests
-{
-public:
-    kvm_processor_requests (int count);
-    ~kvm_processor_requests ();
+    // Imported by KVM
+    struct kvm_counters_t
+    {
+        uint64_t            no_instructions;
+        uint64_t            no_cycles;
+        uint64_t            no_mem_write;
+        uint64_t            no_mem_read;
+        uint64_t            no_dcache_miss;
+        uint64_t            no_icache_miss;
+        uint64_t            no_io_write;
+        uint64_t            no_io_read;
+    };
 
-    kvm_processor_request* GetNewRequest (int bWaitEmpty);
-    kvm_processor_request* GetRequestByTid (unsigned char tid);
-    void FreeRequest (kvm_processor_request *rq);
-    void WaitWBEmpty ();
+    struct kvm_import_t
+    {
+        gdb_srv_start_and_wait_fc_t     gdb_srv_start_and_wait;
+    };
 
-private:
-    kvm_processor_request		*m_headFree;
-    kvm_processor_request		*m_headBusy;
-    sc_event                    m_evEmpty;
-};
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

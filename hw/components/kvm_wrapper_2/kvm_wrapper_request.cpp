@@ -17,12 +17,12 @@
  *  along with Rabbits.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <kvm_processor_request.h>
+#include <kvm_wrapper_request.h>
 
 using namespace std;
 
-// class kvm_processor_request
-kvm_processor_request::kvm_processor_request (unsigned id)
+// class kvm_wrapper_request
+kvm_wrapper_request::kvm_wrapper_request (unsigned id)
 {
     tid = id;
     bDone = false;
@@ -30,23 +30,23 @@ kvm_processor_request::kvm_processor_request (unsigned id)
 }
 
 
-// class kvm_processor_requests
-kvm_processor_requests::kvm_processor_requests (int count)
+// class kvm_wrapper_requests
+kvm_wrapper_requests::kvm_wrapper_requests (int count)
 {
     m_headFree = NULL;
     m_headBusy = NULL;
 
-    kvm_processor_request		**pp = &m_headFree;
+    kvm_wrapper_request		**pp = &m_headFree;
     for (int i = 0; i < count; i++)
     {
-        *pp = new kvm_processor_request (i + 1);
+        *pp = new kvm_wrapper_request (i + 1);
         pp = &(*pp)->m_next;
     }
 }
 
-kvm_processor_requests::~kvm_processor_requests ()
+kvm_wrapper_requests::~kvm_wrapper_requests ()
 {
-    kvm_processor_request		*p;
+    kvm_wrapper_request		*p;
 
     while (m_headFree)
     {
@@ -56,22 +56,22 @@ kvm_processor_requests::~kvm_processor_requests ()
     }
 }
 
-void kvm_processor_requests::WaitWBEmpty ()
+void kvm_wrapper_requests::WaitWBEmpty ()
 {
     while (m_headBusy)
         wait (m_evEmpty);
 }
 
-kvm_processor_request* kvm_processor_requests::GetNewRequest (int bWaitEmpty)
+kvm_wrapper_request* kvm_wrapper_requests::GetNewRequest (int bWaitEmpty)
 {
     while (bWaitEmpty && m_headBusy)
         wait (m_evEmpty);
 
-    kvm_processor_request	*p = m_headFree;
+    kvm_wrapper_request	*p = m_headFree;
 
     if (!p)
     {
-        cerr << "[Error: no request available for kvm_processor_requests::GetNewRequest.]" << endl;
+        cerr << "[Error: no request available for kvm_wrapper_requests::GetNewRequest.]" << endl;
         exit (1);
     }
 
@@ -86,9 +86,9 @@ kvm_processor_request* kvm_processor_requests::GetNewRequest (int bWaitEmpty)
     return p;
 }
 
-kvm_processor_request* kvm_processor_requests::GetRequestByTid (unsigned char tid)
+kvm_wrapper_request* kvm_wrapper_requests::GetRequestByTid (unsigned char tid)
 {
-    kvm_processor_request	*p = m_headBusy;
+    kvm_wrapper_request	*p = m_headBusy;
 
     while (p && p->tid != tid)
         p = p->m_next;
@@ -96,15 +96,15 @@ kvm_processor_request* kvm_processor_requests::GetRequestByTid (unsigned char ti
     return p;
 }
 
-void kvm_processor_requests::FreeRequest (kvm_processor_request *rq)
+void kvm_wrapper_requests::FreeRequest (kvm_wrapper_request *rq)
 {
-    kvm_processor_request	**pp = &m_headBusy;
+    kvm_wrapper_request	**pp = &m_headBusy;
 
     while (*pp && *pp != rq)
         pp = &(*pp)->m_next;
     if (!*pp)
     {
-        cerr << "[Error: Cannot find the request kvm_processor_request::FreeRequest]" << endl;
+        cerr << "[Error: Cannot find the request kvm_wrapper_request::FreeRequest]" << endl;
         return;
     }
 
