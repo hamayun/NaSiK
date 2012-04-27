@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Building cscope Database in ... " $PWD
-find $PWD -name "*.cpp" -o -name "*.h" > cscope.files
+find $PWD -name "*.cpp" -o -name "*.h" -o -name "*.c" > cscope.files
 
 # Build Database, Recursively with Inverted Index for Faster Searches
 cscope -b -R -q
