@@ -145,7 +145,7 @@ int sc_main (int argc, char ** argv)
 
     onoc->connect_master_64 (0, kvm_wrapper.put_port, kvm_wrapper.get_port);
 
-	kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, 1234);
+	//kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, 1234);
 
     // connect block device
     onoc->connect_master_64(1,
