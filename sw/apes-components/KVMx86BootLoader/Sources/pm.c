@@ -70,7 +70,8 @@ static void setup_gdt (void)
 }
 
 /*
- * Set up the IDT
+ * Set up the IDT in Realmode; We use the setup done by KVM Library
+ * Here we load a NULL IDT
  */
 static void setup_idt(void)
 {
@@ -98,10 +99,16 @@ void go_to_protected_mode(void)
     /* Mask all interrupts in the PIC */
     mask_all_interrupts ();
 
-    /* Actual transition to protected mode... */
+    /* Setup the Basic Descriptors */
     setup_idt ();
     setup_gdt ();
 
+    /*
+    puts("Generating Exception ... 3 (Real Mode)\n");
+    asm volatile ("int $0x3");
+    */
+
+    /* Actual transition to protected mode... */
     puts ("Jump to Protected Mode ... 0x100000\n");
     protected_mode_jump (PROT_MODE_JUMP_ADDR);
 }

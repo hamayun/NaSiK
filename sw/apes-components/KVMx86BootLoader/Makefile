@@ -28,6 +28,7 @@ SETUP_ELF := $(BIN_DIR)/KVMx86BootLoader.elf
 SETUP_BIN := $(BIN_DIR)/KVMx86BootLoader.bin
 SETUP_ASM := $(OBJ_DIR)/KVMx86BootLoader.asm
 
+V=true
 ifeq ($(V),)
     V := @
 else

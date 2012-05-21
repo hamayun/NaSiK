@@ -1,4 +1,5 @@
 
+.extern cpu_init_pmode_idt
 .extern system_kickstart
 
 .bss
@@ -12,6 +13,11 @@
        because some of the code in 0x00000010 - 0x0001FFFC gets overwritten during
        the DNAOS boot process; Thats why the above code has been commented; A better 
        place to load target vliw binary is in the application main function. */
+
+    call cpu_init_pmode_idt  /* Install proper ISR handlers (For Exceptions) */
+
+    int $0x3                 /* Now Sync With the GDB Server */
+
 	call system_kickstart   /* Call the OS Start Function */
 	out %eax, $0xf4
 
