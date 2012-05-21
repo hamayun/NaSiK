@@ -11,15 +11,15 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-#APPLICATION=kvmParallelMjpeg
+APPLICATION=kvmParallelMjpeg
 #APPLICATION=susan
-APPLICATION=qsort
+#APPLICATION=qsort
 #APPLICATION=dijkstra
 #APPLICATION=patricia
 #APPLICATION=blowfish
 #APPLICATION=rijndael
 #APPLICATION=sha
-APPLICATION=CRC32
+#APPLICATION=CRC32
 #APPLICATION=bitcount
 #APPLICATION=cjpeg
 #APPLICATION=djpeg
@@ -44,10 +44,12 @@ if [ -e ${APP_DIR}/app_specific_config.sh ]; then
 fi
 
 #Update Links in Application.
-echo "Updating Application Specific Symlinks ..."
-cd ${APP_DIR}
-ln -sf $NASIK_HOME/examples/applications/ldscript_elf.arm elf.lds
-ln -sf interface.xmi.arm interface.xmi
+if [ ${APPLICATION} != "kvmParallelMjpeg" ]; then
+	echo "Updating Application Specific Symlinks ..."
+	cd ${APP_DIR}
+	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.arm elf.lds
+	ln -sf interface.xmi.arm interface.xmi
+fi
 
 # for tty_terms
 export PATH=$NASIK_HOME:$PATH
