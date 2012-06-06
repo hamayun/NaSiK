@@ -70,9 +70,11 @@ interconnect        *onoc = NULL;
 slave_device        *slaves[50];
 int                 nslaves = 0;
 
+
 extern "C" {
         extern uint64_t kvm_ram_size;
         extern void *   kvm_userspace_mem_addr;
+        extern int      kvm_debug_port;
 }
 
 void * p_kvm_cpu_adaptor = NULL;
@@ -81,6 +83,8 @@ int sc_main (int argc, char ** argv)
 {
     int         i;
     //if(argc < 3) usage_and_exit(argv[0]);
+    //kvm_debug_port = 1234;
+
     signal(SIGINT,simulation_stop);
 
     fb_reset_t    fb_res_stat;
@@ -145,7 +149,10 @@ int sc_main (int argc, char ** argv)
 
     onoc->connect_master_64 (0, kvm_wrapper.put_port, kvm_wrapper.get_port);
 
-	kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, 1234);
+    if(kvm_debug_port)
+    {
+	kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, kvm_debug_port);
+    }
 
     // connect block device
     onoc->connect_master_64(1,

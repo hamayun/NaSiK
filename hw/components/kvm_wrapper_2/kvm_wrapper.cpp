@@ -10,7 +10,7 @@ using namespace std;
 
 extern "C" {
     void * kvm_internal_init(struct kvm_import_t * ki, int argc, const char **argv, const char *prefix);
-    int kvm_cmd_run();
+    int kvm_run_cpus();
 }
 
 kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cores, int node_id)
@@ -66,9 +66,7 @@ kvm_wrapper::~kvm_wrapper () {}
 void kvm_wrapper::kvm_cpu_thread ()
 {
     int rval = 0;
-
-    cout << "kvm_cpu_thread: Calling KVM Run ... " << endl;
-    rval = kvm_cmd_run();
+    rval = kvm_run_cpus();
     cout << "kvm_cpu_thread: KVM Run Exited ... Return Value = " << rval << endl;
 }
 
