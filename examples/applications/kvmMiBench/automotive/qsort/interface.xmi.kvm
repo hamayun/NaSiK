@@ -22,11 +22,11 @@
   </inject>
 
   <restrict>
-    <id name="x86Processor" version="1.0"/>
+    <id name="KVMx86Processor" version="1.0"/>
     <id name="DnaCore" version="1.0"/>
     <id name="DnaMM_WorstFit" version="1.0"/>
     <id name="PosixThreadsLibrary" version="1.0"/>
-    <id name="AnnotationManager" version="1.0"/>
+    <id name="KVMAnnotationManager" version="1.0"/>
   </restrict>
 
   <provide>

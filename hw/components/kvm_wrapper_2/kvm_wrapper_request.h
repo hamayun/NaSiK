@@ -17,15 +17,15 @@
  *  along with Rabbits.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _QEMU_WRAPPER_REQUEST_
-#define _QEMU_WRAPPER_REQUEST_
+#ifndef _KVM_WRAPPER_REQUEST_
+#define _KVM_WRAPPER_REQUEST_
 
 #include <systemc.h>
 
-class kvm_processor_request
+class kvm_wrapper_request
 {
 public:
-    kvm_processor_request (unsigned id);
+    kvm_wrapper_request (unsigned id);
 
 public:
     unsigned char			tid;
@@ -36,23 +36,23 @@ public:
     unsigned int			low_word;
     unsigned int			high_word;
 
-    kvm_processor_request		*m_next;
+    kvm_wrapper_request		*m_next;
 };
 
-class kvm_processor_requests
+class kvm_wrapper_requests
 {
 public:
-    kvm_processor_requests (int count);
-    ~kvm_processor_requests ();
+    kvm_wrapper_requests (int count);
+    ~kvm_wrapper_requests ();
 
-    kvm_processor_request* GetNewRequest (int bWaitEmpty);
-    kvm_processor_request* GetRequestByTid (unsigned char tid);
-    void FreeRequest (kvm_processor_request *rq);
+    kvm_wrapper_request* GetNewRequest (int bWaitEmpty);
+    kvm_wrapper_request* GetRequestByTid (unsigned char tid);
+    void FreeRequest (kvm_wrapper_request *rq);
     void WaitWBEmpty ();
 
 private:
-    kvm_processor_request		*m_headFree;
-    kvm_processor_request		*m_headBusy;
+    kvm_wrapper_request		*m_headFree;
+    kvm_wrapper_request		*m_headBusy;
     sc_event                    m_evEmpty;
 };
 
