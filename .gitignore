@@ -1,8 +1,12 @@
-examples/applications/printFloats/
+sw/apes-components/KVMx86Processor/
+sw/apes-components/KVMAnnotationManager/
+examples/applications/kvmParallelMjpeg/
 examples/platforms/kroger/arch.x
 examples/platforms/kroger/objs/
 examples/platforms/kroger/output_data
 examples/platforms/kroger/tty100
+sw/apes-components/KVMx86BootLoader/bin/
+sw/apes-components/KVMx86BootLoader/obj/
 hw/soc_kvm/libsoc_kvm.so
 sw/llvm/projects/c6x-decoder/generated-app/for_docs/
 examples/applications/kvmParallelMjpeg/MJPEGKVM
@@ -28,4 +32,5 @@ sw/llvm/projects/c6x-decoder/generated-app/APPLICATION.X
 sw/llvm/projects/c6x-decoder/lib/ISABehavior/*.bc
 sw/llvm/projects/c6x-decoder/lib/ISABehavior/*.ll
 examples/platforms/tuzki/kvm_c6x_bootstrap
-
+batchtest*
+examples/applications/printFloats/

@@ -7,3 +7,6 @@
 [submodule "examples/applications/kvmParallelMjpeg"]
 	path = examples/applications/kvmParallelMjpeg
 	url = ssh://sls_gitserver/srv/git/ParallelMjpeg
+[submodule "hw/kvm-kmod-2.6.32.27"]
+	path = hw/kvm-kmod-2.6.32.27
+	url = /home/hamayun/workspace/Common/kvm-kmod-2.6.32.27/

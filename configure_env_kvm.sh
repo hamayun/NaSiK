@@ -19,7 +19,7 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-#APPLICATION=kvmParallelMjpeg
+APPLICATION=kvmParallelMjpeg
 #APPLICATION=susan
 #APPLICATION=qsort
 #APPLICATION=dijkstra
@@ -42,12 +42,12 @@ export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 #APPLICATION=factorial
 #APPLICATION=matmult
 #APPLICATION=fibonacci
-APPLICATION=IDCT
+#APPLICATION=IDCT
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
-export PLATFORM=tuzki
-#export PLATFORM=kroger
+#export PLATFORM=tuzki
+export PLATFORM=kroger
 export PFORM_DIR=$NASIK_HOME/examples/platforms/$PLATFORM
 
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
