@@ -1,6 +1,6 @@
 #! /bin/bash
 
-export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
+export PATH=$NASIK_HOME/tools:$PATH
 
 APP_LIST=`ls ${APP_DIR}/*__*`
 

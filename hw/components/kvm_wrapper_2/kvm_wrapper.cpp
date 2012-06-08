@@ -33,7 +33,7 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cores, int node_id)
             (char *) "--cpus",
             (char *) "1",
             (char *) "-k",
-            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/kvmParallelMjpeg/MJPEGKVM",
+            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/ParallelMjpeg/MJPEGKVM",
             (char *) "--debug-ioport",
 #if 0
             (char *) "--debug-single-step",

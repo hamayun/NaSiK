@@ -19,7 +19,7 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-APPLICATION=kvmParallelMjpeg
+APPLICATION=ParallelMjpeg
 #APPLICATION=susan
 #APPLICATION=qsort
 #APPLICATION=dijkstra
@@ -64,7 +64,7 @@ fi
 echo "Updating Application Specific Symlinks ..."
 cd ${APP_DIR}
 
-if [ ${APPLICATION} != "kvmParallelMjpeg" ]; then
+if [ ${APPLICATION} != "ParallelMjpeg" ]; then
 	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mibench elf.lds
 	ln -sf interface.xmi.kvm interface.xmi
 fi

@@ -11,7 +11,7 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-APPLICATION=kvmParallelMjpeg
+APPLICATION=ParallelMjpeg
 #APPLICATION=susan
 #APPLICATION=qsort
 #APPLICATION=dijkstra
@@ -44,7 +44,7 @@ if [ -e ${APP_DIR}/app_specific_config.sh ]; then
 fi
 
 #Update Links in Application.
-if [ ${APPLICATION} != "kvmParallelMjpeg" ]; then
+if [ ${APPLICATION} != "ParallelMjpeg" ]; then
 	echo "Updating Application Specific Symlinks ..."
 	cd ${APP_DIR}
 	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.arm elf.lds

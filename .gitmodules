@@ -4,8 +4,8 @@
 [submodule "sw/apes-components/KVMAnnotationManager"]
 	path = sw/apes-components/KVMAnnotationManager
 	url = ssh://sls_gitserver/srv/git/KVMAnnotationManager
-[submodule "examples/applications/kvmParallelMjpeg"]
-	path = examples/applications/kvmParallelMjpeg
+[submodule "examples/applications/ParallelMjpeg"]
+	path = examples/applications/ParallelMjpeg
 	url = ssh://sls_gitserver/srv/git/ParallelMjpeg
 [submodule "hw/kvm-kmod-2.6.32.27"]
 	path = hw/kvm-kmod-2.6.32.27
