@@ -2,7 +2,7 @@
 
 HOME=$PWD
 TIMESTAMP=$(date +%Y-%m-%d-%Hh%M)
-RESULTSDIR=$HOME/batchtest-c6x-${TIMESTAMP}
+RESULTSDIR=$NASIK_HOME/tests/batchtest-c6x-${TIMESTAMP}
 RESULTFILE=hosttime_kvm.txt
 TTYLOGFILE=tty_debug_00
 TTYCONFILE=tty_console_00
@@ -12,7 +12,7 @@ ALL_RESULTS_PATH=${RESULTSDIR}/results
 
 #APPS_LIST="fibonacci matmult factorial"
 APPS_LIST="factorial IDCT fibonacci"
-TESTS_FILE="tests_list_c6x.txt"
+TESTS_FILE="tests_c6x.list"
 SCRIPT="simulatec6x.sh"
 
 echo "Batch Test ... Started: $(date)"

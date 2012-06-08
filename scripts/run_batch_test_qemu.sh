@@ -2,7 +2,7 @@
 
 TIMESTAMP=$(date +%Y-%m-%d-%Hh%M)
 ARM_PLATFORM=/home/hamayun/workspace/Rabbits-sls/platforms/thumper
-export PATH=/home/hamayun/workspace/Rabbits-sls/rabbits/tools:$PATH
+export PATH=$NASIK_HOME/tools:$PATH
 
 RESULTSDIR=${ARM_PLATFORM}/batchtest-results-${TIMESTAMP}
 RESULTFILE=hosttime_qemu.txt

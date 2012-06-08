@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TIMESTAMP=$(date +%Y-%m-%d-%Hh%M)
-RESULTSDIR=$PFORM_DIR/batchtest-results-${TIMESTAMP}
+RESULTSDIR=$NASIK_HOME/tests/batchtest-results-${TIMESTAMP}
 RESULTFILE=hosttime_kvm.txt
 TTYLOGFILE=tty100
 ALL_TTYLOGS_FILE=tty100_all_tests.txt
