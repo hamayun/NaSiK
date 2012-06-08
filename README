@@ -1,35 +1,69 @@
+Native Simulation Kernel (NaSiK)
+================================
 
-***********************************************
-Always start with
+This readme describes the installation and use of NaSiK platform.
 
-source ./install_env.sh
-***********************************************
+Pre-Requisites
+==============
+Following list shows the tools and libraries required to use NaSiK Platform.
+Not all of them are required, it depends on what features you are interested in.
 
-SystemC
-=======
-Pre-compiled in /opt/libs/systemc-2.2.0/
+- SystemC-2.2.0 (http://www.accellera.org/downloads/standards/systemc)
+    - You can build SystemC using:
+      ../../Common/systemc-2.2.0/configure --prefix=/opt/libs/systemc-2.2.0/ --build=i686-pc-linux-gnu
+      make all install
+    - Install location: /opt/libs/systemc-2.2.0
+    CAUTION: Create the <Install location> Directory before configuring and 
+    building the SystemC, otherwise it does not work, for some unknown reasons.
 
-Rebuild in ../Build/systemc-2.2.0/
-../../Common/systemc-2.2.0/configure --prefix=/opt/libs/systemc-2.2.0/ --build=i686-pc-linux-gnu
-make all install
-------------------------------------------------------------------------------
+- APES (http://tima-sls.imag.fr/www/research/apes)
+    - Install location: /opt/Apes
 
-Transaction Accurate Library
-============================
-Pre-compiled in /opt/libs/native
+- Toolchains
+    - apes-i386 (The Apes Native Toolchain)
+    - llvm-2.8  (The LLVM Toolchain for Native Compilation / Annotation)
+    - apes-arm  (The Apes ARM Toolchain)
+    - Texas Instruments C6000 Toolchain (For compiling C6x binaries, in COFF format)
+    - i386-pc-baremetal (The x86 baremetal toolchain, for SBT based C6x Simulation)
 
-Rebuild in hw/native
-make all install -s
-# PREFIX variable in the makefiles have been replace with NATIVE_HOME
+- Sub-Modules: NaSiK depends on the following git submodules.
+    - examples/applications/ParallelMjpeg (heads/kvm)
+    - hw/kvm-kmod-2.6.32.27
+    - sw/apes-components/KVMAnnotationManager (heads/master)
+    - sw/apes-components/KVMx86Processor (heads/master)
 
--- ParallelMjpeg Application
-------------------------------------------------------------------------------
-in examples/ParallelMjpeg
+Installing NaSiK
+================
+The following scripts can be used to setup NaSiK on your machine. 
+...
+...
 
-source install.sh
-apes-compose 
+    
+Configuring Environement
+========================
+The NaSiK platform contains the following configuration files:
 
-=> MJPEG
+-configure_env_kvm.sh
+    To configure NaSiK for KVM & Source Compilation based native simulation.
+
+-configure_env_c6x.sh
+    To configure NaSiK for KVM & Static Binary Translation based native simulation.
+
+-configure_env_arm.sh
+    To configure NaSiK for QEMU & Dynamic Binary Translation based simulation.
+    This configuration compiles the software binaries only.
+    For simulation we use Rabbits/Thumper Platform.
+    (http://tima-sls.imag.fr/www/research/rabbits)
+
+You need to source the configuration file, before building the simulation 
+platform/software and software stack.
+
+source <configuration-file-name>
+
+Building the S/W Stack
+======================
+NaSiK platform contains a few bash scripts for building/cleaning/testing.
+See NaSiK/scripts for more details.
 
 Using the 'APES_SPLIT_CC' environment variable; if set (even if null) we use 
 the LLVM compiler as Primary toolchain alogwith annotation support, if somehow 
@@ -37,13 +71,18 @@ the compilation fails using the Primary toolchain we then use the Secondary
 toolchain (usually APES); If 'APES_SPLIT_CC' variable is unset we use the APES 
 compilation toolchain only (and of course without annotations !!!)
 
--- Simulation Platform
-------------------------------------------------------------------------------
-in examples/ParallelMjpeg/hw
+Building the Simulation Platform
+================================
+Usually the make command is sufficient to build the simulation platform,
+provided that all the required libraries (SystemC, LibKVM, LibKVM-Tool, S/W)
+have be built using the above-mentioned scripts.
 
-make
+For executing the platform, see the appropriate run script present in platform
+directory.
 
-=> arch.x
+
+Classical Native Platform Instructions:
+=======================================
 
 usage:
 ./arch.x <nb_cpu> <trace_on|trace_off> <conf_file(s)> <native_options>
@@ -64,7 +103,4 @@ filter_op and filter_width are used by gtkwave.
 
 open it with 
 gtkwave -A waveform.vcd
-
-
-
 
