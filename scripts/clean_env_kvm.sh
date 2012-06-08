@@ -55,5 +55,7 @@ print_substep "Cleaning Hardware Model ... "
 cd ${PFORM_DIR}
 make clean 
 
+rm -f $NASIK_HOME/tools/fbviewer $NASIK_HOME/tools/tty_term_rw
+
 print_step "Environment Cleanup Done !!!"
 

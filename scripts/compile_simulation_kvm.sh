@@ -54,12 +54,20 @@ if [ $? != 0 ]; then
     exit 3 
 fi
 
+print_step "Compiling Tools ... "
+cd ${NASIK_HOME}/tools
+make
+if [ $? != 0 ]; then
+    print_error "Compilation Failed for tools"
+    exit 4 
+fi
+
 print_step "Compiling Platform Model ... ${PLATFORM}"
 cd ${PFORM_DIR}
 make -j2
 if [ $? != 0 ]; then
     print_error "Compilation Failed for Hardware Model"
-    exit 4 
+    exit 5
 fi
 
 print_step "Simulation Compiled Successfully !!!" 
