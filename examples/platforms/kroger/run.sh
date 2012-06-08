@@ -1,8 +1,7 @@
 #! /bin/bash
 
-rm tty100
+rm -f tty100
+export PATH=${NASIK_HOME}/tools/:$PATH
 
-export PATH=~/workspace/Rabbits-sls/rabbits/tools:$PATH
 ./arch.x
-
 #./arch.x bootstrap APPLICATION.X
