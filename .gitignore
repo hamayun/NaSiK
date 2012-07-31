@@ -28,9 +28,13 @@ sw/llvm/projects/c6x-decoder/generated-app/*.ll
 sw/llvm/projects/c6x-decoder/generated-app/*.o
 sw/llvm/projects/c6x-decoder/generated-app/*.s
 sw/llvm/projects/c6x-decoder/generated-app/*.bc
+sw/llvm/projects/c6x-decoder/generated-app/for_*
+sw/llvm/projects/c6x-decoder/generated-app/CFGs/
 sw/llvm/projects/c6x-decoder/generated-app/APPLICATION.X
 sw/llvm/projects/c6x-decoder/lib/ISABehavior/*.bc
 sw/llvm/projects/c6x-decoder/lib/ISABehavior/*.ll
 examples/platforms/tuzki/kvm_c6x_bootstrap
 batchtest*
 examples/applications/printFloats/
+tools/fbviewer
+tools/tty_term_rw

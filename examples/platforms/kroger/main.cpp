@@ -151,7 +151,7 @@ int sc_main (int argc, char ** argv)
 
     if(kvm_debug_port)
     {
-	kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, kvm_debug_port);
+	    kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, kvm_debug_port);
     }
 
     // connect block device

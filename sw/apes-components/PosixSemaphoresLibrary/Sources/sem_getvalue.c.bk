@@ -1,0 +1,12 @@
+#include <Private/PosixSemaphores.h>
+
+int sem_getvalue(sem_t *sem, int *sval)
+{
+  watch (int) {
+    ensure (sem != NULL, EINVAL);
+
+    sem->val = *sval;
+  }
+
+  return 0;
+}

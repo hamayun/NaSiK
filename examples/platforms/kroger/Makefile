@@ -17,7 +17,8 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
 
 
 CC           = g++
-OPT          = -O3
+#OPT          = -O3
+OPT          = -O0
 DEBUG        = -Wall -g
 #PROFILE      = -pg
 OTHER        = -Wno-deprecated

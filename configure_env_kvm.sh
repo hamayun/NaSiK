@@ -20,6 +20,7 @@ source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
 APPLICATION=ParallelMjpeg
+#APPLICATION=os_app
 #APPLICATION=susan
 #APPLICATION=qsort
 #APPLICATION=dijkstra
@@ -65,8 +66,10 @@ echo "Updating Application Specific Symlinks ..."
 cd ${APP_DIR}
 
 if [ ${APPLICATION} != "ParallelMjpeg" ]; then
-	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mibench elf.lds
-	ln -sf interface.xmi.kvm interface.xmi
+	if [ ${APPLICATION} != "os_app" ]; then
+		ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mibench elf.lds
+		ln -sf interface.xmi.kvm interface.xmi
+	fi
 fi
 
 

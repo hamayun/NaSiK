@@ -1,0 +1,34 @@
+#include <PosixThreads/PosixThreads.h>
+#include <Private/PosixSemaphores.h>
+
+int sem_trywait(sem_t *sem)
+{
+  int result = 0;
+  sem_t *s = sem;
+
+  if (s == NULL) {
+    result = EINVAL;
+  } else if ((result = pthread_mutex_lock(&s->lock)) == 0) {
+    if (s->id == 0) {
+      (void)pthread_mutex_unlock(&s->lock);
+      errno = EINVAL;
+      return -1;
+    }
+
+    if (s->val > 0) {
+      --s->val;
+      semaphore_acquire(sem->id, 1, 0, 0);
+    } else {
+      result = EAGAIN;
+    }
+
+    (void)pthread_mutex_unlock(&s->lock);
+  }
+
+  if (result != 0) {
+    errno = result;
+    return -1;
+  }
+
+  return 0;
+}

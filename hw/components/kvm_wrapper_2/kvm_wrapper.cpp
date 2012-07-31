@@ -26,15 +26,18 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cores, int node_id)
     m_cpu_loads_count  = 0;
     m_cpu_stores_count = 0;
 
-#define ARGC 5
+#define ARGC 6
     int argc = ARGC;
     char *argv[ARGC] = {
 #if 1
             (char *) "--cpus",
-            (char *) "1",
+            (char *) "2",
             (char *) "-k",
+//            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/os_app/osapp",
             (char *) "/home/hamayun/workspace/NaSiK/examples/applications/ParallelMjpeg/MJPEGKVM",
-            (char *) "--debug-ioport",
+//            (char *) "--debug-ioport",
+            (char *) "--debug-port",
+            (char *) "1234"
 #if 0
             (char *) "--debug-single-step",
             (char *) "-p",

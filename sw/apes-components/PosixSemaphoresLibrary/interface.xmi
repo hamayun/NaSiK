@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<APES:Interface
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:APES="http://www.ocm.org/APES"
+  xsi:schemaLocation="http://www.ocm.org/APES APESInterface.ecore"
+  author="hui.chen@imag.fr"
+  unique="true"
+  wrapper="false">
+
+  <id name="PosixSemaphoresLibrary" version="1.0"/>
+
+  <provide>
+    <context name="semaphore">
+      <type name="sem_t"/>
+
+      <method name="sem_init" result="int">
+        <argument name="sem" type="sem_t" direction="InOut"/>
+        <argument name="pshared" type="int" direction="In"/>
+        <argument name="value" type="unsigned int" direction="In"/>
+      </method>
+
+      <method name="sem_destroy" result="int">
+        <argument name="sem" type="access sem_t" direction="In"/>
+      </method>
+
+      <method name="sem_wait" result="int">
+        <argument name="sem" type="access sem_t" direction="In"/>
+      </method>
+
+      <method name="sem_trywait" result="int">
+        <argument name="sem" type="access sem_t" direction="In"/>
+      </method>
+
+      <method name="sem_post" result="int">
+        <argument name="sem" type="access sem_t" direction="In"/>
+      </method>
+
+      <method name="sem_getvalue" result="int">
+        <argument name="sem" type="sem_t" direction="Out"/>
+        <argument name="sval" type="access int" direction="In"/>
+      </method>
+    </context>
+  </provide>
+
+  <require>
+    <type name="status_t"/>
+
+    <method name="semaphore_create" result="int32_t">
+      <argument name="name" type="string" direction="In"/>
+      <argument name="tokens" type="int32_t" direction="In"/>
+    </method>
+
+    <method name="semaphore_destroy" result="status_t">
+      <argument name="sid" type="int32_t" direction="In"/>
+    </method>
+
+    <method name="semaphore_acquire" result="status_t">
+      <argument name="sid" type="int32_t" direction="In"/>
+      <argument name="tokens" type="int32_t" direction="In"/>
+      <argument name="flags" type="int32_t" direction="In"/>
+      <argument name="timeout" type="bigtime_t" direction="In"/>
+    </method>
+
+    <method name="semaphore_release" result="status_t">
+      <argument name="sid" type="int32_t" direction="In"/>
+      <argument name="n_tokens" type="int32_t" direction="In"/>
+      <argument name="flags" type="int32_t" direction="In"/>
+    </method>
+  </require>
+
+</APES:Interface>
