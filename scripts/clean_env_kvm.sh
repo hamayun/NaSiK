@@ -25,8 +25,10 @@ print_substep "Cleaning LIBKVM ... "
 cd ${LIBKVM_HOME}/libkvm 
 make clean
 
-print_substep "Cleaning bootstrap & dnastart.o ... "
+print_substep "Cleaning Bootstraps & dnastart.o ... "
 cd ${LIBKVM_HOME}/user
+make clean
+cd ${APES_EXTRA_COMPS}/KVMx86BootLoader/
 make clean
 
 print_substep "Cleaning the LIBSOCKVM ... "

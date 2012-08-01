@@ -34,9 +34,11 @@ if [ $? != 0 ]; then
     exit 2 
 fi
 
-print_step "Compiling bootstrap & dnastart.o"
+print_step "Compiling Bootstraps & dnastart.o"
 cd ${LIBKVM_HOME}/user
 make  
+cd ${APES_EXTRA_COMPS}/KVMx86BootLoader/
+make
 
 print_step "Compiling the LIBSOCKVM"
 cd ${LIBSOCKVM_HOME}
