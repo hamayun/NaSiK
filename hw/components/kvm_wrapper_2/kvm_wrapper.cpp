@@ -31,7 +31,7 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cores, int node_id)
     char *argv[ARGC] = {
 #if 1
             (char *) "--cpus",
-            (char *) "2",
+            (char *) "8",
             (char *) "-k",
 //            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/os_app/osapp",
             (char *) "/home/hamayun/workspace/NaSiK/examples/applications/ParallelMjpeg/MJPEGKVM",
