@@ -1,11 +1,3 @@
-/*
- *  Copied and modified from linux (arch/x86/boot/pmjump.S)
- */
- 
-/*
- * The actual transition into protected mode
- */
-
 #include "boot.h"
 #include "processor-flags.h"
 #include "segment.h"
@@ -14,14 +6,15 @@
     .code16
 
 /*
- * void protected_mode_jump (u32 entrypoint, u32 bootparams);
+ * secondary_pm_jump (void);
  */
 
-GLOBAL(protected_mode_jump)
+GLOBAL(secondary_pm_jump)
     xorl    %ebx, %ebx
     movw    %cs, %bx
     shll    $4, %ebx
-    addl    %ebx, 2f
+    addl    $in_pm32, %ebx
+    movl    %ebx,2f
     jmp     1f                  # Short jump to serialize on 386/486
 
 1:
@@ -36,12 +29,16 @@ GLOBAL(protected_mode_jump)
     .byte    0x66, 0xea         # ljmpl opcode
 2:  .long    in_pm32            # offset
     .word    __BOOT_CS          # segment
-ENDPROC(protected_mode_jump)
+ENDPROC(secondary_pm_jump)
 
     .code32
     .section ".text32","ax"
 GLOBAL(in_pm32)
     # Set up data segments for flat 32-bit mode
+    xorl    %ebx, %ebx
+    movw    %ss, %bx
+    shll    $4, %ebx
+
     movl    %ecx, %ds
     movl    %ecx, %es
     movl    %ecx, %fs
@@ -50,9 +47,6 @@ GLOBAL(in_pm32)
     # The 32-bit code sets up its own stack, but this way we do have
     # a valid stack if some debugging hack wants to use it.
     addl    %ebx, %esp
-
-    # Set up TR to make Intel VT happy
-    ltr     %di
 
     # Clear registers to allow for future extensions to the
     # 32-bit boot protocol
@@ -65,6 +59,7 @@ GLOBAL(in_pm32)
     # Set up LDTR to make Intel VT happy
     lldt    %cx
 
+    mov     $0x100000, %eax
     jmpl    *%eax            # Jump to the 32-bit entrypoint
 ENDPROC(in_pm32)
 

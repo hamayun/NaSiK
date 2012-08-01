@@ -293,6 +293,7 @@ void __attribute__((noreturn)) go_to_protected_mode(void);
 /* pmjump.S */
 void __attribute__((noreturn))
 	protected_mode_jump(u32 entrypoint);
+void __attribute__((noreturn))    secondary_pm_jump (void);
 
 /* printf.c */
 int sprintf(char *buf, const char *fmt, ...);

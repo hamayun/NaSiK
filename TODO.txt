@@ -1,0 +1,6 @@
+Send Output of Each Processor to a Different Terminal
+Resolve the blocking_usleep issue in KVMx86Processor ... as this is the most probable cause of failure to boot multiple processors (In some cases)
+Create a script for Generating Help Documents in NaSiK.
+Create a script for installing NaSiK on a Local Machine.
+
+Create a Repo on Pomahaka for linux-kvm tool library.  -- Done
