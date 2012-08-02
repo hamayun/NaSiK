@@ -58,6 +58,7 @@ cd ${PFORM_DIR}
 make clean 
 
 rm -f $NASIK_HOME/tools/fbviewer $NASIK_HOME/tools/tty_term_rw
+rm -f `find $NASIK_HOME -name "cscope.*"`
 
 print_step "Environment Cleanup Done !!!"
 
