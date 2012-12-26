@@ -249,6 +249,7 @@ C62x_MWBack_Node_t * __DeQ_MWB(C62x_MWB_Queue_t * mwb_queue)
     return (mwb_node);
 }
 
+/// TODO: Use Proper HAL Calls.
 int32_t Do_Memory_Writebacks(C62x_DSPState_t * p_state)
 {
     C62x_MWB_Queue_t    * mwb_queue = & p_state->m_mwback_q[p_state->m_curr_cycle % (C62X_MAX_DELAY_SLOTS + 1)];
@@ -2492,6 +2493,10 @@ C62xNOP(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t id
     return OK;
 }
 
+/*
+ * Here we perform the K-1 cycles of NOP K instruction. 
+ * The last pipeline advance is done by the Update Basic Block.
+*/
 ReturnStatus_t
 C62xNOP_UC4(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_zero, uint16_t idx_rc,
             uint32_t constant, uint8_t delay, C62x_Result_t * result)

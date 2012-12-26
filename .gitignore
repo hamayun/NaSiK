@@ -21,6 +21,7 @@ sw/llvm/projects/c6x-decoder/generated-app/*.text
 hw/kvm-85/user/test/x86/kvm_c6x_bootstrap
 examples/platforms/tuzki/tty_*
 examples/platforms/tuzki/log*
+sw/llvm/projects/c6x-decoder/configure
 sw/llvm/projects/c6x-decoder/generated-app/gen_*
 sw/llvm/projects/c6x-decoder/generated-app/header_tables.txt
 sw/llvm/projects/c6x-decoder/generated-app/*.dot
@@ -30,6 +31,7 @@ sw/llvm/projects/c6x-decoder/generated-app/*.s
 sw/llvm/projects/c6x-decoder/generated-app/*.bc
 sw/llvm/projects/c6x-decoder/generated-app/for_*
 sw/llvm/projects/c6x-decoder/generated-app/CFGs/
+sw/llvm/projects/c6x-decoder/generated-app/GlobalAddrMap.txt
 sw/llvm/projects/c6x-decoder/generated-app/APPLICATION.X
 sw/llvm/projects/c6x-decoder/lib/ISABehavior/*.bc
 sw/llvm/projects/c6x-decoder/lib/ISABehavior/*.ll

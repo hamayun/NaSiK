@@ -25,7 +25,7 @@ DEBUG        = -Wall -g
 OTHER        = -Wno-deprecated -fno-strict-aliasing
 CFLAGS       = $(DEBUG) $(OTHER) $(OPT) $(PROFILE)
 LIBDIR       = -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(LIBKVM_PREFIX)/lib 
-LIBS         = -lsystemc -lelf -lSDL -lsoc_kvm -lkvm
+LIBS         = -lsystemc -lelf -lSDL -lsoc_kvm -lkvm -lrt
 TARGET_ARCH  = linux
 
 INCDIR += -I$(SYSTEMC)/include

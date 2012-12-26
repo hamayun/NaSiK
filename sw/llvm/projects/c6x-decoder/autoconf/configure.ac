@@ -1,12 +1,11 @@
 dnl **************************************************************************
 dnl * Initialize
 dnl **************************************************************************
-AC_INIT([C6X-DECODER],[0.1],[mian-muhammad.hamayun@imag.fr])
+AC_INIT([[[C6X-DECODER]]],[[[0.1]]],[mian-muhammad.hamayun@imag.fr])
 
 dnl Identify where LLVM source tree is
-LLVM_SRC_ROOT="../../../"
-#LLVM_OBJ_ROOT="../../../"
-LLVM_OBJ_ROOT="~/workspace/Build/llvm-2.8_debug"
+LLVM_SRC_ROOT="../../.."
+LLVM_OBJ_ROOT="../../.."
 
 dnl Tell autoconf that this is an LLVM project being configured
 dnl This provides the --with-llvmsrc and --with-llvmobj options
