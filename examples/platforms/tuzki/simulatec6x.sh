@@ -43,7 +43,7 @@ OPTIONS:
    -m      Enable Module Level Optimization
    -p      Enable Special Optimizations (If Any)
    -r      Run Simulation
-   -s      Generate Exection Statistics
+   -s      Generate Execution Statistics
    -t      Target Binary Type, 'RAW' or 'COFF'  [Default 'COFF']
    -v      Verbose Mode
    -z      Use Hash Function for Global Mapping
