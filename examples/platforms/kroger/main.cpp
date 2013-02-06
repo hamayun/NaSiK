@@ -72,8 +72,6 @@ int                 nslaves = 0;
 
 
 extern "C" {
-        extern uint64_t kvm_ram_size;
-        extern void *   kvm_userspace_mem_addr;
         extern int      kvm_debug_port;
 }
 
@@ -82,8 +80,12 @@ void * p_kvm_cpu_adaptor = NULL;
 int sc_main (int argc, char ** argv)
 {
     int         i;
-    //if(argc < 3) usage_and_exit(argv[0]);
+
+    if(argc < 3) usage_and_exit(argv[0]);
     //kvm_debug_port = 1234;
+
+	char * boot_loader = (char *) argv[1];
+	char * kernel = (char *) argv[2];
 
     signal(SIGINT,simulation_stop);
 
@@ -97,8 +99,11 @@ int sc_main (int argc, char ** argv)
     }
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
-    int         kvm_num_procs = 1;
-    kvm_wrapper_t kvm_wrapper("kvm_wrap", kvm_num_procs);
+    int         kvm_num_cpus = 8;
+    uint64_t    kvm_ram_size = 512 /* Size in MBs */;
+    void *      kvm_userspace_mem_addr = NULL;
+
+    kvm_wrapper_t kvm_wrapper("kvm_wrapper", kvm_num_cpus, kvm_ram_size, kernel, boot_loader, kvm_userspace_mem_addr);
     p_kvm_cpu_adaptor = & kvm_wrapper;
 
     sl_block_device   *bl1  = new sl_block_device("block1", 1, "input_data", 1);

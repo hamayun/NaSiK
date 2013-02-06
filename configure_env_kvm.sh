@@ -52,6 +52,10 @@ export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 export PLATFORM=kroger
 export PFORM_DIR=$NASIK_HOME/examples/platforms/$PLATFORM
 
+if [ ${PLATFORM} == "kroger" ]; then
+	ln -sf ${NASIK_HOME}/sw/apes-components/KVMx86BootLoader/Primary/bin/KVMx86PrimaryBoot.bin ${PFORM_DIR}/BOOTSTRAP_SMP
+fi
+
 echo "[Setting-up Software Application Environment ($APPLICATION)]"
 cd $NASIK_HOME/examples/applications
 source config-apps-kvm.sh

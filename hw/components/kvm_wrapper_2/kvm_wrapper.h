@@ -40,7 +40,9 @@ class kvm_wrapper : public master_device
 {
 public:
     SC_HAS_PROCESS (kvm_wrapper);
-    kvm_wrapper (sc_module_name name, uint32_t num_cores, int node_id=0);
+	kvm_wrapper (sc_module_name name, uint32_t num_cpus, uint64_t ram_size, 
+				 const char * kernel, const char * boot_loader, void * kvm_userspace_mem_addr,
+				 int node_id=0);
     ~kvm_wrapper ();
 
 public:
@@ -62,7 +64,7 @@ public:
     void log_cpu_stats_delta(unsigned char *data);
 
 private:
-    uint32_t                        m_nr_cores;
+    uint32_t                        m_num_cpus;
     kvm_wrapper_requests           *m_rqs;
     bool                            m_unblocking_write;
 

@@ -9,56 +9,37 @@ using namespace std;
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
-    void * kvm_internal_init(struct kvm_import_t * ki, int argc, const char **argv, const char *prefix);
+	void * kvm_internal_init(struct kvm_import_t *ki, uint32_t num_cpus, uint64_t ram_size /* MBs */, 
+							 const char * kernel, const char * boot_loader, void * kvm_userspace_mem_addr);
     int kvm_run_cpus();
 }
 
-kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cores, int node_id)
+kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cpus, uint64_t ram_size, 
+				 const char * kernel, const char * boot_loader, void * kvm_userspace_mem_addr,
+				 int node_id)
 	: master_device (name)
 {
-    m_nr_cores = num_cores;
+    m_num_cpus = num_cpus;
+    m_node_id = node_id;
     m_rqs = new kvm_wrapper_requests (100);
     m_unblocking_write = 0;
-    m_node_id = node_id;
 
     m_cpu_instrs_count = 0;
     m_cpu_cycles_count = 0;
     m_cpu_loads_count  = 0;
     m_cpu_stores_count = 0;
 
-#define ARGC 7
+#if 0
+	#define ARGC 7
     int argc = ARGC;
     char *argv[ARGC] = {
-#if 1
-            (char *) "--cpus",
-            (char *) "16",
-            (char *) "-k",
-            (char *) "/home/hamayun/workspace/NaSiK/examples/applications/ParallelMjpeg/MJPEGKVM",
             (char *) "--debug-ioport",
             (char *) "--debug-port",
             (char *) "0"
-#if 0
-            (char *) "--debug-single-step",
-            (char *) "-p",
-            (char *) "kgdboc=ttyS1 kgdbwait",
-            (char *) "--tty",
-            (char *) "1"
-            //                    'kvm run -k [vmlinuz] -p "kgdboc=ttyS1 kgdbwait" --tty 1'
-
-#endif
-#else
-            (char *) "--cpus",
-            (char *) "1",
-            (char *) "--disk",
-            (char *) "/home/hamayun/sandbox/linux-kvm/tools/kvm/raw_image/linux-0.2.img",
-            (char *) "--kernel",
-            (char *) "/home/hamayun/sandbox/linux-kvm/arch/i386/boot/bzImage",
-#endif
     };
+#endif
 
-    m_kvm_instance = kvm_internal_init(& m_kvm_import, argc, (const char **) &argv[0], NULL);
-    //printf("(SysC) GDB (After): 0x%08X\n", m_kvm_import.gdb_srv_start_and_wait);
-
+    m_kvm_instance = kvm_internal_init(& m_kvm_import, m_num_cpus, ram_size, kernel, boot_loader, kvm_userspace_mem_addr);
     SC_THREAD (kvm_cpu_thread);
 }
 
