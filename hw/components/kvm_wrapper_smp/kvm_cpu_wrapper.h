@@ -23,7 +23,7 @@
 #include <kvm_wrapper_request.h>
 #include <kvm_wrapper_access_interface.h>
 #include <kvm_wrapper_consts.h>
-#include <kvm_imported.h>
+#include <kvm_import_export.h>
 
 #include <master_device.h>
 
@@ -34,7 +34,7 @@ class kvm_cpu_wrapper : public master_device
 public:
     SC_HAS_PROCESS (kvm_cpu_wrapper);
     kvm_cpu_wrapper (sc_module_name name, void *kvm_instance, unsigned int node_id,
-					 int cpuindex, kvm_import_t *kvm_import);
+					 int cpuindex, kvm_import_export_t * kvm_import_export);
     ~kvm_cpu_wrapper ();
 
 public:
@@ -72,7 +72,7 @@ private:
     void                                   *m_kvm_instance;
     bool                                    m_unblocking_write;
 
-    kvm_import_t                           *m_kvm_import;
+    kvm_import_export_t                    *m_kvm_import_export;
 
 public:
     int                                     m_cpuindex;

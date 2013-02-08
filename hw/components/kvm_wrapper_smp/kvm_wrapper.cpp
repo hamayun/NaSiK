@@ -9,7 +9,7 @@ using namespace std;
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
-	void * kvm_internal_init(struct kvm_import_t *ki, uint32_t num_cpus, uint64_t ram_size /* MBs */, 
+	void * kvm_internal_init(struct kvm_import_export_t * kie, uint32_t num_cpus, uint64_t ram_size /* MBs */, 
 							 const char * kernel, const char * boot_loader, void * kvm_userspace_mem_addr);
     int kvm_run_cpus();
 }
@@ -19,6 +19,8 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cpus, uint64_t ram_s
 				 int node_id)
 	: sc_module(name)
 {
+    m_kvm_import_export.imp_kvm_wrapper = this;	// Export to KVM Tool Library.
+
     m_cpu_instrs_count = 0;
     m_cpu_cycles_count = 0;
     m_cpu_loads_count  = 0;
@@ -27,14 +29,14 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t num_cpus, uint64_t ram_s
     m_ncpus = num_cpus;
     m_cpus = new kvm_cpu_wrapper_t * [m_ncpus];
 
-    m_kvm_instance = kvm_internal_init(& m_kvm_import, m_ncpus, ram_size, kernel, 
-									   boot_loader, kvm_userspace_mem_addr);
+    m_kvm_instance = kvm_internal_init(& m_kvm_import_export, m_ncpus, ram_size, kernel, 
+                                       boot_loader, kvm_userspace_mem_addr);
 
     for (int i = 0; i < m_ncpus; i++)
     {
         char            *s = new char [50];
         sprintf (s, "CPU-%d", i);
-        m_cpus[i] = new kvm_cpu_wrapper_t (s, m_kvm_instance, node_id + i, i, &m_kvm_import);
+        m_cpus[i] = new kvm_cpu_wrapper_t (s, m_kvm_instance, node_id + i, i, & m_kvm_import_export);
         //m_cpus[i]->m_port_access (*this);
     }
 

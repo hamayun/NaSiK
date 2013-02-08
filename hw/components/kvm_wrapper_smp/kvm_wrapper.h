@@ -28,7 +28,7 @@
 #include <kvm_wrapper_access_interface.h>
 #include <kvm_wrapper_request.h>
 #include <kvm_cpu_wrapper.h>
-#include <kvm_imported.h>
+#include <kvm_import_export.h>
 #include <master_device.h>
 
 using namespace noc;
@@ -45,7 +45,7 @@ public:
     ~kvm_wrapper ();
 
     void        		   *m_kvm_instance;
-    kvm_import_t    		m_kvm_import;   		// Functions that are defined in KVM Library
+    kvm_import_export_t 	m_kvm_import_export;
 
 	int             		m_ncpus;
 	kvm_cpu_wrapper_t     **m_cpus;

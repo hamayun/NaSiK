@@ -79,7 +79,6 @@ clean:
 	@rm -fr $(BUILD_DIR)
 	@ln -sf /dev/null APPLICATION.X
 	@ln -sf /dev/null input_data
-	@ln -sf /dev/null BOOTSTRAP_SMP
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPS)

@@ -75,8 +75,6 @@ extern "C" {
         extern int      kvm_debug_port;
 }
 
-void * p_kvm_cpu_adaptor = NULL;
-
 int sc_main (int argc, char ** argv)
 {
     int         i;
@@ -99,12 +97,11 @@ int sc_main (int argc, char ** argv)
     }
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
-    int         kvm_num_cpus = 16;
+    int         kvm_num_cpus = 4;
     uint64_t    kvm_ram_size = 512 /* Size in MBs */;
     void *      kvm_userspace_mem_addr = NULL;
 
     kvm_wrapper_t kvm_wrapper("KVM-0", kvm_num_cpus, kvm_ram_size, kernel, boot_loader, kvm_userspace_mem_addr);
-    p_kvm_cpu_adaptor = & kvm_wrapper;
 
     sl_block_device   *bl1  = new sl_block_device("block1", kvm_num_cpus + 0, "input_data", 1);
     sl_block_device   *bl2  = new sl_block_device("block2", kvm_num_cpus + 1, "input_data", 1);
@@ -162,7 +159,7 @@ int sc_main (int argc, char ** argv)
 
     if(kvm_debug_port)
     {
-	    kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, kvm_debug_port);
+	    kvm_wrapper.m_kvm_import_export.exp_gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, kvm_debug_port);
     }
 
     // connect block device 0

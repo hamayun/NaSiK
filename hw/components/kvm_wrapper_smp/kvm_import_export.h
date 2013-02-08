@@ -16,8 +16,8 @@
  *  along with NaSiK.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __KVM_IMPORTED_FUNCTIONS__
-#define __KVM_IMPORTED_FUNCTIONS__
+#ifndef __KVM_IMPORT_EXPORT__
+#define __KVM_IMPORT_EXPORT__
 
 #include <inttypes.h>
 
@@ -26,7 +26,7 @@ extern "C"
 {
 #endif
 
-    struct kvm_import_t;
+    struct kvm_import_export_t;
     struct kvm_counters_t;
 
     typedef int             (*gdb_srv_start_and_wait_fc_t) (void* instance, int port);
@@ -44,16 +44,17 @@ extern "C"
         uint64_t            no_io_read;
     };
 
-    struct kvm_import_t
+    struct kvm_import_export_t
     {
-        gdb_srv_start_and_wait_fc_t     gdb_srv_start_and_wait;
+        void *                          imp_kvm_wrapper;                // KVM Imports KVM WRAPPER Reference from SystemC
+        gdb_srv_start_and_wait_fc_t     exp_gdb_srv_start_and_wait;     // KVM Exports GDB Server Reference to SystemC
     };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // __KVM_IMPORTED_FUNCTIONS__
+#endif  // __KVM_IMPORT_EXPORT__
 
 /*
  * Vim standard variables

@@ -81,7 +81,7 @@ sl_tty_device::sl_tty_device (const char *_name, int ntty) : slave_device (_name
         {
             setpgrp();
             sprintf (slog, "%s%02d", _name, i);
-            sprintf (sname, "[CPU %d] (%s)", i, slog);
+            sprintf (sname, "(%s)", slog);
 
             if (execlp ("xterm",
                         "xterm",
