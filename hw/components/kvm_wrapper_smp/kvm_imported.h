@@ -1,0 +1,69 @@
+/*
+ *  Copyright (c) 2010 TIMA Laboratory
+ *
+ *
+ *  NaSiK is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  NaSiK is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with NaSiK.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef __KVM_IMPORTED_FUNCTIONS__
+#define __KVM_IMPORTED_FUNCTIONS__
+
+#include <inttypes.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    struct kvm_import_t;
+    struct kvm_counters_t;
+
+    typedef int             (*gdb_srv_start_and_wait_fc_t) (void* instance, int port);
+
+    // Imported by KVM
+    struct kvm_counters_t
+    {
+        uint64_t            no_instructions;
+        uint64_t            no_cycles;
+        uint64_t            no_mem_write;
+        uint64_t            no_mem_read;
+        uint64_t            no_dcache_miss;
+        uint64_t            no_icache_miss;
+        uint64_t            no_io_write;
+        uint64_t            no_io_read;
+    };
+
+    struct kvm_import_t
+    {
+        gdb_srv_start_and_wait_fc_t     gdb_srv_start_and_wait;
+    };
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // __KVM_IMPORTED_FUNCTIONS__
+
+/*
+ * Vim standard variables
+ * vim:set ts=4 expandtab tw=80 cindent syntax=c:
+ *
+ * Emacs standard variables
+ * Local Variables:
+ * mode: c
+ * tab-width: 4
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ */

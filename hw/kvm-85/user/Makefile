@@ -13,7 +13,7 @@ CFLAGS += -I $(KERNELDIR)/include -I ../libkvm
 
 TEST_DIR=test/x86
 
-LDFLAGS += $(CFLAGS) -L ../libkvm
+LDFLAGS += $(CFLAGS) -L ../libkvm -m32
 
 autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d
 
@@ -23,11 +23,11 @@ $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I test/lib -I test/lib/x86
 
 $(TEST_DIR)/bootstrap: $(TEST_DIR)/bootstrap.o
 	@echo "  Linking    ... "$<
-	@$(CC) -nostdlib -o $@ -Wl,-T,bootstrap.lds $^
+	@$(CC) -nostdlib $(LDFLAGS) -o $@ -Wl,-T,bootstrap.lds $^
 
 $(TEST_DIR)/kvm_c6x_bootstrap: $(TEST_DIR)/kvm_c6x_bootstrap.o
 	@echo "  Linking    ... "$<
-	@$(CC) -nostdlib -o $@ -Wl,-T,bootstrap.lds $^
+	@$(CC) -nostdlib $(LDFLAGS) -o $@ -Wl,-T,bootstrap.lds $^
 
 %.o: %.S
 	@echo "  Assembling ... "$<

@@ -3,7 +3,7 @@ COMPONENTS   = hw/components
 PLATFORM     = examples/platforms/kroger
 SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/mem                \
-               $(COMPONENTS)/kvm_wrapper_2      \
+               $(COMPONENTS)/kvm_wrapper_smp    \
                $(COMPONENTS)/framebuffer        \
                $(COMPONENTS)/sem                \
                $(COMPONENTS)/slave_device       \
@@ -79,6 +79,7 @@ clean:
 	@rm -fr $(BUILD_DIR)
 	@ln -sf /dev/null APPLICATION.X
 	@ln -sf /dev/null input_data
+	@ln -sf /dev/null BOOTSTRAP_SMP
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPS)

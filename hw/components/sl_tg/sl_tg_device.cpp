@@ -66,7 +66,6 @@ void sl_tg_device::read (unsigned long ofs, unsigned char be, unsigned char *dat
     int             i;
 	int				offset_dd = 0;
 	int				mod = 0;
-	int             rval = 0;
 
     *((unsigned int *)data + 0) = 0;
     *((unsigned int *)data + 1) = 0;
@@ -104,7 +103,7 @@ void sl_tg_device::read (unsigned long ofs, unsigned char be, unsigned char *dat
                 if(!fread (data + i + offset_dd, sizeof (uint8_t), 1, tg_file))
 				{
                 	reset_input ();
-					rval = fread (data + i + offset_dd, sizeof (uint8_t), 1, tg_file);
+					fread (data + i + offset_dd, sizeof (uint8_t), 1, tg_file);
 				}
 				//*(data + 4 + i) = *(data + i);
                 //tg_bytes_left --;

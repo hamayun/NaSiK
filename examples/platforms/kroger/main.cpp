@@ -99,34 +99,35 @@ int sc_main (int argc, char ** argv)
     }
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
-    int         kvm_num_cpus = 8;
+    int         kvm_num_cpus = 16;
     uint64_t    kvm_ram_size = 512 /* Size in MBs */;
     void *      kvm_userspace_mem_addr = NULL;
 
-    kvm_wrapper_t kvm_wrapper("kvm_wrapper", kvm_num_cpus, kvm_ram_size, kernel, boot_loader, kvm_userspace_mem_addr);
+    kvm_wrapper_t kvm_wrapper("KVM-0", kvm_num_cpus, kvm_ram_size, kernel, boot_loader, kvm_userspace_mem_addr);
     p_kvm_cpu_adaptor = & kvm_wrapper;
 
-    sl_block_device   *bl1  = new sl_block_device("block1", 1, "input_data", 1);
-    sl_block_device   *bl2  = new sl_block_device("block2", 2, "input_data", 1);
-    sl_block_device   *bl3  = new sl_block_device("block3", 3, "output_data", 1);
+    sl_block_device   *bl1  = new sl_block_device("block1", kvm_num_cpus + 0, "input_data", 1);
+    sl_block_device   *bl2  = new sl_block_device("block2", kvm_num_cpus + 1, "input_data", 1);
+    sl_block_device   *bl3  = new sl_block_device("block3", kvm_num_cpus + 2, "output_data", 1);
 
     mem_device         *ram = new mem_device("ram", kvm_ram_size, (unsigned char*) kvm_userspace_mem_addr);
     mem_device  *shared_ram = new mem_device("shared_ram", 0x10000);
     sl_tty_device     *tty0 = new sl_tty_device ("tty1", 1);
     sl_tg_device        *tg = new sl_tg_device ("tg", "fdaccess.0.0");
-    fb_device           *fb = new fb_device("framebuffer", 0, &fb_res_stat);
+    fb_device           *fb = new fb_device("framebuffer", kvm_num_cpus + 3, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
 
-    slaves[nslaves++] = ram;			 // 0	0x00000000 - 0x08000000
-    slaves[nslaves++] = shared_ram;		 // 1	0xAF000000 - 0xAFF00000
-    slaves[nslaves++] = tty0;			 // 2	0xC0000000 - 0xC0000040
-    slaves[nslaves++] = tg;			 // 3	0xC3000000 - 0xC3001000
-    slaves[nslaves++] = fb->get_slave();         // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
-    slaves[nslaves++] = sem;			 // 5	0xC5000000 - 0xC5100000
-    slaves[nslaves++] = bl1->get_slave();        // 6	0xC6000000 - 0xC6100000
-    slaves[nslaves++] = bl2->get_slave();        // 7	0xC6500000 - 0xC6600000
-    slaves[nslaves++] = bl3->get_slave();        // 8	0xC6A00000 - 0xC6B00000
+    slaves[nslaves++] = ram;                    // 0	0x00000000 - 0x08000000
+    slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
+    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
+    slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
+    slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
+    slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
+    slaves[nslaves++] = bl1->get_slave();       // 6	0xC6000000 - 0xC6100000
+    slaves[nslaves++] = bl2->get_slave();       // 7	0xC6500000 - 0xC6600000
+    slaves[nslaves++] = bl3->get_slave();       // 8	0xC6A00000 - 0xC6B00000
 
+	// TODO: Match the timers with kvm_num_cpus
     timer_device	*timers[3 + 1 /* kvm_wrapper_t */];
     int       ntimers = sizeof (timers) / sizeof (timer_device *);   // Why we divide by pointer size here ???
     for (i = 0; i < ntimers; i ++)
@@ -137,39 +138,47 @@ int sc_main (int argc, char ** argv)
         slaves[nslaves++] = timers[i]; // 7 + i  from 0xC1000000
     }
     int                     no_irqs = ntimers + 4;
-    sc_signal<bool> *wires_irq_qemu = new sc_signal<bool>[no_irqs];
+    sc_signal<bool> *wires_irq_kvm = new sc_signal<bool>[no_irqs];
 
     for (i = 0; i < ntimers; i++)
-        timers[i]->irq (wires_irq_qemu[i]);
+        timers[i]->irq (wires_irq_kvm[i]);
 
-    bl1->irq (wires_irq_qemu[no_irqs-4]);
-    bl2->irq (wires_irq_qemu[no_irqs-3]);
-    bl3->irq (wires_irq_qemu[no_irqs-2]);
-    fb->irq (wires_irq_qemu[no_irqs-1]);
+    bl1->irq (wires_irq_kvm[no_irqs-4]);
+    bl2->irq (wires_irq_kvm[no_irqs-3]);
+    bl3->irq (wires_irq_kvm[no_irqs-2]);
+    fb->irq (wires_irq_kvm[no_irqs-1]);
 
     //interconnect
-    onoc = new interconnect ("interconnect", (1 /* kvm_wrapper_t */ + 4), nslaves);
+    onoc = new interconnect ("interconnect", (kvm_num_cpus /* kvm_cpu_wrapper_t */ + 4), nslaves);
     for (i = 0; i < nslaves; i++)
         onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
 
-    onoc->connect_master_64 (0, kvm_wrapper.put_port, kvm_wrapper.get_port);
+    //masters
+//    for(i = 0; i < no_irqs; i++)
+//        kvm_wrapper.interrupt_ports[i] (wires_irq_kvm[i]);
+
+    for(i = 0; i < kvm_num_cpus; i++)
+        onoc->connect_master_64 (i, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
 
     if(kvm_debug_port)
     {
 	    kvm_wrapper.m_kvm_import.gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, kvm_debug_port);
     }
 
-    // connect block device
-    onoc->connect_master_64(1,
+    // connect block device 0
+    onoc->connect_master_64(kvm_num_cpus + 0,
                             bl1->get_master()->put_port,
                             bl1->get_master()->get_port);
-    onoc->connect_master_64(2,
+    // connect block device 1
+    onoc->connect_master_64(kvm_num_cpus + 1,
                             bl2->get_master()->put_port,
                             bl2->get_master()->get_port);
-    onoc->connect_master_64(3,
+    // connect block device 2
+    onoc->connect_master_64(kvm_num_cpus + 2,
                             bl3->get_master()->put_port,
                             bl3->get_master()->get_port);
-    onoc->connect_master_64(4,
+	// connect frame buffer
+    onoc->connect_master_64(kvm_num_cpus + 3,
                             fb->get_master()->put_port,
                             fb->get_master()->get_port);
 
