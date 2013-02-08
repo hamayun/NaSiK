@@ -5,7 +5,7 @@ export LIBKVM_HOME=${NASIK_HOME}/hw/kvm-85
 export LIBSOCKVM_HOME=${NASIK_HOME}/hw/soc_kvm
 export LIBKVM_PREFIX=/opt/libs/libkvm
 export LIBKVMTOOL_PREFIX=/home/hamayun/workspace/linux-kvm/tools/kvm
-export SYSTEMC_INCLUDE_FOR_KVM=${NASIK_HOME}/hw/components/kvm_wrapper_2/
+export SYSTEMC_INCLUDE_FOR_KVM=${NASIK_HOME}/hw/components/kvm_wrapper_smp/
 
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
