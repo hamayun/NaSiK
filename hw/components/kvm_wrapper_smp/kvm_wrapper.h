@@ -39,15 +39,16 @@ class kvm_wrapper : public sc_module //, public kvm_wrapper_access_interface
 {
 public:
     SC_HAS_PROCESS (kvm_wrapper);
-    kvm_wrapper (sc_module_name name, uint32_t num_cpus, uint64_t ram_size,
-                 const char * kernel, const char * boot_loader,
-                 void * kvm_userspace_mem_addr, int node_id=0);
+    kvm_wrapper (sc_module_name name, uint32_t node_id,
+				 uint32_t ninterrupts, uint32_t *int_cpu_mask, uint32_t num_cpus,
+				 uint64_t ram_size, const char * kernel, const char * boot_loader,
+				 void * kvm_userspace_mem_addr);
     ~kvm_wrapper ();
 
     void        		   *m_kvm_instance;
     kvm_import_export_t 	m_kvm_import_export;
 
-	int             		m_ncpus;
+	int             		m_ncpu;		/* Number of CPUs in this Wrapper */
 	kvm_cpu_wrapper_t     **m_cpus;
 
 	inline kvm_cpu_wrapper_t * get_cpu (int i) {return m_cpus[i];}
@@ -59,8 +60,19 @@ public:
     void log_cpu_stats();
     void log_cpu_stats_delta(unsigned char *data);
 
+	// Interrupt Support
+    sc_in<bool>                         *interrupt_ports;
+	
 private:
+    void interrupts_thread ();
     void kvm_cpus_thread ();
+
+    int                                  m_ninterrupts;
+    unsigned long                       *m_cpu_interrupts_raw_status;
+    unsigned long                       *m_cpu_interrupts_status;
+    unsigned long                        m_interrupts_raw_status;
+    unsigned long                        m_interrupts_enable;
+    int                                 *m_irq_cpu_mask;
 
     // Statistics extracted from Annotations
     uint64_t                        m_cpu_instrs_count;

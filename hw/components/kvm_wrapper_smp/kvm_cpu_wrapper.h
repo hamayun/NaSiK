@@ -59,7 +59,7 @@ private:
 public:
 	// TODO: Enable this Interface
     // ports
-    //sc_port<kvm_wrapper_access_interface>  m_port_access;
+    // sc_port<kvm_wrapper_access_interface>  m_port_access;
 
 private:
     // signals & events
@@ -76,7 +76,7 @@ private:
 
 public:
     int                                     m_cpuindex;
-    unsigned long                           m_crt_cpu_thread;
+//    unsigned long                           m_crt_cpu_thread;
     unsigned long                           m_swi;
 };
 
