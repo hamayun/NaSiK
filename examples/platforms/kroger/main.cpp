@@ -40,7 +40,6 @@
 #include <sl_block_device.h>
 #include <mem_device.h>
 
-
 using namespace std;
 
 #ifndef O_BINARY
@@ -97,13 +96,14 @@ int sc_main (int argc, char ** argv)
     }
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
-    int         kvm_num_cpus = 1;
+    int         kvm_num_cpus = 4;
     uint64_t    kvm_ram_size = 512 /* Size in MBs */;
     void *      kvm_userspace_mem_addr = NULL;
 	int         non_cpu_masters = 4;
 
 	// TODO: Make it as many timers the int_cpu_mask
-	uint32_t    int_cpu_mask [] = {1, 1, 1, 1, 1};		/* Timer Interrupts ,BLK0, BLK1, BLK2, FB */
+	// uint32_t    int_cpu_mask [] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};		/* Timer Interrupts ,BLK0, BLK1, BLK2, FB */
+	uint32_t    int_cpu_mask [] = {1, 1, 1, 1, 1, 1, 1, 1};		/* Timer Interrupts ,BLK0, BLK1, BLK2, FB */
 
     kvm_wrapper_t kvm_wrapper ("KVM", 0, kvm_num_cpus + non_cpu_masters, int_cpu_mask,
                                kvm_num_cpus, kvm_ram_size, kernel, boot_loader,

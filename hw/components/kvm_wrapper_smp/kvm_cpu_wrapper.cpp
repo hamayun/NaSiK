@@ -36,6 +36,10 @@
 
 static struct timeval                   start_time;
 
+extern "C" {
+	#include <libkvm-main.h>
+}
+
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsigned int node_id,
 								  int cpuindex, kvm_import_export_t * kvm_import_export)
 : master_device (name)
@@ -51,6 +55,22 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
 
     if (cpuindex == 0)
         gettimeofday (&start_time, NULL);
+
+    m_kvm_cpu_instance = kvm_cpu_internal_init(kvm_instance, cpuindex);
+    if(!m_kvm_cpu_instance)
+    {
+        cerr << "Error Initializing KVM CPU" << endl;
+        return;
+    }
+
+    SC_THREAD (kvm_cpu_thread);
+}
+
+// A thread used to simulate the kvm processor
+void kvm_cpu_wrapper::kvm_cpu_thread ()
+{
+	kvm_run_cpu(m_kvm_cpu_instance);
+    // cout << "kvm_cpu_thread[" << m_cpuindex << "]: kvm_cpu_thread exited ... return Value = " << rval << endl;
 }
 
 kvm_cpu_wrapper::~kvm_cpu_wrapper ()

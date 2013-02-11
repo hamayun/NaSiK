@@ -46,8 +46,8 @@ extern "C"
 
     struct kvm_import_export_t
     {
-        void *                          imp_kvm_wrapper;                // KVM Imports KVM WRAPPER Reference from SystemC
-        gdb_srv_start_and_wait_fc_t     exp_gdb_srv_start_and_wait;     // KVM Exports GDB Server Reference to SystemC
+        void *                          imp_kvm_wrapper;              // KVM Imports KVM WRAPPER Reference from SystemC
+        gdb_srv_start_and_wait_fc_t     exp_gdb_srv_start_and_wait;   // KVM Exports GDB Server Reference to SystemC
     };
 
 #ifdef __cplusplus

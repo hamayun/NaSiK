@@ -65,7 +65,6 @@ public:
 	
 private:
     void interrupts_thread ();
-    void kvm_cpus_thread ();
 
     int                                  m_ninterrupts;
     unsigned long                       *m_cpu_interrupts_raw_status;

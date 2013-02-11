@@ -56,6 +56,7 @@ private:
     uint32_t read (uint32_t address, uint8_t nbytes, int bIO);
     void write (uint32_t address, uint32_t data, uint8_t nbytes, int bIO);
 
+    void kvm_cpu_thread ();
 public:
 	// TODO: Enable this Interface
     // ports
@@ -70,6 +71,7 @@ private:
     kvm_wrapper_requests                   *m_rqs;
     void                                   *m_cpuenv;
     void                                   *m_kvm_instance;
+    void                                   *m_kvm_cpu_instance;
     bool                                    m_unblocking_write;
 
     kvm_import_export_t                    *m_kvm_import_export;

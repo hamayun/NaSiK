@@ -28,7 +28,7 @@ LIBS         = -lsystemc -lSDL -lelf -lkvm-tool -lz -lrt -lpthread -lutil
 TARGET_ARCH  = linux
 
 INCDIR += -I$(SYSTEMC)/include
-INCDIR += -I$(LIBKVM_PREFIX)/include
+INCDIR += -I$(LIBKVMTOOL_PREFIX)/include/kvm
 INCDIR += $(foreach SUB_DIR, $(SUB_DIRS), $(addprefix -I$(SRC_BASE_DIR)/, $(SUB_DIR)))
 
 MODULE       = arch

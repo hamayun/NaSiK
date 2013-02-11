@@ -9,9 +9,7 @@ using namespace std;
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
-	void * kvm_internal_init(struct kvm_import_export_t * kie, uint32_t num_cpus, uint64_t ram_size /* MBs */, 
-							 const char * kernel, const char * boot_loader, void * kvm_userspace_mem_addr);
-    int kvm_run_cpus();
+	#include <libkvm-main.h>
 }
 
 kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
@@ -24,8 +22,6 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
     m_kvm_import_export.imp_kvm_wrapper = this;	// Export to KVM Tool Library.
     m_ninterrupts = ninterrupts;
     interrupt_ports = NULL;
-
-	cout << "MMH: No of Interrupts = " << m_ninterrupts << endl;
 
     if (m_ninterrupts)
     {
@@ -62,7 +58,6 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
     }
 
     SC_THREAD (interrupts_thread);
-    SC_THREAD (kvm_cpus_thread);
 }
 
 kvm_wrapper::~kvm_wrapper ()
@@ -87,7 +82,7 @@ kvm_wrapper::~kvm_wrapper ()
     delete [] m_cpu_interrupts_status;
 }
 
-class my_sc_event_or_list : public sc_event_or_list
+class my_sc_event_or_list : public sc_event_or_list		// SC Even OR List (Any one event)
 {
 public:
     inline my_sc_event_or_list (const sc_event& e, bool del = false)
@@ -98,28 +93,23 @@ public:
 
 void kvm_wrapper::interrupts_thread ()
 {
-    if (!m_ninterrupts)
+    if (!m_ninterrupts)			// quit if no interrupts
         return;
-
-	cout << "MMH: Inside the Interrupts Thread " << endl;
 
     int                     i, cpu;
     bool                    *bup, *bdown;
     unsigned long           val;
-    my_sc_event_or_list     el (interrupt_ports[0].default_event ());
+    my_sc_event_or_list     eventlist (interrupt_ports[0].default_event ());
 
     bup = new bool[m_ncpu];
     bdown = new bool[m_ncpu];
 
     for (i = 1; i < m_ninterrupts; i++)
-        el | interrupt_ports[i].default_event ();
+        eventlist | interrupt_ports[i].default_event ();
 
     while (1)
     {
-		cout << "MMH: Waiting on Event List " << endl;
-        wait (el);
-
-		cout << "MMH: Finished Wait on Event List " << endl;
+        wait (eventlist);
 
         for (cpu = 0; cpu < m_ncpu; cpu++)
         {
@@ -170,6 +160,10 @@ void kvm_wrapper::interrupts_thread ()
             val <<= 1;
         }
 
+		// cout << "MMH@Interrupt: ...... " << endl;
+		// kvm_interrupt_cpu(m_kvm_instance, 0 /* cpu_id */);
+		// kvm__irq_trigger(m_kvm_instance, 1);
+
         for (cpu = 0; cpu < m_ncpu; cpu++)
         {
             if (bup[cpu] && !m_cpus[cpu]->m_swi)
@@ -186,15 +180,6 @@ void kvm_wrapper::interrupts_thread ()
                 }
         }
     }
-}
-
-// A thread used to simulate the kvm processors
-// We use only one SystemC thread here, each cpu is represented by a pthread in linux-kvm library.
-void kvm_wrapper::kvm_cpus_thread ()
-{
-    int rval = 0;
-    rval = kvm_run_cpus();
-    cout << "kvm_cpus_thread: KVM Run Exited ... Return Value = " << rval << endl;
 }
 
 /*
