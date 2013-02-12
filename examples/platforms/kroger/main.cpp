@@ -96,7 +96,7 @@ int sc_main (int argc, char ** argv)
     }
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
-    int         kvm_num_cpus = 4;
+    int         kvm_num_cpus = 8;
     uint64_t    kvm_ram_size = 512 /* Size in MBs */;
     void *      kvm_userspace_mem_addr = NULL;
 	int         non_cpu_masters = 4;

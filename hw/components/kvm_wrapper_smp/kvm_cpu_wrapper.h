@@ -24,6 +24,7 @@
 #include <kvm_wrapper_access_interface.h>
 #include <kvm_wrapper_consts.h>
 #include <kvm_import_export.h>
+#include <KVMAnnotationManager.h>
 
 #include <master_device.h>
 

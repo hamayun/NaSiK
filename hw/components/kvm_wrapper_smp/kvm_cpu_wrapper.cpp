@@ -35,6 +35,12 @@
 #define PRINTF if (0) printf
 #endif
 
+#ifdef ENABLE_CPU_STATS
+#define UPDATE_CPU_STATS(x) _this->update_cpu_stats(x)
+#else
+#define UPDATE_CPU_STATS(x) if(0) {} 
+#endif
+
 static struct timeval                   start_time;
 
 extern "C" {
@@ -287,7 +293,7 @@ extern "C"
     }
 #endif
 
-#ifdef USE_ANNOTATION_BUFFERS
+#ifdef USE_ANNOT_BUFF
 #ifdef USE_EXECUTION_SPY
     void
     systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
@@ -298,39 +304,42 @@ extern "C"
     void
     systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
     {
-/*
         db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) ptr;
         annotation_db_t *pdb = NULL;
         uint32_t buffer_cycles = 0;
 
+		//printf("%s: annotate function buffer=%x\n", _this->name(), (unsigned int) ptr);
+
         while(pbuff_desc->StartIndex != pbuff_desc->EndIndex)
-        
+        {        
             // Get pointer to the annotation db;
-            pdb = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb);
+            pdb = (annotation_db_t *)((uint32_t)vm_addr + 
+                  (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb);
+
             buffer_cycles += pdb->CycleCount;
-#ifdef ENABLE_CPU_STATS
-            _this->update_cpu_stats(pdb);
-#endif
+
+		    UPDATE_CPU_STATS(pdb);
             pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
         }
 
         wait(buffer_cycles, SC_NS);
- */
+		
+		printf("%s: annotate buffer[%2d]: Start = %4d, End = %4d\n", _this->name(),
+			   pbuff_desc->BufferID, pbuff_desc->StartIndex, pbuff_desc->EndIndex);
     }
 #endif
 #else
     void
     systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
     {
-/*
         annotation_db_t *pdb = (annotation_db_t *) ptr;
+		
+//		printf("%s: annotate function db=%x\n", _this->name(), (unsigned int) ptr);
         wait(pdb->CycleCount, SC_NS);
-#ifdef ENABLE_CPU_STATS
-        update_cpu_stats(pdb);
-#endif
-*/
+
+		UPDATE_CPU_STATS(pdb);
     }
-#endif /* USE_ANNOTATION_BUFFERS */
+#endif /* USE_ANNOT_BUFF */
 }
 
 /*

@@ -29,6 +29,8 @@ TARGET_ARCH  = linux
 
 INCDIR += -I$(SYSTEMC)/include
 INCDIR += -I$(LIBKVMTOOL_PREFIX)/include/kvm
+# We add the following path here to just get the definition of annotation_db_t and related macros.
+INCDIR += -I$(NASIK_HOME)/sw/apes-components/KVMAnnotationManager/Headers/Public
 INCDIR += $(foreach SUB_DIR, $(SUB_DIRS), $(addprefix -I$(SRC_BASE_DIR)/, $(SUB_DIR)))
 
 MODULE       = arch
