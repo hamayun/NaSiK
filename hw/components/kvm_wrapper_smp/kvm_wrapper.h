@@ -53,18 +53,11 @@ public:
 
 	inline kvm_cpu_wrapper_t * get_cpu (int i) {return m_cpus[i];}
 
-    uint64_t read (uint32_t cpu_id, uint64_t address, int nbytes, int bIO);
-    void write (uint32_t cpu_id, uint64_t address, unsigned char *data, int nbytes, int bIO);
-
-    //void update_cpu_stats(annotation_db_t *pdb);
-    void log_cpu_stats();
-    void log_cpu_stats_delta(unsigned char *data);
-
 	// Interrupt Support
     sc_in<bool>                         *interrupt_ports;
 	
 private:
-    void interrupts_thread ();
+    void                                 interrupts_thread ();
 
     int                                  m_ninterrupts;
     unsigned long                       *m_cpu_interrupts_raw_status;
@@ -72,12 +65,6 @@ private:
     unsigned long                        m_interrupts_raw_status;
     unsigned long                        m_interrupts_enable;
     int                                 *m_irq_cpu_mask;
-
-    // Statistics extracted from Annotations
-    uint64_t                        m_cpu_instrs_count;
-    uint64_t                        m_cpu_cycles_count;
-    uint64_t                        m_cpu_loads_count;
-    uint64_t                        m_cpu_stores_count;
 };
 
 typedef kvm_wrapper kvm_wrapper_t;

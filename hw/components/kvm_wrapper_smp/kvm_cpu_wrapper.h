@@ -62,6 +62,10 @@ public:
     // ports
     // sc_port<kvm_wrapper_access_interface>  m_port_access;
 
+	//void update_cpu_stats(annotation_db_t *pdb);
+    void log_cpu_stats();
+    void log_cpu_stats_delta(unsigned char *data);
+
 private:
     // signals & events
 //    sc_event                                m_ev_wakeup;
@@ -80,6 +84,12 @@ public:
     int                                     m_cpuindex;
 //    unsigned long                           m_crt_cpu_thread;
     unsigned long                           m_swi;
+
+    // Statistics extracted from Annotations
+    uint64_t                        m_cpu_instrs_count;
+    uint64_t                        m_cpu_cycles_count;
+    uint64_t                        m_cpu_loads_count;
+    uint64_t                        m_cpu_stores_count;
 };
 
 typedef kvm_cpu_wrapper kvm_cpu_wrapper_t;

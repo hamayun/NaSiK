@@ -24,6 +24,7 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <time.h>
+#include <iomanip>
 
 #include <master_device.h>
 
@@ -56,12 +57,18 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
     if (cpuindex == 0)
         gettimeofday (&start_time, NULL);
 
-    m_kvm_cpu_instance = kvm_cpu_internal_init(kvm_instance, cpuindex);
+    m_kvm_cpu_instance = kvm_cpu_internal_init(kvm_instance, this, cpuindex);
     if(!m_kvm_cpu_instance)
     {
         cerr << "Error Initializing KVM CPU" << endl;
         return;
     }
+	
+	// Init the Annotation Counters
+    m_cpu_instrs_count = 0;
+    m_cpu_cycles_count = 0;
+    m_cpu_loads_count  = 0;
+    m_cpu_stores_count = 0;
 
     SC_THREAD (kvm_cpu_thread);
 }
@@ -70,7 +77,6 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {
 	kvm_run_cpu(m_kvm_cpu_instance);
-    // cout << "kvm_cpu_thread[" << m_cpuindex << "]: kvm_cpu_thread exited ... return Value = " << rval << endl;
 }
 
 kvm_cpu_wrapper::~kvm_cpu_wrapper ()
@@ -155,6 +161,23 @@ void kvm_cpu_wrapper::write (uint64_t addr,
     unsigned char                   tid;
     kvm_wrapper_request            *localrq;
 
+	/* See if this request is for KVM Wrapper? */
+    if(addr >= KVM_ADDR_BASE && addr <= KVM_ADDR_END)
+    {
+        addr = addr - KVM_ADDR_BASE;
+        switch(addr)
+        {
+            case LOG_KVM_STATS:
+                log_cpu_stats();
+                break;
+
+            case LOG_KVM_STATS_DELTA:
+                log_cpu_stats_delta(data);
+                break;
+        }
+        return;
+    }
+
     if (m_unblocking_write)
         localrq = m_rqs->GetNewRequest (bIO);
     else
@@ -181,6 +204,157 @@ void kvm_cpu_wrapper::write (uint64_t addr,
     return;
 
 }
+
+/*
+void kvm_cpu_wrapper::update_cpu_stats(annotation_db_t *pdb)
+{
+    m_cpu_instrs_count += pdb->InstructionCount;
+    m_cpu_cycles_count += pdb->CycleCount;
+    m_cpu_loads_count  += pdb->LoadCount;
+    m_cpu_stores_count += pdb->StoreCount;
+}
+*/
+
+void kvm_cpu_wrapper::log_cpu_stats()
+{
+    std::cout << "KVM STATS: cpu_instrs_count = " << m_cpu_instrs_count
+              << " cpu_cycles_count = " << m_cpu_cycles_count
+              << " cpu_loads_count = " << m_cpu_loads_count
+              << " cpu_stores_count = " << m_cpu_stores_count << std::endl;
+}
+
+void kvm_cpu_wrapper::log_cpu_stats_delta(unsigned char *data)
+{
+    static uint64_t cpu_instrs_count_prev = 0, cpu_cycles_count_prev = 0,
+                    cpu_loads_count_prev = 0, cpu_stores_count_prev = 0;
+    uint32_t value = (uint32_t) *data;
+
+    std::cout << "KVM STATS Delta[" << value << "]:"
+              << " cpu_instrs_count = " << std::setw(12) 
+              << (m_cpu_instrs_count - cpu_instrs_count_prev)
+              << " cpu_cycles_count = " << std::setw(10) 
+              << (m_cpu_cycles_count - cpu_cycles_count_prev)
+              << " cpu_loads_count = "  << std::setw(10) 
+              << (m_cpu_loads_count  - cpu_loads_count_prev )
+              << " cpu_stores_count = " << std::setw(10) 
+              << (m_cpu_stores_count - cpu_stores_count_prev) << std::endl;
+
+    cpu_instrs_count_prev = m_cpu_instrs_count;
+    cpu_cycles_count_prev = m_cpu_cycles_count;
+    cpu_loads_count_prev  = m_cpu_loads_count;
+    cpu_stores_count_prev = m_cpu_stores_count;
+
+    if(value == 0){
+        std::cout << "Exiting on Application Request ..." << std::endl;
+        exit(0);
+    }
+}
+
+extern "C"
+{
+    uint64_t
+    systemc_kvm_read_memory (kvm_cpu_wrapper_t *_this, uint64_t addr,
+        int nbytes, unsigned int *ns, int bIO)
+    {
+        uint64_t ret;
+
+        ret = _this->read (addr, nbytes, bIO);
+        return ret;
+    }
+
+    void
+    systemc_kvm_write_memory (kvm_cpu_wrapper_t *_this, uint64_t addr,
+        unsigned char *data, int nbytes, unsigned int *ns, int bIO)
+    {
+        _this->write (addr, data, nbytes, bIO);
+    }
+
+#if 0
+    void print_annotation_db(annotation_db_t *db)
+    {
+        printf("@db = 0x%08x\t", (uint32_t) db);
+        printf("Type: [ ");
+        if(db->Type == BB_DEFAULT) printf("BB_DEFAULT ");
+        else
+        {
+            if(db->Type & BB_ENTRY) printf("BB_ENTRY ");
+            if(db->Type & BB_RETURN) printf("BB_RETURN ");
+        }
+        printf("]\t");
+
+        printf("Instr. Cnt = 0x%x, Cycle Cnt = 0x%x, Load Cnt = 0x%x, Store Cnt = 0x%x, FuncAddr = 0x%x\n",
+               db->InstructionCount, db->CycleCount, db->LoadCount, db->StoreCount, db->FuncAddr);
+    }
+#endif
+
+#ifdef USE_ANNOTATION_BUFFERS
+#ifdef USE_EXECUTION_SPY
+    void
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
+    {
+        _this->annotate((void *)vm_addr, (db_buffer_desc_t *) ptr);
+    }
+#else
+    void
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
+    {
+/*
+        db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) ptr;
+        annotation_db_t *pdb = NULL;
+        uint32_t buffer_cycles = 0;
+
+        while(pbuff_desc->StartIndex != pbuff_desc->EndIndex)
+        
+            // Get pointer to the annotation db;
+            pdb = (annotation_db_t *)((uint32_t)vm_addr + (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb);
+            buffer_cycles += pdb->CycleCount;
+#ifdef ENABLE_CPU_STATS
+            _this->update_cpu_stats(pdb);
+#endif
+            pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
+        }
+
+        wait(buffer_cycles, SC_NS);
+ */
+    }
+#endif
+#else
+    void
+    systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
+    {
+/*
+        annotation_db_t *pdb = (annotation_db_t *) ptr;
+        wait(pdb->CycleCount, SC_NS);
+#ifdef ENABLE_CPU_STATS
+        update_cpu_stats(pdb);
+#endif
+*/
+    }
+#endif /* USE_ANNOTATION_BUFFERS */
+}
+
+/*
+printf("BufferID = %d, StartIndex = %d,  EndIndex = %d, Capacity = %d\n",
+    pbuff_desc->BufferID, pbuff_desc->StartIndex,
+    pbuff_desc->EndIndex, pbuff_desc->Capacity);
+
+printf("@db: 0x%08x, Type: %d, CC = %d, FuncAddr: 0x%08x\n",
+       (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex], pdb->Type, pdb->CycleCount, pdb->FuncAddr);
+*/
+
+/*
+db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) pdesc;
+uint32_t db_count = 0;
+
+if(pbuff_desc->EndIndex > pbuff_desc->StartIndex)
+    db_count = pbuff_desc->EndIndex - pbuff_desc->StartIndex;
+else
+    db_count = pbuff_desc->Capacity - (pbuff_desc->StartIndex - pbuff_desc->EndIndex);
+
+printf("BufferID [%d] %5d --> %5d (Count = %d)\n",
+        pbuff_desc->BufferID, pbuff_desc->StartIndex,
+        pbuff_desc->EndIndex, db_count);
+ */
 
 /*
  * Vim standard variables
