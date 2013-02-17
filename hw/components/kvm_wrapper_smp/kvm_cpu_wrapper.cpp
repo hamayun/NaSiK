@@ -196,8 +196,8 @@ void kvm_cpu_wrapper::write (uint64_t addr,
     localrq->bWrite = 1;
     tid = localrq->tid;
 
-    PRINTF("kvm_cpu_wrapper[%d]: Write tid = %d, addr = 0x%08x, nbytes = %d, p = 0x%08x\n",
-			m_cpuindex, tid, (uint32_t) addr, nbytes, (uint32_t) localrq);
+    PRINTF("kvm_cpu_wrapper[%d]: Write tid = %d, addr = 0x%08x, nbytes = %d, p = 0x%p\n",
+			m_cpuindex, tid, (uint32_t) addr, nbytes, localrq);
     send_req(tid, addr, (unsigned char *)data, nbytes, 1);
 
     if (!m_unblocking_write)
