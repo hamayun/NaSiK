@@ -308,23 +308,29 @@ extern "C"
         annotation_db_t *pdb = NULL;
         uint32_t buffer_cycles = 0;
 
-		PRINTF("%s: annotate buffer[%2d]: Start = %4d, End = %4d\n", _this->name(),
-			   pbuff_desc->BufferID, pbuff_desc->StartIndex, pbuff_desc->EndIndex);
+        //printf("%s: annotate buffer[%2d]: Start = %4d, End = %4d\n", _this->name(),
+        //        pbuff_desc->BufferID, pbuff_desc->StartIndex, pbuff_desc->EndIndex);
 
         while(pbuff_desc->StartIndex != pbuff_desc->EndIndex)
-        {        
+        {
+            /* get the guest physical address depending the host machine is x86 or x86_64 */
+            intptr_t guest_db_addr;
+#ifndef __i386__
+            guest_db_addr = ((intptr_t)(pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb) >> 32);
+#else
+            guest_db_addr = (intptr_t)(pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb);
+#endif
             // Get pointer to the annotation db;
-            pdb = (annotation_db_t *)((uint32_t)vm_addr + 
-                  (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex].pdb);
+            pdb = (annotation_db_t *)((intptr_t)vm_addr + guest_db_addr);
 
             buffer_cycles += pdb->CycleCount;
 
-		    UPDATE_CPU_STATS(pdb);
+            UPDATE_CPU_STATS(pdb);
             pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
         }
 
         wait(buffer_cycles, SC_NS);
-    }
+    } 
 #endif /* USE_EXECUTION_SPY */
 #else  /* USE_ANNOT_BUFF */
     void
