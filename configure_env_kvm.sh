@@ -1,6 +1,6 @@
 echo "[Setting-up Hardware Platform Environment (SystemC, LIBKVM)]"
 export NASIK_HOME=$PWD
-export SYSTEMC=/opt/libs/systemc-2.2.0
+export SYSTEMC=/opt/libs/systemc-2.3.0
 export LIBKVM_HOME=${NASIK_HOME}/hw/kvm-85
 export LIBSOCKVM_HOME=${NASIK_HOME}/hw/soc_kvm
 export LIBKVM_PREFIX=/opt/libs/libkvm
@@ -83,7 +83,7 @@ export PATH=$NASIK_HOME:$PATH
 export PATH=${BAREMETAL_TOOLCHAIN}/bin:$PATH
 export PATH=${SECONDARY_TOOLCHAIN}/bin:$PATH
 export PATH=${PRIMARY_TOOLCHAIN}/bin:$PATH
-export LD_LIBRARY_PATH=${LIBKVMTOOL_PREFIX}:${LIBKVM_PREFIX}/lib
+export LD_LIBRARY_PATH=${LIBKVMTOOL_PREFIX}:${LIBKVM_PREFIX}/lib:${SYSTEMC}/lib-linux/
 
 cd $NASIK_HOME
 

@@ -1,20 +1,21 @@
 /*
- *  Copyright (c) 2010 TIMA Laboratory
+ *  Copyright (c) 2013 TIMA Laboratory
  *
- *  This file is part of Rabbits.
+ *  This file is part of NaSiK and inherits most of its features from 
+ *  Rabbits Framework.
  *
- *  Rabbits is free software: you can redistribute it and/or modify
+ *  NaSiK is a free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Rabbits is distributed in the hope that it will be useful,
+ *  NaSiK is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Rabbits.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with NaSiK.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __KVM_CPU_WRAPPER__
@@ -63,15 +64,11 @@ public:
     // ports
     // sc_port<kvm_wrapper_access_interface>  m_port_access;
 
-	//void update_cpu_stats(annotation_db_t *pdb);
+	void update_cpu_stats(annotation_db_t *pdb);
     void log_cpu_stats();
     void log_cpu_stats_delta(unsigned char *data);
 
 private:
-    // signals & events
-//    sc_event                                m_ev_wakeup;
-//    sc_event                                m_ev_sync;
-
     //other attributes
     kvm_wrapper_requests                   *m_rqs;
     void                                   *m_cpuenv;
@@ -83,8 +80,6 @@ private:
 
 public:
     int                                     m_cpuindex;
-//    unsigned long                           m_crt_cpu_thread;
-    unsigned long                           m_swi;
 
     // Statistics extracted from Annotations
     uint64_t                        m_cpu_instrs_count;

@@ -1,20 +1,21 @@
 /*
- *  Copyright (c) 2010 TIMA Laboratory
+ *  Copyright (c) 2013 TIMA Laboratory
  *
- *  This file is part of Rabbits.
+ *  This file is part of NaSiK and inherits most of its features from 
+ *  Rabbits Framework.
  *
- *  Rabbits is free software: you can redistribute it and/or modify
+ *  NaSiK is a free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Rabbits is distributed in the hope that it will be useful,
+ *  NaSiK is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Rabbits.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with NaSiK.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <kvm_cpu_wrapper.h>
@@ -35,6 +36,7 @@
 #define PRINTF if (0) printf
 #endif
 
+//#define ENABLE_CPU_STATS
 #ifdef ENABLE_CPU_STATS
 #define UPDATE_CPU_STATS(x) _this->update_cpu_stats(x)
 #else
@@ -58,7 +60,6 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
     m_rqs = new kvm_wrapper_requests (100);
 
     m_unblocking_write = 0;
-    m_swi = 0;
 
     if (cpuindex == 0)
         gettimeofday (&start_time, NULL);
@@ -207,11 +208,11 @@ void kvm_cpu_wrapper::write (uint64_t addr,
     }
 
     wait(20, SC_US);
-    return;
 
+//	cout << name() << "MMH:SC Time = " << sc_time_stamp() << endl;
+    return;
 }
 
-/*
 void kvm_cpu_wrapper::update_cpu_stats(annotation_db_t *pdb)
 {
     m_cpu_instrs_count += pdb->InstructionCount;
@@ -219,7 +220,6 @@ void kvm_cpu_wrapper::update_cpu_stats(annotation_db_t *pdb)
     m_cpu_loads_count  += pdb->LoadCount;
     m_cpu_stores_count += pdb->StoreCount;
 }
-*/
 
 void kvm_cpu_wrapper::log_cpu_stats()
 {
@@ -300,7 +300,7 @@ extern "C"
     {
         _this->annotate((void *)vm_addr, (db_buffer_desc_t *) ptr);
     }
-#else
+#else	/* USE_EXECUTION_SPY */
     void
     systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
     {
@@ -308,7 +308,8 @@ extern "C"
         annotation_db_t *pdb = NULL;
         uint32_t buffer_cycles = 0;
 
-		//printf("%s: annotate function buffer=%x\n", _this->name(), (unsigned int) ptr);
+		PRINTF("%s: annotate buffer[%2d]: Start = %4d, End = %4d\n", _this->name(),
+			   pbuff_desc->BufferID, pbuff_desc->StartIndex, pbuff_desc->EndIndex);
 
         while(pbuff_desc->StartIndex != pbuff_desc->EndIndex)
         {        
@@ -323,18 +324,15 @@ extern "C"
         }
 
         wait(buffer_cycles, SC_NS);
-		
-		printf("%s: annotate buffer[%2d]: Start = %4d, End = %4d\n", _this->name(),
-			   pbuff_desc->BufferID, pbuff_desc->StartIndex, pbuff_desc->EndIndex);
     }
-#endif
-#else
+#endif /* USE_EXECUTION_SPY */
+#else  /* USE_ANNOT_BUFF */
     void
     systemc_annotate_function(kvm_cpu_wrapper_t *_this, void *vm_addr, void *ptr)
     {
         annotation_db_t *pdb = (annotation_db_t *) ptr;
 		
-//		printf("%s: annotate function db=%x\n", _this->name(), (unsigned int) ptr);
+		PRINTF("%s: annotate function db=%x\n", _this->name(), (unsigned int) ptr);
         wait(pdb->CycleCount, SC_NS);
 
 		UPDATE_CPU_STATS(pdb);
@@ -342,16 +340,16 @@ extern "C"
 #endif /* USE_ANNOT_BUFF */
 }
 
-/*
+
+
+#if 0
 printf("BufferID = %d, StartIndex = %d,  EndIndex = %d, Capacity = %d\n",
     pbuff_desc->BufferID, pbuff_desc->StartIndex,
     pbuff_desc->EndIndex, pbuff_desc->Capacity);
 
 printf("@db: 0x%08x, Type: %d, CC = %d, FuncAddr: 0x%08x\n",
        (uint32_t)pbuff_desc->Buffer[pbuff_desc->StartIndex], pdb->Type, pdb->CycleCount, pdb->FuncAddr);
-*/
 
-/*
 db_buffer_desc_t *pbuff_desc = (db_buffer_desc_t *) pdesc;
 uint32_t db_count = 0;
 
@@ -363,7 +361,9 @@ else
 printf("BufferID [%d] %5d --> %5d (Count = %d)\n",
         pbuff_desc->BufferID, pbuff_desc->StartIndex,
         pbuff_desc->EndIndex, db_count);
- */
+#endif
+
+
 
 /*
  * Vim standard variables

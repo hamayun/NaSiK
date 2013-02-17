@@ -79,7 +79,7 @@ int sc_main (int argc, char ** argv)
     int         i;
 
     if(argc < 3) usage_and_exit(argv[0]);
-    //kvm_debug_port = 1234;
+    // kvm_debug_port = 1234;
 
 	char * boot_loader = (char *) argv[1];
 	char * kernel = (char *) argv[2];
@@ -96,16 +96,20 @@ int sc_main (int argc, char ** argv)
     }
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
-    int         kvm_num_cpus = 8;
+    int         kvm_num_cpus = 1;
     uint64_t    kvm_ram_size = 512 /* Size in MBs */;
     void *      kvm_userspace_mem_addr = NULL;
 	int         non_cpu_masters = 4;
 
-	// TODO: Make it as many timers the int_cpu_mask
-	// uint32_t    int_cpu_mask [] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};		/* Timer Interrupts ,BLK0, BLK1, BLK2, FB */
-	uint32_t    int_cpu_mask [] = {1, 1, 1, 1, 1, 1, 1, 1};		/* Timer Interrupts ,BLK0, BLK1, BLK2, FB */
+	int32_t     intr_mask_size = kvm_num_cpus + non_cpu_masters;
+	uint32_t   *intr_cpu_mask = new uint32_t [intr_mask_size];
 
-    kvm_wrapper_t kvm_wrapper ("KVM", 0, kvm_num_cpus + non_cpu_masters, int_cpu_mask,
+	for(i = 0; i < kvm_num_cpus; i++)	// Interrupt mask for all Timers
+        intr_cpu_mask[i] = 1;
+	for(; i < intr_mask_size; i++)	    // Rest of the master devices (BLK0, BLK1, BLK2, FB)
+		intr_cpu_mask[i] = 0;
+
+    kvm_wrapper_t kvm_wrapper ("KVM-0", 0, kvm_num_cpus + non_cpu_masters, intr_cpu_mask,
                                kvm_num_cpus, kvm_ram_size, kernel, boot_loader,
                                kvm_userspace_mem_addr);
 
@@ -141,7 +145,7 @@ int sc_main (int argc, char ** argv)
         slaves[nslaves++] = timers[i]; // 7 + i  from 0xC1000000
     }
 
-    int                     num_irqs = ntimers + non_cpu_masters; /* 1 FB and 3 Block Devices */
+    int                    num_irqs = ntimers + non_cpu_masters; /* 1 FB and 3 Block Devices */
     sc_signal<bool> * kvm_irq_wires = new sc_signal<bool>[num_irqs];
 
 	// Connect IRQ ports to Timers

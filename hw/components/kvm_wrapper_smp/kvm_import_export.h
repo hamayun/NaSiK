@@ -1,8 +1,10 @@
 /*
- *  Copyright (c) 2010 TIMA Laboratory
+ *  Copyright (c) 2013 TIMA Laboratory
  *
+ *  This file is part of NaSiK and inherits most of its features from 
+ *  Rabbits Framework.
  *
- *  NaSiK is free software: you can redistribute it and/or modify
+ *  NaSiK is a free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.

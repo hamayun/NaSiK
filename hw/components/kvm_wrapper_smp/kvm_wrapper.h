@@ -1,9 +1,10 @@
 /*
- *  Copyright (c) 2010 TIMA Laboratory
+ *  Copyright (c) 2013 TIMA Laboratory
  *
- *  This file is part of NaSiK.
+ *  This file is part of NaSiK and inherits most of its features from 
+ *  Rabbits Framework.
  *
- *  NaSiK is free software: you can redistribute it and/or modify
+ *  NaSiK is a free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
@@ -35,7 +36,7 @@ using namespace noc;
 class cpu_logs;
 
 // TODO: Implement the kvm_wrapper_access_interface
-class kvm_wrapper : public sc_module //, public kvm_wrapper_access_interface
+class kvm_wrapper : public sc_module, public kvm_wrapper_access_interface
 {
 public:
     SC_HAS_PROCESS (kvm_wrapper);
@@ -52,6 +53,12 @@ public:
 	kvm_cpu_wrapper_t     **m_cpus;
 
 	inline kvm_cpu_wrapper_t * get_cpu (int i) {return m_cpus[i];}
+
+	void set_unblocking_write (bool val);
+	unsigned long get_no_cpus();
+	unsigned long get_int_status();
+	unsigned long get_int_enable();
+	void set_int_enable (unsigned long val);
 
 	// Interrupt Support
     sc_in<bool>                         *interrupt_ports;
