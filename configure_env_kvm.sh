@@ -10,6 +10,8 @@ export SYSTEMC_INCLUDE_FOR_KVM=${NASIK_HOME}/hw/components/kvm_wrapper_smp/
 echo "[Setting-up Software Platform Environment (APES+Toolchains)]"
 export PRIMARY_TOOLCHAIN=/opt/toolchains/llvm-2.8
 export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386
+# Note: The APES toolchain version must match the actual version being used for annotation to work properly.
+export APES_TOOLCHAIN_VERSION=4.7.0
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat-llvm-newlib
 #export SECONDARY_TOOLCHAIN=/opt/toolchains/apes-i386-multifloat-annotated

@@ -1,7 +1,9 @@
 #!/bin/bash
 
 export CRT0="${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/lib/crt0.o"
-export CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/i386-sls-dnaos/4.4.2/include/"
+# Attenation: Make sure the following includes actually match the apes-i386 toolchains version being used;
+# otherwise annotation fails using split compilation, for almost every file.
+export CUSTOM_INCLUDES="-I${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/include/ -I${SECONDARY_TOOLCHAIN}/lib/gcc/i386-sls-dnaos/${APES_TOOLCHAIN_VERSION}/include/"
 export DNASTART="${LIBKVM_HOME}/user/test/x86/dnastart.o"
 
 # Try and Do the Split Compilation using the Primary Compiler. 
