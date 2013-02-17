@@ -24,7 +24,7 @@
 
 using namespace std;
 
-#define DEBUG_KVM_WRAPPER false 
+#define DEBUG_KVM_WRAPPER true 
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
@@ -52,8 +52,8 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
     m_irq_cpu_mask = 0;
 
     m_interrupts_raw_status = 0;
-	// TODO: Disable interrupts after testing
-    m_interrupts_enable = 1;
+	// Interrupts are disabled by default
+    m_interrupts_enable = 0;
     if (m_ninterrupts)
     {
         interrupt_ports = new sc_in<bool> [m_ninterrupts];
@@ -220,7 +220,8 @@ void kvm_wrapper::interrupts_thread ()
             if (bup[cpu]) // if (bup[cpu] && !m_cpus[cpu]->m_swi)
             {
                 cout << "***** INT SENT RE ***** to VCPU-" << cpu << endl;
-				kvm__irq_trigger(m_kvm_instance, 5);
+                // TTY Interrupt Number; Given as i8259_VECTOR_OFFSET + 5 in linker script of Software
+                kvm__irq_trigger(m_kvm_instance, 5);
             }
             else if (bdown[cpu]) 	// if (bdown[cpu] && !m_cpus[cpu]->m_swi)
             {
