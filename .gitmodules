@@ -1,12 +1,12 @@
 [submodule "sw/apes-components/KVMx86Processor"]
 	path = sw/apes-components/KVMx86Processor
-	url = ssh://sls_gitserver/srv/git/KVMx86Processor
+	url = ../KVMx86Processor
 [submodule "sw/apes-components/KVMAnnotationManager"]
 	path = sw/apes-components/KVMAnnotationManager
-	url = ssh://sls_gitserver/srv/git/KVMAnnotationManager
+	url = ../KVMAnnotationManager
 [submodule "examples/applications/ParallelMjpeg"]
 	path = examples/applications/ParallelMjpeg
-	url = ssh://sls_gitserver/srv/git/ParallelMjpeg
+	url = ../ParallelMjpeg
 [submodule "hw/kvm-kmod-2.6.32.27"]
 	path = hw/kvm-kmod-2.6.32.27
 	url = /home/hamayun/workspace/Common/kvm-kmod-2.6.32.27/
