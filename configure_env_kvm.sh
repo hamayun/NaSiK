@@ -22,10 +22,10 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-APPLICATION=ParallelMjpeg
+#APPLICATION=ParallelMjpeg
 #APPLICATION=os_app
 #APPLICATION=susan
-#APPLICATION=qsort
+APPLICATION=qsort
 #APPLICATION=dijkstra
 #APPLICATION=patricia
 #APPLICATION=blowfish
