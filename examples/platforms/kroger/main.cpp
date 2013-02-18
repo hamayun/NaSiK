@@ -97,8 +97,8 @@ int sc_main (int argc, char ** argv)
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
     int         kvm_num_cpus = 1;
-    uint64_t    kvm_ram_size = 512 /* Size in MBs */;
-    void *      kvm_userspace_mem_addr = NULL;
+    uint64_t    kvm_ram_size = 256 /* Size in MBs */;
+    uintptr_t   kvm_userspace_mem_addr = 0;
 	int         non_cpu_masters = 4;
 
 	int32_t     intr_mask_size = kvm_num_cpus + non_cpu_masters;
@@ -111,13 +111,13 @@ int sc_main (int argc, char ** argv)
 
     kvm_wrapper_t kvm_wrapper ("KVM-0", 0, kvm_num_cpus + non_cpu_masters, intr_cpu_mask,
                                kvm_num_cpus, kvm_ram_size, kernel, boot_loader,
-                               kvm_userspace_mem_addr);
+                               & kvm_userspace_mem_addr);
 
     sl_block_device   *blk0 = new sl_block_device("BLK0", kvm_num_cpus + 0, "input_data", 1);
     sl_block_device   *blk1 = new sl_block_device("BLK1", kvm_num_cpus + 1, "input_data", 1);
     sl_block_device   *blk2 = new sl_block_device("BLK2", kvm_num_cpus + 2, "output_data", 1);
 
-    mem_device         *ram = new mem_device("ram", kvm_ram_size, (unsigned char*) kvm_userspace_mem_addr);
+    mem_device         *ram = new mem_device("ram", kvm_ram_size*(1024*1024), (unsigned char*) kvm_userspace_mem_addr);
     mem_device  *shared_ram = new mem_device("shared_ram", 0x10000);
     sl_tty_device     *tty0 = new sl_tty_device ("tty1", 1);
     sl_tg_device        *tg = new sl_tg_device ("tg", "fdaccess.0.0");

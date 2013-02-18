@@ -41,7 +41,7 @@ extern "C" {
 kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
 						  uint32_t ninterrupts, uint32_t *int_cpu_mask, uint32_t num_cpus,
 						  uint64_t ram_size, const char * kernel, const char * boot_loader,
-						  void * kvm_userspace_mem_addr)
+						  uintptr_t * kvm_userspace_mem_addr)
 	: sc_module(name)
 {
     m_ncpu = num_cpus;
@@ -74,8 +74,7 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
     }
 
     m_cpus = new kvm_cpu_wrapper_t * [m_ncpu];
-    m_kvm_instance = kvm_internal_init(& m_kvm_import_export, m_ncpu, ram_size, kernel, 
-                                       boot_loader, kvm_userspace_mem_addr);
+    m_kvm_instance = kvm_internal_init(& m_kvm_import_export, m_ncpu, ram_size);
 
 	//TODO: Do the proper interrupt setup here
 	{
@@ -88,7 +87,7 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
 		}
 	}
 
-	kvm_setup_bios_and_ram(m_kvm_instance);
+	kvm_setup_bios_and_ram(m_kvm_instance, kvm_userspace_mem_addr, kernel, boot_loader);
 
     for (int i = 0; i < m_ncpu; i++)
     {

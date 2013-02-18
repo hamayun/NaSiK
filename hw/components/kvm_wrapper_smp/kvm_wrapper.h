@@ -43,7 +43,7 @@ public:
     kvm_wrapper (sc_module_name name, uint32_t node_id,
 				 uint32_t ninterrupts, uint32_t *int_cpu_mask, uint32_t num_cpus,
 				 uint64_t ram_size, const char * kernel, const char * boot_loader,
-				 void * kvm_userspace_mem_addr);
+				 uintptr_t * kvm_userspace_mem_addr);
     ~kvm_wrapper ();
 
     void        		   *m_kvm_instance;
