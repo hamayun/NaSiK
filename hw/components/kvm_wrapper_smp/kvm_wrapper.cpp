@@ -24,7 +24,7 @@
 
 using namespace std;
 
-#define DEBUG_KVM_WRAPPER true 
+#define DEBUG_KVM_WRAPPER false 
 #define DOUT_NAME if(DEBUG_KVM_WRAPPER) std::cout << this->name() << ": "
 
 extern "C" {
