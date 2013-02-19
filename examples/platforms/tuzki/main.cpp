@@ -119,7 +119,7 @@ int sc_main (int argc, char ** argv)
     /* Initialize the adaptor, also pass the application name to execute*/
     kvm_cpu_wrapper_t * kvm_cpu_adaptor = NULL;
     kvm_cpu_adaptor = new kvm_cpu_wrapper_t("kvm_cpu_wrapper", argv[2], (uintptr_t)soc_kvm_init_data.vm_mem, 0);
-    p_kvm_cpu_adaptor[i] = (void *) kvm_cpu_adaptor;
+    p_kvm_cpu_adaptor[0] = (void *) kvm_cpu_adaptor;
 
     sl_block_device   *bl1  = new sl_block_device("block1", 1, "input_data", 1);
     sl_block_device   *bl2  = new sl_block_device("block2", 2, "input_data", 1);
