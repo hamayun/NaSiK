@@ -1,5 +1,9 @@
 #!/bin/bash
 
+HERE=`pwd`
+NB_PROC=`cat /proc/cpuinfo | grep "processor" | wc -l`
+JOPT=-j${NB_PROC}
+
 print_step()
 {
     echo "======================================================================"
@@ -24,28 +28,38 @@ if [ -z $NASIK_HOME ] ; then
     exit 1 
 fi
 
-print_step "Compiling the LIBKVM"
-cd ${LIBKVM_HOME}
-./configure --arch=i386 --prefix=${LIBKVM_PREFIX}
-cd ${LIBKVM_HOME}/libkvm 
-make && make install-libkvm
-if [ $? != 0 ]; then
-    print_error "Error: LIBKVM compilation failed"
-    exit 2 
-fi
+# Platform is tuzki, so we need libKVM and DNA Start Files
+if [ ${PLATFORM} == "tuzki" ]; then
+	print_step "Compiling the LibKVM Library"
+	cd ${LIBKVM_HOME}
+	./configure --arch=i386 --prefix=${LIBKVM_PREFIX}
+	cd ${LIBKVM_HOME}/libkvm 
+	make && make install-libkvm
+	if [ $? != 0 ]; then
+	    print_error "Error: LIBKVM compilation failed"
+    	exit 2 
+	fi
 
-print_step "Compiling Bootstraps & dnastart.o"
-cd ${LIBKVM_HOME}/user
-make  
-cd ${APES_EXTRA_COMPS}/KVMx86BootLoader/
-make
+	print_step "Compiling Bootstrap and DNAStart Objects ..."
+	cd ${LIBKVM_HOME}/user
+	make  
 
-print_step "Compiling the LIBSOCKVM"
-cd ${LIBSOCKVM_HOME}
-make && make install 
-if [ $? != 0 ]; then
-    print_error "Compilation Failed for LIBSOCKVM"
-    exit 3 
+	print_step "Compiling the LIBSOCKVM"
+	cd ${LIBSOCKVM_HOME}
+	make && make install 
+	if [ $? != 0 ]; then
+	    print_error "Compilation Failed for LIBSOCKVM"
+    	exit 3 
+	fi
+# Platform is other than tuzki; more recent ones are based on LibKVMTool Library
+else
+	print_step "Compiling the LibKVMTool Library"
+	cd ${LIBKVMTOOL_PREFIX}
+	make ${JOPT}
+
+	print_step "Compiling the BootLoader"
+	cd ${APES_EXTRA_COMPS}/KVMx86BootLoader/
+	make
 fi
 
 print_step "Compiling Software Application ... ${APPLICATION}"
@@ -66,11 +80,12 @@ fi
 
 print_step "Compiling Platform Model ... ${PLATFORM}"
 cd ${PFORM_DIR}
-make -j2
+make ${JOPT}
+
 if [ $? != 0 ]; then
     print_error "Compilation Failed for Hardware Model"
     exit 5
 fi
 
 print_step "Simulation Compiled Successfully !!!" 
-
+cd ${HERE}

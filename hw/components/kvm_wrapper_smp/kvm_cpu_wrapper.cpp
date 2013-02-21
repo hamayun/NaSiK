@@ -259,7 +259,7 @@ void kvm_cpu_wrapper::log_cpu_stats_delta(unsigned char *data)
 extern "C"
 {
     uint64_t
-    systemc_kvm_read_memory (kvm_cpu_wrapper_t *_this, uint64_t addr,
+    systemc_mmio_read (kvm_cpu_wrapper_t *_this, uint64_t addr,
         int nbytes, unsigned int *ns, int bIO)
     {
         uint64_t ret;
@@ -269,7 +269,7 @@ extern "C"
     }
 
     void
-    systemc_kvm_write_memory (kvm_cpu_wrapper_t *_this, uint64_t addr,
+    systemc_mmio_write (kvm_cpu_wrapper_t *_this, uint64_t addr,
         unsigned char *data, int nbytes, unsigned int *ns, int bIO)
     {
         _this->write (addr, data, nbytes, bIO);

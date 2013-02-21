@@ -91,8 +91,12 @@ cd $NASIK_HOME
 
 echo "======================= GENERAL ENVIRONMENT SETTINGS ========================="
 echo "SYSTEMC                 = $SYSTEMC"
-echo "LIBKVM_HOME             = $LIBKVM_HOME"
-echo "LIBKVM_PREFIX           = $LIBKVM_PREFIX"
+if [ ${PLATFORM} == "kroger" ]; then
+	echo "LIBKVMTOOL              = $LIBKVMTOOL_PREFIX"
+else
+	echo "LIBKVM_HOME             = $LIBKVM_HOME"
+	echo "LIBKVM_PREFIX           = $LIBKVM_PREFIX"
+fi
 echo "APPLICATION             = $APP_DIR"
 echo "PLATFORM                = $PFORM_DIR"
 echo "APES_ROOT               = $APES_ROOT"
