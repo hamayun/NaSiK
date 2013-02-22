@@ -77,6 +77,16 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
     m_cpu_loads_count  = 0;
     m_cpu_stores_count = 0;
 
+	// Init the Semi-hosting Profile Support 
+	char htime_fname[64] = {0};
+	sprintf(htime_fname, "hosttime_cpu-%02d.log", m_cpuindex);
+	m_hosttime_instance = new hosttime(htime_fname);
+	if(!m_hosttime_instance)
+	{
+		cerr << "Error Initializing Semi-hosting Profile Support" << endl;
+		return;
+	}
+
     SC_THREAD (kvm_cpu_thread);
 }
 
@@ -89,7 +99,16 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 kvm_cpu_wrapper::~kvm_cpu_wrapper ()
 {
     if (m_rqs)
+	{
         delete m_rqs;
+		m_rqs = NULL;
+	}
+
+	if(m_hosttime_instance)
+	{
+		delete m_hosttime_instance;
+		m_hosttime_instance = NULL;
+	}
 }
 
 void kvm_cpu_wrapper::set_unblocking_write (bool val)
@@ -292,6 +311,12 @@ extern "C"
                db->InstructionCount, db->CycleCount, db->LoadCount, db->StoreCount, db->FuncAddr);
     }
 #endif
+
+    void
+    semihosting_profile_function(kvm_cpu_wrapper_t *_this, uint32_t value)
+    {
+        _this->m_hosttime_instance->hosttime_handler(value);
+    }
 
 #ifdef USE_ANNOT_BUFF
 #ifdef USE_EXECUTION_SPY

@@ -45,9 +45,8 @@ int main(int argc, char *argv[])
     int app_repeat_count;
     for (app_repeat_count = 0; app_repeat_count < 100; app_repeat_count++)
         real_main(argc, argv, app_repeat_count);
-
-    CPU_PROFILE_FLUSH_DATA();
 #endif
+    CPU_PROFILE_FLUSH_DATA();
     return 0;
 }
 

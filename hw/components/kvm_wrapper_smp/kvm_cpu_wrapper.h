@@ -28,6 +28,7 @@
 #include <KVMAnnotationManager.h>
 
 #include <master_device.h>
+#include <hosttime.h>
 
 using namespace noc;
 
@@ -68,6 +69,8 @@ public:
     void log_cpu_stats();
     void log_cpu_stats_delta(unsigned char *data);
 
+	// Semi-hosting Profile Support
+    hosttime_t                             *m_hosttime_instance;
 private:
     //other attributes
     kvm_wrapper_requests                   *m_rqs;
