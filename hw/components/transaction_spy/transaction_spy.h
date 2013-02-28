@@ -60,11 +60,22 @@ public:
 /*
  * TRANSACTION_SPY
  */
+ 
+#define ACCESS_NONE  0
+#define ACCESS_READ  1
+#define ACCESS_WRITE 2
+
+#define SET_NOC_ACCESS(address,data,width,op) \
+	_address = (uintptr_t)address; \
+	_data = (uintptr_t)data; \
+	_width = width; \
+	_op = op; 
+
 class transaction_spy: public slave_device
 {
 public:
     SC_HAS_PROCESS(transaction_spy);
-    transaction_spy (sc_module_name _name);
+    transaction_spy (sc_module_name name);
     virtual ~transaction_spy();
 
 	void connect_slave_64 (sc_port<VCI_GET_REQ_IF> &getp, sc_port<VCI_PUT_RSP_IF> &putp);
@@ -74,6 +85,39 @@ public:
 
 private:
     interconnect_slave_spy              *m_slave_spy;
+
+	inline uint8_t be_width(uint8_t be)
+	{
+		uint8_t  width = 0;
+	    switch (be)
+    	{
+        //byte access
+        case 0x01:	case 0x02:	case 0x04:	case 0x08:
+        case 0x10:  case 0x20:  case 0x40:  case 0x80:
+			width = 1; break;
+        //word access
+        case 0x03:  case 0x0C:  case 0x30:  case 0xC0:
+			width = 2; break;
+        //dword access
+        case 0x0F:  case 0xF0:
+			width = 4; break;
+        //qword access
+        case 0xFF:
+			width = 8; break;
+		}
+		return width;
+	}
+
+public:
+	uintptr_t     _address;
+    uintptr_t     _data;
+    uint8_t       _width;
+    uint8_t       _op; // none=0, read=1, write=2
+
+    inline bool operator == (const transaction_spy& t) const
+    {
+      return (t._address == _address && t._data == _data && t._width == _width && t._op == _op);
+    }
 };
 
 #endif

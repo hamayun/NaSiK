@@ -91,8 +91,7 @@ void interconnect_slave_spy::dispatch_responses_thread ()
 /*
  * TRANSACTION_SPY
  */
-transaction_spy::transaction_spy (sc_module_name name)
-:slave_device(name)
+transaction_spy::transaction_spy (sc_module_name name):slave_device(name)
 {
 	cout << __func__ << ": Creating Spy Interconnect Interface" << endl;
 	m_slave_spy = new interconnect_slave_spy("DUMMY", this);
@@ -101,6 +100,7 @@ transaction_spy::transaction_spy (sc_module_name name)
 		cerr << __func__ << ": Error Creating the Spy Interconnect Interface Instance" << endl;
 		exit(-1);
 	}
+	cout << "My name is: "<< this->name() << endl;
 }
 
 transaction_spy::~transaction_spy ()
@@ -120,7 +120,38 @@ void transaction_spy::rcv_rqst (unsigned long ofs, unsigned char be,
 {
 	// cout << "Runing the " << __func__ << endl;
 	/* Do the Spying Work Here */
+	if(bWrite){
+		SET_NOC_ACCESS(ofs,*data,be_width(be),ACCESS_WRITE);
+	}
+	else
+	{
+		SET_NOC_ACCESS(ofs,*data,be_width(be),ACCESS_READ);
+	}
+		
+	// Send to Actual Slave
 	m_slave_spy->add_request(m_req);
+	
+	SET_NOC_ACCESS(m_req.address,*data,be_width(be),ACCESS_NONE);
+}
+
+inline void sc_trace(sc_trace_file *tf, const transaction_spy& tspy, std::ofstream *vcd_conf)
+{
+//  ::sc_trace(tf, tspy._address, (std::string)(tspy.name()) + ".address");
+//  ::sc_trace(tf, tspy._data, (std::string)(tspy.name()) + ".data");
+//  ::sc_trace(tf, tspy._width, (std::string)(tspy.name()) + ".width");
+//  ::sc_trace(tf, tspy._op, (std::string)(tspy.name()) + ".op");
+ 
+/* 
+  if(vcd_conf != NULL)
+    *vcd_conf << "@200\n-" << tspy.name() << ":\n";
+  if(vcd_conf != NULL)
+  {
+    *vcd_conf << "@20\n+address SystemC.\\" << tspy.name() << ".address" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";
+    *vcd_conf << "@20\n+data SystemC.\\" << tspy.name() << ".data" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";    
+    *vcd_conf << "@2024\n^1 filter_op\n+op SystemC.\\" << tspy.name() << ".op" << "[7:0]\n";                          
+    *vcd_conf << "@2024\n^1 filter_width\n+width SystemC.\\" << tspy.name() << ".width" << "[7:0]\n";                 
+  }
+*/
 }
 
 /*
