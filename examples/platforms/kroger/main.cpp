@@ -39,6 +39,7 @@
 #include <framebuffer_device.h>
 #include <sl_block_device.h>
 #include <mem_device.h>
+#include <transaction_spy.h>
 
 using namespace std;
 
@@ -124,9 +125,12 @@ int sc_main (int argc, char ** argv)
     fb_device           *fb = new fb_device("framebuffer", kvm_num_cpus + 3, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
 
+    transaction_spy   *tspy = new transaction_spy("TSPY");
+
     slaves[nslaves++] = ram;                    // 0	0x00000000 - 0x08000000
     slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
-    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
+//    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
+    slaves[nslaves++] = tspy;
     slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
     slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
     slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
@@ -161,9 +165,11 @@ int sc_main (int argc, char ** argv)
     // Create the Interconnect Component
     onoc = new interconnect ("interconnect", (kvm_num_cpus + non_cpu_masters), nslaves);
 	
-	// Connect All Slave to Interconnect	
+	// Connect All Slaves to Interconnect	
     for (i = 0; i < nslaves; i++)
         onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
+
+    tspy->connect_slave_64(tty0->get_port, tty0->put_port);
 
     // Connect IRQs to KVM Wrapper
     for(i = 0; i < num_irqs; i++)
