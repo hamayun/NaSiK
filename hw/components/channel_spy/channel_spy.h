@@ -136,19 +136,19 @@ public:
 
 inline void channel_spy_trace(sc_trace_file *tf, const channel_spy &spy, std::ofstream *vcd_conf)
 {
-  sc_trace(tf, spy._address, (std::string)(spy.name()) + ".address");
-  sc_trace(tf, spy._data, (std::string)(spy.name()) + ".data");
-  sc_trace(tf, spy._width, (std::string)(spy.name()) + ".width");
-  sc_trace(tf, spy._op, (std::string)(spy.name()) + ".op");
+  sc_trace(tf, spy._address, (std::string)(spy.name()) + ".ADDR");
+  sc_trace(tf, spy._data, (std::string)(spy.name()) + ".DATA");
+  sc_trace(tf, spy._width, (std::string)(spy.name()) + ".WIDTH");
+  sc_trace(tf, spy._op, (std::string)(spy.name()) + ".OP");
  
   if(vcd_conf != NULL)
     *vcd_conf << "@200\n-" << spy.name() << ":\n";
   if(vcd_conf != NULL)
   {
-    *vcd_conf << "@20\n+address SystemC.\\" << spy.name() << ".address" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";
-    *vcd_conf << "@20\n+data SystemC.\\" << spy.name() << ".data" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";    
-    *vcd_conf << "@2024\n^1 filter_op\n+op SystemC.\\" << spy.name() << ".op" << "[7:0]\n";                          
-    *vcd_conf << "@2024\n^1 filter_width\n+width SystemC.\\" << spy.name() << ".width" << "[7:0]\n";                 
+    *vcd_conf << "@20\n+ADDR SystemC.\\" << spy.name() << ".ADDR" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";
+    *vcd_conf << "@20\n+DATA SystemC.\\" << spy.name() << ".DATA" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";
+    *vcd_conf << "@2024\n^1 filter_width\n+WIDTH SystemC.\\" << spy.name() << ".WIDTH" << "[7:0]\n";
+    *vcd_conf << "@2024\n^1 filter_op\n+OP SystemC.\\" << spy.name() << ".OP" << "[7:0]\n";
   }
 }
 

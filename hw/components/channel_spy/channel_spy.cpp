@@ -70,7 +70,7 @@ void channel_spy_master::put (vci_request& req)
 {
 	char * data = (char *) req.wdata;
 
-   	/* Do the Spying Work Here */
+  	/* Do the Spying Work Here */
 	if(req.cmd == CMD_READ){
 		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_READ);
 	}
@@ -121,7 +121,7 @@ void channel_spy_slave::get (vci_request& req)
 {
 	char * data = (char *) req.wdata;
 
-   	/* Do the Spying Work Here */
+  	/* Do the Spying Work Here */
 	if(req.cmd == CMD_READ){
 		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_READ);
 	}
@@ -132,7 +132,7 @@ void channel_spy_slave::get (vci_request& req)
 	// Forward call to the actual master (NOC)
 	get_req_port->get(req);
 
-	data = (char *) req.wdata;
+ 	data = (char *) req.wdata;
 	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
 }
 
