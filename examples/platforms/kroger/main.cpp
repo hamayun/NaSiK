@@ -126,20 +126,20 @@ int sc_main (int argc, char ** argv)
     fb_device           *fb = new fb_device("framebuffer", kvm_num_cpus + 3, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
 
-    channel_spy   *chspy1 = new channel_spy("CHSPY-TTY");
-    channel_spy   *chspy2 = new channel_spy("CHSPY-FB");
+    channel_spy_slave   *chspy1 = new channel_spy_slave("CHSPY-TTY");
+    channel_spy_slave   *chspy2 = new channel_spy_slave("CHSPY-FB");
 
     slaves[nslaves++] = ram;                    // 0	0x00000000 - 0x08000000
     slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
 //    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
 	int chspy1_id = nslaves++;
-    chspy1->connect_slave(tty0->get_port, tty0->put_port);
+    chspy1->connect_slave(chspy1_id, tty0->get_port, tty0->put_port);
 
     slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
 //    slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
 //    slaves[nslaves++] = chspy2;        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
 	int chspy2_id = nslaves++;
-    chspy2->connect_slave(fb->get_slave()->get_port, fb->get_slave()->put_port);
+    chspy2->connect_slave(chspy2_id, fb->get_slave()->get_port, fb->get_slave()->put_port);
 
     slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
     slaves[nslaves++] = blk0->get_slave();       // 6	0xC6000000 - 0xC6100000

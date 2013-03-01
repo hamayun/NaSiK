@@ -22,9 +22,6 @@
 
 #include <abstract_noc.h>
 
-/*
- * CHANNEL_SPY
- */
 #define ACCESS_NONE  0
 #define ACCESS_READ  1
 #define ACCESS_WRITE 2
@@ -35,31 +32,17 @@
 	_width = width; \
 	_op = op; 
 
-SC_MODULE(channel_spy), public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
+/*
+ * CHANNEL_SPY
+ */
+SC_MODULE(channel_spy)
 {
-public:
-    /* Master Side Ports */
-    sc_port < VCI_GET_REQ_IF > get_req_port;
-    sc_port < VCI_PUT_RSP_IF > put_rsp_port;
-
-    /* Slave Side Ports */
-    sc_export < VCI_GET_REQ_IF > slave_get_req_exp;
-    sc_export < VCI_PUT_RSP_IF > slave_put_rsp_exp;
-
+protected:
     SC_HAS_PROCESS(channel_spy);
     channel_spy (sc_module_name mod_name);
-    virtual ~channel_spy();
 
 public:
-    void connect_slave(sc_port<VCI_GET_REQ_IF> &slave_get_port,
-                       sc_port<VCI_PUT_RSP_IF> &slave_put_port);
-
-    void connect_master(sc_port<VCI_PUT_REQ_IF> &master_put_port,
-                        sc_port<VCI_GET_RSP_IF> &master_get_port);
-
-    // get/put interfaces
-    virtual void get (vci_request&); 
-    virtual void put (vci_response&); 
+    virtual ~channel_spy();
 
 public:
     uintptr_t     _address;
@@ -95,21 +78,52 @@ public:
 	}
 };
 
-inline void channel_spy_trace(sc_trace_file *tf, const channel_spy &tspy, std::ofstream *vcd_conf)
+/*
+ * CHANNEL_SPY_SLAVE
+ */
+class channel_spy_slave: public channel_spy, public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
 {
-  sc_trace(tf, tspy._address, (std::string)(tspy.name()) + ".address");
-  sc_trace(tf, tspy._data, (std::string)(tspy.name()) + ".data");
-  sc_trace(tf, tspy._width, (std::string)(tspy.name()) + ".width");
-  sc_trace(tf, tspy._op, (std::string)(tspy.name()) + ".op");
+public:
+    /* Master Side Ports */
+    sc_port < VCI_GET_REQ_IF > get_req_port;
+    sc_port < VCI_PUT_RSP_IF > put_rsp_port;
+
+    /* Slave Side Ports */
+    sc_export < VCI_GET_REQ_IF > slave_get_req_exp;
+    sc_export < VCI_PUT_RSP_IF > slave_put_rsp_exp;
+
+    SC_HAS_PROCESS(channel_spy_slave);
+    channel_spy_slave (sc_module_name mod_name);
+    virtual ~channel_spy_slave();
+
+public:
+    void connect_slave(int device_id,
+                       sc_port<VCI_GET_REQ_IF> &slave_get_port,
+                       sc_port<VCI_PUT_RSP_IF> &slave_put_port);
+
+//    void connect_master(sc_port<VCI_PUT_REQ_IF> &master_put_port,
+//                        sc_port<VCI_GET_RSP_IF> &master_get_port);
+
+    // get/put interfaces
+    virtual void get (vci_request&); 
+    virtual void put (vci_response&); 
+};
+
+inline void channel_spy_trace(sc_trace_file *tf, const channel_spy &spy, std::ofstream *vcd_conf)
+{
+  sc_trace(tf, spy._address, (std::string)(spy.name()) + ".address");
+  sc_trace(tf, spy._data, (std::string)(spy.name()) + ".data");
+  sc_trace(tf, spy._width, (std::string)(spy.name()) + ".width");
+  sc_trace(tf, spy._op, (std::string)(spy.name()) + ".op");
  
   if(vcd_conf != NULL)
-    *vcd_conf << "@200\n-" << tspy.name() << ":\n";
+    *vcd_conf << "@200\n-" << spy.name() << ":\n";
   if(vcd_conf != NULL)
   {
-    *vcd_conf << "@20\n+address SystemC.\\" << tspy.name() << ".address" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";
-    *vcd_conf << "@20\n+data SystemC.\\" << tspy.name() << ".data" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";    
-    *vcd_conf << "@2024\n^1 filter_op\n+op SystemC.\\" << tspy.name() << ".op" << "[7:0]\n";                          
-    *vcd_conf << "@2024\n^1 filter_width\n+width SystemC.\\" << tspy.name() << ".width" << "[7:0]\n";                 
+    *vcd_conf << "@20\n+address SystemC.\\" << spy.name() << ".address" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";
+    *vcd_conf << "@20\n+data SystemC.\\" << spy.name() << ".data" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";    
+    *vcd_conf << "@2024\n^1 filter_op\n+op SystemC.\\" << spy.name() << ".op" << "[7:0]\n";                          
+    *vcd_conf << "@2024\n^1 filter_width\n+width SystemC.\\" << spy.name() << ".width" << "[7:0]\n";                 
   }
 }
 

@@ -19,7 +19,7 @@
 
 #include <systemc.h>
 #include <channel_spy.h>
-//#define DEBUG_CHANNEL_SPY
+#define DEBUG_CHANNEL_SPY
 
 #ifdef DEBUG_CHANNEL_SPY
 #define DPRINTF(fmt, args...)                               \
@@ -34,27 +34,40 @@
 channel_spy::channel_spy (sc_module_name mod_name)
 :sc_module(mod_name),
 _address(0), _data(0), _width(32), _op(ACCESS_NONE)
+{}
+
+channel_spy::~channel_spy ()
+{
+    DPRINTF("%s: Destructor Called\n", __func__);
+}
+
+/*
+ * CHANNEL_SPY_SLAVE
+ */
+channel_spy_slave::channel_spy_slave (sc_module_name mod_name)
+:channel_spy(mod_name)
 {
     slave_get_req_exp(*this);
     slave_put_rsp_exp(*this);
 }
 
-channel_spy::~channel_spy ()
+channel_spy_slave::~channel_spy_slave ()
 {
-    printf("%s: Destructor Called\n", __func__);
+    DPRINTF("%s: Destructor Called\n", __func__);
 }
 
-void channel_spy::connect_slave(sc_port<VCI_GET_REQ_IF> &slave_get_port,
-                                    sc_port<VCI_PUT_RSP_IF> &slave_put_port)
-{
-    printf("channel_spy: Connecting Slave Side\n");
 
+void channel_spy_slave::connect_slave(int device_id,
+                                      sc_port<VCI_GET_REQ_IF> &slave_get_port,
+                                      sc_port<VCI_PUT_RSP_IF> &slave_put_port)
+{
+    DPRINTF("Connecting Slave Device %d\n", device_id);
     slave_get_port(slave_get_req_exp);
     slave_put_port(slave_put_rsp_exp);
 }
 
 // get/put interface implementations for slave_get_req_exp and slave_put_rsp_exp
-void channel_spy::get (vci_request& req) 
+void channel_spy_slave::get (vci_request& req) 
 {
 	char * data = (char *) req.wdata;
 
@@ -73,7 +86,7 @@ void channel_spy::get (vci_request& req)
 	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
 }
 
-void channel_spy::put (vci_response& rsp) 
+void channel_spy_slave::put (vci_response& rsp) 
 {
    	/* Do the Spying Work Here */
 	// Forward call to the actual master (NOC)
