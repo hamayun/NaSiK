@@ -77,9 +77,11 @@ extern "C" {
 
 int sc_main (int argc, char ** argv)
 {
-    int         i;
+    int i = 0;
+
 	bool trace_on = true;
-	bool trace_block_devices = false;
+	uint32_t slave_trace_mask = 0xFFFFFFEB;		// If slave bit is set to 1; trace for that slave is masked.
+	bool trace_non_cpu_masters = false;			// true: Trace All Masters; false: CPUs only.
 	channel_spy_master **master_spies = {NULL};
 	channel_spy_slave  **slave_spies  = {NULL};
 
@@ -295,16 +297,25 @@ int sc_main (int argc, char ** argv)
         trace_file = sc_create_vcd_trace_file("waveforms");
         vcd_config_file.open("waveforms.sav");
 
+		if(trace_non_cpu_masters)	
+			cout << "Tracing Enabled for All Master Devices " << endl;
+		else
+			cout << "Tracing Enabled for CPU Master Only" << endl;
+
 		for(i = 0; i < total_masters; i++)
 		{	
-			if(i >= kvm_num_cpus && !trace_block_devices && i< (kvm_num_cpus+3))
+			if(i >= kvm_num_cpus && !trace_non_cpu_masters)
 				continue;
 	        channel_spy_trace(trace_file, *master_spies[i], &vcd_config_file);
 		}
 
 		for(i = 0; i < total_slaves; i++)
-		{	
-	        channel_spy_trace(trace_file, *slave_spies[i], &vcd_config_file);
+		{
+			if(~slave_trace_mask & (1 << i)) 
+			{
+				cout << "Tracing Enabled for Slave ID " << i << endl;
+		        channel_spy_trace(trace_file, *slave_spies[i], &vcd_config_file);
+			}
 		}
 
         vcd_config_file.close();
