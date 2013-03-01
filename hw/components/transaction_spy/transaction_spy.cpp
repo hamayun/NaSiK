@@ -39,31 +39,7 @@
 #define DPRINTF(fmt, args...) do {} while(0)
 #endif
 
-/*
- * INTERCONNECT_SLAVE_SPY
- */
-interconnect_slave_spy::interconnect_slave_spy (sc_module_name name, transaction_spy *parent)
-: sc_module (name)
-{
-    m_parent = parent;
-
-    m_queue_requests = new mwsr_ta_fifo<vci_request> (8);
-    m_queue_responses = new mwsr_ta_fifo<vci_response> (8);
-
-    SC_THREAD (dispatch_responses_thread);
-}
-
-interconnect_slave_spy::~interconnect_slave_spy ()
-{
-    printf("%s: Destructor Called\n", __func__);
-
-    if (m_queue_requests)
-        delete m_queue_requests;
-
-    if (m_queue_responses)
-        delete m_queue_responses;
-}
-
+#if 0
 //put interface
 void interconnect_slave_spy::put (vci_response &rsp)
 {
@@ -79,7 +55,6 @@ void interconnect_slave_spy::get (vci_request &req)
 void interconnect_slave_spy::dispatch_responses_thread ()
 {
     vci_response            rsp;
-
     while (1)
     {
         rsp = m_queue_responses->Read ();
@@ -87,20 +62,22 @@ void interconnect_slave_spy::dispatch_responses_thread ()
     	m_parent->send_rsp(rsp.rerror);
     }
 }
+#endif
 
 /*
  * TRANSACTION_SPY
  */
-transaction_spy::transaction_spy (sc_module_name name):slave_device(name)
+transaction_spy::transaction_spy (sc_module_name mod_name)
+:sc_module(mod_name),
+_address(0),
+_data(0),
+_width(32),
+_op(ACCESS_NONE)
 {
-	cout << __func__ << ": Creating Spy Interconnect Interface" << endl;
-	m_slave_spy = new interconnect_slave_spy("DUMMY", this);
-	if(!m_slave_spy)
-	{
-		cerr << __func__ << ": Error Creating the Spy Interconnect Interface Instance" << endl;
-		exit(-1);
-	}
-	cout << "My name is: "<< this->name() << endl;
+	get_req_port(*this);
+	put_rsp_port(*this);
+//    SC_THREAD (request_transfer);
+//    SC_THREAD (response_transfer);
 }
 
 transaction_spy::~transaction_spy ()
@@ -108,13 +85,57 @@ transaction_spy::~transaction_spy ()
     printf("%s: Destructor Called\n", __func__);
 }
 
-void transaction_spy::connect_slave_64 (sc_port<VCI_GET_REQ_IF> &getp, sc_port<VCI_PUT_RSP_IF> &putp)
+#if 0
+void transaction_spy::request_transfer()
 {
-    printf("transaction_spy@connect_slave_64: Connecting Slave\n");
-    getp (*m_slave_spy);
-	putp(*m_slave_spy);
+    vci_request m_req;
+
+	cout << __func__ << ": Thread Running" << endl;
+    while(1)
+    {
+//        get_port->get (m_req);
+    	/* Do the Spying Work Here */
+//        put_req_port->put(m_req);
+    }
+}
+void transaction_spy::response_transfer()
+{
+    vci_response m_rsp;
+
+	cout << __func__ << ": Thread Running" << endl;
+    while(1)
+    {
+//        get_rsp_port->get (m_rsp);
+    	/* Do the Spying Work Here */
+//        put_port->put(m_rsp);
+    }
+}
+#endif
+
+/*
+void transaction_spy::connect_master_side(sc_port<VCI_GET_REQ_IF> &getp, sc_port<VCI_PUT_RSP_IF> &putp)
+{
+    printf("transaction_spy: Connecting Master Side\n");
+//    getp (*m_slave_spy);
+//	putp(*m_slave_spy);
+}
+*/
+
+void transaction_spy::connect_slave_side(sc_port<VCI_GET_REQ_IF> &slave_get_port, sc_port<VCI_PUT_RSP_IF> &slave_put_port)
+{
+    printf("transaction_spy: Connecting Slave Side\n");
+
+#if 1    
+    slave_get_port(get_req_port);
+	slave_put_port(put_rsp_port);
+#else
+    get_req_port(slave_get_port);
+	put_rsp_port(slave_put_port);
+#endif
+
 }
 
+#if 0
 void transaction_spy::rcv_rqst (unsigned long ofs, unsigned char be,
                                 unsigned char *data, bool bWrite)
 {
@@ -153,6 +174,7 @@ inline void sc_trace(sc_trace_file *tf, const transaction_spy& tspy, std::ofstre
   }
 */
 }
+#endif
 
 /*
  * Vim standard variables

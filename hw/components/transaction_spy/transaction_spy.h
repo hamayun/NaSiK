@@ -20,47 +20,12 @@
 #ifndef __TRANSACTION_SPY__
 #define __TRANSACTION_SPY__
 
-#include <interconnect.h>
-#include <mwsr_ta_fifo.h>
-#include<slave_device.h>
-
-class transaction_spy;
-/*
- * INTERCONNECT_SLAVE_SPY
- */
-class interconnect_slave_spy : public sc_module, public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
-{
-public:
-    SC_HAS_PROCESS (interconnect_slave_spy);
-	interconnect_slave_spy (sc_module_name name, transaction_spy *parent);
-    ~interconnect_slave_spy ();
-
-public:
-    inline void add_request (vci_request &req)
-    {
-        m_queue_requests->Write (req);
-    }
-
-public:
-    //get interface
-    virtual void get (vci_request&);
-    //put interface
-    virtual void put (vci_response&);
-
-private:
-    //thread
-    void dispatch_responses_thread ();
-
-public:
-    transaction_spy            *m_parent;
-    mwsr_ta_fifo<vci_request>  *m_queue_requests;
-    mwsr_ta_fifo<vci_response> *m_queue_responses;
-};
+//#include <interconnect.h>
+#include <abstract_noc.h>
 
 /*
  * TRANSACTION_SPY
  */
- 
 #define ACCESS_NONE  0
 #define ACCESS_READ  1
 #define ACCESS_WRITE 2
@@ -71,20 +36,55 @@ public:
 	_width = width; \
 	_op = op; 
 
-class transaction_spy: public slave_device
+SC_MODULE(transaction_spy), public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
+     //public VCI_PUT_REQ_IF, public VCI_GET_RSP_IF,
 {
 public:
+    /* Master Side Ports */
+    sc_port < VCI_GET_REQ_IF > get_port;
+    sc_port < VCI_PUT_RSP_IF > put_port;
+
+    /* Slave Side Ports */
+    sc_export < VCI_GET_REQ_IF > get_req_port;
+    sc_export < VCI_PUT_RSP_IF > put_rsp_port;
+
     SC_HAS_PROCESS(transaction_spy);
-    transaction_spy (sc_module_name name);
+    transaction_spy (sc_module_name mod_name);
     virtual ~transaction_spy();
 
-	void connect_slave_64 (sc_port<VCI_GET_REQ_IF> &getp, sc_port<VCI_PUT_RSP_IF> &putp);
+//    void request_transfer();
+//    void response_transfer();
+    
+public:
 
-	void rcv_rqst (unsigned long ofs, unsigned char be,	
-                   unsigned char *data, bool bWrite);
+//    void connect_master_side(sc_port<VCI_GET_REQ_IF> &getp, sc_port<VCI_PUT_RSP_IF> &putp);
+    void connect_slave_side(sc_port<VCI_GET_REQ_IF> &slave_get_port, sc_port<VCI_PUT_RSP_IF> &slave_put_port);
 
-private:
-    interconnect_slave_spy              *m_slave_spy;
+    // get/put interfaces
+    virtual void get (vci_request& req) 
+	{
+		get_port->get(req);
+	}
+    virtual void put (vci_response& rsp) {
+		put_port->put(rsp);
+	}
+
+/*
+    // get/put interfaces
+    virtual void put (vci_request&);
+    virtual void get (vci_response&);
+*/
+
+public:
+    uintptr_t     _address;
+    uintptr_t     _data;
+    uint8_t       _width;
+    uint8_t       _op; // none=0, read=1, write=2
+
+    inline bool operator == (const transaction_spy& t) const
+    {
+      return (t._address == _address && t._data == _data && t._width == _width && t._op == _op);
+    }
 
 	inline uint8_t be_width(uint8_t be)
 	{
@@ -107,17 +107,6 @@ private:
 		}
 		return width;
 	}
-
-public:
-	uintptr_t     _address;
-    uintptr_t     _data;
-    uint8_t       _width;
-    uint8_t       _op; // none=0, read=1, write=2
-
-    inline bool operator == (const transaction_spy& t) const
-    {
-      return (t._address == _address && t._data == _data && t._width == _width && t._op == _op);
-    }
 };
 
 #endif

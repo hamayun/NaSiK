@@ -126,15 +126,18 @@ int sc_main (int argc, char ** argv)
     sem_device         *sem = new sem_device("sem", 0x100000);
 
     transaction_spy   *tspy1 = new transaction_spy("TSPY1");
-    transaction_spy   *tspy2 = new transaction_spy("TSPY2");
+//    transaction_spy   *tspy2 = new transaction_spy("TSPY2");
 
     slaves[nslaves++] = ram;                    // 0	0x00000000 - 0x08000000
     slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
 //    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
-    slaves[nslaves++] = tspy1;
+//    slaves[nslaves++] = tspy1;
+	int tspy_id = nslaves++;
+    tspy1->connect_slave_side(tty0->get_port, tty0->put_port);
+
     slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
-//    slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
-    slaves[nslaves++] = tspy2;        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
+    slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
+//    slaves[nslaves++] = tspy2;        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
     slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
     slaves[nslaves++] = blk0->get_slave();       // 6	0xC6000000 - 0xC6100000
     slaves[nslaves++] = blk1->get_slave();       // 7	0xC6500000 - 0xC6600000
@@ -169,10 +172,18 @@ int sc_main (int argc, char ** argv)
 	
 	// Connect All Slaves to Interconnect	
     for (i = 0; i < nslaves; i++)
-        onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
+	{
+		if(i == tspy_id)
+		{
+			cout << "Actually Connecting the NOC to TSPY" << endl;
+			onoc->connect_slave_64 (i, tspy1->get_port, tspy1->put_port);
+		}
+		else
+		    onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
+	}
 
-    tspy1->connect_slave_64(tty0->get_port, tty0->put_port);
-    tspy2->connect_slave_64(fb->get_slave()->get_port, fb->get_slave()->put_port);
+//    tspy1->connect_slave_64(tty0->get_port, tty0->put_port);
+//    tspy2->connect_slave_64(fb->get_slave()->get_port, fb->get_slave()->put_port);
 
     // Connect IRQs to KVM Wrapper
     for(i = 0; i < num_irqs; i++)
