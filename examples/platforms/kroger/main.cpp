@@ -79,6 +79,9 @@ int sc_main (int argc, char ** argv)
 {
     int         i;
 	bool trace_on = true;
+	bool trace_block_devices = false;
+	channel_spy_master **master_spies = {NULL};
+	channel_spy_slave  **slave_spies  = {NULL};
 
     if(argc < 3) usage_and_exit(argv[0]);
     // kvm_debug_port = 1234;
@@ -98,12 +101,14 @@ int sc_main (int argc, char ** argv)
     }
 
     /* Initialize the KVM Processor Wrapper and specify the number of cores here.*/
-    int         kvm_num_cpus = 1;
+    int         kvm_num_cpus = 4;
     uint64_t    kvm_ram_size = 256 /* Size in MBs */;
     uintptr_t   kvm_userspace_mem_addr = 0;
 	int         non_cpu_masters = 4;
+	int 		total_masters = kvm_num_cpus + non_cpu_masters;
+	int 		total_slaves = kvm_num_cpus + 9;	/* One Timer/CPU + Slave Devices */
 
-	int32_t     intr_mask_size = kvm_num_cpus + non_cpu_masters;
+	int32_t     intr_mask_size = total_masters;
 	uint32_t   *intr_cpu_mask = new uint32_t [intr_mask_size];
 
 	for(i = 0; i < kvm_num_cpus; i++)	// Interrupt mask for all Timers
@@ -111,7 +116,7 @@ int sc_main (int argc, char ** argv)
 	for(; i < intr_mask_size; i++)	    // Rest of the master devices (BLK0, BLK1, BLK2, FB)
 		intr_cpu_mask[i] = 0;
 
-    kvm_wrapper_t kvm_wrapper ("KVM-0", 0, kvm_num_cpus + non_cpu_masters, intr_cpu_mask,
+    kvm_wrapper_t kvm_wrapper ("KVM-0", 0, total_masters, intr_cpu_mask,
                                kvm_num_cpus, kvm_ram_size, kernel, boot_loader,
                                & kvm_userspace_mem_addr);
 
@@ -126,28 +131,66 @@ int sc_main (int argc, char ** argv)
     fb_device           *fb = new fb_device("framebuffer", kvm_num_cpus + 3, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
 
-    channel_spy_master  *chspy0 = new channel_spy_master("CHSPY-CPU");
-    channel_spy_slave   *chspy1 = new channel_spy_slave("CHSPY-TTY");
-    channel_spy_slave   *chspy2 = new channel_spy_slave("CHSPY-FB");
+	if(trace_on)
+	{
+		char master_name[20];
+		master_spies = new channel_spy_master* [total_masters];
+		for(i = 0; i < kvm_num_cpus; i++)
+		{
+			sprintf(master_name, "CPU-%02d", i);
+			master_spies[i] = new channel_spy_master(master_name);
+		}
+		// Non-CPU Masters ...
+		master_spies[i++] = new channel_spy_master("BLK0-MASTER");
+		master_spies[i++] = new channel_spy_master("BLK1-MASTER");
+		master_spies[i++] = new channel_spy_master("BLK2-MASTER");
+		master_spies[i++] = new channel_spy_master("FB-MASTER");
 
-    slaves[nslaves++] = ram;                    // 0	0x00000000 - 0x08000000
-    slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
-//    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
-	int chspy1_id = nslaves++;
-    chspy1->connect_slave(chspy1_id, tty0->get_port, tty0->put_port);
+		// Slave Spies
+		slave_spies = new channel_spy_slave* [total_slaves];
 
-    slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
-//    slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
-//    slaves[nslaves++] = chspy2;        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
-	int chspy2_id = nslaves++;
-    chspy2->connect_slave(chspy2_id, fb->get_slave()->get_port, fb->get_slave()->put_port);
+		slave_spies[nslaves] = new channel_spy_slave("RAM");
+	    slave_spies[nslaves]->connect_slave(nslaves, ram->get_port, ram->put_port);
+		nslaves++;
+		slave_spies[nslaves] = new channel_spy_slave("SHARED-RAM");
+	    slave_spies[nslaves]->connect_slave(nslaves, shared_ram->get_port, shared_ram->put_port);
+		nslaves++;
+		slave_spies[nslaves] = new channel_spy_slave("TTY");
+	    slave_spies[nslaves]->connect_slave(nslaves, tty0->get_port, tty0->put_port);
+		nslaves++;
+		slave_spies[nslaves] = new channel_spy_slave("TR-GEN");
+	    slave_spies[nslaves]->connect_slave(nslaves, tg->get_port, tg->put_port);
+		nslaves++;
+		slave_spies[nslaves] = new channel_spy_slave("FB-SLAVE");
+	    slave_spies[nslaves]->connect_slave(nslaves, fb->get_slave()->get_port, fb->get_slave()->put_port);
+		nslaves++;
+		slave_spies[nslaves] = new channel_spy_slave("SEM");
+	    slave_spies[nslaves]->connect_slave(nslaves, sem->get_port, sem->put_port);
+		nslaves++;
+		slave_spies[nslaves] = new channel_spy_slave("BLK0-SLAVE");
+	    slave_spies[nslaves]->connect_slave(nslaves, blk0->get_slave()->get_port, blk0->get_slave()->put_port);
+		nslaves++;
+		slave_spies[nslaves] = new channel_spy_slave("BLK1-SLAVE");
+	    slave_spies[nslaves]->connect_slave(nslaves, blk1->get_slave()->get_port, blk1->get_slave()->put_port);
+		nslaves++;
+		slave_spies[nslaves] = new channel_spy_slave("BLK2-SLAVE");
+	    slave_spies[nslaves]->connect_slave(nslaves, blk2->get_slave()->get_port, blk2->get_slave()->put_port);
+		nslaves++;
+	}
+	else
+	{
+	    slaves[nslaves++] = ram;                    // 0	0x00000000 - 0x08000000
+    	slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
+	    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
+    	slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
+    	slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
+	    slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
+	    slaves[nslaves++] = blk0->get_slave();      // 6	0xC6000000 - 0xC6100000
+	    slaves[nslaves++] = blk1->get_slave();      // 7	0xC6500000 - 0xC6600000
+	    slaves[nslaves++] = blk2->get_slave();      // 8	0xC6A00000 - 0xC6B00000
+	}
 
-    slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
-    slaves[nslaves++] = blk0->get_slave();       // 6	0xC6000000 - 0xC6100000
-    slaves[nslaves++] = blk1->get_slave();       // 7	0xC6500000 - 0xC6600000
-    slaves[nslaves++] = blk2->get_slave();       // 8	0xC6A00000 - 0xC6B00000
-
-	// TODO: Match the timers with kvm_num_cpus
+	// Create as many timers as many CPUs
     timer_device	* timers[kvm_num_cpus];
     int       ntimers = sizeof (timers) / sizeof (timer_device *);
     for (i = 0; i < ntimers; i ++)
@@ -155,10 +198,21 @@ int sc_main (int argc, char ** argv)
         char		buf[20];
         sprintf(buf, "timer_%d", i);
         timers[i] = new timer_device (buf);
-        slaves[nslaves++] = timers[i]; // 7 + i  from 0xC1000000
+
+		if(trace_on)
+		{
+        	sprintf(buf, "TIMER-%02d", i);
+			slave_spies[nslaves] = new channel_spy_slave(buf);
+		    slave_spies[nslaves]->connect_slave(nslaves, timers[i]->get_port, timers[i]->put_port);
+			nslaves++;		
+		}
+		else
+		{
+	        slaves[nslaves++] = timers[i]; // 8 + i  from 0xC1000000
+		}
     }
 
-    int                    num_irqs = ntimers + non_cpu_masters; /* 1 FB and 3 Block Devices */
+    int num_irqs = ntimers + non_cpu_masters; /* 1 FB and 3 Block Devices */
     sc_signal<bool> * kvm_irq_wires = new sc_signal<bool>[num_irqs];
 
 	// Connect IRQ ports to Timers
@@ -172,21 +226,13 @@ int sc_main (int argc, char ** argv)
     fb->irq  (kvm_irq_wires[num_irqs - 1]);
 
     // Create the Interconnect Component
-    onoc = new interconnect ("interconnect", (kvm_num_cpus + non_cpu_masters), nslaves);
-	
-	// Connect All Slaves to Interconnect	
+    onoc = new interconnect ("interconnect", total_masters, nslaves);
+
+	// Connect All Slaves to Interconnect
     for (i = 0; i < nslaves; i++)
 	{
-		if(i == chspy1_id)
-		{
-			cout << "Connecting NOC to Channel Spy for TTY" << endl;
-			onoc->connect_slave_64 (i, chspy1->get_req_port, chspy1->put_rsp_port);
-		}
-		else if(i == chspy2_id)
-		{
-			cout << "Connecting NOC to Channel Spy for FB" << endl;
-			onoc->connect_slave_64 (i, chspy2->get_req_port, chspy2->put_rsp_port);
-		}
+		if(trace_on)
+			onoc->connect_slave_64 (i, slave_spies[i]->get_req_port, slave_spies[i]->put_rsp_port);
 		else
 		    onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
 	}
@@ -197,15 +243,14 @@ int sc_main (int argc, char ** argv)
 
 	// Connect All CPU Masters
     for(i = 0; i < kvm_num_cpus; i++)
-	if(!trace_on)
-        onoc->connect_master_64 (i, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
-	else
 	{
-	    cout << "Connecting Channel Spy to CPU master" << endl;
-		chspy0->connect_master(i, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
-
-	    cout << "Connecting NOC to Channel Spy CPU" << endl;
-		onoc->connect_master_64 (i, chspy0->put_req_port, chspy0->get_rsp_port);
+		if(trace_on)
+		{
+			master_spies[i]->connect_master(i, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
+			onoc->connect_master_64 (i, master_spies[i]->put_req_port, master_spies[i]->get_rsp_port);
+		}
+		else
+        	onoc->connect_master_64 (i, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
 	}
 
 	// Initialize the Debugger, if required.
@@ -214,25 +259,32 @@ int sc_main (int argc, char ** argv)
 	    kvm_wrapper.m_kvm_import_export.exp_gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, kvm_debug_port);
     }
 
-    // Connect Block Device 0
-    onoc->connect_master_64(kvm_num_cpus + 0,
-                            blk0->get_master()->put_port,
-                            blk0->get_master()->get_port);
-
-    // Connect Block Device 1
-    onoc->connect_master_64(kvm_num_cpus + 1,
-                            blk1->get_master()->put_port,
-                            blk1->get_master()->get_port);
-    
-	// Connect Block Device 2
-    onoc->connect_master_64(kvm_num_cpus + 2,
-                            blk2->get_master()->put_port,
-                            blk2->get_master()->get_port);
-
-    // Connect Frame Buffer
-    onoc->connect_master_64(kvm_num_cpus + 3,
-                            fb->get_master()->put_port,
-                            fb->get_master()->get_port);
+	if(trace_on)
+	{
+		master_spies[i]->connect_master(i, blk0->get_master()->put_port, blk0->get_master()->get_port);
+		onoc->connect_master_64 (i, master_spies[i]->put_req_port, master_spies[i]->get_rsp_port);
+		i++;
+		master_spies[i]->connect_master(i, blk1->get_master()->put_port, blk1->get_master()->get_port);
+		onoc->connect_master_64 (i, master_spies[i]->put_req_port, master_spies[i]->get_rsp_port);
+		i++;
+		master_spies[i]->connect_master(i, blk2->get_master()->put_port, blk2->get_master()->get_port);
+		onoc->connect_master_64 (i, master_spies[i]->put_req_port, master_spies[i]->get_rsp_port);
+		i++;
+		master_spies[i]->connect_master(i, fb->get_master()->put_port, fb->get_master()->get_port);
+		onoc->connect_master_64 (i, master_spies[i]->put_req_port, master_spies[i]->get_rsp_port);
+		i++;
+	}
+	else
+	{
+	    // Connect Block Device 0
+    	onoc->connect_master_64(i++, blk0->get_master()->put_port, blk0->get_master()->get_port);
+	    // Connect Block Device 1
+	    onoc->connect_master_64(i++, blk1->get_master()->put_port, blk1->get_master()->get_port);
+		// Connect Block Device 2
+    	onoc->connect_master_64(i++, blk2->get_master()->put_port, blk2->get_master()->get_port);
+	    // Connect Frame Buffer
+    	onoc->connect_master_64(i++, fb->get_master()->put_port, fb->get_master()->get_port);
+	}
 
 	// Start the Simulation
     cout << "Starting SystemC Hardware ... " << endl;
@@ -243,14 +295,25 @@ int sc_main (int argc, char ** argv)
         trace_file = sc_create_vcd_trace_file("waveforms");
         vcd_config_file.open("waveforms.sav");
 
-        channel_spy_trace(trace_file, *chspy0, &vcd_config_file);
-        channel_spy_trace(trace_file, *chspy1, &vcd_config_file);
-        channel_spy_trace(trace_file, *chspy2, &vcd_config_file);
+		for(i = 0; i < total_masters; i++)
+		{	
+			if(i >= kvm_num_cpus && !trace_block_devices && i< (kvm_num_cpus+3))
+				continue;
+	        channel_spy_trace(trace_file, *master_spies[i], &vcd_config_file);
+		}
+
+		for(i = 0; i < total_slaves; i++)
+		{	
+	        channel_spy_trace(trace_file, *slave_spies[i], &vcd_config_file);
+		}
+
         vcd_config_file.close();
     }
 
     sc_start();
-    if (trace_on) {
+
+    if (trace_on)
+    {
         sc_close_vcd_trace_file(trace_file);
     }
     return (EXIT_SUCCESS);

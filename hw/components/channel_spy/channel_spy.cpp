@@ -23,7 +23,7 @@
 
 #ifdef DEBUG_CHANNEL_SPY
 #define DPRINTF(fmt, args...)                               \
-    do { printf("%s: " fmt, name(), ##args); } while (0)
+    do { printf("[CHANNEL_SPY]: " fmt, ##args); } while (0)
 #else
 #define DPRINTF(fmt, args...) do {} while(0)
 #endif
@@ -38,7 +38,7 @@ _address(0), _data(0), _width(32), _op(ACCESS_NONE)
 
 channel_spy::~channel_spy ()
 {
-    DPRINTF("%s: Destructor Called\n", __func__);
+    DPRINTF("Destructor Called\n");
 }
 
 /*
@@ -53,14 +53,14 @@ channel_spy_master::channel_spy_master (sc_module_name mod_name)
 
 channel_spy_master::~channel_spy_master ()
 {
-    DPRINTF("Destructor Called\n");
+    DPRINTF("Destructor Called by Master (%s)\n", name());
 }
 
 void channel_spy_master::connect_master(int device_id,
                                         sc_port<VCI_PUT_REQ_IF> &master_put_port,
                                         sc_port<VCI_GET_RSP_IF> &master_get_port)
 {
-    DPRINTF("Connecting Master Device %d\n", device_id);
+    DPRINTF("Connecting Master ID %2d (%s)\n", device_id, name());
     master_put_port(master_put_req_exp);
     master_get_port(master_get_rsp_exp);
 }
@@ -104,14 +104,14 @@ channel_spy_slave::channel_spy_slave (sc_module_name mod_name)
 
 channel_spy_slave::~channel_spy_slave ()
 {
-    DPRINTF("Destructor Called\n");
+    DPRINTF("Destructor Called by Slave (%s)\n", name());
 }
 
 void channel_spy_slave::connect_slave(int device_id,
                                       sc_port<VCI_GET_REQ_IF> &slave_get_port,
                                       sc_port<VCI_PUT_RSP_IF> &slave_put_port)
 {
-    DPRINTF("Connecting Slave Device %d\n", device_id);
+    DPRINTF("Connecting Slave ID %2d (%s)\n", device_id, name());
     slave_get_port(slave_get_req_exp);
     slave_put_port(slave_put_rsp_exp);
 }
