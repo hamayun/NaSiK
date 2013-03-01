@@ -20,7 +20,6 @@
 #ifndef __TRANSACTION_SPY__
 #define __TRANSACTION_SPY__
 
-//#include <interconnect.h>
 #include <abstract_noc.h>
 
 /*
@@ -37,7 +36,6 @@
 	_op = op; 
 
 SC_MODULE(transaction_spy), public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
-     //public VCI_PUT_REQ_IF, public VCI_GET_RSP_IF,
 {
 public:
     /* Master Side Ports */
@@ -52,28 +50,23 @@ public:
     transaction_spy (sc_module_name mod_name);
     virtual ~transaction_spy();
 
-//    void request_transfer();
-//    void response_transfer();
-    
 public:
-
-//    void connect_master_side(sc_port<VCI_GET_REQ_IF> &getp, sc_port<VCI_PUT_RSP_IF> &putp);
     void connect_slave_side(sc_port<VCI_GET_REQ_IF> &slave_get_port, sc_port<VCI_PUT_RSP_IF> &slave_put_port);
 
     // get/put interfaces
     virtual void get (vci_request& req) 
 	{
+    	/* Do the Spying Work Here */
+//		SET_NOC_ACCESS(ofs,*data,be_width(be),ACCESS_WRITE);
 		get_port->get(req);
-	}
-    virtual void put (vci_response& rsp) {
-		put_port->put(rsp);
+//		SET_NOC_ACCESS(m_req.address,*data,be_width(be),ACCESS_NONE);
 	}
 
-/*
-    // get/put interfaces
-    virtual void put (vci_request&);
-    virtual void get (vci_response&);
-*/
+    virtual void put (vci_response& rsp) 
+	{
+    	/* Do the Spying Work Here */
+		put_port->put(rsp);
+	}
 
 public:
     uintptr_t     _address;
