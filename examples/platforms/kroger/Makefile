@@ -13,7 +13,7 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/sl_tty             \
                $(COMPONENTS)/timer              \
                $(COMPONENTS)/sl_blockdevice     \
-               $(COMPONENTS)/transaction_spy    \
+               $(COMPONENTS)/channel_spy        \
                $(PLATFORM)
 
 

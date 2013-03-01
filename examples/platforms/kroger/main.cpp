@@ -39,7 +39,7 @@
 #include <framebuffer_device.h>
 #include <sl_block_device.h>
 #include <mem_device.h>
-#include <transaction_spy.h>
+#include <channel_spy.h>
 
 using namespace std;
 
@@ -126,21 +126,20 @@ int sc_main (int argc, char ** argv)
     fb_device           *fb = new fb_device("framebuffer", kvm_num_cpus + 3, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
 
-//    transaction_spy   *tspy_cpu = new transaction_spy("TSPYCPU");
-    transaction_spy   *tspy1 = new transaction_spy("TSPY1");
-    transaction_spy   *tspy2 = new transaction_spy("TSPY2");
+    channel_spy   *chspy1 = new channel_spy("CHSPY-TTY");
+    channel_spy   *chspy2 = new channel_spy("CHSPY-FB");
 
     slaves[nslaves++] = ram;                    // 0	0x00000000 - 0x08000000
     slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
 //    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
-	int tspy_id = nslaves++;
-    tspy1->connect_slave(tty0->get_port, tty0->put_port);
+	int chspy1_id = nslaves++;
+    chspy1->connect_slave(tty0->get_port, tty0->put_port);
 
     slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
 //    slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
-//    slaves[nslaves++] = tspy2;        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
-	int tspy_id_fb = nslaves++;
-    tspy2->connect_slave(fb->get_slave()->get_port, fb->get_slave()->put_port);
+//    slaves[nslaves++] = chspy2;        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
+	int chspy2_id = nslaves++;
+    chspy2->connect_slave(fb->get_slave()->get_port, fb->get_slave()->put_port);
 
     slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
     slaves[nslaves++] = blk0->get_slave();       // 6	0xC6000000 - 0xC6100000
@@ -177,15 +176,15 @@ int sc_main (int argc, char ** argv)
 	// Connect All Slaves to Interconnect	
     for (i = 0; i < nslaves; i++)
 	{
-		if(i == tspy_id)
+		if(i == chspy1_id)
 		{
-			cout << "Actually Connecting the NOC to TSPY TTY" << endl;
-			onoc->connect_slave_64 (i, tspy1->get_req_port, tspy1->put_rsp_port);
+			cout << "Connecting NOC to Channel Spy for TTY" << endl;
+			onoc->connect_slave_64 (i, chspy1->get_req_port, chspy1->put_rsp_port);
 		}
-		else if(i == tspy_id_fb)
+		else if(i == chspy2_id)
 		{
-			cout << "Actually Connecting the NOC to TSPY FB" << endl;
-			onoc->connect_slave_64 (i, tspy2->get_req_port, tspy2->put_rsp_port);
+			cout << "Connecting NOC to Channel Spy for FB" << endl;
+			onoc->connect_slave_64 (i, chspy2->get_req_port, chspy2->put_rsp_port);
 		}
 		else
 		    onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
@@ -234,8 +233,8 @@ int sc_main (int argc, char ** argv)
         trace_file = sc_create_vcd_trace_file("waveforms");
         vcd_config_file.open("waveforms.sav");
 
-        sc_trace_spy(trace_file, *tspy1, &vcd_config_file);
-        sc_trace_spy(trace_file, *tspy2, &vcd_config_file);
+        channel_spy_trace(trace_file, *chspy1, &vcd_config_file);
+        channel_spy_trace(trace_file, *chspy2, &vcd_config_file);
         vcd_config_file.close();
     }
 

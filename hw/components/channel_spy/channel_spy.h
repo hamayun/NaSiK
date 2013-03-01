@@ -17,13 +17,13 @@
  *  along with Rabbits.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TRANSACTION_SPY__
-#define __TRANSACTION_SPY__
+#ifndef __CHANNEL_SPY__
+#define __CHANNEL_SPY__
 
 #include <abstract_noc.h>
 
 /*
- * TRANSACTION_SPY
+ * CHANNEL_SPY
  */
 #define ACCESS_NONE  0
 #define ACCESS_READ  1
@@ -35,7 +35,7 @@
 	_width = width; \
 	_op = op; 
 
-SC_MODULE(transaction_spy), public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
+SC_MODULE(channel_spy), public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
 {
 public:
     /* Master Side Ports */
@@ -46,9 +46,9 @@ public:
     sc_export < VCI_GET_REQ_IF > slave_get_req_exp;
     sc_export < VCI_PUT_RSP_IF > slave_put_rsp_exp;
 
-    SC_HAS_PROCESS(transaction_spy);
-    transaction_spy (sc_module_name mod_name);
-    virtual ~transaction_spy();
+    SC_HAS_PROCESS(channel_spy);
+    channel_spy (sc_module_name mod_name);
+    virtual ~channel_spy();
 
 public:
     void connect_slave(sc_port<VCI_GET_REQ_IF> &slave_get_port,
@@ -67,7 +67,7 @@ public:
     uint8_t       _width;
     uint8_t       _op; // none=0, read=1, write=2
 
-    inline bool operator == (const transaction_spy& t) const
+    inline bool operator == (const channel_spy& t) const
     {
       return (t._address == _address && t._data == _data && t._width == _width && t._op == _op);
     }
@@ -95,7 +95,7 @@ public:
 	}
 };
 
-inline void sc_trace_spy(sc_trace_file *tf, const transaction_spy &tspy, std::ofstream *vcd_conf)
+inline void channel_spy_trace(sc_trace_file *tf, const channel_spy &tspy, std::ofstream *vcd_conf)
 {
   sc_trace(tf, tspy._address, (std::string)(tspy.name()) + ".address");
   sc_trace(tf, tspy._data, (std::string)(tspy.name()) + ".data");
