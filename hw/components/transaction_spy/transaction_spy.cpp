@@ -53,24 +53,29 @@ void transaction_spy::connect_slave_side(sc_port<VCI_GET_REQ_IF> &slave_get_port
 	slave_put_port(put_rsp_port);
 }
 
-inline void sc_trace(sc_trace_file *tf, const transaction_spy &tspy, std::ofstream *vcd_conf)
+// get/put interfaces
+void transaction_spy::get (vci_request& req) 
 {
-//  ::sc_trace(tf, tspy._address, (std::string)(tspy.name()) + ".address");
-//  ::sc_trace(tf, tspy._data, (std::string)(tspy.name()) + ".data");
-//  ::sc_trace(tf, tspy._width, (std::string)(tspy.name()) + ".width");
-//  ::sc_trace(tf, tspy._op, (std::string)(tspy.name()) + ".op");
- 
-/* 
-  if(vcd_conf != NULL)
-    *vcd_conf << "@200\n-" << tspy.name() << ":\n";
-  if(vcd_conf != NULL)
-  {
-    *vcd_conf << "@20\n+address SystemC.\\" << tspy.name() << ".address" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";
-    *vcd_conf << "@20\n+data SystemC.\\" << tspy.name() << ".data" << "[" << sizeof(uintptr_t) * 8 - 1 << ":0]\n";    
-    *vcd_conf << "@2024\n^1 filter_op\n+op SystemC.\\" << tspy.name() << ".op" << "[7:0]\n";                          
-    *vcd_conf << "@2024\n^1 filter_width\n+width SystemC.\\" << tspy.name() << ".width" << "[7:0]\n";                 
-  }
-*/
+	char * data = (char *) req.wdata;
+
+   	/* Do the Spying Work Here */
+	if(req.cmd == CMD_READ){
+		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_READ);
+	}
+	else{
+		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_WRITE);
+	}
+
+	get_port->get(req);
+
+	data = (char *) req.wdata;
+	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
+}
+
+void transaction_spy::put (vci_response& rsp) 
+{
+   	/* Do the Spying Work Here */
+	put_port->put(rsp);
 }
 
 /*

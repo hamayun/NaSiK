@@ -78,6 +78,7 @@ extern "C" {
 int sc_main (int argc, char ** argv)
 {
     int         i;
+	bool trace_on = true;
 
     if(argc < 3) usage_and_exit(argv[0]);
     // kvm_debug_port = 1234;
@@ -225,7 +226,22 @@ int sc_main (int argc, char ** argv)
 
 	// Start the Simulation
     cout << "Starting SystemC Hardware ... " << endl;
+
+    sc_trace_file * trace_file = NULL;
+    ofstream vcd_config_file;
+    if (trace_on) {
+        trace_file = sc_create_vcd_trace_file("waveforms");
+        vcd_config_file.open("waveforms.sav");
+
+        sc_trace_spy(trace_file, *tspy1, &vcd_config_file);
+        sc_trace_spy(trace_file, *tspy2, &vcd_config_file);
+        vcd_config_file.close();
+    }
+
     sc_start();
+    if (trace_on) {
+        sc_close_vcd_trace_file(trace_file);
+    }
     return (EXIT_SUCCESS);
 }
 

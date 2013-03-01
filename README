@@ -102,5 +102,6 @@ waveform.vcd and waveform.sav are generated
 filter_op and filter_width are used by gtkwave.
 
 open it with 
-gtkwave -A waveform.vcd
+gtkwave -A waveforms.vcd waveforms.sav
+
 
