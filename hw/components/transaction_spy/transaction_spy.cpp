@@ -35,8 +35,8 @@ transaction_spy::transaction_spy (sc_module_name mod_name)
 :sc_module(mod_name),
 _address(0), _data(0), _width(32), _op(ACCESS_NONE)
 {
-	get_req_port(*this);
-	put_rsp_port(*this);
+    slave_get_req_exp(*this);
+    slave_put_rsp_exp(*this);
 }
 
 transaction_spy::~transaction_spy ()
@@ -44,16 +44,16 @@ transaction_spy::~transaction_spy ()
     printf("%s: Destructor Called\n", __func__);
 }
 
-void transaction_spy::connect_slave_side(sc_port<VCI_GET_REQ_IF> &slave_get_port,
-                                         sc_port<VCI_PUT_RSP_IF> &slave_put_port)
+void transaction_spy::connect_slave(sc_port<VCI_GET_REQ_IF> &slave_get_port,
+                                    sc_port<VCI_PUT_RSP_IF> &slave_put_port)
 {
     printf("transaction_spy: Connecting Slave Side\n");
 
-    slave_get_port(get_req_port);
-	slave_put_port(put_rsp_port);
+    slave_get_port(slave_get_req_exp);
+    slave_put_port(slave_put_rsp_exp);
 }
 
-// get/put interfaces
+// get/put interface implementations for slave_get_req_exp and slave_put_rsp_exp
 void transaction_spy::get (vci_request& req) 
 {
 	char * data = (char *) req.wdata;
@@ -66,7 +66,8 @@ void transaction_spy::get (vci_request& req)
 		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_WRITE);
 	}
 
-	get_port->get(req);
+	// Forward call to the actual master (NOC)
+	get_req_port->get(req);
 
 	data = (char *) req.wdata;
 	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
@@ -75,7 +76,8 @@ void transaction_spy::get (vci_request& req)
 void transaction_spy::put (vci_response& rsp) 
 {
    	/* Do the Spying Work Here */
-	put_port->put(rsp);
+	// Forward call to the actual master (NOC)
+	put_rsp_port->put(rsp);
 }
 
 /*

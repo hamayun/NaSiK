@@ -39,20 +39,23 @@ SC_MODULE(transaction_spy), public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
 {
 public:
     /* Master Side Ports */
-    sc_port < VCI_GET_REQ_IF > get_port;
-    sc_port < VCI_PUT_RSP_IF > put_port;
+    sc_port < VCI_GET_REQ_IF > get_req_port;
+    sc_port < VCI_PUT_RSP_IF > put_rsp_port;
 
     /* Slave Side Ports */
-    sc_export < VCI_GET_REQ_IF > get_req_port;
-    sc_export < VCI_PUT_RSP_IF > put_rsp_port;
+    sc_export < VCI_GET_REQ_IF > slave_get_req_exp;
+    sc_export < VCI_PUT_RSP_IF > slave_put_rsp_exp;
 
     SC_HAS_PROCESS(transaction_spy);
     transaction_spy (sc_module_name mod_name);
     virtual ~transaction_spy();
 
 public:
-    void connect_slave_side(sc_port<VCI_GET_REQ_IF> &slave_get_port,
-                            sc_port<VCI_PUT_RSP_IF> &slave_put_port);
+    void connect_slave(sc_port<VCI_GET_REQ_IF> &slave_get_port,
+                       sc_port<VCI_PUT_RSP_IF> &slave_put_port);
+
+    void connect_master(sc_port<VCI_PUT_REQ_IF> &master_put_port,
+                        sc_port<VCI_GET_RSP_IF> &master_get_port);
 
     // get/put interfaces
     virtual void get (vci_request&); 

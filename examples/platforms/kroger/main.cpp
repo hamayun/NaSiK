@@ -126,6 +126,7 @@ int sc_main (int argc, char ** argv)
     fb_device           *fb = new fb_device("framebuffer", kvm_num_cpus + 3, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
 
+//    transaction_spy   *tspy_cpu = new transaction_spy("TSPYCPU");
     transaction_spy   *tspy1 = new transaction_spy("TSPY1");
     transaction_spy   *tspy2 = new transaction_spy("TSPY2");
 
@@ -133,13 +134,13 @@ int sc_main (int argc, char ** argv)
     slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
 //    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
 	int tspy_id = nslaves++;
-    tspy1->connect_slave_side(tty0->get_port, tty0->put_port);
+    tspy1->connect_slave(tty0->get_port, tty0->put_port);
 
     slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
 //    slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
 //    slaves[nslaves++] = tspy2;        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
 	int tspy_id_fb = nslaves++;
-    tspy2->connect_slave_side(fb->get_slave()->get_port, fb->get_slave()->put_port);
+    tspy2->connect_slave(fb->get_slave()->get_port, fb->get_slave()->put_port);
 
     slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
     slaves[nslaves++] = blk0->get_slave();       // 6	0xC6000000 - 0xC6100000
@@ -179,12 +180,12 @@ int sc_main (int argc, char ** argv)
 		if(i == tspy_id)
 		{
 			cout << "Actually Connecting the NOC to TSPY TTY" << endl;
-			onoc->connect_slave_64 (i, tspy1->get_port, tspy1->put_port);
+			onoc->connect_slave_64 (i, tspy1->get_req_port, tspy1->put_rsp_port);
 		}
 		else if(i == tspy_id_fb)
 		{
 			cout << "Actually Connecting the NOC to TSPY FB" << endl;
-			onoc->connect_slave_64 (i, tspy2->get_port, tspy2->put_port);
+			onoc->connect_slave_64 (i, tspy2->get_req_port, tspy2->put_rsp_port);
 		}
 		else
 		    onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
