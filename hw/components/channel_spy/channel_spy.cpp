@@ -42,6 +42,57 @@ channel_spy::~channel_spy ()
 }
 
 /*
+ * CHANNEL_SPY_MASTER
+ */
+channel_spy_master::channel_spy_master (sc_module_name mod_name)
+:channel_spy(mod_name)
+{
+    master_put_req_exp(*this);
+    master_get_rsp_exp(*this);
+}
+
+channel_spy_master::~channel_spy_master ()
+{
+    DPRINTF("Destructor Called\n");
+}
+
+void channel_spy_master::connect_master(int device_id,
+                                        sc_port<VCI_PUT_REQ_IF> &master_put_port,
+                                        sc_port<VCI_GET_RSP_IF> &master_get_port)
+{
+    DPRINTF("Connecting Master Device %d\n", device_id);
+    master_put_port(master_put_req_exp);
+    master_get_port(master_get_rsp_exp);
+}
+
+// put/get interface implementations for master_put_req_exp and master_get_rsp_exp
+void channel_spy_master::put (vci_request& req) 
+{
+	char * data = (char *) req.wdata;
+
+   	/* Do the Spying Work Here */
+	if(req.cmd == CMD_READ){
+		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_READ);
+	}
+	else{
+		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_WRITE);
+	}
+
+	// Forward call to the actual slave (NOC)
+	put_req_port->put(req);
+
+	data = (char *) req.wdata;
+	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
+}
+
+void channel_spy_master::get (vci_response& rsp) 
+{
+   	/* Do the Spying Work Here */
+	// Forward call to the actual slave (NOC)
+	get_rsp_port->get(rsp);
+}
+
+/*
  * CHANNEL_SPY_SLAVE
  */
 channel_spy_slave::channel_spy_slave (sc_module_name mod_name)
@@ -53,9 +104,8 @@ channel_spy_slave::channel_spy_slave (sc_module_name mod_name)
 
 channel_spy_slave::~channel_spy_slave ()
 {
-    DPRINTF("%s: Destructor Called\n", __func__);
+    DPRINTF("Destructor Called\n");
 }
-
 
 void channel_spy_slave::connect_slave(int device_id,
                                       sc_port<VCI_GET_REQ_IF> &slave_get_port,

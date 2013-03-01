@@ -126,6 +126,7 @@ int sc_main (int argc, char ** argv)
     fb_device           *fb = new fb_device("framebuffer", kvm_num_cpus + 3, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
 
+    channel_spy_master  *chspy0 = new channel_spy_master("CHSPY-CPU");
     channel_spy_slave   *chspy1 = new channel_spy_slave("CHSPY-TTY");
     channel_spy_slave   *chspy2 = new channel_spy_slave("CHSPY-FB");
 
@@ -196,7 +197,16 @@ int sc_main (int argc, char ** argv)
 
 	// Connect All CPU Masters
     for(i = 0; i < kvm_num_cpus; i++)
+	if(!trace_on)
         onoc->connect_master_64 (i, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
+	else
+	{
+	    cout << "Connecting Channel Spy to CPU master" << endl;
+		chspy0->connect_master(i, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
+
+	    cout << "Connecting NOC to Channel Spy CPU" << endl;
+		onoc->connect_master_64 (i, chspy0->put_req_port, chspy0->get_rsp_port);
+	}
 
 	// Initialize the Debugger, if required.
     if(kvm_debug_port)
@@ -233,6 +243,7 @@ int sc_main (int argc, char ** argv)
         trace_file = sc_create_vcd_trace_file("waveforms");
         vcd_config_file.open("waveforms.sav");
 
+        channel_spy_trace(trace_file, *chspy0, &vcd_config_file);
         channel_spy_trace(trace_file, *chspy1, &vcd_config_file);
         channel_spy_trace(trace_file, *chspy2, &vcd_config_file);
         vcd_config_file.close();

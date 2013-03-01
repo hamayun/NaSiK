@@ -79,16 +79,44 @@ public:
 };
 
 /*
+ * CHANNEL_SPY_MASTER
+ */
+class channel_spy_master: public channel_spy, public VCI_PUT_REQ_IF, public VCI_GET_RSP_IF
+{
+public:
+    /* Master Side Ports e.g. CPU */
+    sc_export < VCI_PUT_REQ_IF > master_put_req_exp;
+    sc_export < VCI_GET_RSP_IF > master_get_rsp_exp;
+
+    /* Slave Side Ports e.g. NOC */
+    sc_port < VCI_PUT_REQ_IF > put_req_port;
+    sc_port < VCI_GET_RSP_IF > get_rsp_port;
+
+    SC_HAS_PROCESS(channel_spy_master);
+    channel_spy_master (sc_module_name mod_name);
+    virtual ~channel_spy_master();
+
+public:
+    void connect_master(int device_id,
+                        sc_port<VCI_PUT_REQ_IF> &master_put_port,
+                        sc_port<VCI_GET_RSP_IF> &master_get_port);
+
+    // put/get interface implementations for master_put_req_exp and master_get_rsp_exp
+    virtual void put (vci_request&); 
+    virtual void get (vci_response&); 
+};
+
+/*
  * CHANNEL_SPY_SLAVE
  */
 class channel_spy_slave: public channel_spy, public VCI_GET_REQ_IF, public VCI_PUT_RSP_IF
 {
 public:
-    /* Master Side Ports */
+    /* Master Side Ports e.g. NOC */
     sc_port < VCI_GET_REQ_IF > get_req_port;
     sc_port < VCI_PUT_RSP_IF > put_rsp_port;
 
-    /* Slave Side Ports */
+    /* Slave Side Ports e.g. RAM */
     sc_export < VCI_GET_REQ_IF > slave_get_req_exp;
     sc_export < VCI_PUT_RSP_IF > slave_put_rsp_exp;
 
@@ -101,10 +129,7 @@ public:
                        sc_port<VCI_GET_REQ_IF> &slave_get_port,
                        sc_port<VCI_PUT_RSP_IF> &slave_put_port);
 
-//    void connect_master(sc_port<VCI_PUT_REQ_IF> &master_put_port,
-//                        sc_port<VCI_GET_RSP_IF> &master_get_port);
-
-    // get/put interfaces
+    // get/put interface implementations for slave_get_req_exp and slave_put_rsp_exp
     virtual void get (vci_request&); 
     virtual void put (vci_response&); 
 };
