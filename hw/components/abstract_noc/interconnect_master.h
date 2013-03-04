@@ -31,6 +31,8 @@ typedef struct
     unsigned long                   intern_offset;
 } interconnect_master_map_el;
 
+#ifdef __cplusplus
+
 template <typename ITEM>
 class mwsr_ta_fifo;
 
@@ -107,6 +109,7 @@ public:
     mwsr_ta_fifo<vci_request>           *m_queue_requests;
 };
 
+#endif /* __cplusplus */
 #endif
 
 /*

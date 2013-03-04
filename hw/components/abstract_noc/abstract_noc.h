@@ -22,6 +22,8 @@
 
 #define MAP_FILES_DIR "./maps"
 
+#ifdef __cplusplus
+
 #include <stdint.h>
 #include <systemc.h>
 
@@ -114,6 +116,7 @@ using namespace noc;
 ostream &operator<<(ostream& output, const vci_request& value);
 ostream &operator<<(ostream& output, const vci_response& value);
 
+#endif /* __cplusplus */
 #endif /* _ABRSTACT_NOC_H */
 
 /*

@@ -20,6 +20,7 @@
 #ifndef MWSR_TA_FIFO_H_
 #define MWSR_TA_FIFO_H_
 
+#ifdef __cplusplus
 #include <systemc.h>
 
 template <typename ITEM>
@@ -49,6 +50,7 @@ private:
     int                         m_idxWrite;
 };
 
+#endif /* __cplusplus */
 #endif
 
 /*

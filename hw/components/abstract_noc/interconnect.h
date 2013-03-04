@@ -20,6 +20,7 @@
 #ifndef _INTERCONNECT_H
 #define _INTERCONNECT_H
 
+#ifdef __cplusplus
 #include <abstract_noc.h>
 
 class interconnect_master;
@@ -62,6 +63,7 @@ protected:
     interconnect_slave                  **m_slaves;
 };
 
+#endif /* __cplusplus */
 #endif
 
 /*
