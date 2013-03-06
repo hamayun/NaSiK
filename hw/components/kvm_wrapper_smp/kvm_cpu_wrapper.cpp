@@ -93,6 +93,8 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
 // A thread used to simulate the kvm processor
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {
+	if(m_node_id)
+		wait(10000, SC_MS);
 	kvm_run_cpu(m_kvm_cpu_instance);
 }
 
@@ -277,6 +279,13 @@ void kvm_cpu_wrapper::log_cpu_stats_delta(unsigned char *data)
 
 extern "C"
 {
+	void systemc_call_wait(kvm_cpu_wrapper_t *_this)
+	{
+		cout << "Calling Wait for CPU-" << _this->m_node_id 
+             << " Current SC Time = " << sc_time_stamp() << endl;
+		wait(0);
+	}
+
     uint64_t
     systemc_mmio_read (kvm_cpu_wrapper_t *_this, uint64_t addr,
         int nbytes, unsigned int *ns, int bIO)
