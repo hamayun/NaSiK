@@ -49,6 +49,8 @@ extern "C" {
 	#include <libkvm-main.h>
 	extern int kvm_cpu_init_sipi_received(void * kvm_cpu_inst);
 	extern int kvm_cpu_is_runnable(void * kvm_cpu_inst);
+	extern int kvm_cpu__start(void *cpu);
+	extern int kvm_cpu__execute(void *cpu);
 }
 
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsigned int node_id,
@@ -102,15 +104,31 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 			//cout << "CPU-" << m_node_id << " Waiting for INIT IPI" << endl;
 			wait (100, SC_NS, m_ev_init_ipi);
 		} while(!kvm_cpu_init_sipi_received(m_kvm_cpu_instance));
-
-		if(kvm_cpu_is_runnable(m_kvm_cpu_instance))
-			kvm_run_cpu(m_kvm_cpu_instance);
-		else
-			wait(m_ev_runnable);
 	}
 
-	// Boot CPU is Run un-conditionally.
-	kvm_run_cpu(m_kvm_cpu_instance);
+	kvm_cpu__start(m_kvm_cpu_instance);
+
+	while(1)
+	{
+		if(m_node_id)
+		{
+		/*
+			if(kvm_cpu_is_runnable(m_kvm_cpu_instance))
+			{
+			    cout << "CPU-" << m_node_id << " Going to Run ..." << endl;
+				kvm_cpu__execute(m_kvm_cpu_instance);
+			}
+			else
+		*/
+			{
+			    //cout << "CPU-" << m_node_id << " Waiting for Runnbale Event" << endl;
+				//wait(m_ev_runnable);
+				kvm_cpu__execute(m_kvm_cpu_instance);
+			}
+		}
+		else
+			kvm_cpu__execute(m_kvm_cpu_instance);
+	}
 }
 
 kvm_cpu_wrapper::~kvm_cpu_wrapper ()
@@ -294,6 +312,13 @@ void kvm_cpu_wrapper::log_cpu_stats_delta(unsigned char *data)
 
 extern "C"
 {
+	void systemc_notify_runnable_event(kvm_cpu_wrapper_t *_this)
+	{
+//		cout << "CPU-" << _this->m_node_id << " Notifying Runnable Event;"
+//             << " Current SC Time = " << sc_time_stamp() << endl;
+		_this->m_ev_runnable.notify();
+	}
+
 	void systemc_notify_init_event(kvm_cpu_wrapper_t *_this)
 	{
 		cout << "CPU-" << _this->m_node_id << " Notifying INIT IPI;"
@@ -301,18 +326,11 @@ extern "C"
 		_this->m_ev_init_ipi.notify();
 	}
 
-	void systemc_notify_runnable_event(kvm_cpu_wrapper_t *_this)
+	void systemc_wait_runnable_event(kvm_cpu_wrapper_t *_this)
 	{
-		cout << "CPU-" << _this->m_node_id << " Notifying INIT IPI;"
+		cout << "Calling Wait for Runnable Event on CPU-" << _this->m_node_id 
              << " Current SC Time = " << sc_time_stamp() << endl;
-		_this->m_ev_runnable.notify();
-	}
-
-	void systemc_call_wait(kvm_cpu_wrapper_t *_this)
-	{
-		cout << "Calling Wait for CPU-" << _this->m_node_id 
-             << " Current SC Time = " << sc_time_stamp() << endl;
-		wait(0);
+		wait(_this->m_ev_runnable);
 	}
 
     uint64_t
