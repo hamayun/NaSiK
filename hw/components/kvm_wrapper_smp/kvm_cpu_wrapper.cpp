@@ -47,6 +47,8 @@ static struct timeval                   start_time;
 
 extern "C" {
 	#include <libkvm-main.h>
+	extern int kvm_cpu_init_sipi_received(void * kvm_cpu_inst);
+	extern int kvm_cpu_is_runnable(void * kvm_cpu_inst);
 }
 
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsigned int node_id,
@@ -93,8 +95,21 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
 // A thread used to simulate the kvm processor
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {
-	if(m_node_id)
-		wait(10000, SC_MS);
+	if(m_node_id)		// For Non-Boot CPUs
+	{	
+		do
+		{
+			//cout << "CPU-" << m_node_id << " Waiting for INIT IPI" << endl;
+			wait (100, SC_NS, m_ev_init_ipi);
+		} while(!kvm_cpu_init_sipi_received(m_kvm_cpu_instance));
+
+		if(kvm_cpu_is_runnable(m_kvm_cpu_instance))
+			kvm_run_cpu(m_kvm_cpu_instance);
+		else
+			wait(m_ev_runnable);
+	}
+
+	// Boot CPU is Run un-conditionally.
 	kvm_run_cpu(m_kvm_cpu_instance);
 }
 
@@ -279,6 +294,20 @@ void kvm_cpu_wrapper::log_cpu_stats_delta(unsigned char *data)
 
 extern "C"
 {
+	void systemc_notify_init_event(kvm_cpu_wrapper_t *_this)
+	{
+		cout << "CPU-" << _this->m_node_id << " Notifying INIT IPI;"
+             << " Current SC Time = " << sc_time_stamp() << endl;
+		_this->m_ev_init_ipi.notify();
+	}
+
+	void systemc_notify_runnable_event(kvm_cpu_wrapper_t *_this)
+	{
+		cout << "CPU-" << _this->m_node_id << " Notifying INIT IPI;"
+             << " Current SC Time = " << sc_time_stamp() << endl;
+		_this->m_ev_runnable.notify();
+	}
+
 	void systemc_call_wait(kvm_cpu_wrapper_t *_this)
 	{
 		cout << "Calling Wait for CPU-" << _this->m_node_id 

@@ -83,6 +83,8 @@ private:
 
 public:
     int                                     m_cpuindex;
+    sc_event          						m_ev_init_ipi;		// The processor should wait for INIT IPI for Boot CPU
+	sc_event								m_ev_runnable;
 
     // Statistics extracted from Annotations
     uint64_t                        m_cpu_instrs_count;
