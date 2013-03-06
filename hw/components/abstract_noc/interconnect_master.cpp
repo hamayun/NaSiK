@@ -44,8 +44,9 @@ interconnect_master::interconnect_master (sc_module_name name, interconnect *par
     i = 0;
     while (1)
     {
-        k = fscanf (file, "0x%lX 0x%lX 0x%lX %d\n",
-                    &m_map[i].begin_address, &m_map[i].end_address, &m_map[i].intern_offset, &m_map[i].slave_id);
+        k = fscanf (file, "0x%lX 0x%lX 0x%lX %d %d\n",
+                    &m_map[i].begin_address, &m_map[i].end_address, &m_map[i].intern_offset,
+                    &m_map[i].slave_id, &m_map[i].coalesced);
         if (k <= 0)
             break;
         i++;

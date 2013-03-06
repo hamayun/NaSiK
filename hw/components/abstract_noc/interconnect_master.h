@@ -26,6 +26,7 @@
 typedef struct
 {
     int                             slave_id;
+    int                             coalesced;	    /* Could this device be Coalesced ? */
     unsigned long                   begin_address;
     unsigned long                   end_address;
     unsigned long                   intern_offset;

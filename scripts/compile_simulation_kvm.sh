@@ -3,6 +3,7 @@
 HERE=`pwd`
 NB_PROC=`cat /proc/cpuinfo | grep "processor" | wc -l`
 JOPT=-j${NB_PROC}
+# can also use the 'nproc' command.
 
 print_step()
 {
