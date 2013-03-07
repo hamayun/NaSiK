@@ -323,8 +323,8 @@ extern "C"
 {
 	void systemc_notify_runnable_event(kvm_cpu_wrapper_t *_this)
 	{
-		cout << " Notifying Runnable Event for CPU-" << _this->m_node_id
-             << " Current SC Time = " << sc_time_stamp() << endl;
+//		cout << " Notifying Runnable Event for CPU-" << _this->m_node_id
+//             << " Current SC Time = " << sc_time_stamp() << endl;
 		_this->m_ev_runnable.notify();
 	}
 
@@ -335,7 +335,7 @@ extern "C"
 		_this->m_ev_init_ipi.notify();
 	}
 
-	void systemc_wait_runnable_event(kvm_cpu_wrapper_t *_this)
+	void systemc_wait_until_runnable(kvm_cpu_wrapper_t *_this)
 	{
 		cout << "Calling Wait for Runnable Event on CPU-" << _this->m_node_id 
              << " Current SC Time = " << sc_time_stamp() << endl;

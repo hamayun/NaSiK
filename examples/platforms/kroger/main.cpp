@@ -98,8 +98,8 @@ int sc_main (int argc, char ** argv)
 	char * boot_loader = (char *) argv[1];
 	char * kernel = (char *) argv[2];
 
-    //signal(SIGINT, simulation_stop);
-    signal(SIGALRM, simulation_alarm);
+    signal(SIGINT, simulation_stop);
+    //signal(SIGALRM, simulation_alarm);
 
     fb_reset_t    fb_res_stat;
     {
