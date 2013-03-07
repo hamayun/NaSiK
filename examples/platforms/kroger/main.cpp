@@ -59,6 +59,13 @@ void simulation_stop(int signo)
 	exit(0);
 }
 
+void simulation_alarm(int signo)
+{
+	cout << "Alarm Handler" << endl;
+	exit(0);
+}
+
+
 void usage_and_exit(char * name)
 {
     cerr << "usage : " << name << "  <bootstrap_file> <application_path>" << endl;
@@ -91,7 +98,8 @@ int sc_main (int argc, char ** argv)
 	char * boot_loader = (char *) argv[1];
 	char * kernel = (char *) argv[2];
 
-    signal(SIGINT,simulation_stop);
+    //signal(SIGINT, simulation_stop);
+    signal(SIGALRM, simulation_alarm);
 
     fb_reset_t    fb_res_stat;
     {

@@ -110,6 +110,15 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 
 	while(1)
 	{
+		if(kvm_cpu_is_runnable(m_kvm_cpu_instance))	
+			kvm_cpu__execute(m_kvm_cpu_instance);
+		else
+			wait(m_ev_runnable);
+	}
+	return;
+
+	while(1)
+	{
 		if(m_node_id)
 		{
 		/*
@@ -122,7 +131,7 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 		*/
 			{
 			    //cout << "CPU-" << m_node_id << " Waiting for Runnbale Event" << endl;
-				//wait(m_ev_runnable);
+				// wait(m_ev_runnable);
 				kvm_cpu__execute(m_kvm_cpu_instance);
 			}
 		}
@@ -314,8 +323,8 @@ extern "C"
 {
 	void systemc_notify_runnable_event(kvm_cpu_wrapper_t *_this)
 	{
-//		cout << "CPU-" << _this->m_node_id << " Notifying Runnable Event;"
-//             << " Current SC Time = " << sc_time_stamp() << endl;
+		cout << " Notifying Runnable Event for CPU-" << _this->m_node_id
+             << " Current SC Time = " << sc_time_stamp() << endl;
 		_this->m_ev_runnable.notify();
 	}
 
