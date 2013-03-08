@@ -87,7 +87,7 @@ int sc_main (int argc, char ** argv)
     int i = 0;
 
 	bool trace_on = true;
-	uint32_t slave_trace_mask = 0xFFFFFFEB;		// If slave bit is set to 1; trace for that slave is masked.
+	uint32_t slave_trace_mask = 0xFFFFFE2B;		// If slave bit is set to 1; trace for that slave is masked.
 	bool trace_non_cpu_masters = false;			// true: Trace All Masters; false: CPUs only.
 	channel_spy_master **master_spies = {NULL};
 	channel_spy_slave  **slave_spies  = {NULL};

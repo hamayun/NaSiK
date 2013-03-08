@@ -97,6 +97,7 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
 // A thread used to simulate the kvm processor
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {
+	/*
 	if(m_node_id)		// For Non-Boot CPUs
 	{	
 		do
@@ -105,39 +106,23 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 			wait (100, SC_NS, m_ev_init_ipi);
 		} while(!kvm_cpu_init_sipi_received(m_kvm_cpu_instance));
 	}
-
+	*/
 	kvm_cpu__start(m_kvm_cpu_instance);
 
 	while(1)
 	{
-		if(kvm_cpu_is_runnable(m_kvm_cpu_instance))	
-			kvm_cpu__execute(m_kvm_cpu_instance);
-		else
-			wait(m_ev_runnable);
-	}
-	return;
-
-	while(1)
-	{
-		if(m_node_id)
+		if(kvm_cpu__execute(m_kvm_cpu_instance) == -1)
 		{
-		/*
-			if(kvm_cpu_is_runnable(m_kvm_cpu_instance))
+			//if(m_node_id != 0)
 			{
-			    cout << "CPU-" << m_node_id << " Going to Run ..." << endl;
-				kvm_cpu__execute(m_kvm_cpu_instance);
-			}
-			else
-		*/
-			{
-			    //cout << "CPU-" << m_node_id << " Waiting for Runnbale Event" << endl;
-				// wait(m_ev_runnable);
-				kvm_cpu__execute(m_kvm_cpu_instance);
+				//cout << "Going to Sleep CPU-" << m_node_id << endl;
+				wait (100, SC_NS, m_ev_runnable);
+				//cout << "Woke-up CPU-" << m_node_id << endl;
 			}
 		}
-		else
-			kvm_cpu__execute(m_kvm_cpu_instance);
 	}
+
+	return;
 }
 
 kvm_cpu_wrapper::~kvm_cpu_wrapper ()
@@ -323,16 +308,9 @@ extern "C"
 {
 	void systemc_notify_runnable_event(kvm_cpu_wrapper_t *_this)
 	{
-//		cout << " Notifying Runnable Event for CPU-" << _this->m_node_id
-//             << " Current SC Time = " << sc_time_stamp() << endl;
+		//cout << " Notifying Runnable Event for CPU-" << _this->m_node_id
+        //     << " Current SC Time = " << sc_time_stamp() << endl;
 		_this->m_ev_runnable.notify();
-	}
-
-	void systemc_notify_init_event(kvm_cpu_wrapper_t *_this)
-	{
-		cout << "CPU-" << _this->m_node_id << " Notifying INIT IPI;"
-             << " Current SC Time = " << sc_time_stamp() << endl;
-		_this->m_ev_init_ipi.notify();
 	}
 
 	void systemc_wait_until_runnable(kvm_cpu_wrapper_t *_this)
