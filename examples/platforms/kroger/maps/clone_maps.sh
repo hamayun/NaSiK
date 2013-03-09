@@ -14,8 +14,10 @@ echo "Cloning Node Map ... ${SRC_MAP} From: ${FROM} ... To: ${TO}"
 
 for (( i=${FROM}; i<=${TO}; i++ ))
 do
-	echo "cp ${SRC_MAP} ${BASE_NAME}${i}.map"
-	cp ${SRC_MAP} ${BASE_NAME}${i}.map
+	#echo "cp ${SRC_MAP} ${BASE_NAME}${i}.map"
+	#cp ${SRC_MAP} ${BASE_NAME}${i}.map
+	echo "linking ${SRC_MAP} ${BASE_NAME}${i}.map"
+	ln -sf ${SRC_MAP} ${BASE_NAME}${i}.map
 done
 
 echo "Done !"
