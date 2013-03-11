@@ -80,8 +80,8 @@ sl_tty_device::sl_tty_device (const char *_name, int ntty) : slave_device (_name
         if (!(s_pid_tty[s_nb_tty++] = fork ()))
         {
             setpgrp();
-            sprintf (slog, "%s%02d", _name, i);
-            sprintf (sname, "(%s)", slog);
+            sprintf (slog, "%s-cpu-%d", _name, i);
+            sprintf (sname, "[%s]", slog);
 
             if (execlp ("xterm",
                         "xterm",
@@ -122,7 +122,6 @@ void sl_tty_device::write (unsigned long ofs, unsigned char be, unsigned char *d
     }
     else
         value = * ((unsigned long *) data + 0);
-
 
     tty = ofs / TTY_SPAN;
     ofs = ofs % TTY_SPAN;

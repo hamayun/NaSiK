@@ -136,7 +136,7 @@ int sc_main (int argc, char ** argv)
 
     mem_device         *ram = new mem_device("ram", kvm_ram_size*(1024*1024), (unsigned char*) kvm_userspace_mem_addr);
     mem_device  *shared_ram = new mem_device("shared_ram", 0x10000);
-    sl_tty_device     *tty0 = new sl_tty_device ("tty1", 1);
+    sl_tty_device     *tty0 = new sl_tty_device ("tty", kvm_num_cpus);
     sl_tg_device        *tg = new sl_tg_device ("tg", "fdaccess.0.0");
     fb_device           *fb = new fb_device("framebuffer", kvm_num_cpus + 3, &fb_res_stat);
     sem_device         *sem = new sem_device("sem", 0x100000);
@@ -191,7 +191,7 @@ int sc_main (int argc, char ** argv)
 	{
 	    slaves[nslaves++] = ram;                    // 0	0x00000000 - 0x08000000
     	slaves[nslaves++] = shared_ram;             // 1	0xAF000000 - 0xAFF00000
-	    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000040
+	    slaves[nslaves++] = tty0;                   // 2	0xC0000000 - 0xC0000200 /* 16 bytes for Each TTY; Should be enough for 32 Instances of TTYs */
     	slaves[nslaves++] = tg;                     // 3	0xC3000000 - 0xC3001000
     	slaves[nslaves++] = fb->get_slave();        // 4	0xC4000000 - 0xC4100000 /* Important: In Application ldscript the base address should be 0XC4001000 */
 	    slaves[nslaves++] = sem;                    // 5	0xC5000000 - 0xC5100000
