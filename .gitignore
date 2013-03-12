@@ -40,3 +40,8 @@ batchtest*
 examples/applications/printFloats/
 tools/fbviewer
 tools/tty_term_rw
+examples/platforms/kroger/waveforms*
+examples/platforms/kroger/hosttime_cpu-*.log
+examples/platforms/kroger/tty-cpu-*
+hw/components/cscope.*
+sw/apes-components/KVMx86BootLoader/cscope.*
