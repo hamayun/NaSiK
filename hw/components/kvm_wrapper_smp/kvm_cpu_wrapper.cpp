@@ -104,7 +104,6 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 	{	
 		do
 		{
-			//cout << "CPU-" << m_node_id << " Waiting for INIT IPI" << endl;
 			wait (100, SC_NS, m_ev_runnable);
 		} while(!kvm_cpu_init_sipi_received(m_kvm_cpu_instance));
 	}
@@ -119,13 +118,10 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 
 		if (r == -1)
 		{
-			//cout << "Going to Sleep CPU-" << m_node_id << endl;
 			m_parent->kvm_cpu_block(m_node_id);
 			m_parent->kvm_cpus_status();
-			do{
-				wait (100, SC_NS, m_ev_runnable);	
-			} while (m_parent->m_cpu_running[m_node_id] == false);
-			//cout << "Woke-up CPU-" << m_node_id << endl;
+
+			wait (m_ev_runnable);	
 		}
 		else if(r == -2)
 		{
