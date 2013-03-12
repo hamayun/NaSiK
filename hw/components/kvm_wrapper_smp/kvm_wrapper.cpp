@@ -44,7 +44,7 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
 						  uintptr_t * kvm_userspace_mem_addr)
 	: sc_module(name)
 {
-    m_ncpu = num_cpus;
+	m_ncpu = num_cpus;
     m_kvm_import_export.imp_kvm_wrapper = this;	// Export to KVM Tool Library.
     
 	m_ninterrupts = ninterrupts;
@@ -92,13 +92,57 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
     for (int i = 0; i < m_ncpu; i++)
     {
         char            *s = new char [50];
-        sprintf (s, "CPU-%d", i);
-        m_cpus[i] = new kvm_cpu_wrapper_t (s, m_kvm_instance, node_id + i,
-										   i, & m_kvm_import_export);
+		sprintf (s, "CPU-%d", i);
+		m_cpus[i] = new kvm_cpu_wrapper_t (s, m_kvm_instance, node_id + i,
+										   i, & m_kvm_import_export, this);
 //        m_cpus[i]->m_port_access (*this);
+		m_cpu_running[i] = false;
     }
 
+	m_running_count = 0;
     SC_THREAD (interrupts_thread);
+}
+
+void kvm_wrapper::kvm_cpu_block(int cpu_id)
+{
+	m_kvm_mutex.lock();
+
+	if(m_cpu_running[cpu_id])		// If running then set status to blocked
+	{
+		m_cpu_running[cpu_id] = false;
+		m_running_count--;
+	}
+
+	if(m_running_count == 0)
+	{
+		kvm_cpu_set_run_state(m_cpus[0]->get_kvm_cpu(), 0);
+		m_cpus[0]->m_ev_runnable.notify();
+	}
+		
+	m_kvm_mutex.unlock();
+}
+
+void kvm_wrapper::kvm_cpu_unblock(int cpu_id)
+{
+	m_kvm_mutex.lock();
+
+	if(!m_cpu_running[cpu_id])		// If blocked then set status to running
+	{
+		m_cpu_running[cpu_id] = true;
+		m_running_count++;
+	}
+
+	m_kvm_mutex.unlock();
+}
+
+void kvm_wrapper::kvm_cpus_status()
+{
+	int i = 0;
+
+	cout << "KVM CPUs: " << m_running_count << "/" << m_ncpu << " [ ";
+	for(; i< m_ncpu; i++)
+		cout << (m_cpu_running[i] ? "1 " : "0 "); 
+	cout << "] " << sc_time_stamp() << endl;
 }
 
 kvm_wrapper::~kvm_wrapper ()

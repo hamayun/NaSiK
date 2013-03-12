@@ -52,6 +52,17 @@ public:
 	int             		m_ncpu;		/* Number of CPUs in this Wrapper */
 	kvm_cpu_wrapper_t     **m_cpus;
 
+	// Mutexes
+	sc_mutex				m_kvm_mutex;
+	sc_mutex				m_kvm_run_mutex;
+
+	bool				  	m_cpu_running[32];
+	int 					m_running_count;
+
+	void kvm_cpu_block(int cpu_id);
+	void kvm_cpu_unblock(int cpu_id);
+	void kvm_cpus_status();
+
 	inline kvm_cpu_wrapper_t * get_cpu (int i) {return m_cpus[i];}
 
 	void set_unblocking_write (bool val);

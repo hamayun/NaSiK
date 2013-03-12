@@ -32,12 +32,14 @@
 
 using namespace noc;
 
+class kvm_wrapper;
+
 class kvm_cpu_wrapper : public master_device
 {
 public:
     SC_HAS_PROCESS (kvm_cpu_wrapper);
     kvm_cpu_wrapper (sc_module_name name, void *kvm_instance, unsigned int node_id,
-					 int cpuindex, kvm_import_export_t * kvm_import_export);
+					 int cpuindex, kvm_import_export_t * kvm_import_export, kvm_wrapper * parent);
     ~kvm_cpu_wrapper ();
 
 public:
@@ -51,6 +53,12 @@ public:
     void wakeup ();
     void sync ();
 */
+	kvm_wrapper 	* m_parent;
+	void notify_runnable_event();
+	void wait_until_runnable();
+	void wait_zero_time();
+
+	void * get_kvm_cpu() { return (m_kvm_cpu_instance); }
 
 private:
 	void rcv_rsp(unsigned char tid, unsigned char *data, bool bErr, bool bWrite);
@@ -80,6 +88,7 @@ private:
     bool                                    m_unblocking_write;
 
     kvm_import_export_t                    *m_kvm_import_export;
+
 
 public:
     int                                     m_cpuindex;

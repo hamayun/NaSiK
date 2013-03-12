@@ -19,6 +19,7 @@
  */
 
 #include <kvm_cpu_wrapper.h>
+#include <kvm_wrapper.h>
 #include <kvm_import_export.h>
 #include <kvm_wrapper_consts.h>
 #include <sys/types.h>
@@ -54,9 +55,11 @@ extern "C" {
 }
 
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsigned int node_id,
-								  int cpuindex, kvm_import_export_t * kvm_import_export)
+								  int cpuindex, kvm_import_export_t * kvm_import_export,
+   							      kvm_wrapper * parent)
 : master_device (name)
 {
+	m_parent = parent;		// Parent KVM_Wrapper Instance
     m_kvm_import_export = kvm_import_export;
     m_kvm_instance = kvm_instance;
     m_node_id = node_id;
@@ -107,18 +110,26 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 		} while(!kvm_cpu_init_sipi_received(m_kvm_cpu_instance));
 	}
 	*/
+
 	kvm_cpu__start(m_kvm_cpu_instance);
 
 	while(1)
 	{
-		if(kvm_cpu__execute(m_kvm_cpu_instance) == -1)
+		m_parent->kvm_cpu_unblock(m_node_id);
+		m_parent->kvm_cpus_status();
+		int r = kvm_cpu__execute(m_kvm_cpu_instance);
+
+		if (r == -1)
 		{
-			//if(m_node_id != 0)
-			{
-				//cout << "Going to Sleep CPU-" << m_node_id << endl;
-				wait (100, SC_NS, m_ev_runnable);
-				//cout << "Woke-up CPU-" << m_node_id << endl;
-			}
+			//cout << "Going to Sleep CPU-" << m_node_id << endl;
+			m_parent->kvm_cpu_block(m_node_id);
+			m_parent->kvm_cpus_status();
+			wait (100, SC_NS, m_ev_runnable);
+			//cout << "Woke-up CPU-" << m_node_id << endl;
+		}
+		else if(r == -2)
+		{
+			cout << "KVM PANICKED ... !!!" << endl;
 		}
 	}
 
@@ -304,20 +315,65 @@ void kvm_cpu_wrapper::log_cpu_stats_delta(unsigned char *data)
     }
 }
 
+void kvm_cpu_wrapper::notify_runnable_event()
+{
+	cout << "Notifying Runnable Event for CPU-" << m_node_id
+         << " Current SC Time = " << sc_time_stamp() << endl;
+	m_parent->kvm_cpu_unblock(m_node_id);
+	m_ev_runnable.notify();
+}
+
+void kvm_cpu_wrapper::wait_until_runnable()
+{
+	cout << "Calling Wait for Runnable Event on CPU-" << m_node_id 
+         << " Current SC Time = " << sc_time_stamp() << endl;
+	m_parent->kvm_cpu_block(m_node_id);
+	m_parent->kvm_cpus_status();
+	wait(m_ev_runnable);
+}
+
+void kvm_cpu_wrapper::wait_zero_time()
+{
+	cout << "Calling Wait for Zero Time on CPU-" << m_node_id 
+         << " Current SC Time = " << sc_time_stamp() << endl;
+	wait(SC_ZERO_TIME);
+}
+
 extern "C"
 {
 	void systemc_notify_runnable_event(kvm_cpu_wrapper_t *_this)
 	{
-		//cout << " Notifying Runnable Event for CPU-" << _this->m_node_id
-        //     << " Current SC Time = " << sc_time_stamp() << endl;
-		_this->m_ev_runnable.notify();
+		_this->notify_runnable_event();
 	}
 
 	void systemc_wait_until_runnable(kvm_cpu_wrapper_t *_this)
 	{
-		cout << "Calling Wait for Runnable Event on CPU-" << _this->m_node_id 
-             << " Current SC Time = " << sc_time_stamp() << endl;
-		wait(_this->m_ev_runnable);
+		_this->wait_until_runnable();
+	}
+
+	void systemc_wait_zero_time(kvm_cpu_wrapper_t *_this)
+	{
+		_this->wait_zero_time();
+	}
+
+	int systemc_running_cpu_count(kvm_cpu_wrapper_t *_this)
+	{
+		return(_this->m_parent->m_running_count);	
+	}
+	
+	void systemc_running_cpu_status(kvm_cpu_wrapper_t *_this)
+	{
+		_this->m_parent->kvm_cpus_status();	
+	}
+
+	void kvm_lock_run_mutex(kvm_cpu_wrapper_t *_this)
+	{
+		_this->m_parent->m_kvm_run_mutex.lock();	
+	}
+
+	void kvm_unlock_run_mutex(kvm_cpu_wrapper_t *_this)
+	{
+		_this->m_parent->m_kvm_run_mutex.unlock();	
 	}
 
     uint64_t
@@ -334,6 +390,7 @@ extern "C"
     systemc_mmio_write (kvm_cpu_wrapper_t *_this, uint64_t addr,
         unsigned char *data, int nbytes, unsigned int *ns, int bIO)
     {
+		// printf("%s: addr = 0x%x, data=%c, nbytes=%d\n", __func__, (uint32_t)addr, *data, nbytes);
         _this->write (addr, data, nbytes, bIO);
     }
 
