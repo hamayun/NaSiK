@@ -73,9 +73,12 @@ public:
 
 	// Interrupt Support
     sc_in<bool>                         *interrupt_ports;
-	
+
+	sc_event 							m_ev_cpu_got_blocked;
+
 private:
     void                                 interrupts_thread ();
+	void 								 trigger_thread();
 
     int                                  m_ninterrupts;
     unsigned long                       *m_cpu_interrupts_raw_status;

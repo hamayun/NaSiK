@@ -100,16 +100,14 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
 // A thread used to simulate the kvm processor
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {
-	/*
 	if(m_node_id)		// For Non-Boot CPUs
 	{	
 		do
 		{
 			//cout << "CPU-" << m_node_id << " Waiting for INIT IPI" << endl;
-			wait (100, SC_NS, m_ev_init_ipi);
+			wait (100, SC_NS, m_ev_runnable);
 		} while(!kvm_cpu_init_sipi_received(m_kvm_cpu_instance));
 	}
-	*/
 
 	kvm_cpu__start(m_kvm_cpu_instance);
 
@@ -124,7 +122,9 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 			//cout << "Going to Sleep CPU-" << m_node_id << endl;
 			m_parent->kvm_cpu_block(m_node_id);
 			m_parent->kvm_cpus_status();
-			wait (100, SC_NS, m_ev_runnable);
+			do{
+				wait (100, SC_NS, m_ev_runnable);	
+			} while (m_parent->m_cpu_running[m_node_id] == false);
 			//cout << "Woke-up CPU-" << m_node_id << endl;
 		}
 		else if(r == -2)

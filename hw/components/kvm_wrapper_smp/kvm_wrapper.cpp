@@ -101,6 +101,21 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
 
 	m_running_count = 0;
     SC_THREAD (interrupts_thread);
+    SC_THREAD (trigger_thread);
+}
+
+void kvm_wrapper::trigger_thread()
+{
+	while(1)
+	{
+		wait(m_ev_cpu_got_blocked);
+		if(m_running_count == 0)
+		{
+			cout << "Firing Boot CPU Event" << endl;
+			kvm_cpu_unblock(0);
+			m_cpus[0]->m_ev_runnable.notify();
+		}
+	}
 }
 
 void kvm_wrapper::kvm_cpu_block(int cpu_id)
@@ -113,13 +128,8 @@ void kvm_wrapper::kvm_cpu_block(int cpu_id)
 		m_running_count--;
 	}
 
-	if(m_running_count == 0)
-	{
-		kvm_cpu_set_run_state(m_cpus[0]->get_kvm_cpu(), 0);
-		m_cpus[0]->m_ev_runnable.notify();
-	}
-		
 	m_kvm_mutex.unlock();
+	m_ev_cpu_got_blocked.notify();
 }
 
 void kvm_wrapper::kvm_cpu_unblock(int cpu_id)
