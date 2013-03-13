@@ -44,7 +44,7 @@
 #define UPDATE_CPU_STATS(x) if(0) {} 
 #endif
 
-//#define SHOW_CPU_TIMING
+#define SHOW_CPU_TIMING
 #ifdef SHOW_CPU_TIMING
 #define KVM_CPUS_STATUS() kvm_cpus_status()
 #else
@@ -116,6 +116,9 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 		{
 			wait (100, SC_NS, m_ev_runnable);
 		} while(!kvm_cpu_sipi_received(m_kvm_cpu_instance));
+		
+		// Now Wait Until You get the Green Flag
+		wait (m_ev_runnable);
 	}
 
 	kvm_cpu_reset(m_kvm_cpu_instance);
@@ -124,22 +127,32 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 	{
 		m_parent->kvm_cpu_unblock(m_node_id);
 		KVM_CPUS_STATUS();
+		
 		cpu_status = kvm_cpu_execute(m_kvm_cpu_instance);
 
 		switch(cpu_status)
 		{
-			case KVM_CPU_BLOCK:
+			case KVM_CPU_RETRY:
 				m_parent->kvm_cpu_block(m_node_id);
 				KVM_CPUS_STATUS();
 				// Ideally we should block for a minimum time; so the kicked cpu starts and 
 				// we enter KVM after the other cpu has executed atleast once.
-		    	wait (m_ev_runnable);
-				// wait (100, SC_NS, m_ev_runnable); // Does not work
+				do
+				{
+					wait (100, SC_NS, m_ev_runnable);
+				} while(!kvm_cpu_is_runnable(m_kvm_cpu_instance));
+			break;
+
+			case KVM_CPU_BLOCK_AFTER_KICK:
+				m_parent->kvm_cpu_block(m_node_id);
+				do
+				{
+					wait (100, SC_NS, m_ev_runnable);
+				} while(!kvm_cpu_is_runnable(m_kvm_cpu_instance));
 			break;
 
 			case KVM_CPU_PANIC:
 				cout << "KVM PANICKED ... !!!" << endl;
-
 			case KVM_CPU_SHUTDOWN:
 				cout << "KVM Shuting Down!" << endl;
 			break;
@@ -338,7 +351,6 @@ void kvm_cpu_wrapper::notify_runnable_event()
 {
 	cout << "Notifying Runnable Event for CPU-" << m_node_id
          << " Current SC Time = " << sc_time_stamp() << endl;
-	m_parent->kvm_cpu_unblock(m_node_id);
 	m_ev_runnable.notify();
 }
 
@@ -349,6 +361,8 @@ void kvm_cpu_wrapper::wait_until_runnable()
 	m_parent->kvm_cpu_block(m_node_id);
 	KVM_CPUS_STATUS();
 	wait(m_ev_runnable);
+	m_parent->kvm_cpu_unblock(m_node_id);
+	KVM_CPUS_STATUS();
 }
 
 void kvm_cpu_wrapper::wait_zero_time()
@@ -384,7 +398,8 @@ extern "C"
 	{
 		return(_this->m_parent->m_running_count);	
 	}
-	
+
+	/*	
 	void kvm_lock_run_mutex(kvm_cpu_wrapper_t *_this)
 	{
 		_this->m_parent->m_kvm_run_mutex.lock();	
@@ -394,6 +409,7 @@ extern "C"
 	{
 		_this->m_parent->m_kvm_run_mutex.unlock();	
 	}
+	*/
 
 	void systemc_wait_us(kvm_cpu_wrapper_t *_this, int us)
 	{
