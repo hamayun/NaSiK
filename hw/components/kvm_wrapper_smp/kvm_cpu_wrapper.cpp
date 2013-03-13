@@ -44,14 +44,17 @@
 #define UPDATE_CPU_STATS(x) if(0) {} 
 #endif
 
+//#define SHOW_CPU_TIMING
+#ifdef SHOW_CPU_TIMING
+#define KVM_CPUS_STATUS() kvm_cpus_status()
+#else
+#define KVM_CPUS_STATUS() if(0) {}
+#endif
+
 static struct timeval                   start_time;
 
 extern "C" {
 	#include <libkvm-main.h>
-	extern int kvm_cpu_init_sipi_received(void * kvm_cpu_inst);
-	extern int kvm_cpu_is_runnable(void * kvm_cpu_inst);
-	extern int kvm_cpu__start(void *cpu);
-	extern int kvm_cpu__execute(void *cpu);
 }
 
 kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsigned int node_id,
@@ -100,36 +103,56 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
 // A thread used to simulate the kvm processor
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {
+	int cpu_status = KVM_CPU_OK;
+
 	if(m_node_id)		// For Non-Boot CPUs
 	{	
 		do
 		{
 			wait (100, SC_NS, m_ev_runnable);
-		} while(!kvm_cpu_init_sipi_received(m_kvm_cpu_instance));
+		} while(!kvm_cpu_init_received(m_kvm_cpu_instance));
+
+		do
+		{
+			wait (100, SC_NS, m_ev_runnable);
+		} while(!kvm_cpu_sipi_received(m_kvm_cpu_instance));
 	}
 
-	kvm_cpu__start(m_kvm_cpu_instance);
+	kvm_cpu_reset(m_kvm_cpu_instance);
 
 	while(1)
 	{
 		m_parent->kvm_cpu_unblock(m_node_id);
-		m_parent->kvm_cpus_status();
-		int r = kvm_cpu__execute(m_kvm_cpu_instance);
+		KVM_CPUS_STATUS();
+		cpu_status = kvm_cpu_execute(m_kvm_cpu_instance);
 
-		if (r == -1)
+		switch(cpu_status)
 		{
-			m_parent->kvm_cpu_block(m_node_id);
-			m_parent->kvm_cpus_status();
+			case KVM_CPU_BLOCK:
+				m_parent->kvm_cpu_block(m_node_id);
+				KVM_CPUS_STATUS();
+				// Ideally we should block for a minimum time; so the kicked cpu starts and 
+				// we enter KVM after the other cpu has executed atleast once.
+		    	wait (m_ev_runnable);
+				// wait (100, SC_NS, m_ev_runnable); // Does not work
+			break;
 
-			wait (m_ev_runnable);	
-		}
-		else if(r == -2)
-		{
-			cout << "KVM PANICKED ... !!!" << endl;
+			case KVM_CPU_PANIC:
+				cout << "KVM PANICKED ... !!!" << endl;
+
+			case KVM_CPU_SHUTDOWN:
+				cout << "KVM Shuting Down!" << endl;
+			break;
 		}
 	}
 
 	return;
+}
+
+void kvm_cpu_wrapper::kvm_cpus_status()
+{
+	cout << "[KVM-CPU-" << m_node_id << "]: ";
+	m_parent->kvm_cpus_status(); 
 }
 
 kvm_cpu_wrapper::~kvm_cpu_wrapper ()
@@ -324,7 +347,7 @@ void kvm_cpu_wrapper::wait_until_runnable()
 	cout << "Calling Wait for Runnable Event on CPU-" << m_node_id 
          << " Current SC Time = " << sc_time_stamp() << endl;
 	m_parent->kvm_cpu_block(m_node_id);
-	m_parent->kvm_cpus_status();
+	KVM_CPUS_STATUS();
 	wait(m_ev_runnable);
 }
 
@@ -333,6 +356,11 @@ void kvm_cpu_wrapper::wait_zero_time()
 	cout << "Calling Wait for Zero Time on CPU-" << m_node_id 
          << " Current SC Time = " << sc_time_stamp() << endl;
 	wait(SC_ZERO_TIME);
+}
+
+void kvm_cpu_wrapper::wait_us_time(int us)
+{
+	wait(us, SC_US);
 }
 
 extern "C"
@@ -357,11 +385,6 @@ extern "C"
 		return(_this->m_parent->m_running_count);	
 	}
 	
-	void systemc_running_cpu_status(kvm_cpu_wrapper_t *_this)
-	{
-		_this->m_parent->kvm_cpus_status();	
-	}
-
 	void kvm_lock_run_mutex(kvm_cpu_wrapper_t *_this)
 	{
 		_this->m_parent->m_kvm_run_mutex.lock();	
@@ -370,6 +393,11 @@ extern "C"
 	void kvm_unlock_run_mutex(kvm_cpu_wrapper_t *_this)
 	{
 		_this->m_parent->m_kvm_run_mutex.unlock();	
+	}
+
+	void systemc_wait_us(kvm_cpu_wrapper_t *_this, int us)
+	{
+		_this->wait_us_time(us);
 	}
 
     uint64_t

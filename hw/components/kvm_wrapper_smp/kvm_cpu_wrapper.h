@@ -57,6 +57,7 @@ public:
 	void notify_runnable_event();
 	void wait_until_runnable();
 	void wait_zero_time();
+	void wait_us_time(int us);
 
 	void * get_kvm_cpu() { return (m_kvm_cpu_instance); }
 
@@ -68,6 +69,7 @@ private:
     void write (uint32_t address, uint32_t data, uint8_t nbytes, int bIO);
 
     void kvm_cpu_thread ();
+
 public:
 	// TODO: Enable this Interface
     // ports
@@ -93,7 +95,8 @@ private:
 public:
     int                                     m_cpuindex;
 	sc_event								m_ev_runnable;
-
+	void kvm_cpus_status();
+	
     // Statistics extracted from Annotations
     uint64_t                        m_cpu_instrs_count;
     uint64_t                        m_cpu_cycles_count;

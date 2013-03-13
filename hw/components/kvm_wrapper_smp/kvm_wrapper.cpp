@@ -149,10 +149,10 @@ void kvm_wrapper::kvm_cpus_status()
 {
 	int i = 0;
 
-	cout << "KVM CPUs: " << m_running_count << "/" << m_ncpu << " [ ";
+	cout << "KVM CPUs: " << m_running_count << "/" << m_ncpu << " { ";
 	for(; i< m_ncpu; i++)
 		cout << (m_cpu_running[i] ? "1 " : "0 "); 
-	cout << "] " << sc_time_stamp() << endl;
+	cout << "} " << sc_time_stamp() << endl;
 }
 
 kvm_wrapper::~kvm_wrapper ()
