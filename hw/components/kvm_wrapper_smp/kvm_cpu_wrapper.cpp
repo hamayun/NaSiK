@@ -44,7 +44,7 @@
 #define UPDATE_CPU_STATS(x) if(0) {} 
 #endif
 
-#define SHOW_CPU_TIMING
+//#define SHOW_CPU_TIMING
 #ifdef SHOW_CPU_TIMING
 #define KVM_CPUS_STATUS() kvm_cpus_status()
 #else
@@ -127,7 +127,8 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 	{
 		m_parent->kvm_cpu_unblock(m_node_id);
 		KVM_CPUS_STATUS();
-		
+	
+		m_last_time = sc_time_stamp();	
 		cpu_status = kvm_cpu_execute(m_kvm_cpu_instance);
 
 		switch(cpu_status)
@@ -139,6 +140,7 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 				// we enter KVM after the other cpu has executed atleast once.
 				do
 				{
+					m_last_time = sc_time_stamp();	
 					wait (100, SC_NS, m_ev_runnable);
 				} while(!kvm_cpu_is_runnable(m_kvm_cpu_instance));
 			break;
@@ -147,12 +149,12 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 				m_parent->kvm_cpu_block(m_node_id);
 				do
 				{
+					m_last_time = sc_time_stamp();	
 					wait (100, SC_NS, m_ev_runnable);
 				} while(!kvm_cpu_is_runnable(m_kvm_cpu_instance));
 			break;
 
 			case KVM_CPU_PANIC:
-				cout << "KVM PANICKED ... !!!" << endl;
 			case KVM_CPU_SHUTDOWN:
 				cout << "KVM Shuting Down!" << endl;
 			break;
@@ -249,6 +251,7 @@ uint64_t kvm_cpu_wrapper::read (uint64_t addr, int nbytes, int bIO)
     for (i = 0; i < nbytes; i++)
         *((unsigned char *) &ret + i) = adata[i];
 
+	m_last_time = sc_time_stamp();	
     wait(20, SC_US);
     return ret;
 }
@@ -298,6 +301,7 @@ void kvm_cpu_wrapper::write (uint64_t addr,
         m_rqs->FreeRequest (localrq);
     }
 
+	m_last_time = sc_time_stamp();	
     wait(20, SC_US);
 
 //	cout << name() << "MMH:SC Time = " << sc_time_stamp() << endl;
@@ -378,8 +382,20 @@ void kvm_cpu_wrapper::wait_us_time(int us)
 }
 
 // This principally called as a result of CPU_TEST_AND_SET execution by a processor.
-void kvm_cpu_wrapper::wait_until_kick_or_timeout()
+void kvm_cpu_wrapper::wait_until_kick_or_timeout(int locker_cpu_id)
 {
+	sc_time my_time, lockers_time;
+
+	my_time = sc_time_stamp();
+	lockers_time = m_parent->m_cpus[locker_cpu_id]->get_last_time();
+
+	cout << "CPU[" << m_node_id << "]: My Time: " << my_time
+         << " Locker CPU[" << locker_cpu_id << "] Time: " << lockers_time;
+
+	if(my_time < lockers_time)
+		cout << "Check it out !!!";
+	cout << endl;
+ 
 	// TODO: Instead to doing this; 
 	// Advance the Simulation Time to the Minimum of other processors.
 	wait(1000, SC_NS, m_ev_runnable);
@@ -402,9 +418,9 @@ extern "C"
 		_this->wait_zero_time();
 	}
 
-	void systemc_wait_until_kick_or_timeout(kvm_cpu_wrapper_t *_this)
+	void systemc_wait_until_kick_or_timeout(kvm_cpu_wrapper_t *_this, int locker_cpu_id)
 	{
-		_this->wait_until_kick_or_timeout();
+		_this->wait_until_kick_or_timeout(locker_cpu_id);
 	}
 
 	int systemc_running_cpu_count(kvm_cpu_wrapper_t *_this)

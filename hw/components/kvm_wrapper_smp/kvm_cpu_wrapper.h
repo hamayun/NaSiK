@@ -58,9 +58,32 @@ public:
 	void wait_until_runnable();
 	void wait_zero_time();
 	void wait_us_time(int us);
-	void wait_until_kick_or_timeout();
+	void wait_until_kick_or_timeout(int locker_cpu_id);
 
 	void * get_kvm_cpu() { return (m_kvm_cpu_instance); }
+
+	void kvm_cpu_sc_wait(uint32_t value, sc_time_unit unit)
+	{
+		sc_time time_to_wait(value, unit);
+		sc_time current_time = sc_time_stamp();
+
+		m_last_time = current_time + time_to_wait;
+		wait(value, unit);
+	}
+
+	/* MMH: TODO: Implement a Macro as Events are non-copiable.	
+	void kvm_cpu_sc_wait_event(uint32_t value, sc_time_unit unit, sc_event event)
+	{
+		sc_time time_to_wait(value, unit);
+		sc_time current_time = sc_time_stamp();
+
+		m_last_time = current_time + time_to_wait;
+		wait(value, unit, event);
+
+		// Update time; We may have woken up earlier due to event
+		m_last_time = sc_time_stamp();
+	}
+	*/
 
 private:
 	void rcv_rsp(unsigned char tid, unsigned char *data, bool bErr, bool bWrite);
@@ -96,7 +119,9 @@ private:
 public:
     int                                     m_cpuindex;
 	sc_event								m_ev_runnable;
-	void kvm_cpus_status();
+	void 									kvm_cpus_status();
+	sc_time									m_last_time;	// Last Known time of this CPU
+	sc_time 								get_last_time() { return (m_last_time); }
 	
     // Statistics extracted from Annotations
     uint64_t                        m_cpu_instrs_count;

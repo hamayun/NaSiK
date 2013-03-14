@@ -45,3 +45,5 @@ examples/platforms/kroger/hosttime_cpu-*.log
 examples/platforms/kroger/tty-cpu-*
 hw/components/cscope.*
 sw/apes-components/KVMx86BootLoader/cscope.*
+examples/platforms/kroger/APPLICATION.X
+examples/platforms/kroger/BOOTSTRAP_SMP
