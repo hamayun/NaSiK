@@ -58,6 +58,7 @@ public:
 	void wait_until_runnable();
 	void wait_zero_time();
 	void wait_us_time(int us);
+	void wait_until_kick_or_timeout();
 
 	void * get_kvm_cpu() { return (m_kvm_cpu_instance); }
 

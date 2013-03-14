@@ -377,6 +377,14 @@ void kvm_cpu_wrapper::wait_us_time(int us)
 	wait(us, SC_US);
 }
 
+// This principally called as a result of CPU_TEST_AND_SET execution by a processor.
+void kvm_cpu_wrapper::wait_until_kick_or_timeout()
+{
+	// TODO: Instead to doing this; 
+	// Advance the Simulation Time to the Minimum of other processors.
+	wait(1000, SC_NS, m_ev_runnable);
+}
+
 extern "C"
 {
 	void systemc_notify_runnable_event(kvm_cpu_wrapper_t *_this)
@@ -392,6 +400,11 @@ extern "C"
 	void systemc_wait_zero_time(kvm_cpu_wrapper_t *_this)
 	{
 		_this->wait_zero_time();
+	}
+
+	void systemc_wait_until_kick_or_timeout(kvm_cpu_wrapper_t *_this)
+	{
+		_this->wait_until_kick_or_timeout();
 	}
 
 	int systemc_running_cpu_count(kvm_cpu_wrapper_t *_this)
