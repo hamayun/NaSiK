@@ -44,7 +44,7 @@
 #define UPDATE_CPU_STATS(x) if(0) {} 
 #endif
 
-#define SHOW_CPU_TIMING
+//#define SHOW_CPU_TIMING
 #ifdef SHOW_CPU_TIMING
 #define KVM_CPUS_STATUS() kvm_cpus_status()
 #else
@@ -103,6 +103,8 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
 // A thread used to simulate the kvm processor
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {
+	sc_time time_before, time_after;
+
 	int cpu_status = KVM_CPU_OK;
 
 	if(m_node_id)		// For Non-Boot CPUs
@@ -129,7 +131,14 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 		KVM_CPUS_STATUS();
 	
 		// m_last_known_time = sc_time_stamp();	
+		time_before = sc_time_stamp();
 		cpu_status = kvm_cpu_execute(m_kvm_cpu_instance);
+		time_after = sc_time_stamp();
+
+		if(time_before != time_after)
+			cout << "CPU[" << m_node_id << "] Before: " << time_before 
+				 << " After: " << time_after << " Diff: "
+				 << time_after - time_before << endl;
 
 		switch(cpu_status)
 		{
@@ -249,7 +258,7 @@ uint64_t kvm_cpu_wrapper::read (uint64_t addr, int nbytes, int bIO)
     for (i = 0; i < nbytes; i++)
         *((unsigned char *) &ret + i) = adata[i];
 
-    KVM_CPU_SC_WAIT(20, SC_US);
+    KVM_CPU_SC_WAIT_READ_WRITE(20, SC_US);
     return ret;
 }
 
@@ -298,7 +307,7 @@ void kvm_cpu_wrapper::write (uint64_t addr,
         m_rqs->FreeRequest (localrq);
     }
 
-    KVM_CPU_SC_WAIT(20, SC_US);
+    KVM_CPU_SC_WAIT_READ_WRITE(20, SC_US);
 
 //	cout << name() << "MMH:SC Time = " << sc_time_stamp() << endl;
     return;
@@ -380,7 +389,7 @@ void kvm_cpu_wrapper::wait_us_time(int us)
 // This principally called as a result of CPU_TEST_AND_SET execution by a processor.
 void kvm_cpu_wrapper::wait_until_kick_or_timeout(int locker_cpu_id)
 {
-	sc_time my_time, lockers_time;
+	sc_time my_time, lockers_time, delta_time;
 
 	my_time = sc_time_stamp();
 	lockers_time = m_parent->m_cpus[locker_cpu_id]->get_last_time();
@@ -394,11 +403,29 @@ void kvm_cpu_wrapper::wait_until_kick_or_timeout(int locker_cpu_id)
  
 	// TODO: Instead to doing this; 
 	// Advance the Simulation Time to the Minimum of other processors.
-	KVM_CPU_SC_WAIT_EVENT(100, SC_NS, m_ev_runnable);
+	// KVM_CPU_SC_WAIT_EVENT(100, SC_NS, m_ev_runnable);
 
 	// OR even better would be to kick the locker CPU and Call SC_ZERO_TIME
 	// m_parent->m_cpus[locker_cpu_id]->m_ev_runnable.notify();
 	// wait(SC_ZERO_TIME);
+
+//	if(my_time == lockers_time)
+//		return;	// We don't know what to do here.
+
+	if(my_time >= lockers_time)
+	{
+		// If we are ahead in time; then Calling Zero should be sufficient for 
+		// SystemC to Execute the locker CPU.
+		wait(SC_ZERO_TIME);
+	}
+	else
+	{
+		// We are lagging behind in time from the Locker CPU
+		// So we can safely update our time to match the Locker CPUs time
+		// Because we won't get the lock until he unlocks it.
+		delta_time = (lockers_time - my_time);
+		KVM_CPU_SC_WAIT_EVENT_DELTA(delta_time, m_ev_runnable);
+	}
 }
 
 extern "C"

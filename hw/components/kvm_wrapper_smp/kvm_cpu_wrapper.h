@@ -46,12 +46,33 @@ class kvm_wrapper;
 	m_last_known_time = sc_time_stamp();							\
 }
 
+#define KVM_CPU_SC_WAIT_EVENT_DELTA(time_to_wait,event)				\
+{																	\
+	sc_time current_time = sc_time_stamp();							\
+																	\
+	m_last_known_time = current_time + time_to_wait;				\
+	wait(time_to_wait, event);										\
+																	\
+	/* Update time; We may have woken up earlier due to event */	\
+	m_last_known_time = sc_time_stamp();							\
+}
+
 #define KVM_CPU_SC_WAIT(value,unit)									\
 {																	\
 	sc_time time_to_wait(value, unit);								\
 	sc_time current_time = sc_time_stamp();							\
 																	\
 	m_last_known_time = current_time + time_to_wait;				\
+	wait(value, unit);												\
+}
+
+#define KVM_CPU_SC_WAIT_READ_WRITE(value,unit)						\
+{																	\
+	sc_time time_to_wait(value, unit);								\
+	sc_time time_rw(4, SC_NS);										\
+	sc_time current_time = sc_time_stamp();							\
+																	\
+	m_last_known_time = current_time + time_to_wait + time_rw;		\
 	wait(value, unit);												\
 }
 
