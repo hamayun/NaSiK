@@ -44,7 +44,7 @@
 #define UPDATE_CPU_STATS(x) if(0) {} 
 #endif
 
-//#define SHOW_CPU_TIMING
+#define SHOW_CPU_TIMING
 #ifdef SHOW_CPU_TIMING
 #define KVM_CPUS_STATUS() kvm_cpus_status()
 #else
@@ -109,12 +109,12 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 	{	
 		do
 		{
-			wait (100, SC_NS, m_ev_runnable);
+			KVM_CPU_SC_WAIT_EVENT (100, SC_NS, m_ev_runnable);
 		} while(!kvm_cpu_init_received(m_kvm_cpu_instance));
 
 		do
 		{
-			wait (100, SC_NS, m_ev_runnable);
+			KVM_CPU_SC_WAIT_EVENT (100, SC_NS, m_ev_runnable);
 		} while(!kvm_cpu_sipi_received(m_kvm_cpu_instance));
 		
 		// Now Wait Until You get the Green Flag
@@ -128,7 +128,7 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 		m_parent->kvm_cpu_unblock(m_node_id);
 		KVM_CPUS_STATUS();
 	
-		m_last_time = sc_time_stamp();	
+		// m_last_known_time = sc_time_stamp();	
 		cpu_status = kvm_cpu_execute(m_kvm_cpu_instance);
 
 		switch(cpu_status)
@@ -140,8 +140,7 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 				// we enter KVM after the other cpu has executed atleast once.
 				do
 				{
-					m_last_time = sc_time_stamp();	
-					wait (100, SC_NS, m_ev_runnable);
+					KVM_CPU_SC_WAIT_EVENT (100, SC_NS, m_ev_runnable);
 				} while(!kvm_cpu_is_runnable(m_kvm_cpu_instance));
 			break;
 
@@ -149,8 +148,7 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 				m_parent->kvm_cpu_block(m_node_id);
 				do
 				{
-					m_last_time = sc_time_stamp();	
-					wait (100, SC_NS, m_ev_runnable);
+					KVM_CPU_SC_WAIT_EVENT (100, SC_NS, m_ev_runnable);
 				} while(!kvm_cpu_is_runnable(m_kvm_cpu_instance));
 			break;
 
@@ -251,8 +249,7 @@ uint64_t kvm_cpu_wrapper::read (uint64_t addr, int nbytes, int bIO)
     for (i = 0; i < nbytes; i++)
         *((unsigned char *) &ret + i) = adata[i];
 
-	m_last_time = sc_time_stamp();	
-    wait(20, SC_US);
+    KVM_CPU_SC_WAIT(20, SC_US);
     return ret;
 }
 
@@ -301,8 +298,7 @@ void kvm_cpu_wrapper::write (uint64_t addr,
         m_rqs->FreeRequest (localrq);
     }
 
-	m_last_time = sc_time_stamp();	
-    wait(20, SC_US);
+    KVM_CPU_SC_WAIT(20, SC_US);
 
 //	cout << name() << "MMH:SC Time = " << sc_time_stamp() << endl;
     return;
@@ -378,7 +374,7 @@ void kvm_cpu_wrapper::wait_zero_time()
 
 void kvm_cpu_wrapper::wait_us_time(int us)
 {
-	wait(us, SC_US);
+	KVM_CPU_SC_WAIT(us, SC_US);
 }
 
 // This principally called as a result of CPU_TEST_AND_SET execution by a processor.
@@ -393,12 +389,16 @@ void kvm_cpu_wrapper::wait_until_kick_or_timeout(int locker_cpu_id)
          << " Locker CPU[" << locker_cpu_id << "] Time: " << lockers_time;
 
 	if(my_time < lockers_time)
-		cout << "Check it out !!!";
+		cout << "  <<< --- Check it out !!!";
 	cout << endl;
  
 	// TODO: Instead to doing this; 
 	// Advance the Simulation Time to the Minimum of other processors.
-	wait(1000, SC_NS, m_ev_runnable);
+	KVM_CPU_SC_WAIT_EVENT(100, SC_NS, m_ev_runnable);
+
+	// OR even better would be to kick the locker CPU and Call SC_ZERO_TIME
+	// m_parent->m_cpus[locker_cpu_id]->m_ev_runnable.notify();
+	// wait(SC_ZERO_TIME);
 }
 
 extern "C"
@@ -522,8 +522,9 @@ extern "C"
             UPDATE_CPU_STATS(pdb);
             pbuff_desc->StartIndex = (pbuff_desc->StartIndex + 1) % pbuff_desc->Capacity;
         }
+		// TODO: Replace this wait with Macro to update Curr CPUs Last Known Time
 
-        wait(buffer_cycles, SC_NS);
+        _KVM_CPU_SC_WAIT (buffer_cycles, SC_NS);
     } 
 #endif /* USE_EXECUTION_SPY */
 #else  /* USE_ANNOT_BUFF */
@@ -533,7 +534,8 @@ extern "C"
         annotation_db_t *pdb = (annotation_db_t *) ptr;
 		
 		PRINTF("%s: annotate function db=%x\n", _this->name(), (unsigned int) ptr);
-        wait(pdb->CycleCount, SC_NS);
+		// TODO: Replace this wait with Macro to update Curr CPUs Last Known Time
+        _KVM_CPU_SC_WAIT (pdb->CycleCount, SC_NS);
 
 		UPDATE_CPU_STATS(pdb);
     }
