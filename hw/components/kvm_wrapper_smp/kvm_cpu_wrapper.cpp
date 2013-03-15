@@ -134,11 +134,13 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 		time_before = sc_time_stamp();
 		cpu_status = kvm_cpu_execute(m_kvm_cpu_instance);
 		time_after = sc_time_stamp();
-
+		
+		/*
 		if(time_before != time_after)
 			cout << "CPU[" << m_node_id << "] Before: " << time_before 
 				 << " After: " << time_after << " Diff: "
 				 << time_after - time_before << endl;
+		*/
 
 		switch(cpu_status)
 		{
@@ -394,36 +396,34 @@ void kvm_cpu_wrapper::wait_until_kick_or_timeout(int locker_cpu_id)
 	my_time = sc_time_stamp();
 	lockers_time = m_parent->m_cpus[locker_cpu_id]->get_last_time();
 
-	cout << "CPU[" << m_node_id << "]: My Time: " << my_time
-         << " Locker CPU[" << locker_cpu_id << "] Time: " << lockers_time;
-
-	if(my_time < lockers_time)
-		cout << "  <<< --- Check it out !!!";
-	cout << endl;
- 
 	// TODO: Instead to doing this; 
 	// Advance the Simulation Time to the Minimum of other processors.
 	// KVM_CPU_SC_WAIT_EVENT(100, SC_NS, m_ev_runnable);
-
-	// OR even better would be to kick the locker CPU and Call SC_ZERO_TIME
-	// m_parent->m_cpus[locker_cpu_id]->m_ev_runnable.notify();
-	// wait(SC_ZERO_TIME);
-
-//	if(my_time == lockers_time)
-//		return;	// We don't know what to do here.
 
 	if(my_time >= lockers_time)
 	{
 		// If we are ahead in time; then Calling Zero should be sufficient for 
 		// SystemC to Execute the locker CPU.
+		m_parent->m_cpus[locker_cpu_id]->m_ev_runnable.notify();
 		wait(SC_ZERO_TIME);
 	}
 	else
 	{
+		delta_time = (lockers_time - my_time);
+
+		cout << "CPU[" << m_node_id << "]: My Time: " << my_time
+   		     << " Locker CPU[" << locker_cpu_id << "] Time: " << lockers_time;
+
+		if(my_time < lockers_time)
+			cout << "  <<< --- Check it out [Delta: "
+				 << delta_time << "]";
+		cout << endl;
+ 
 		// We are lagging behind in time from the Locker CPU
 		// So we can safely update our time to match the Locker CPUs time
 		// Because we won't get the lock until he unlocks it.
-		delta_time = (lockers_time - my_time);
+		m_parent->m_cpus[locker_cpu_id]->m_ev_runnable.notify();
+
 		KVM_CPU_SC_WAIT_EVENT_DELTA(delta_time, m_ev_runnable);
 	}
 }
