@@ -111,12 +111,12 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 	{	
 		do
 		{
-			KVM_CPU_SC_WAIT_EVENT (100, SC_NS, m_ev_runnable);
+			KVM_CPU_SC_WAIT_EVENT (100, SC_US, m_ev_runnable);
 		} while(!kvm_cpu_init_received(m_kvm_cpu_instance));
 
 		do
 		{
-			KVM_CPU_SC_WAIT_EVENT (100, SC_NS, m_ev_runnable);
+			KVM_CPU_SC_WAIT_EVENT (100, SC_US, m_ev_runnable);
 		} while(!kvm_cpu_sipi_received(m_kvm_cpu_instance));
 		
 		// Now Wait Until You get the Green Flag
@@ -134,8 +134,8 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 		time_before = sc_time_stamp();
 		cpu_status = kvm_cpu_execute(m_kvm_cpu_instance);
 		time_after = sc_time_stamp();
-		
-		/*
+
+		/*		
 		if(time_before != time_after)
 			cout << "CPU[" << m_node_id << "] Before: " << time_before 
 				 << " After: " << time_after << " Diff: "
