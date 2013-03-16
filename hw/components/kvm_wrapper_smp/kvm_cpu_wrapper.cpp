@@ -100,6 +100,12 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
     SC_THREAD (kvm_cpu_thread);
 }
 
+void kvm_cpu_wrapper::end_of_elaboration ()
+{
+	cout << "CPU[" << m_node_id << "]: End of Elaboration Called" << endl;
+	//while(1);
+}
+
 // A thread used to simulate the kvm processor
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {

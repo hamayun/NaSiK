@@ -91,6 +91,8 @@ public:
     SC_HAS_PROCESS (kvm_cpu_wrapper);
     kvm_cpu_wrapper (sc_module_name name, void *kvm_instance, unsigned int node_id,
 					 int cpuindex, kvm_import_export_t * kvm_import_export, kvm_wrapper * parent);
+
+	void end_of_elaboration ();
     ~kvm_cpu_wrapper ();
 
 public:
