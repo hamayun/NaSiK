@@ -44,7 +44,7 @@
 #define UPDATE_CPU_STATS(x) if(0) {} 
 #endif
 
-//#define SHOW_CPU_TIMING
+#define SHOW_CPU_TIMING
 #ifdef SHOW_CPU_TIMING
 #define KVM_CPUS_STATUS() kvm_cpus_status()
 #else
