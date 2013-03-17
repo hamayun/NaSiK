@@ -69,7 +69,9 @@ class kvm_wrapper;
 #define KVM_CPU_SC_WAIT_READ_WRITE(value,unit)						\
 {																	\
 	sc_time time_to_wait(value, unit);								\
-	sc_time time_rw(4, SC_NS);										\
+	sc_time time_noc_mst(NOC_MST_WAIT, SC_NS);						\
+	sc_time time_noc_slv(NOC_SLV_WAIT, SC_NS);						\
+	sc_time time_rw = time_noc_mst + time_noc_slv;					\
 	sc_time current_time = sc_time_stamp();							\
 																	\
 	m_next_wakeup_time = current_time + time_to_wait + time_rw;		\

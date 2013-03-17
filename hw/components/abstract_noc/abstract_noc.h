@@ -24,6 +24,10 @@
 
 #ifdef __cplusplus
 
+// NOTE: These delays are supposed to be in SC_NS (see kvm_cpu_wrapper.h)
+#define NOC_MST_WAIT	3
+#define NOC_SLV_WAIT	1
+
 #include <stdint.h>
 #include <systemc.h>
 
