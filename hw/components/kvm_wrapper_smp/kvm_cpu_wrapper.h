@@ -39,22 +39,22 @@ class kvm_wrapper;
 	sc_time time_to_wait(value, unit);								\
 	sc_time current_time = sc_time_stamp();							\
 																	\
-	m_last_known_time = current_time + time_to_wait;				\
+	m_next_wakeup_time = current_time + time_to_wait;				\
 	wait(value, unit, event);										\
 																	\
 	/* Update time; We may have woken up earlier due to event */	\
-	m_last_known_time = sc_time_stamp();							\
+	m_next_wakeup_time = sc_time_stamp();							\
 }
 
 #define KVM_CPU_SC_WAIT_EVENT_DELTA(time_to_wait,event)				\
 {																	\
 	sc_time current_time = sc_time_stamp();							\
 																	\
-	m_last_known_time = current_time + time_to_wait;				\
+	m_next_wakeup_time = current_time + time_to_wait;				\
 	wait(time_to_wait, event);										\
 																	\
 	/* Update time; We may have woken up earlier due to event */	\
-	m_last_known_time = sc_time_stamp();							\
+	m_next_wakeup_time = sc_time_stamp();							\
 }
 
 #define KVM_CPU_SC_WAIT(value,unit)									\
@@ -62,7 +62,7 @@ class kvm_wrapper;
 	sc_time time_to_wait(value, unit);								\
 	sc_time current_time = sc_time_stamp();							\
 																	\
-	m_last_known_time = current_time + time_to_wait;				\
+	m_next_wakeup_time = current_time + time_to_wait;				\
 	wait(value, unit);												\
 }
 
@@ -72,7 +72,7 @@ class kvm_wrapper;
 	sc_time time_rw(4, SC_NS);										\
 	sc_time current_time = sc_time_stamp();							\
 																	\
-	m_last_known_time = current_time + time_to_wait + time_rw;		\
+	m_next_wakeup_time = current_time + time_to_wait + time_rw;		\
 	wait(value, unit);												\
 }
 
@@ -81,7 +81,7 @@ class kvm_wrapper;
 	sc_time time_to_wait(value, unit);								\
 	sc_time current_time = sc_time_stamp();							\
 																	\
-	_this->m_last_known_time = current_time + time_to_wait;		\
+	_this->m_next_wakeup_time = current_time + time_to_wait;		\
 	wait(value, unit);												\
 }
 
@@ -150,8 +150,9 @@ public:
     int                                     m_cpuindex;
 	sc_event								m_ev_runnable;
 	void 									kvm_cpus_status();
-	sc_time									m_last_known_time;	// Last Known time of this CPU
-	sc_time 								get_last_time() { return (m_last_known_time); }
+	sc_time									m_next_wakeup_time;		// Potential Next Wakeup Time of this CPU 
+																    // Could be earlier if kicked by some other CPU!
+	sc_time 								get_next_wakeup_time() { return (m_next_wakeup_time); }
 	
     // Statistics extracted from Annotations
     uint64_t                        m_cpu_instrs_count;
