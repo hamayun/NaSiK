@@ -93,8 +93,6 @@ public:
     SC_HAS_PROCESS (kvm_cpu_wrapper);
     kvm_cpu_wrapper (sc_module_name name, void *kvm_instance, unsigned int node_id,
 					 int cpuindex, kvm_import_export_t * kvm_import_export, kvm_wrapper * parent);
-
-	void end_of_elaboration ();
     ~kvm_cpu_wrapper ();
 
 public:
@@ -102,12 +100,7 @@ public:
     void write (uint64_t address, unsigned char *data, int nbytes, int bIO);
 
     void set_unblocking_write (bool val);
-/*
-    uint64 get_no_cycles ();
-    void wait_wb_empty ();
-    void wakeup ();
-    void sync ();
-*/
+
 	kvm_wrapper 	* m_parent;
 	void notify_runnable_event();
 	void wait_until_runnable();
@@ -120,25 +113,20 @@ public:
 private:
 	void rcv_rsp(unsigned char tid, unsigned char *data, bool bErr, bool bWrite);
 
-    // local functions
     uint32_t read (uint32_t address, uint8_t nbytes, int bIO);
     void write (uint32_t address, uint32_t data, uint8_t nbytes, int bIO);
 
     void kvm_cpu_thread ();
 
 public:
-	// TODO: Enable this Interface
-    // ports
-    // sc_port<kvm_wrapper_access_interface>  m_port_access;
-
 	void update_cpu_stats(annotation_db_t *pdb);
     void log_cpu_stats();
     void log_cpu_stats_delta(unsigned char *data);
 
 	// Semi-hosting Profile Support
     hosttime_t                             *m_hosttime_instance;
+
 private:
-    //other attributes
     kvm_wrapper_requests                   *m_rqs;
     void                                   *m_cpuenv;
     void                                   *m_kvm_instance;
@@ -146,7 +134,6 @@ private:
     bool                                    m_unblocking_write;
 
     kvm_import_export_t                    *m_kvm_import_export;
-
 
 public:
     int                                     m_cpuindex;

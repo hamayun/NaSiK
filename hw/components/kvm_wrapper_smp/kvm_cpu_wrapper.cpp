@@ -44,7 +44,7 @@
 #define UPDATE_CPU_STATS(x) if(0) {} 
 #endif
 
-#define SHOW_CPU_TIMING
+//#define SHOW_CPU_TIMING
 #ifdef SHOW_CPU_TIMING
 #define KVM_CPUS_STATUS() kvm_cpus_status()
 #else
@@ -100,16 +100,10 @@ kvm_cpu_wrapper::kvm_cpu_wrapper (sc_module_name name, void * kvm_instance, unsi
     SC_THREAD (kvm_cpu_thread);
 }
 
-void kvm_cpu_wrapper::end_of_elaboration ()
-{
-	cout << "CPU[" << m_node_id << "]: End of Elaboration Called" << endl;
-	//while(1);
-}
-
 // A thread used to simulate the kvm processor
 void kvm_cpu_wrapper::kvm_cpu_thread ()
 {
-	sc_time time_before, time_after;
+	//sc_time time_before, time_after;
 
 	int cpu_status = KVM_CPU_OK;
 
@@ -136,9 +130,9 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 		m_parent->kvm_cpu_unblock(m_node_id);
 		KVM_CPUS_STATUS();
 	
-		time_before = sc_time_stamp();
+		//time_before = sc_time_stamp();
 		cpu_status = kvm_cpu_execute(m_kvm_cpu_instance);
-		time_after = sc_time_stamp();
+		//time_after = sc_time_stamp();
 
 		/*		
 		if(time_before != time_after)
@@ -154,9 +148,11 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 				KVM_CPUS_STATUS();
 				// Ideally we should block for a minimum time; so the kicked cpu starts and 
 				// we enter KVM after the other cpu has executed atleast once.
+				// But smaller value cause much more synchronizations and simulation speed 
+				// is very slow; thats why we use a high value here.
 				do
 				{
-					KVM_CPU_SC_WAIT_EVENT (100, SC_NS, m_ev_runnable);
+					KVM_CPU_SC_WAIT_EVENT (100, SC_US, m_ev_runnable);
 				} while(!kvm_cpu_is_runnable(m_kvm_cpu_instance));
 			break;
 
@@ -315,8 +311,6 @@ void kvm_cpu_wrapper::write (uint64_t addr,
     }
 
     KVM_CPU_SC_WAIT_READ_WRITE(20, SC_US);
-
-//	cout << name() << "MMH:SC Time = " << sc_time_stamp() << endl;
     return;
 }
 
@@ -457,18 +451,6 @@ extern "C"
 		return(_this->m_parent->m_running_count);	
 	}
 
-	/*	
-	void kvm_lock_run_mutex(kvm_cpu_wrapper_t *_this)
-	{
-		_this->m_parent->m_kvm_run_mutex.lock();	
-	}
-
-	void kvm_unlock_run_mutex(kvm_cpu_wrapper_t *_this)
-	{
-		_this->m_parent->m_kvm_run_mutex.unlock();	
-	}
-	*/
-
 	void systemc_wait_us(kvm_cpu_wrapper_t *_this, int us)
 	{
 		_this->wait_us_time(us);
@@ -570,8 +552,6 @@ extern "C"
     }
 #endif /* USE_ANNOT_BUFF */
 }
-
-
 
 #if 0
 printf("BufferID = %d, StartIndex = %d,  EndIndex = %d, Capacity = %d\n",
