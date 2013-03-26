@@ -1,6 +1,6 @@
 echo "[Setting-up Hardware Platform Environment (SystemC, LIBKVM)]"
 export NASIK_HOME=$PWD
-export SYSTEMC=/opt/libs/systemc-2.3.0
+export SYSTEMC=/opt/libs/systemc-2.2.0
 export LIBKVM_HOME=${NASIK_HOME}/hw/kvm-85
 export LIBSOCKVM_HOME=${NASIK_HOME}/hw/soc_kvm
 export LIBKVM_PREFIX=/opt/libs/libkvm
@@ -22,7 +22,8 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-APPLICATION=ParallelMjpeg
+#APPLICATION=ParallelMjpeg
+APPLICATION=audio_dsp
 #APPLICATION=os_app
 #APPLICATION=susan
 #APPLICATION=qsort
@@ -50,8 +51,8 @@ APPLICATION=ParallelMjpeg
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
-#export PLATFORM=tuzki
-export PLATFORM=kroger
+export PLATFORM=tuzki
+#export PLATFORM=kroger
 export PFORM_DIR=$NASIK_HOME/examples/platforms/$PLATFORM
 
 if [ ${PLATFORM} == "kroger" ]; then
@@ -72,13 +73,10 @@ fi
 echo "Updating Application Specific Symlinks ..."
 cd ${APP_DIR}
 
-if [ ${APPLICATION} != "ParallelMjpeg" ]; then
-	if [ ${APPLICATION} != "os_app" ]; then
-		ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mibench elf.lds
-		ln -sf interface.xmi.kvm interface.xmi
-	fi
+if [[ ${APPLICATION} != "ParallelMjpeg" && ${APPLICATION} != "os_app" && ${APPLICATION} != "audio_dsp" ]]; then
+	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mibench elf.lds
+	ln -sf interface.xmi.kvm interface.xmi
 fi
-
 
 # for tty_terms
 export PATH=$NASIK_HOME:$PATH
