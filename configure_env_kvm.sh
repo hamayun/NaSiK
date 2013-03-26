@@ -51,8 +51,10 @@ APPLICATION=audio_dsp
 export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
-export PLATFORM=tuzki
+#export PLATFORM=tuzki
 #export PLATFORM=kroger
+export PLATFORM=hybrid
+
 export PFORM_DIR=$NASIK_HOME/examples/platforms/$PLATFORM
 
 if [ ${PLATFORM} == "kroger" ]; then
