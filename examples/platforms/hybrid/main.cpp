@@ -134,22 +134,16 @@ int sc_main (int argc, char ** argv)
     qemu_ram = new mem_device ("dynamic", is.ramsize + 0x1000);
     kvm_ram 	= new mem_device("kvm_ram", kvm_ram_size*(1024*1024), (unsigned char*) kvm_userspace_mem_addr);
 	shared_ram = new mem_device("shared_ram", 0x10000);
-    tty_serial_device   *tty = new tty_serial_device ("tty");
-    sl_tty_device   *tty0 = new sl_tty_device ("tty0", kvm_num_cpus);
-	sl_tty_device   *tty1 = new sl_tty_device ("tty1", kvm_num_cpus);
-	sl_tg_device		*tg = new sl_tg_device ("tg", "fdaccess.0.0");
-    sl_tty_device     *dummy = new sl_tty_device ("dummy", kvm_num_cpus);
+    tty_serial_device   *tty_qemu = new tty_serial_device ("tty_qemu");
+    sl_tty_device   *tty_kvm = new sl_tty_device ("tty_kvm", kvm_num_cpus);
 	sem_device		*sem = new sem_device("sem", 0x100000);
 
     slaves[nslaves++] = qemu_ram;		// 0
     slaves[nslaves++] = kvm_ram;		// 1
   	slaves[nslaves++] = shared_ram;		// 2
-    slaves[nslaves++] = tty;			// 3
-    slaves[nslaves++] = tty0;			// 4
-    slaves[nslaves++] = tty1;			// 5
-   	slaves[nslaves++] = tg;				// 6
-	slaves[nslaves++] = dummy;			// 7
-    slaves[nslaves++] = sem;			// 8
+    slaves[nslaves++] = tty_qemu;		// 3
+    slaves[nslaves++] = tty_kvm;		// 4
+    slaves[nslaves++] = sem;			// 5
 
 	timer_device	*timers_qemu[1];
 	int				ntimers_qemu = sizeof (timers_qemu) / sizeof (timer_device *);
@@ -165,7 +159,7 @@ int sc_main (int argc, char ** argv)
 	int 						int_cpu_mask [] = {1, 1};
     sc_signal<bool>             *wires_irq_qemu = new sc_signal<bool>[num_irqs_qemu];
     timers_qemu[0]->irq (wires_irq_qemu[0]);
-    tty ->irq_line (wires_irq_qemu[1]);
+    tty_qemu ->irq_line (wires_irq_qemu[1]);
 
 	// Create as many timers as many CPUs
     timer_device	* timers_kvm[kvm_num_cpus];

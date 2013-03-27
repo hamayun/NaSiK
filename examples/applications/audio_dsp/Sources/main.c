@@ -65,16 +65,15 @@ int main(int argc, char *argv[])
             // execution of local objects
             do {
 				while(*shared_lock == 0);
-#if 1
             	printf("    Beginning a block\n");
-#endif
+
                 memcpy(xr, (void *)shared_buffer, 320 * sizeof(float));
                 err += fourier_obj_cycle(xr, xi, (float *) fourier_A);
                 err += fourier_obj_cycle(xr, xi, (float *) fourier_S);
                 memcpy((void *)shared_buffer, xr, 320 * sizeof(float));
-#if 1
+
             	printf("    Ending a block, count = %ld\n", count++);
-#endif
+
 				*shared_lock = 0;
             }
             while (err == 0);
