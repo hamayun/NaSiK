@@ -34,8 +34,8 @@
 
 /* ----- Function definition ------------------------------------------------ */
 
-//extern volatile int  *shared_lock;
-//extern volatile void *shared_buffer;
+extern volatile int  *shared_lock;
+extern volatile void *shared_buffer;
 
 int main(int argc, char *argv[])
 {
@@ -60,22 +60,22 @@ int main(int argc, char *argv[])
 
         if (err == 0 && xr && xi) {
             printf("Beginning processing\n");
-//            printf("address of shared_lock is 0x%x\n", shared_lock);
-//            printf("address of shared_buffer is 0x%x\n", shared_buffer);
+            printf("address of shared_lock is 0x%x\n", shared_lock);
+            printf("address of shared_buffer is 0x%x\n", shared_buffer);
             // execution of local objects
             do {
-//				while(*shared_lock == 0);
+				while(*shared_lock == 0);
 #if 1
             	printf("    Beginning a block\n");
 #endif
-//                memcpy(xr, (void *)shared_buffer, 320 * sizeof(float));
+                memcpy(xr, (void *)shared_buffer, 320 * sizeof(float));
                 err += fourier_obj_cycle(xr, xi, (float *) fourier_A);
                 err += fourier_obj_cycle(xr, xi, (float *) fourier_S);
-//                memcpy((void *)shared_buffer, xr, 320 * sizeof(float));
+                memcpy((void *)shared_buffer, xr, 320 * sizeof(float));
 #if 1
             	printf("    Ending a block, count = %ld\n", count++);
 #endif
-//				*shared_lock = 0;
+				*shared_lock = 0;
             }
             while (err == 0);
             printf("Ending processing\n");

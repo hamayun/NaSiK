@@ -12,6 +12,7 @@ SUB_DIRS     = $(COMPONENTS)/abstract_noc       \
                $(COMPONENTS)/tg                 \
                $(COMPONENTS)/sl_tg              \
                $(COMPONENTS)/sl_tty             \
+               $(COMPONENTS)/tty_serial         \
                $(COMPONENTS)/timer              \
                $(COMPONENTS)/etrace			    \
                $(COMPONENTS)/channel_spy        \
@@ -31,6 +32,7 @@ TARGET_ARCH  = linux
 
 INCDIR += -I$(SYSTEMC)/include
 INCDIR += -I$(LIBKVMTOOL_PREFIX)/include/kvm
+INCDIR += -I$(PLATFORM)/
 # We add the following path here to just get the definition of annotation_db_t and related macros.
 INCDIR += -I$(NASIK_HOME)/sw/apes-components/KVMAnnotationManager/Headers/Public
 INCDIR += $(foreach SUB_DIR, $(SUB_DIRS), $(addprefix -I$(SRC_BASE_DIR)/, $(SUB_DIR)))
