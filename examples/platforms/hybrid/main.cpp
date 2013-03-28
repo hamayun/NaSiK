@@ -86,16 +86,12 @@ extern "C" {
 int sc_main (int argc, char ** argv)
 {
     int i = 0, j = 0;
-
-	char *			kvm_argv[10];
-	int				kvm_argc;
-
-	/*
-	uint32_t slave_trace_mask = 0xFFFFFE2B;		// If slave bit is set to 1; trace for that slave is masked.
-	bool trace_non_cpu_masters = false;			// true: Trace All Masters; false: CPUs only.
+	bool trace_on = true;
+	char *	kvm_argv[10];
+	int		kvm_argc;
+	uint32_t slave_trace_mask = 0xFFFFFFFB;		// If slave bit is set to 1; trace for that slave is masked.
 	channel_spy_master **master_spies = {NULL};
 	channel_spy_slave  **slave_spies  = {NULL};
-	*/
 
     // if(argc < 3) usage_and_exit(argv[0]);
     // kvm_debug_port = 1234;
@@ -120,13 +116,14 @@ int sc_main (int argc, char ** argv)
     int         kvm_num_cpus = 1;
     uint64_t    kvm_ram_size = 128 /* Size in MBs */;
     uintptr_t   kvm_userspace_mem_addr = 0;
-	int 		total_masters = kvm_num_cpus;
+	int 		total_masters = kvm_num_cpus + is.no_cpus;
+	int 		total_slaves = kvm_num_cpus + is.no_cpus + 6;	/* One Timer per CPU + Slave Devices */
 
-	int32_t     intr_mask_size = total_masters;
+	int32_t     intr_mask_size = kvm_num_cpus;
 	uint32_t   *intr_cpu_mask = new uint32_t [intr_mask_size];
-    memset(intr_cpu_mask, 0x0, sizeof(uint32_t) * total_masters);
+    memset(intr_cpu_mask, 0x0, sizeof(uint32_t) * intr_mask_size);
 
-    kvm_wrapper_t kvm_wrapper ("KVM-0", 1, total_masters, intr_cpu_mask,
+    kvm_wrapper_t kvm_wrapper ("KVM-0", 1, kvm_num_cpus, intr_cpu_mask,
                                kvm_num_cpus, kvm_ram_size, kernel, boot_loader,
                                & kvm_userspace_mem_addr);
     
@@ -138,12 +135,60 @@ int sc_main (int argc, char ** argv)
     sl_tty_device   *tty_kvm = new sl_tty_device ("tty_kvm", kvm_num_cpus);
 	sem_device		*sem = new sem_device("sem", 0x100000);
 
-    slaves[nslaves++] = qemu_ram;		// 0
-    slaves[nslaves++] = kvm_ram;		// 1
-  	slaves[nslaves++] = shared_ram;		// 2
-    slaves[nslaves++] = tty_qemu;		// 3
-    slaves[nslaves++] = tty_kvm;		// 4
-    slaves[nslaves++] = sem;			// 5
+	if(trace_on)
+	{
+		char master_name[20];
+		master_spies = new channel_spy_master* [total_masters];
+		// QEMU CPUs
+		for(i = 0; i < is.no_cpus; i++)
+		{
+			sprintf(master_name, "QEMU-CPU-%02d", i);
+			master_spies[i] = new channel_spy_master(master_name);
+		}
+		// KVM CPUs
+		for(i = 0; i < kvm_num_cpus; i++)
+		{
+			sprintf(master_name, "KVM-CPU-%02d", i);
+			master_spies[is.no_cpus+i] = new channel_spy_master(master_name);
+		}
+
+		// Slaves
+		slave_spies = new channel_spy_slave* [total_slaves];
+
+    	slaves[nslaves] = qemu_ram;		// 0		// QEMU RAM pointers must be stored in slaves
+		slave_spies[nslaves] = new channel_spy_slave("QEMU-MEM");
+    	slave_spies[nslaves]->connect_slave(nslaves, qemu_ram->get_port, qemu_ram->put_port);
+		nslaves++;
+
+		slave_spies[nslaves] = new channel_spy_slave("KVM-MEM");
+    	slave_spies[nslaves]->connect_slave(nslaves, kvm_ram->get_port, kvm_ram->put_port);
+		nslaves++;
+
+		slave_spies[nslaves] = new channel_spy_slave("SHARED-MEM");
+    	slave_spies[nslaves]->connect_slave(nslaves, shared_ram->get_port, shared_ram->put_port);
+		nslaves++;
+
+		slave_spies[nslaves] = new channel_spy_slave("TTY-QEMU");
+    	slave_spies[nslaves]->connect_slave(nslaves, tty_qemu->get_port, tty_qemu->put_port);
+		nslaves++;
+
+		slave_spies[nslaves] = new channel_spy_slave("TTY-KVM");
+    	slave_spies[nslaves]->connect_slave(nslaves, tty_kvm->get_port, tty_kvm->put_port);
+		nslaves++;
+
+		slave_spies[nslaves] = new channel_spy_slave("SEM");
+    	slave_spies[nslaves]->connect_slave(nslaves, sem->get_port, sem->put_port);
+		nslaves++;
+	}
+	else
+	{
+    	slaves[nslaves++] = qemu_ram;		// 0
+	    slaves[nslaves++] = kvm_ram;		// 1
+  		slaves[nslaves++] = shared_ram;		// 2
+	    slaves[nslaves++] = tty_qemu;		// 3
+	    slaves[nslaves++] = tty_kvm;		// 4
+    	slaves[nslaves++] = sem;			// 5
+	}
 
 	timer_device	*timers_qemu[1];
 	int				ntimers_qemu = sizeof (timers_qemu) / sizeof (timer_device *);
@@ -152,7 +197,18 @@ int sc_main (int argc, char ** argv)
 		char		buf[20];
 		sprintf(buf, "timer_qemu-%d", i);
 		timers_qemu[i] = new timer_device (buf);
-		slaves[nslaves++] = timers_qemu[i];
+
+		if(trace_on)
+		{
+        	sprintf(buf, "TIMER-QEMU-%02d", i);
+			slave_spies[nslaves] = new channel_spy_slave(buf);
+		    slave_spies[nslaves]->connect_slave(nslaves, timers_qemu[i]->get_port, timers_qemu[i]->put_port);
+			nslaves++;		
+		}
+		else
+		{
+			slaves[nslaves++] = timers_qemu[i];
+		}
 	} 
 
 	int							num_irqs_qemu = 2;
@@ -169,7 +225,18 @@ int sc_main (int argc, char ** argv)
         char		buf[20];
         sprintf(buf, "timer_kvm-%d", i);
         timers_kvm[i] = new timer_device (buf);
-        slaves[nslaves++] = timers_kvm[i]; // 9 + i  from 0xC1000000
+
+		if(trace_on)
+		{
+        	sprintf(buf, "TIMER-KVM-%02d", i);
+			slave_spies[nslaves] = new channel_spy_slave(buf);
+		    slave_spies[nslaves]->connect_slave(nslaves, timers_kvm[i]->get_port, timers_kvm[i]->put_port);
+			nslaves++;		
+		}
+		else
+		{
+			slaves[nslaves++] = timers_kvm[i];
+		}
     }
 
     int num_irqs_kvm = kvm_num_cpus;
@@ -180,11 +247,16 @@ int sc_main (int argc, char ** argv)
         timers_kvm[i]->irq (kvm_irq_wires[i]);
 
     // Create the Interconnect Component
-    onoc = new interconnect ("interconnect", total_masters + is.no_cpus, nslaves);
+    onoc = new interconnect ("interconnect", total_masters, nslaves);
 
 	// Connect All Slaves to Interconnect
     for (i = 0; i < nslaves; i++)
-		onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
+	{
+		if(trace_on)
+			onoc->connect_slave_64 (i, slave_spies[i]->get_req_port, slave_spies[i]->put_rsp_port);
+		else
+		    onoc->connect_slave_64 (i, slaves[i]->get_port, slaves[i]->put_port);
+	}
 
     arm_load_kernel (&is);
 
@@ -198,17 +270,31 @@ int sc_main (int argc, char ** argv)
 
     // Connect QEMU Master
     for (j = 0; j < is.no_cpus; j++)
-        onoc->connect_master_64 (j, qemu1.get_cpu (j)->put_port, qemu1.get_cpu (j)->get_port);
-	
+	{
+		if(trace_on)
+		{
+			master_spies[j]->connect_master(j, qemu1.get_cpu(j)->put_port, qemu1.get_cpu(j)->get_port);
+			onoc->connect_master_64 (j, master_spies[j]->put_req_port, master_spies[j]->get_rsp_port);
+		}
+		else
+			onoc->connect_master_64 (j, qemu1.get_cpu (j)->put_port, qemu1.get_cpu (j)->get_port);
+	}
+
     // Connect IRQs to KVM Wrapper
     for(i = 0; i < num_irqs_kvm; i++)
         kvm_wrapper.interrupt_ports[i] (kvm_irq_wires[i]);
 
 	// Connect All CPU Masters
     for(i = 0; i < kvm_num_cpus; i++)
-    {
-        	onoc->connect_master_64 (i+j, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
-    }
+	{
+		if(trace_on)
+		{
+			master_spies[i+j]->connect_master(i+j, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
+			onoc->connect_master_64 (i+j, master_spies[i+j]->put_req_port, master_spies[i+j]->get_rsp_port);
+		}
+		else
+       		onoc->connect_master_64 (i+j, kvm_wrapper.get_cpu(i)->put_port, kvm_wrapper.get_cpu(i)->get_port);
+	}
 
 	// Initialize the Debugger, if required.
     if(kvm_debug_port)
@@ -216,10 +302,32 @@ int sc_main (int argc, char ** argv)
 	    kvm_wrapper.m_kvm_import_export.exp_gdb_srv_start_and_wait(kvm_wrapper.m_kvm_instance, kvm_debug_port);
     }
 
+   sc_trace_file * trace_file = NULL;
+    ofstream vcd_config_file;
+    if (trace_on) {
+        trace_file = sc_create_vcd_trace_file("waveforms");
+        vcd_config_file.open("waveforms.sav");
+
+		for(i = 0; i < total_masters; i++)
+	        channel_spy_trace(trace_file, *master_spies[i], &vcd_config_file);
+
+		for(i = 0; i < total_slaves; i++)
+		{
+			if(~slave_trace_mask & (1 << i)) 
+			{
+				cout << "Tracing Enabled for Slave ID " << i << endl;
+		        channel_spy_trace(trace_file, *slave_spies[i], &vcd_config_file);
+			}
+		}
+
+        vcd_config_file.close();
+    }
+
 	// Start the Simulation
     cout << "Starting SystemC Hardware ... " << endl;
 
     sc_start();
+
     return (EXIT_SUCCESS);
 }
 

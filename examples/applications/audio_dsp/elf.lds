@@ -32,7 +32,7 @@ SECTIONS
 	.data ALIGN(0x8) : { *(.data*) *(.glue_7*) *(.eh_frame*) ../../../sw/apes-components/KVMx86BootLoader/Secondary/bin/KVMx86SecondaryBoot.o } > mem :data
 
     .data ALIGN(4K) : { *(.data) *(.glue_7*) *(.eh_frame*)
-        shared_lock = .; LONG(0xAF000000)
+        shared_lock = .; LONG(0xAF000020)
         shared_buffer = .; LONG(0xAF001000)
     } > text :data
 
