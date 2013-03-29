@@ -37,7 +37,7 @@
 extern volatile int  *shared_lock;
 extern volatile void *shared_buffer;
 
-// #define DEBUG_APP
+#define DEBUG_APP
 
 int main(int argc, char *argv[])
 {
