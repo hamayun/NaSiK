@@ -160,7 +160,8 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 				m_parent->kvm_cpu_block(m_node_id);
 				do
 				{
-					KVM_CPU_SC_WAIT_EVENT (1000, SC_NS, m_ev_runnable);
+					KVM_CPU_SC_WAIT_EVENT (10, SC_NS, m_ev_runnable);    // We have to use this wait for 4 or more cpus for some unknown reasons.
+					// KVM_CPU_SC_WAIT_EVENT (0, SC_NS, m_ev_runnable);		// This works for 3 Processors
 				} while(!kvm_cpu_is_runnable(m_kvm_cpu_instance));
 			break;
 
