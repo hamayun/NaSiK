@@ -593,6 +593,8 @@ unsigned long qemu_cpu_wrapper::read (unsigned long addr,
     for (i = 0; i < nbytes; i++)
         *((unsigned char *) &ret + i) = adata[i];
 
+	// MMH: To do a comparable wait w.r.t kvm_wrapper
+	wait(20, SC_US);
 
     return ret;
 }
@@ -624,6 +626,8 @@ void qemu_cpu_wrapper::write (unsigned long addr,
         m_rqs->FreeRequest (localrq);
     }
 
+	// MMH: To do a comparable wait w.r.t kvm_wrapper
+	wait(20, SC_US);
     return;
 }
 

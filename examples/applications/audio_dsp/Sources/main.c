@@ -71,8 +71,10 @@ int main(int argc, char *argv[])
             	printf("DSP: Begin Block %ld\n", count);
 #endif
                 memcpy(xr, (void *)shared_buffer, 320 * sizeof(float));
+//                memcpy(xr, (void *)shared_buffer, 64);			// Used for GTKWave Trace
                 err += fourier_obj_cycle(xr, xi, (float *) fourier_A);
                 err += fourier_obj_cycle(xr, xi, (float *) fourier_S);
+//                memcpy((void *)shared_buffer, xr, 64);			// Used for GTKWave Trace
                 memcpy((void *)shared_buffer, xr, 320 * sizeof(float));
 #ifdef DEBUG_APP
             	printf("DSP: Ending Block %ld\n", count++);
