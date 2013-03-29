@@ -70,6 +70,12 @@ void channel_spy_master::put (vci_request& req)
 {
 	char * data = (char *) req.wdata;
 
+//	data = (char *) req.wdata;
+//	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
+
+	// Forward call to the actual slave (NOC)
+	put_req_port->put(req);
+
   	/* Do the Spying Work Here */
 	if(req.cmd == CMD_READ){
 		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_READ);
@@ -78,16 +84,16 @@ void channel_spy_master::put (vci_request& req)
 		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_WRITE);
 	}
 
-	// Forward call to the actual slave (NOC)
-	put_req_port->put(req);
-
-	data = (char *) req.wdata;
-	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
+	last_req_addr = req.address;
 }
 
 void channel_spy_master::get (vci_response& rsp) 
 {
+	char * data = (char *) rsp.rdata;
+
    	/* Do the Spying Work Here */
+	SET_NOC_ACCESS(last_req_addr,*data,be_width(rsp.rbe),ACCESS_NONE);
+
 	// Forward call to the actual slave (NOC)
 	get_rsp_port->get(rsp);
 }
@@ -122,23 +128,29 @@ void channel_spy_slave::get (vci_request& req)
 	char * data = (char *) req.wdata;
 
   	/* Do the Spying Work Here */
+	// 	data = (char *) req.wdata;
+	//	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
+
+	// Forward call to the actual master (NOC)
+	get_req_port->get(req);
+
 	if(req.cmd == CMD_READ){
 		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_READ);
 	}
 	else{
 		SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_WRITE);
 	}
-
-	// Forward call to the actual master (NOC)
-	get_req_port->get(req);
-
- 	data = (char *) req.wdata;
-	SET_NOC_ACCESS(req.address,*data,be_width(req.be),ACCESS_NONE);
+	
+	last_req_addr = req.address;
 }
 
 void channel_spy_slave::put (vci_response& rsp) 
 {
+	char * data = (char *) rsp.rdata;
+
    	/* Do the Spying Work Here */
+	SET_NOC_ACCESS(last_req_addr,*data,be_width(rsp.rbe),ACCESS_NONE);
+
 	// Forward call to the actual master (NOC)
 	put_rsp_port->put(rsp);
 }

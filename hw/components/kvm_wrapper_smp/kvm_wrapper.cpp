@@ -74,7 +74,7 @@ kvm_wrapper::kvm_wrapper (sc_module_name name, uint32_t node_id,
     }
 
     m_cpus = new kvm_cpu_wrapper_t * [m_ncpu];
-    m_kvm_instance = kvm_internal_init(& m_kvm_import_export, m_ncpu, ram_size);
+    m_kvm_instance = kvm_internal_init(& m_kvm_import_export, node_id, m_ncpu, ram_size);
 
 	//TODO: Do the proper interrupt setup here
 	{

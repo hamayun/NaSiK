@@ -22,7 +22,7 @@
 #include <interconnect_slave.h>
 #include <string.h>
 
-//#define DEBUG_INTERCONNECT
+#define DEBUG_INTERCONNECT
 
 interconnect::interconnect (sc_module_name name, int nmasters, int nslaves)
 : sc_module (name)

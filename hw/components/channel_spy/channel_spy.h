@@ -104,6 +104,9 @@ public:
     // put/get interface implementations for master_put_req_exp and master_get_rsp_exp
     virtual void put (vci_request&); 
     virtual void get (vci_response&); 
+
+	// Address to Store the last request received
+	uint32_t last_req_addr;
 };
 
 /*
@@ -132,6 +135,9 @@ public:
     // get/put interface implementations for slave_get_req_exp and slave_put_rsp_exp
     virtual void get (vci_request&); 
     virtual void put (vci_response&); 
+
+	// Address to Store the last request received
+	uint32_t last_req_addr;
 };
 
 inline void channel_spy_trace(sc_trace_file *tf, const channel_spy &spy, std::ofstream *vcd_conf)

@@ -107,7 +107,7 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 
 	int cpu_status = KVM_CPU_OK;
 
-	if(m_node_id)		// For Non-Boot CPUs
+	if(m_cpuindex)		// For Non-Boot CPUs
 	{	
 		do
 		{
@@ -127,7 +127,7 @@ void kvm_cpu_wrapper::kvm_cpu_thread ()
 
 	while(1)
 	{
-		m_parent->kvm_cpu_unblock(m_node_id);
+		m_parent->kvm_cpu_unblock(m_cpuindex);
 		KVM_CPUS_STATUS();
 	
 		//time_before = sc_time_stamp();

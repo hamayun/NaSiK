@@ -21,8 +21,8 @@ export APES_CC_FLAGS="-Wall -Wno-format -std=c99 -O0 ${CUSTOM_PARAM} $CUSTOM_INC
 export APES_ASSEMBLER="i386-sls-dnaos-as"
 
 export APES_LINKER="i386-sls-dnaos-gcc"
-#export APES_LINKER_FLAGS="${CRT0} ${DNASTART} -Wl,-T,elf.lds"
-export APES_LINKER_FLAGS="${CRT0} -Wl,-T,elf.lds"
+export APES_LINKER_FLAGS="${CRT0} ${DNASTART} -Wl,-T,elf.lds"
+#export APES_LINKER_FLAGS="${CRT0} -Wl,-T,elf.lds"
 export APES_LINKER_TRAIL_FLAGS="-L${SECONDARY_TOOLCHAIN}/i386-sls-dnaos/lib -lc -lgcc -lm"
 
 APES_CC_OPTIMIZATIONS="-g"
