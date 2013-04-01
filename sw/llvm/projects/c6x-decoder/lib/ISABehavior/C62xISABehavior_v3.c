@@ -877,10 +877,10 @@ C62xCLR_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         uint16_t cstb = GET_BITS_0_TO_4(rb);
 
         uint16_t rshift = cstb + 1;
-        uint16_t lshift = (csta == 0 ? 31 : 32 - csta);		// 32 bit shift becomes circuler so we need this check
+		uint16_t lshift = 32 - csta;
 
         uint32_t ra_hi  = (ra >> rshift) << rshift;
-        uint32_t ra_lo  = (ra << lshift) >> lshift;
+		uint32_t ra_lo  = (lshift == 32 ? 0 : ((ra << lshift) >> lshift));  // 32 bit shift becomes circuler so we need this check
 
         uint32_t rd = ra_hi | ra_lo;
 
@@ -904,10 +904,10 @@ C62xCLR_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
         uint16_t cstb = (uint16_t) constantb;
 
         uint16_t rshift = cstb + 1;
-        uint16_t lshift = (csta == 0 ? 31 : 32 - csta);		// 32 bit shift becomes circuler so we need this check
+		uint16_t lshift = 32 - csta;
 
         uint32_t ra_hi  = (ra >> rshift) << rshift;
-        uint32_t ra_lo  = (ra << lshift) >> lshift;
+		uint32_t ra_lo  = (lshift == 32 ? 0 : ((ra << lshift) >> lshift));  // 32 bit shift becomes circuler so we need this check
 
         uint32_t rd = ra_hi | ra_lo;
 
