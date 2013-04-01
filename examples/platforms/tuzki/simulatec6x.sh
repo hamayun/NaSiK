@@ -143,7 +143,7 @@ if [ $TARGET_BIN = "RAW" ]; then
     ln -sf ${TARGET_BIN_WRITER}/instructions.bin ${GENERATED_APP}/instructions.bin
 elif [ $TARGET_BIN = "COFF" ]; then
     print_step "Compiling Target COFF Binary ... ${CCS_EXAMPLE_OUTFILE}"
-    cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
+    cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_RPATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
     gmake -k all                                                  >& $OUTPUT_TTY
     if [ $? != 0 ]; then
         print_error "Error! Compiling COFF Binary ..."

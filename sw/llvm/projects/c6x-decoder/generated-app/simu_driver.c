@@ -112,7 +112,7 @@ int main(int argc, char **argv, char **environ)
         if(curr_func)
         {
             next_func_ptr = (sim_func_t) curr_func(& p_state);
-            //Print_DSP_State(& p_state);
+//            Print_DSP_State(& p_state);				// Use this print for generating DSP Execution Trace for Comparison with CCS
             //printf("Next Function Pointer: 0x%08X\n", next_func_ptr);
         }
 #if 0

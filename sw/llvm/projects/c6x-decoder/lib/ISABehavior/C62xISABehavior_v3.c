@@ -666,8 +666,8 @@ C62xADDU_UR32_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra = p_state->m_reg[idx_ra];
-        uint32_t rb = p_state->m_reg[idx_rb];
+        uint64_t ra = p_state->m_reg[idx_ra];
+        uint64_t rb = p_state->m_reg[idx_rb];
         uint64_t rd = ra + rb;
 
         uint32_t rdh = U64_TO_C6XMSB12(rd);
@@ -877,7 +877,7 @@ C62xCLR_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         uint16_t cstb = GET_BITS_0_TO_4(rb);
 
         uint16_t rshift = cstb + 1;
-        uint16_t lshift = 32 - csta;
+        uint16_t lshift = (csta == 0 ? 31 : 32 - csta);		// 32 bit shift becomes circuler so we need this check
 
         uint32_t ra_hi  = (ra >> rshift) << rshift;
         uint32_t ra_lo  = (ra << lshift) >> lshift;
@@ -886,7 +886,7 @@ C62xCLR_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 
         SAVE_REG_RESULT(result, idx_rd, rd);
 
-        TRACE(INFO_LEVEL, "%08x\tCLR       %s,%s,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCLR v1     %s,%s,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), REG(idx_rb), REG(idx_rd));
     }
     return OK;
@@ -904,7 +904,7 @@ C62xCLR_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
         uint16_t cstb = (uint16_t) constantb;
 
         uint16_t rshift = cstb + 1;
-        uint16_t lshift = 32 - csta;
+        uint16_t lshift = (csta == 0 ? 31 : 32 - csta);		// 32 bit shift becomes circuler so we need this check
 
         uint32_t ra_hi  = (ra >> rshift) << rshift;
         uint32_t ra_lo  = (ra << lshift) >> lshift;
@@ -913,7 +913,7 @@ C62xCLR_UR32_UC5_UC5_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 
         SAVE_REG_RESULT(result, idx_rd, rd);
 
-        TRACE(INFO_LEVEL, "%08x\tCLR       %s,0x%x,0x%x,%s\n",
+        TRACE(INFO_LEVEL, "%08x\tCLR v2      %s,0x%x,0x%x,%s\n",
                 Get_DSP_PC(p_state), REG(idx_ra), csta, cstb, REG(idx_rd));
     }
     return OK;
@@ -3003,7 +3003,7 @@ C62xSHL_UR32_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         uint64_t ra    = (uint64_t) p_state->m_reg[idx_ra];
         int32_t shift  = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
-        //ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
+        // ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
         uint64_t rd    = 0;
         if(shift < 40)
@@ -3103,7 +3103,7 @@ C62xSHR_SR32_UR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         int32_t ra    = p_state->m_reg[idx_ra];
         int32_t shift = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
-        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+        // ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
 
         int32_t rd    = ra >> shift;
 
@@ -3125,7 +3125,7 @@ C62xSHR_SR40_UR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         int32_t ral    = p_state->m_reg[idx_ral];
         int32_t shift  = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
-        ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
+        // ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
         int64_t ra     = C6X40_TO_S64(rah, ral);
         int64_t rd     = ra >> shift;
@@ -3203,7 +3203,7 @@ C62xSHRU_UR32_UR32_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         uint32_t ra    = p_state->m_reg[idx_ra];
         uint32_t shift = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
-        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+   		// ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
 
         uint32_t rd    = ra >> shift;
 
@@ -3225,7 +3225,7 @@ C62xSHRU_UR40_UR32_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         uint32_t ral   = p_state->m_reg[idx_ral];
         uint32_t shift = GET_BITS_0_TO_5(p_state->m_reg[idx_rb]);
 
-        ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
+        // ASSERT(0 <= shift && shift < 40, "Invalid Shift Amount\n");
 
         uint64_t ra    = C6X40_TO_U64(rah, ral);
         uint64_t rd    = ra >> shift;
@@ -3443,7 +3443,7 @@ C62xSSHL_SR32_UR32_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
         uint32_t bitmask = 0x80000000;
         uint32_t signbit = ra & bitmask;
 
-        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+        // ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
 
         for(int i = 30; i >= (31 - shift); i--)
         {
@@ -3494,7 +3494,7 @@ C62xSSHL_SR32_UC5_SR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
         uint32_t bitmask = 0x80000000;
         uint32_t signbit = ra & bitmask;
 
-        ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
+        // ASSERT(0 <= shift && shift < 32, "Invalid Shift Amount\n");
 
         for(int i = 30; i >= (31 - shift); i--)
         {

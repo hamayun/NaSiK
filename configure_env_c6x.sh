@@ -15,14 +15,16 @@ export BAREMETAL_TOOLCHAIN=/opt/toolchains/i386-pc-baremetal
 export TARGET_BIN_WRITER=/home/hamayun/examples/ti-c6x-examples/BinWriter
 
 export CCS_WORKSPACE_PATH=/home/hamayun/workspace_ccs
+export CCS_EXAMPLE_RPATH=./polybench-c-3.2/stencils
 #export CCS_EXAMPLE_NAME=matmult
-export CCS_EXAMPLE_NAME=factorial
+#export CCS_EXAMPLE_NAME=factorial
 #export CCS_EXAMPLE_NAME=fibonacci
 #export CCS_EXAMPLE_NAME=file_io
 #export CCS_EXAMPLE_NAME=IDCT
+export CCS_EXAMPLE_NAME=jacobi-2d-imper
 export CCS_EXAMPLE_BUILD=Debug
 export CCS_EXAMPLE_OUTFILE=${CCS_EXAMPLE_NAME}.out
-export CCS_EXAMPLE_PATH=${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}/${CCS_EXAMPLE_OUTFILE}
+export CCS_EXAMPLE_PATH=${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_RPATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}/${CCS_EXAMPLE_OUTFILE}
 source ${CCS_WORKSPACE_PATH}/install.sh
 
 export C6XDEC_SOURCE=${NASIK_HOME}/sw/llvm/projects/c6x-decoder

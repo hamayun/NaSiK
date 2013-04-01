@@ -33,10 +33,12 @@
 #define PRINT_CYCLES
 
 #define MEMIO_LEVEL 1
+// Use INFO Level for Generating Trace for Comparison with CCS
 #define INFO_LEVEL 2
 #define VERBOSE_LEVEL 3
 
 //#define ENABLE_TRACE VERBOSE_LEVEL
+//#define ENABLE_TRACE INFO_LEVEL
 
 #define LOG(format, ...)                                      \
     fprintf (stderr, format, ## __VA_ARGS__);
