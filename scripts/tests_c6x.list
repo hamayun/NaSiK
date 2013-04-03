@@ -1,6 +1,4 @@
--t COFFBUILT -g BBL -bvr -m
--t COFFBUILT -g BBL -bvr -mij
--t COFFBUILT -g BBL -bvr -ml
--t COFFBUILT -g BBL -bvr -mlij
--t COFFBUILT -g BBL -bvr -mz
--t COFFBUILT -g BBL -bvr -mzij
+-g EPL -bvr -m
+-g BBL -bvr -m
+-g BBL -bvr -mijl
+-g BBL -bvr -mijz

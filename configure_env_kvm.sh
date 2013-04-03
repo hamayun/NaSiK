@@ -22,8 +22,8 @@ export APES_EXTRA_COMPS=$NASIK_HOME/sw/apes-components
 source $APES_ROOT/install.sh
 export APES_PATH=$APES_PATH:$APES_EXTRA_COMPS
 
-#APPLICATION=ParallelMjpeg
-APPLICATION=audio_dsp
+APPLICATION=ParallelMjpeg
+#APPLICATION=audio_dsp
 #APPLICATION=os_app
 #APPLICATION=susan
 #APPLICATION=qsort
@@ -52,8 +52,8 @@ export APPLICATION
 export APP_DIR=$(find $NASIK_HOME/examples/applications -name "$APPLICATION")
 
 #export PLATFORM=tuzki
-#export PLATFORM=kroger
-export PLATFORM=hybrid
+export PLATFORM=kroger
+#export PLATFORM=hybrid
 
 export PFORM_DIR=$NASIK_HOME/examples/platforms/$PLATFORM
 
@@ -75,7 +75,7 @@ fi
 echo "Updating Application Specific Symlinks ..."
 cd ${APP_DIR}
 
-if [[ ${APPLICATION} != "ParallelMjpeg" && ${APPLICATION} != "os_app" && ${APPLICATION} != "audio_dsp" ]]; then
+if [[ ${APPLICATION} != "ParallelMjpeg" && ${APPLICATION} != "os_app" && ${APPLICATION} != "audio_dsp" && ${APPLICATION} != "selfProf" ]]; then
 	ln -sf $NASIK_HOME/examples/applications/ldscript_elf.kvm_mibench elf.lds
 	ln -sf interface.xmi.kvm interface.xmi
 fi

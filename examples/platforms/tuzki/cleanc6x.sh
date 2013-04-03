@@ -28,7 +28,7 @@ cd ${TARGET_BIN_WRITER}
 make clean
 
 print_step "Cleaning Coff Binary ...${CCS_EXAMPLE_OUTFILE}"
-cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
+cd ${CCS_WORKSPACE_PATH}/${CCS_EXAMPLE_RPATH}/${CCS_EXAMPLE_NAME}/${CCS_EXAMPLE_BUILD}
 gmake clean
 
 print_step "Cleaning the C6x Decoder ... "

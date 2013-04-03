@@ -1,17 +1,19 @@
 #!/bin/bash
 
+export PATH=${NASIK_HOME}/tools:$PATH
+
 HOME=$PWD
 TIMESTAMP=$(date +%Y-%m-%d-%Hh%M)
 RESULTSDIR=$NASIK_HOME/tests/batchtest-c6x-${TIMESTAMP}
 RESULTFILE=hosttime_kvm.txt
-TTYLOGFILE=tty_debug_00
-TTYCONFILE=tty_console_00
+TTYLOGFILE=tty_debug_-cpu-0
+TTYCONFILE=tty_console_-cpu-0
 ALL_TTYLOGS_FILE=${RESULTSDIR}/tty_debug_all.txt
 ALL_TTYCONS_FILE=${RESULTSDIR}/tty_console_all.txt
 ALL_RESULTS_PATH=${RESULTSDIR}/results
 
 #APPS_LIST="fibonacci matmult factorial"
-APPS_LIST="factorial IDCT fibonacci"
+APPS_LIST="IDCT"
 TESTS_FILE="tests_c6x.list"
 SCRIPT="simulatec6x.sh"
 
@@ -25,7 +27,6 @@ do
 
     export CCS_EXAMPLE_BUILD=Debug
     export CCS_EXAMPLE_NAME=$TARGET_APP
-    export CCS_EXAMPLE_OUTFILE=${CCS_EXAMPLE_NAME}.out
     source ${CCS_WORKSPACE_PATH}/install.sh
 
     echo "Building All Versions of :" $TARGET_APP
