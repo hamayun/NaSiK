@@ -251,7 +251,7 @@ namespace native
             return (p_section->get_sect_entry(0)->get_vir_addrs());
         }
 
-        return (NULL);
+        return ((uint32_t) NULL);
     }
 
     uint32_t COFFBinaryReader :: GetEntryPoint()
@@ -363,7 +363,7 @@ namespace native
 
         if(!ptr_text_section){
             DOUT << "Error Finding Text Section" << endl;
-            return (NULL);
+            return ((uint32_t) NULL);
         }
 
         return(ptr_text_section->get_nm_entries());

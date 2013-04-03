@@ -1,5 +1,5 @@
-TOOLCHAIN=/opt/toolchains/i386-pc-baremetal
-KVMSTART=/home/hamayun/workspace/NaSiK/hw/kvm-85/user/test/x86/kvm_kickstart.o
+TOOLCHAIN=${BAREMETAL_TOOLCHAIN}
+KVMSTART=${NASIK_HOME}/hw/kvm-85/user/test/x86/kvm_kickstart.o
 CRT0=${TOOLCHAIN}/i386-pc-baremetal/lib/crt0.o
 
 SRCS      = $(wildcard *.c)

@@ -60,6 +60,7 @@ int main (int argc, char ** argv)
     ofstream               * p_out_asm_file = NULL;
     uint32_t               * section_handle = NULL;
     uint32_t                 instr_address  = 0x0;
+	int 				    	 raw_binary = 0;
     uint32_t total_bbs = 0, total_pkts = 0, curr_bb = 0, curr_pkt = 0, progress = 0;
 
     cl::ParseCommandLineOptions(argc, argv, ToolDescription.c_str());
@@ -72,6 +73,7 @@ int main (int argc, char ** argv)
     else if(InputBinaryFormat.compare("RAW") == 0)
     {
         reader = new RawBinaryReader(InputBinaryFilename.c_str());
+		raw_binary = 1;
     }
     ASSERT(reader != NULL, "Unknown Input Binary Format Specified.");
 
@@ -83,7 +85,8 @@ int main (int argc, char ** argv)
     }
 
     section_handle = reader->GetSectionHandle(".text");
-    ASSERT(section_handle != NULL, "Text Section Handle Not Found");
+	if(!raw_binary)
+	    ASSERT(section_handle != NULL, "Text Section Handle Not Found");
     instr_address  = reader->GetSectionStartAddress(section_handle);
 
     COUT << "Reading Input Binary ... " << endl;

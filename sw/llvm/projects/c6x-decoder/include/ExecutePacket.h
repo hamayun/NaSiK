@@ -30,6 +30,8 @@
 
 using namespace std;
 
+#define EP_BAR true
+
 namespace native
 {
     class BasicBlock;
@@ -121,7 +123,7 @@ namespace native
                 if(dec_instr->IsBranchTarget())
                     return((*ILCI)->GetAddress());
             }
-            return(NULL);
+            return((uint32_t)NULL);
         }
 
         virtual uint32_t GetBrTargetInstrCount() const
@@ -264,7 +266,8 @@ namespace native
                         break;
                 }
             }
-            (*out) << setw(8) << setfill(' ') << "" << setw(72) << setfill('-') << "" << endl;
+			if(EP_BAR)
+	            (*out) << setw(8) << setfill(' ') << "" << setw(72) << setfill('-') << "" << endl;
         }
 
         virtual Instruction * GetInstrByIndex(uint32_t index) const

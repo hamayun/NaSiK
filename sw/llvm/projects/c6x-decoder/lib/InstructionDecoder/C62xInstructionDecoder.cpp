@@ -1935,9 +1935,11 @@ namespace native
             case REG_OFFSET_PRE_INCR:        // *++R[offsetR]
             case REG_OFFSET_POST_DECR:       // *R--[offsetR]
             case REG_OFFSET_POST_INCR:       // *R++[offsetR]
-                // TODO: Verify that the bank id is correct in the following Register !!!
-                // Can we have the offset register from the other Register Bank ?
-                src1_opr = new C62xRegister(false, 32, dh->GetCrossBankId(), dh->GetSrc1());
+				/* offsetR and baseR must be in the same register file and on the same side as
+				   the .D unit used. The y bit in the opcode determines the .D unit and register
+				   file used: y = 0 selects the .D1 unit and baseR and offsetR from the A register
+				   file, and y = 1 selects the .D2 unit and baseR and offsetR from the B register file. */
+                src1_opr = new C62xRegister(false, 32, (C62xRegisterBank_t) dh->GetDUnitId(), dh->GetSrc1());
                 break;
         }
 
