@@ -61,6 +61,9 @@ OUTPUT_TTY="/dev/null"
 CODEGEN_OPT=""
 ISA_EXTRA_FLAGS=""
 
+rm -f tty_console_-cpu-0
+rm -f tty_debug_-cpu-0
+
 while getopts “bdfg:hijklmprst:vz” OPTION
 do
      case $OPTION in

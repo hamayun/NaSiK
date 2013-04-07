@@ -407,8 +407,8 @@ C62xADD_SR32_SR32_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra = p_state->m_reg[idx_ra];
-        int32_t rb = p_state->m_reg[idx_rb];
+        int64_t ra = p_state->m_reg[idx_ra];
+        int64_t rb = p_state->m_reg[idx_rb];
         int64_t rd = ra + rb;
 
         int32_t rdh = U64_TO_C6XMSB12(rd);
@@ -428,7 +428,7 @@ C62xADD_SR32_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_ze
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = p_state->m_reg[idx_ra];
+        int64_t ra  = p_state->m_reg[idx_ra];
         int32_t rbh = p_state->m_reg[idx_rbh];
         int32_t rbl = p_state->m_reg[idx_rbl];
 
@@ -687,7 +687,7 @@ C62xADDU_UR32_UR40_UR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra  = p_state->m_reg[idx_ra];
+        uint64_t ra  = p_state->m_reg[idx_ra];
         uint32_t rbh = p_state->m_reg[idx_rbh];
         uint32_t rbl = p_state->m_reg[idx_rbl];
 
@@ -962,7 +962,7 @@ C62xCMPEQ_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t  ra = p_state->m_reg[idx_ra];
+        int64_t  ra = p_state->m_reg[idx_ra];
         int32_t rbh = p_state->m_reg[idx_rbh];
         int32_t rbl = p_state->m_reg[idx_rbl];
         int64_t  rb = C6X40_TO_S64(rbh, rbl);
@@ -1068,7 +1068,7 @@ C62xCMPGT_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = p_state->m_reg[idx_ra];
+        int64_t ra  = p_state->m_reg[idx_ra];
         int32_t rbh = p_state->m_reg[idx_rbh];
         int32_t rbl = p_state->m_reg[idx_rbl];
         int64_t rb  = C6X40_TO_S64(rbh, rbl);
@@ -1151,7 +1151,7 @@ C62xCMPGTU_UR32_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra  = p_state->m_reg[idx_ra];
+        uint64_t ra  = p_state->m_reg[idx_ra];
         uint32_t rbh = p_state->m_reg[idx_rbh];
         uint32_t rbl = p_state->m_reg[idx_rbl];
         uint64_t rb  = C6X40_TO_U64(rbh, rbl);
@@ -1171,7 +1171,7 @@ C62xCMPGTU_UC4_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra  = constant & 0xF;
+        uint64_t ra  = constant & 0xF;
         uint32_t rbh = p_state->m_reg[idx_rbh];
         uint32_t rbl = p_state->m_reg[idx_rbl];
         uint64_t rb  = C6X40_TO_U64(rbh, rbl);
@@ -1228,7 +1228,7 @@ C62xCMPLT_SR32_SR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = p_state->m_reg[idx_ra];
+        int64_t ra  = p_state->m_reg[idx_ra];
         int32_t rbh = p_state->m_reg[idx_rbh];
         int32_t rbl = p_state->m_reg[idx_rbl];
         int64_t rb  = C6X40_TO_S64(rbh, rbl);
@@ -1305,7 +1305,7 @@ C62xCMPLTU_UR32_UR40_UR32(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        uint32_t ra  = p_state->m_reg[idx_ra];
+        uint64_t ra  = p_state->m_reg[idx_ra];
         uint32_t rbh = p_state->m_reg[idx_rbh];
         uint32_t rbl = p_state->m_reg[idx_rbl];
         uint64_t rb  = C6X40_TO_U64(rbh, rbl);
@@ -2689,7 +2689,7 @@ C62xSADD_SR32_SR40_SR40(C62x_DSPState_t * p_state, uint8_t is_cond, uint8_t be_z
 {
     if(Check_Predicate(p_state, is_cond, be_zero, idx_rc))
     {
-        int32_t ra  = p_state->m_reg[idx_ra];
+        int64_t ra  = p_state->m_reg[idx_ra];
         int32_t rbh = p_state->m_reg[idx_rbh];
         int32_t rbl = p_state->m_reg[idx_rbl];
         int32_t sflag = 0;

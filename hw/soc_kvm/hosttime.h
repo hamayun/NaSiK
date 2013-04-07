@@ -28,7 +28,10 @@
 // This value is used to calculate the profiling overhead.
 // This particular value is for KVM Platform on my Desktop Machine.
 // Use selfProf Application to get this Value.
-#define ONE_PROFILE_CALL_COST 0.000001614
+// #define ONE_PROFILE_CALL_COST 0.000001614
+
+// For my laptop
+#define ONE_PROFILE_CALL_COST 0.000002050
 
 typedef enum hosttime_port_value
 {
