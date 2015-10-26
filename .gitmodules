@@ -1,15 +1,17 @@
 [submodule "sw/apes-components/KVMx86Processor"]
 	path = sw/apes-components/KVMx86Processor
-	url = ../KVMx86Processor
+	url = git@github.com:hamayun/KVMx86Processor.git
 [submodule "sw/apes-components/KVMAnnotationManager"]
 	path = sw/apes-components/KVMAnnotationManager
-	url = ../KVMAnnotationManager
+	url = git@github.com:hamayun/KVMAnnotationManager.git
 [submodule "examples/applications/ParallelMjpeg"]
 	path = examples/applications/ParallelMjpeg
-	url = ../ParallelMjpeg
+	url = git@github.com:hamayun/ParallelMjpeg.git
 [submodule "hw/kvm-kmod-2.6.32.27"]
 	path = hw/kvm-kmod-2.6.32.27
 	url = /home/hamayun/workspace/Common/kvm-kmod-2.6.32.27/
 [submodule "sw/apes-components/ix86Processor"]
 	path = sw/apes-components/ix86Processor
-	url = ../ix86Processor.git
+	url = git@github.com:hamayun/ix86Processor.git
+
+
